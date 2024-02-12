@@ -1,0 +1,67 @@
+registros = parse_xml_to_array(open('Moving-Image-Archive/Moving-Image-Archive-dataset-MARC.xml'))
+
+for registro in registros:
+
+    titulo = autor = lugar_produccion = fecha = extension = creditos = materias = resumen = detalles = enlace =''
+
+    # título
+    if registro['245'] is not None:
+      titulo = registro['245']['a']
+      if registro['245']['b'] is not None:
+        titulo = titulo + " " + registro['245']['b']
+
+    # autor
+    if registro['100'] is not None:
+      autor = registro['100']['a']
+    elif registro['110'] is not None:
+      autor = registro['110']['a']
+    elif registro['700'] is not None:
+      autor = registro['700']['a']
+    elif registro['710'] is not None:
+      autor = registro['710']['a']
+
+    # lugar de producción
+    if registro['264'] is not None:
+      lugar_produccion = registro['264']['a']
+
+    # fecha
+    for f in registro.get_fields('264'):
+        fechas = f.get_subfields('c')
+        if len(fechas):
+            fecha = fechas[0]
+
+            if fecha.endswith('.'): fecha = fecha[:-1]
+
+
+    # descripción física - extensión
+    for f in registro.get_fields('300'):
+        extension = f.get_subfields('a')
+        if len(extension):
+            extension = extension[0]
+            # TODO cleaning
+        detalles = f.get_subfields('b')
+        if len(detalles):
+            detalles = detalles[0]
+
+    # créditos
+    if registro['508'] is not None:
+      creditos = registro['508']['a']
+
+    # resumen
+    if registro['520'] is not None:
+      resumen = registro['520']['a']
+
+    # materias
+    if registro['653'] is not None:
+        materias = ''
+        for f in registro.get_fields('653'):
+            materias += f.get_subfields('a')[0] + ' -- '
+        materias = re.sub(' -- $', '', materias)
+
+
+    # enlace
+    if registro['856'] is not None:
+      enlace = registro['856']['u']
+
+
+    csv_salida.writerow([titulo,autor,lugar_produccion,fecha,extension,creditos,materias,resumen,detalles,enlace])

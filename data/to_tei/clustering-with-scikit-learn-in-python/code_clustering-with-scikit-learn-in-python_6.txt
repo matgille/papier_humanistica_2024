@@ -1,0 +1,20 @@
+def elbowPlot(range_, data, figsize=(10,10)):
+    '''
+    the elbow plot function helps to figure out the right amount of clusters for a dataset
+    '''
+    inertia_list = []
+    for n in range_:
+        kmeans = KMeans(n_clusters=n, random_state=42)
+        kmeans.fit(data)
+        inertia_list.append(kmeans.inertia_)
+        
+    # plotting
+    fig = plt.figure(figsize=figsize)
+    ax = fig.add_subplot(111)
+    sns.lineplot(y=inertia_list, x=range_, ax=ax)
+    ax.set_xlabel("Cluster")
+    ax.set_ylabel("Inertia")
+    ax.set_xticks(list(range_))
+    fig.show()
+    fig.savefig("elbow_plot.png")
+

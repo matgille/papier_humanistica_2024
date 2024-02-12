@@ -1,0 +1,22 @@
+def sintonia_mag_para_tom(magnitude):
+    escala_pct = meumidi.linear_scale_pct(0, 1, magnitude)
+    # Pick a range of notes. This allows you to play in a key.
+    c_major = ['C', 'C#', 'D', 'D#', 'E', 'E#', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'B#']
+
+    #Encontre as notas que correspondem com os pontos dos seus dados
+    nota = meumidi.scale_to_note(escala_pct, c_major)
+
+    #Traduza essa nota em um tom MIDI
+    midi_tom = meumidi.note_to_midi_pitch(nota)
+
+    return midi_tom
+
+lista_notas = []
+
+for d in meus_dados_tempo:
+    lista_notas.append([
+        d['beat'] - tempo_inicio,
+        sintonia_mag_para_tom(d['magnitude']),
+        random.randint(0,200),  # ataque
+        random.randint(1,4)  # duration, in beats
+    ])

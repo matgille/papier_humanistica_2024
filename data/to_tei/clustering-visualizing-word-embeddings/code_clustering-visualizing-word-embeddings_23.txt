@@ -1,0 +1,45 @@
+# Set up the figure and axes so that you have one 
+# word cloud per DDC Category
+f,axes = plt.subplots(nrows, ncols, figsize=fsize) 
+
+# Set up the word cloud
+Cloud = WordCloud(background_color=None, mode='RGBA', 
+                  max_words=75, relative_scaling=0.5, font_path=fp, 
+                  height=axheight, width=axwidth)
+
+# For each cluster...
+for i, cl in enumerate(sorted(clustered_df[f'Cluster_Name_{num_clusters}'].unique())):
+    
+    print(f"Processing {cl} cluster ({i+1} of {nplots})")
+    
+    # This deals with the risk that there's only one
+    # cluster in the analysis...
+    try:
+        ax = axes.flatten()[i]
+    except AttributeError:
+        ax = axes
+       
+    # Extract the column (i.e. cluster) and associate it with
+    # the source words from the CountVectorizer.
+    tmp = pd.DataFrame({'words':words, 'weights':ctfidf.toarray()[i]}).set_index('words')
+    
+    # Format the title so that it's not so long that it 
+    # overlaps the titles of adjacent figures.
+    ax.set_title(break_title(f"{cl} ($n$={(clustered_df[f'Cluster_Name_{num_clusters}']==cl).sum():,})", 30), **tfont)
+    ax.imshow(Cloud.generate_from_frequencies({x:tmp.loc[x].weights for x in tmp.index.tolist()}))
+    ax.axis("off")
+    # Tidy up
+    del(tmp)
+
+# Deal with any 'leftover' or unused slots
+# (e.g. you have 11 clusters on a 4*3 grid
+# so 12 subplots were created)
+while i < len(axes.flatten())-1:
+    i += 1
+    axes.flatten()[i].axis('off')
+
+# Adjust the layout to minimise whitespace
+plt.tight_layout()
+
+#plt.savefig(os.path.join(c.outputs_dir,f'{c.which_embedding}-{c.embedding}-d{c.dimensions}-ddc{ddc}-c{num_clusters}-class_tfidf.png'), dpi=dpi)
+print("Done.")

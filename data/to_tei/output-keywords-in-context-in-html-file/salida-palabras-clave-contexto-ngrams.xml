@@ -1,0 +1,88 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>Salida de palabras clave en contexto en un archivo HTML con Python</title>
+  <authors>William J. Turkel,Adam Crymble</authors>
+  <date>2012-07-17</date>
+  <translation_date>2017-03-15</translation_date>
+  <editors>Miriam Posner</editors>
+  <reviewers>Jim Clifford,Frederik Elwert</reviewers>
+  <translator>V&#237;ctor Gayol</translator>
+  <translation-editor>Adam Crymble</translation-editor>
+  <translation-reviewer>Jairo A. Melo,Maria Jos&#233; Afanador-Llach,Antonio Rojas Castro</translation-reviewer>
+  <review-ticket>https://github.com/programminghistorian/ph-submissions/issues/51</review-ticket>
+  <layout>lesson</layout>
+  <previous>palabras-clave-en-contexto-n-grams</previous>
+  <next>descarga-multiples-registros-usando-cadenas-de-consulta</next>
+  <original>output-keywords-in-context-in-html-file</original>
+  <python_warning>False</python_warning>
+  <difficulty>2</difficulty>
+  <activity>presenting</activity>
+  <topics>python</topics>
+  <abstract>Esta lecci&#243;n se basa en 'Palabras clave en contexto (usando n-grams)', en la que se extrajeron n-gramas de un texto. Aqu&#237; aprender&#225;s c&#243;mo generar una salidad de todos los n-gramas de una palabra clave dada en un documento descargado de Internet, y visualizarlos claramente en la ventana de tu navegador.</abstract>
+  <avatar_alt>Grabado de un le&#243;n, un oso y un mono caminando.</avatar_alt>
+  <doi>10.46430/phes0026</doi>
+  <sequence>14</sequence>
+  <series_total>15</series_total>
+</metadata>
+  <text>
+    <body>
+      <div n="1"><head>Objetivo de la lecci&#243;n</head>
+<p>Esta lecci&#243;n se basa en <link target="/es/lecciones/palabras-clave-en-contexto-n-grams">Palabras clave en contexto (usando n-grams)</link>, en la que se extrajeron n-gramas de un texto. Aqu&#237; aprender&#225;s c&#243;mo generar una salidad de todos los n-gramas de una palabra clave dada en un documento descargado de Internet, y visualizarlos claramente en la ventana de tu navegador.</p>
+</div>
+      <div n="1"><head>Archivos necesarios para esta lecci&#243;n</head>
+<ul>
+<li><code type="inline">obo.py</code></li>
+</ul>
+<p>Si no tienes estos archivos de las lecciones anteriores, puedes descargar un <link target="/assets/python-es-lecciones8.zip">archivo zip de las lecciones anteriores</link>.</p>
+</div>
+      <div n="1"><head>Crear un diccionario de n-gramas</head>
+<p>Nuestros n-gramas tienen un n&#250;mero impar de palabras por una raz&#243;n. En este punto, los n-gramas no contienen en realidad una palabra clave; son solamente una lista de palabras. Sin  embargo, si tenemos un n-grama impar, la palabra central siempre tendr&#225; el mismo n&#250;mero de palabras a la izquierda y a la derecha. Entonces, podemos utilizar esa palabra del medio como nuestra palabra clave. Por ejemplo, ["it", "was", "the", "best", "of", "times", "it"] es un 7-grama de la palabra clave "best".</p>
+<p>Ya que tenemos un texto largo, quisieramos ser capaces de generar una salida para todos los n-gramas de nuestra palabra clave. Para ello, vamos a poner cada n-grama en un <emph>diccionario</emph> utilizando la palabra de en medio como <emph>clave</emph>. Para averiguar la palabra clave de cada n-grama podemos utilizar la <emph>posici&#243;n de &#237;ndice</emph> de la lista. Si estamos trabajando con 5-gramas, por ejemplo, el contexto izquierdo consistir&#225; en t&#233;rminos indexados en 0, 1; la palabra clave en 2 y los t&#233;rminos del contexto derecho en 3, 4. Dado que los &#237;ndices en Python comienzan en 0, la palabra clave de un 5-grama siempre estar&#225; en la posici&#243;n de &#237;ndice 2.</p>
+<p>Eso est&#225; bien para 5-gramas; pero para hacer el c&#243;digo un poco m&#225;s robusto queremos asegurarnos de que funcionar&#225; para cualquier longitud de n-gramas, asumiendo que su longitud ser&#225; un n&#250;mero impar. Para ello, vamos a tomar la longitud del n-grama, dividirla entre 2 y dejar aparte el resto. Podemos lograrlo usando un operador de <code type="inline">divisi&#243;n de piso</code> representado por dos barras, que divide y da como resultado el n&#250;mero entero m&#225;s cercano, siempre redondeando hacia abajo -de ah&#237; el t&#233;rmino <code type="inline">piso</code>.</p>
+<pre><code class="language-python" xml:id="code_salida-palabras-clave-contexto-ngrams_0" type="block" corresp="code_salida-palabras-clave-contexto-ngrams_0.txt"></code></pre>
+<p>Construyamos una funci&#243;n que pueda identificar la posici&#243;n de &#237;ndice de la palabra clave cuando se le de un n-grama con un n&#250;mero impar de palabras. Guarda lo siguiente en <code type="inline">obo.py</code></p>
+<pre><code class="language-python" xml:id="code_salida-palabras-clave-contexto-ngrams_1" type="block" corresp="code_salida-palabras-clave-contexto-ngrams_1.txt"></code></pre>
+<p>Para determinar el &#237;ndice de la palabra clave hemos utilizado la propiedad <code type="inline">len</code> para decirnos cu&#225;ntos elementos hay en el primer n-grama, a continuaci&#243;n hacemos una divisi&#243;n de piso para aislar la posici&#243;n de &#237;ndice media. Puedes ver si esto funciona mediante la creaci&#243;n de un nuevo programa <code type="inline">obten-palabraClave.py</code> y ejecutarlo. Si todo va bien y ya que estamos tratando con un 5-grama, debes obtener 2 como la posici&#243;n de &#237;ndice de la palabra clave tal y como se determin&#243; anteriormente.</p>
+<pre><code class="language-python" xml:id="code_salida-palabras-clave-contexto-ngrams_2" type="block" corresp="code_salida-palabras-clave-contexto-ngrams_2.txt"></code></pre>
+<p>Ahora que sabemos la ubicaci&#243;n de las palabras clave, vamos a a&#241;adir todo en un diccionario que pueda utilizarse para generar la salida de todos los n-gramas KWIC para una palabra clave determinada. Estudia este c&#243;digo y luego remplaza tu <code type="inline">nGramasAdicKWIC</code> con lo que sigue en tu m&#243;dulo <code type="inline">obo.py</code>.</p>
+<pre><code class="language-python" xml:id="code_salida-palabras-clave-contexto-ngrams_3" type="block" corresp="code_salida-palabras-clave-contexto-ngrams_3.txt"></code></pre>
+<p>Un bucle <code type="inline">for</code>y una declaraci&#243;n <code type="inline">if</code> comprueban cada n-grama para ver si su palabra clave est&#225; ya almacenada en el diccionario. Si no es as&#237;, se a&#241;ade una nueva entrada. Si lo es, a&#241;ade a una entrada anterior. Ahora tenemos un diccionario llamado <emph>kwicdicc</emph> que contiene todos los n-gramas, clasificables por palabra clave y podemos regresar a la tarea de dar salida a la informaci&#243;n en un formato m&#225;s &#250;til como lo hicimos en <link target="/es/lecciones/salida-de-datos-como-archivo-html">Salida de datos como archivo HTML</link>.</p>
+<p>Prueba volver a ejecutar el programa <code type="inline">obten-palabraClave.py</code> y ahora podr&#225;s ver qu&#233; es lo que hay en tu diccionario KWIC.</p>
+</div>
+      <div n="1"><head>Salida de datos a HTML</head>
+<div n="2"><head><emph>Pretty Printing</emph> de una KWIC</head>
+<p>"<emph>Pretty Printing</emph>" es un proceso de formateo de salida que puede ser le&#237;do f&#225;cilmente por seres humanos. En el caso de nuestras palabras clave en contexto, las queremos tener alineadas en una columna con los t&#233;rminos del contexto de la izquierda alineados a la derecha y los t&#233;rminos del contexto de la derecha alineados a la izquierda. En otras palabras, queremos que la visualizaci&#243;n de nuestro KWIC se vea parecido a esto:</p>
+<pre><code xml:id="code_salida-palabras-clave-contexto-ngrams_4" type="block" corresp="code_salida-palabras-clave-contexto-ngrams_4.txt"></code></pre>
+<p>Esta t&#233;cnica no es la mejor manera de formatear texto desde la perspectiva de un dise&#241;ador de p&#225;ginas Web. Si tienes experiencia con HTML te animamos a que utilices otro m&#233;todo que permita crear un archivo HTML compatible con los est&#225;ndares, pero para los nuevos estudiantes, simplemente no podemos resistirnos a la facilidad de la t&#233;cnica que vamos a describir. Despu&#233;s de todo, el objetivo es integrar los principios de programaci&#243;n r&#225;pidamente en nuestra investigaci&#243;n.</p>
+<p>Para conseguir este efecto, vamos a tener que hacer un n&#250;mero de manipulaciones de listas y cadenas. Empecemos por averiguar c&#243;mo se ve nuestro diccionario de salida en su estado actual. Entonces podremos trabajar en perfeccionarlo para lo que queremos.</p>
+<pre><code class="language-python" xml:id="code_salida-palabras-clave-contexto-ngrams_5" type="block" corresp="code_salida-palabras-clave-contexto-ngrams_5.txt"></code></pre>
+<p>Como puedes observar al ejecutar el programa anterior, la salida de datos a&#250;n no es muy legible. Lo que tenemos que hacer es dividir el n-grama en tres partes: antes de la palabra clave, la palabra clave y despu&#233;s de la palabra clave. Podemos utilizar las t&#233;cnicas aprendidas en los cap&#237;tulos anteriores para encerrar todo en HTML para que sea f&#225;cil de leer.</p>
+<p>Utilizando el mismo m&#233;todo anterior de <code type="inline">slice</code>, vamos a crear nuestras tres partes. Abre un int&#233;rprete de Python para ensayar los siguiente ejemplos. Pon especial atenci&#243;n a lo que aparece antes y despu&#233;s de los dos puntos en cada caso. Saber c&#243;mo manipular el m&#233;todo de <code type="inline">slice</code> es una poderosa habilidad para un nuevo historiador programador.</p>
+<pre><code class="language-python" xml:id="code_salida-palabras-clave-contexto-ngrams_6" type="block" corresp="code_salida-palabras-clave-contexto-ngrams_6.txt"></code></pre>
+<p>Ahora que sabemos c&#243;mo encontrar cada uno de los tres segmentos, necesitamos dar formato a cada uno en cada una de las columnas de nuestra pantalla.</p>
+<p>El contexto de la derecha consistir&#225; simplemente en una cadena de t&#233;rminos separados por espacios en blanco. Utilizaremos el m&#233;todo <code type="inline">join</code> para convertir las entradas de la lista en una cadena.</p>
+<pre><code class="language-python" xml:id="code_salida-palabras-clave-contexto-ngrams_7" type="block" corresp="code_salida-palabras-clave-contexto-ngrams_7.txt"></code></pre>
+<p>Queremos que las palabras clave tengan un poco de espacio blanco de relleno a su alrededor. Podemos lograr esto mediante el uso de un m&#233;todo de cadena llamado <code type="inline">center</code> que servir&#225; para adaptar el texto a la mitad de la pantalla. Podemos agregar relleno al hacer la longitud de la cadena m&#225;s larga que la palabra clave. La expresi&#243;n que sige a&#241;ade tres espacios en blanco (6/2) a cada lado de la palabra clave. Hemos a&#241;adido marcas de almohadilla al principio y al final de la expresi&#243;n para que puedas ver los espacios en blanco inciales y finales.</p>
+<pre><code class="language-python" xml:id="code_salida-palabras-clave-contexto-ngrams_8" type="block" corresp="code_salida-palabras-clave-contexto-ngrams_8.txt"></code></pre>
+<p>Por &#250;ltimo, queremos que el contexto de la izquierda est&#233; alineado a la derecha. Dependiendo de qu&#233; tan grande sea <emph>n</emph>, vamos a necesitar incrementar la longitud total de esta columna. Haremos esto mediante la definici&#243;n de una variable llamada <emph>width</emph> (<emph>ancho</emph>) y luego hacer que la longitud de la columna sea un m&#250;ltiplo de esa variable (se utiliz&#243; un ancho de 10 caracteres, pero se puede hacer m&#225;s grande o m&#225;s peque&#241;a seg&#250;n se desee). El m&#233;todo <code type="inline">rjust</code> se encarga de alinear a la derecha. Una vez m&#225;s, hemos a&#241;adido marcas de almohadilla para que puedas ver los espacios en blanco.</p>
+<pre><code class="language-python" xml:id="code_salida-palabras-clave-contexto-ngrams_9" type="block" corresp="code_salida-palabras-clave-contexto-ngrams_9.txt"></code></pre>
+<p>Ahora podemos combinar esto en una funci&#243;n que tome una KWIC y nos regrese una cadena "<emph>pretty-printed</emph>". A&#241;ade esto al m&#243;dulo <code type="inline">obo.py</code>. Estudia el c&#243;digo para asegurarte que lo entiendes antes de seguir adelante.</p>
+<pre><code class="language-python" xml:id="code_salida-palabras-clave-contexto-ngrams_10" type="block" corresp="code_salida-palabras-clave-contexto-ngrams_10.txt"></code></pre>
+</div></div>
+      <div n="1"><head>Ensamblando todo</head>
+<p>Ahora podemos crear un programa que, dado un URL y una palabra clave, envuelve en HTML la visualizaci&#243;n de una KWIC y genera su salida en Firefox. Este programa empieza y termina de una manera similar como el programa que calcula la frecuencia de palabras. Escribe o copia el c&#243;digo en tu editor de texto, gu&#225;rdalo como <code type="inline">html-a-kwic.py</code> y ejec&#250;talo. Deber&#225;s elegir entre obo.envuelveCadenaenHTMLMac() u obo.envuelveCadenaenHTMLWindows() seg&#250;n corresponda a tu sistema, como hicimos antes.</p>
+<pre><code class="language-python" xml:id="code_salida-palabras-clave-contexto-ngrams_11" type="block" corresp="code_salida-palabras-clave-contexto-ngrams_11.txt"></code></pre>
+<p>La primera parte del programa es igual que en el caso anterior. En la segunda parte del programa hemos encerrado todo en una etiqueta HTML <emph>pre</emph> (pre-formateada), lo cual le indica al navegador que no se confunda con los espacios que hemos agregado.</p>
+<p>Adem&#225;s, observa que hemos utilizado el m&#233;todo <code type="inline">has_key</code> en el diccionario para asegurarnos que la palabra clave realmente se encuentra en nuestro texto. Si no es as&#237;, podemos imprimir un mensaje para el usuario antes de enviar la salida a Firefox. Prueba cambiar la variable <emph>objetivo</emph> a algunas otras palabras clave. Intenta con alguna que t&#250; sepas que no se encuentra en el texto para asegurarte que tu programa no genere salida de datos cuando no deba.</p>
+<p>Ahora hemos creado un programa que busca una palabra clave en un diccionario creado a partir de una p&#225;gina HTML de la Web, y luego produce una salida de datos con n-gramas de esa palabra clave en otro archivo HTML para visualizar en la Web. Todas las lecciones hasta este punto han incluido partes del vocabulario de Python y m&#233;todos necesarios para crear este programa final. Al referirte a esas lecciones, ahora puedes experimentar con Python para crear programas que realicen tareas espec&#237;ficas que te ayudar&#225;n en tu proceso de investigaci&#243;n.</p>
+</div>
+      <div n="1"><head>Sincron&#237;a de c&#243;digo</head>
+<p>Esta lecci&#243;n marca el final de la serie de lecciones originales sobre Python. El c&#243;digo terminado de la serie puede descargarse como un archivo zip. Si las est&#225;s siguiendo con Mac o Linux deber&#225;s abrir el archivo <code type="inline">obo.py</code> y cambiar "file:///Users/username/Desktop/programming-historian/" a la ruta del archivo en el directorio de tu propia computadora.</p>
+<ul>
+<li>python-es-lecciones9.zip <link target="/assets/python-es-lecciones9.zip">zip sync</link></li>
+</ul>
+<p><emph>Nota:</emph> Ahora puedes ir a la siguiente lecci&#243;n (en ingl&#233;s) para aprender a <link target="/lessons/downloading-multiple-records-using-query-strings">Descargar registros m&#250;ltiples</link></p>
+</div>
+    </body>
+  </text>
+</TEI>

@@ -1,0 +1,29 @@
+## On fixe les paramètres graphiques
+## 'mfrow' permet d'afficher les 4 graphiques sur 2 lignes et 2 colonnes
+par(mfrow = c(2, 2), mar = c(3, 4, 0, 0) + 0.1, las = 1)
+couleurs <- c("#DDAA33", "#BB5566", "#004488")
+
+## Pour chaque objet daté...
+for (j in 1:ncol(turin)) {
+  ## On définit l'étendue des valeurs en abscisse (années)
+  k <- range(turin[, j, 1])
+  x <- seq(min(k) * 0.8, max(k) * 1.2, by = 1)
+  ## On définit un graphique vide auquel ajouter les distributions
+  plot(x = NULL, y = NULL, xlim = range(x), ylim = c(0, 0.02),
+       xlab = "", ylab = "", type = "l")
+
+  ## On affiche le nom de l'échantillon
+  text(x = min(k) * 0.9, y = 0.02, labels = colnames(turin)[j], pos = 1)
+
+  ## Pour chaque âge obtenu...
+  for (i in 1:nrow(turin)) {
+    ## On calcule la fonction de densité de la distribution normale
+    y <- dnorm(x = x, mean = turin[i, j, 1], sd = turin[i, j, 2])
+
+    ## On trace la courbe
+    lines(x = x, y = y, type = "l", lty = 1, lwd = 1.5, col = couleurs[[i]])
+  }
+}
+
+## On ajoute une légende au dernier graphique
+legend("topright", legend = rownames(turin), lty = 1, lwd = 1.5, col = couleurs)

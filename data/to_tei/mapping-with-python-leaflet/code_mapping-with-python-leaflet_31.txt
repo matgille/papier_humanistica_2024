@@ -1,0 +1,40 @@
+window.onload = function () {
+
+    L.mapbox.accessToken = 'YOURTOKENHERE';
+
+    var basemap = L.tileLayer('https://api.mapbox.com/v4/YOURLINKHERE/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
+        attribution: '<a href="https://www.mapbox.com/tos/">Mapbox</a>'
+      });
+
+    $.getJSON("stations.geojson", function(data) {
+
+    var geojson = L.geoJson(data, {
+
+//EDIT HERE
+      pointToLayer: function (feature, latlng) {
+       var smallIcon = L.icon({
+                          iconSize: [27, 27],
+                          iconAnchor: [13, 27],
+                          popupAnchor:  [1, -24],
+                          iconUrl: 'leaf.png'
+                  });
+
+         return L.marker(latlng, {icon: smallIcon});
+        },
+
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup(feature.properties.name + '<p><b> Line: ' + feature.properties.line + '</b></p>');
+      }
+
+    });
+
+
+    var map = L.map('my-map')
+    .fitBounds(geojson.getBounds());
+    //.setView([51.505,-0.09], 9);
+
+    basemap.addTo(map);
+    geojson.addTo(map);
+  });
+
+};

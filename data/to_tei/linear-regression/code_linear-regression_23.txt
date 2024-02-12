@@ -1,0 +1,11 @@
+features = SelectKBest(f_regression, k=3500).fit(Z, date_labels)
+
+selected = features.get_support()
+
+features_df = pd.DataFrame()
+features_df['term'] = v.feature_names_
+features_df['selected'] = selected
+features_df = features_df.loc[features_df['selected'] == True]
+features_df['coef'] = lr.coef_
+
+coefficients = features_df.sort_values(by='coef', ascending=False).reset_index(drop=True)

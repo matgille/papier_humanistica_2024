@@ -1,0 +1,33 @@
+# The os library is used by Python for operations with directories and files on the operating system
+import os
+
+# set the folder where the images are.
+images_folder = "/content/"
+
+# Set the path to file containing recognized text.
+text_file_path = os.path.join(images_folder, "a_text_file.txt")
+
+# Open a text file to write to it.
+f = open(text_file_path, "w")
+
+# store a list of allowed image extensions.
+image_extensions = (".bmp", ".gif",".jpg", ".jpeg", ".png")
+
+# loop through each file in the folder.
+for root, dirs, files in os.walk(images_folder):
+    for file in files:
+        # check the file ends with an extension for an image.
+        if file.lower().endswith(image_extensions):
+             print(os.path.join(root, file))
+             # write a header for each text file.
+             f.write("\n------------------------------\n" + os.path.join(root, file) + "\n")
+             # store the path into the read_image_path variable.
+             read_image_path = os.path.join(root, file)
+             # call the function to read_handwriting_in_stored_image.
+             image_text = read_handwriting_in_stored_image(read_image_path)
+             # write the text to the file.
+             f.writelines(image_text)
+             # wait 10 seconds before processing the next file to avoid an error caused by too many requests.
+             time.sleep(10)
+# close the text file.
+f.close()

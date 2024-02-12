@@ -1,0 +1,8 @@
+docs = pd.DataFrame({'Document': clustered_df.tokens.apply(' '.join), 'Class': clustered_df[f'Cluster_Name_{num_clusters}']})
+docs_per_class = docs.groupby(['Class'], as_index=False).agg({'Document': ' '.join})
+
+cvec  = CountVectorizer().fit(docs_per_class.Document)
+count = cvec.transform(docs_per_class.Document)
+words = cvec.get_feature_names_out()
+
+ctfidf = CTFIDFVectorizer().fit_transform(count, n_samples=len(docs))

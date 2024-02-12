@@ -1,0 +1,17 @@
+# html-a-frec-3.py
+import obo
+
+# crea un diccionario ordenado de pares de frecuencia de palabras
+url = 'http://www.oldbaileyonline.org/browse.jsp?id=t17800628-33&div=t17800628-33'
+texto = obo.paginaWebATexto(url)
+listaPalabrasCompleta = obo.quitaNoAlfaNum(texto)
+listaPalabras = obo.quitarPalabrasvac(listaPalabrasCompleta, obo.palabrasvac)
+diccionario = obo.listaPalabrasDicFrec(listaPalabras)
+diccOrdenado = obo.ordenaDicFrec(diccionario)
+
+# compila el diccionario en una cadena y envuelve con HTML
+salidaCadena = ""
+for s in diccOrdenado:
+    salidaCadena += str(s)
+    salidaCadena += "<br />"
+obo.envuelveCadenaenHTMLMac("html-a-frec-3", url, salidaCadena)

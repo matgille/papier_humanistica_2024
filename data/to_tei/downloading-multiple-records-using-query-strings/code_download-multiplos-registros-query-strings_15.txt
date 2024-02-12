@@ -1,0 +1,41 @@
+# cria URLs para páginas de resultados de busca e armazena os ficheiros.
+def getSearchResults(query, kwparse, fromYear, fromMonth, toYear, toMonth, entries):
+
+    import urllib.request, math, os
+
+    # Essa linha é nova! Cria um novo diretório.
+    if not os.path.exists(query):
+        os.makedirs(query)
+
+    startValue = 0
+
+    # Determina quantos ficheiros precisam ser baixados.
+    pageCount = entries / 10
+    pageCount = math.ceil(pageCount)
+
+    for pages in range(1, pageCount +1):
+
+        # cada parte do URL. Dividido para facilitar a leitura.
+        url = 'https://www.oldbaileyonline.org/search.jsp?gen=1&form=searchHomePage&_divs_fulltext='
+        url += query
+        url += '&kwparse=' + kwparse
+        url += '&_divs_div0Type_div1Type=sessionsPaper_trialAccount'
+        url += '&fromYear=' + fromYear
+        url += '&fromMonth=' + fromMonth
+        url += '&toYear=' + toYear
+        url += '&toMonth=' + toMonth
+        url += '&start=' + str(startValue)
+        url += '&count=0'
+
+        # faz o download da página e salva o resultado. 
+        response = urllib.request.urlopen(url)
+        webContent = response.read().decode('UTF-8')
+
+        # armazena o resultado num novo diretório.
+        filename = 'search-result' + str(startValue)
+
+        f = open(filename + ".html", 'w')
+        f.write(webContent)
+        f.close
+
+        startValue = startValue + 10

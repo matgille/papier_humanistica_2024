@@ -1,0 +1,20 @@
+def obtener_procesos_individuales(consulta):
+consulta_limpia = re.sub(r'\W', '', consulta)
+resultados_busqueda = os.listdir(consulta_limpia)
+urls = []
+
+# encuentra las paginas de resultados de búsqueda
+for nombre_archivo in resultados_busqueda:
+    if 'resultado_consulta' in nombre_archivo: # ①
+        with open(consulta_limpia + '/' + nombre_archivo, 'r') as f:
+            texto = f.read().split(' ') # ②
+
+            # busca las IDs de los procesos judiciales
+            for palabra in texto: # ③
+                if 'browse.jsp?id=' in palabra: # ④
+                    # aísla la ID
+                    captura = re.search(r'id=(.+?)&', palabra) # ⑤
+                    url = captura.group(1) # ⑥
+                    urls.append(url) # ⑦
+
+    print(urls)

@@ -1,0 +1,35 @@
+# en premier lieu, faites les import dont vous aurez besoin et définissez la fonction lev() comme décrite ci-dessus, et enfin:
+
+fin = open("our_base_OCR_result.txt", 'r') # lit notre texte récupéré de l’OCR
+fout = open("out1.txt", 'w') # crée un nouveau fichier texte pour le modifier quand nous sommes prêts
+GScriba = fin.readlines() # transforme notre fichier d’entrée en une liste de lignes
+
+for line in GScriba:
+    # obtenez la distance de Levenshtein pour chaque ligne du texte
+    recto_lev_score = lev(line, 'IL CARTOLARE DI GIOVANNI SCRIBA')
+    verso_lev_score = lev(line, 'MARIO CHIAUDANO - MATTIA MORESCO')
+
+    # vous voulez utilisez les scores les plus élevés possibles,
+    # tout en voulant cibler uniquement les en-têtes de page.
+    if recto_lev_score < 26 :
+
+        # Si nous incrémentons une variable 'n' pour compter le nombre d'en-têtes trouvés
+        # alors la valeur de cette variable devrait être équivalente à notre nombre de page.
+        n += 1
+        print(f"recto: {recto_lev_score} {line}")
+
+        # Une fois que nous avons pu établir notre score lev() optimal, nous pouvons 'décommenter'
+        # tout ces `fout.write()` pour rédiger notre nouveau document texte
+        # en remplacant chaque en-tête par une chaîne de caractères facilement identifiable qui contiendra
+        # le numéro de la page: notre variable 'n'.
+
+        #fout.write("~~~~~ PAGE %d ~~~~~\n\n" % n)
+    elif verso_lev_score < 26 :
+        n += 1
+        print(f"verso: {verso_lev_score} {line}")
+        #fout.write("~~~~~ PAGE %d ~~~~~\n\n" % n)
+    else:
+        #fout.write(line)
+        pass
+
+print(n)

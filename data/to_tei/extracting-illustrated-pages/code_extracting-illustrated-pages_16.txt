@@ -1,0 +1,24 @@
+# collect the pages with at least one picture block
+img_pages = []
+
+with gzip.open(abbyy_file) as fp:
+    tree = ET.parse(fp)
+    document = tree.getroot()
+    for i, page in enumerate(document):
+        for block in page:
+            try:
+                if block.attrib['blockType'] == 'Picture':
+                    img_pages.append(i)
+                    break
+            except KeyError:
+                continue
+
+# 0 is not a valid page for making GET requests to IA, yet sometimes
+# it's in the zipped Abbyy file
+img_pages = [page for page in img_pages if page > 0]
+
+# track for download progress report
+total_pages = len(img_pages)
+
+# OCR files are huge, so just delete once we have pagelist
+os.remove(abbyy_file)

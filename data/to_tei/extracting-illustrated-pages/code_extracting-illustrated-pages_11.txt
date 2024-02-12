@@ -1,0 +1,18 @@
+# metadata from API in json format (different than HT collection metadata)
+meta = json.loads(data_api.getmeta(item_id, json=True))
+
+# sequence gets us each page of the scanned item in order, with any
+# additional information that might be available for it
+sequence = meta['htd:seqmap'][0]['htd:seq']
+
+# list of pages with pictures (empty to start)
+img_pages = []
+
+# try/except block handles situation where no "pfeats" exist OR
+# the sequence numbers are not numeric
+for page in sequence:
+    try:
+        if 'IMAGE_ON_PAGE' in page['htd:pfeat']:
+            img_pages.append(int(page['pseq']))
+    except (KeyError, TypeError) as e:
+        continue

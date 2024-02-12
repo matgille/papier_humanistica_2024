@@ -1,0 +1,53 @@
+# Assumes a data frame, a clustering result, and a DDC level (1, 2 or 3)
+# for mapping the clusters on to 'plain English' labels from the DDC
+def label_clusters(src_df:pd.DataFrame, clusterings:np.ndarray, ddc_level:int=1):
+    
+    num_clusters = clusterings.max()
+    
+    # Create a new data frame holding only the
+    # cluster results but indexed to the source
+    tmp = pd.DataFrame({f'Cluster_{num_clusters}':clusterings}, index=src_df.index)
+    
+    joined_df = src_df.join(tmp, how='inner')
+    
+    labels = get_dominant_cat(joined_df, clusterings.max(), ddc_level)
+    
+    # Map the labels for each cluster value
+    joined_df[f'Cluster_Name_{num_clusters}'] = joined_df[f'Cluster_{num_clusters}'].apply(lambda x: labels[x])
+
+    return joined_df
+
+# Find the dominant class for each cluster assuming a specified DDC level (1, 2 or 3)
+def get_dominant_cat(clustered_df:pd.DataFrame, num_clusters:int, ddc_level:int=1):
+    labels = {}
+    struct = {}
+
+    # First, work out the dominant group in each cluster
+    # and note that together with the cluster number --
+    # this gives us a dict with key==dominant group and 
+    # then one or more cluster numbers from the output above
+    for cl in range(1,num_clusters+1):
+    
+        # Identify the dominant 'domain' (i.e. group by
+        # DDC description) using the value counts result.
+        dom     = clustered_df[clustered_df[f'Cluster_{num_clusters}']==cl][f'ddc{ddc_level}'].value_counts().index[0]
+        print(f"Cluster {cl} dominated by {dom} theses.")
+    
+        if struct.get(dom) == None:
+            struct[dom] = []
+    
+        struct[dom].append(cl)
+
+    # Next, flip this around so that we create useful
+    # cluster labels for each cluster. Since we can have
+    # more than one cluster dominated by the same group
+    # we have to increment them (e.g. History 1, History 2)
+    for g in struct.keys():
+        if len(struct[g])==1:
+            labels[struct[g][0]]=g
+            #print(f'{g} maps to Cluster {struct[g][0]}')
+        else:
+            for s in range(0,len(struct[g])):
+                labels[struct[g][s]]=f'{g} {s+1}'
+                #print(f'{g} {s+1} maps to Cluster {struct[g][s]}')
+    return labels

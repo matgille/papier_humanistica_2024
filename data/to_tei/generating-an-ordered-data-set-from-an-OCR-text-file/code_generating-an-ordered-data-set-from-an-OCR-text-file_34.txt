@@ -1,0 +1,76 @@
+fout = open("your_page.html", 'w') # create a text file to write the html to
+
+# write to the file your html header with some CSS formatting declarations
+fout.write("""
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+
+<html>
+<head>
+  <title>Giovanni Scriba Vol. I</title>
+  <style>
+    h1 {text-align: center; color: #800; font-size: 16pt; margin-bottom: 0px; margin-top: 16px;}
+    ul {list-style-type: none;}
+    .sep {color: #800; text-align: center}
+    .charter {width: 650px; margin-left: auto; margin-right: auto; margin-top: 60px; border-top: double #800;}
+    .folio {color: #777;}
+    .summary {color: #777; margin: 12px 0px 12px 12px;}
+    .marginal {color: red}
+    .charter-text {margin-left: 16px}
+    .footnotes
+    .page-number {font-size: 60%}
+  </style></head>
+
+<body>
+""")
+
+# a loop that will write out a blob of html code for each of the charters in our dictionary:
+for x in charters:
+
+    # use a shallow copy so that charters[x] is not modified for this specialized purpose
+    d = charters[x].copy()
+
+    try:
+        if d['footnotes']:
+            # remember, this is a list of tuples. So you can feed them directly
+            # to the string interpolation operator in the list comprehension.
+            fnlist = ["<li>(%s) %s</li>" % t for t in d['footnotes']]
+            d['footnotes'] = "<ul>" + ''.join(fnlist) + "</ul>"
+        else:
+            d['footnotes'] = ""
+
+        d['text'] = ' '.join(d['text']) # d['text'] is a list of strings
+
+        blob = """
+            <div>
+                <div class="charter">
+                    <h1>%(chid)s</h1>
+                    <div class="folio">%(folio)s (pg. %(pgno)d)</div>
+                    <div class="summary">%(summary)s</div>
+                    <div class="marginal">%(marginal)s</div>
+                    <div class="text">%(text)s</div>
+                    <div class="footnotes">%(footnotes)s</div>
+                </div>
+            </div>
+            """
+
+        fout.write(blob % d)
+
+        # `string % dictionary` is a neat trick for html templating
+        # that makes use of python's string interpolation syntax
+        # see: https://docs.python.org/3/tutorial/inputoutput.html#the-string-format-method
+
+        fout.write("\n\n")
+    except:
+        # insert entries noting the absence of charters on the missing pg. 214
+        erratum = """
+            <div>
+                <div class="charter">
+                    <h1>Charter no. %d is missing because the scan for Pg. 214 was ommited</h1>
+                </div>
+            </div>
+            """  % d['chno']
+
+        fout.write(erratum)
+
+fout.write("""</body></html>""")
+

@@ -1,0 +1,38 @@
+fin = open("your_current_source_file.txt", 'r')
+GScriba = fin.readlines()
+
+# in notemark, note the 'lookbehind' expression '?<!' to insure that
+# the marker '(1)' does not begin the string
+notemark = re.compile(r"\(\d+\)(?<!^\(\d+\))")
+notetext = re.compile(r"^\(\d+\)")
+this_charter = 1
+pg = re.compile("~~~~~ PAGE \d+ ~~~~~")
+pgno = 1
+fndict = {}
+
+for line in GScriba:
+    nmarkers = notemark.findall(line)
+    ntexts = notetext.findall(line)
+    if pg.match(line):
+        # This is our 'sentinel'. We've come to the end of a page,
+        # so we record our accumulated footnote data in the 'charters' dict.
+        for fn in fndict:
+            chid = fndict[fn]['chid']
+            fntext = fndict[fn]['fntext']
+            charters[int(chid)]['footnotes'].append((fn, fntext))
+        pgno += 1
+        fndict = {}  # and then re-initialize our temporary container
+    if slug.match(line): # here's the beginning of a charter, so update the variable.
+        this_charter = int(slug.match(line).group(3))
+    if nmarkers:
+        for marker in [eval(x) for x in nmarkers]:
+            # create an entry with the charter's id and an empty text field
+            fndict[marker] = {'chid':this_charter, 'fntext': ''}
+    if ntexts:
+        for text in [eval(x) for x in ntexts]:
+            try:
+                # fill in the appropriate empty field.
+                fndict[text]['fntext'] = re.sub('\(\d+\)', '', line).strip()
+            except KeyError:
+                print("printer's error? ", "pgno:", pgno, line)
+

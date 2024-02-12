@@ -1,0 +1,26 @@
+# obo.py
+def getSearchResults(query, kwparse, fromYear, fromMonth, toYear, toMonth):
+
+    import urllib.request
+
+    startValue = 0
+
+    # cada parte do URL. Dividido para facilitar a leitura
+    url = 'https://www.oldbaileyonline.org/search.jsp?gen=1&form=searchHomePage&_divs_fulltext='
+    url += query
+    url += '&kwparse=' + kwparse
+    url += '&_divs_div0Type_div1Type=sessionsPaper_trialAccount'
+    url += '&fromYear=' + fromYear
+    url += '&fromMonth=' + fromMonth
+    url += '&toYear=' + toYear
+    url += '&toMonth=' + toMonth
+    url += '&start=' + str(startValue)
+    url += '&count=0'
+
+    # faz o download da página e armazena o resultado
+    response = urllib.request.urlopen(url)
+    webContent = response.read().decode('UTF-8')
+    filename = 'search-result'
+    f = open(filename + ".html", 'w')
+    f.write(webContent)
+    f.close

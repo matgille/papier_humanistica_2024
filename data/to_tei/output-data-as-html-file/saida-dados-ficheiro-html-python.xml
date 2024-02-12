@@ -1,0 +1,88 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>Sa&#237;da de Dados como um Ficheiro HTML com Python</title>
+  <layout>lesson</layout>
+  <slug>saida-dados-ficheiro-html-python</slug>
+  <date>2012-07-17</date>
+  <translation_date>2022-10-31</translation_date>
+  <authors>William J. Turkel,Adam Crymble</authors>
+  <reviewers>Jim Clifford,Frederik Elwert</reviewers>
+  <editors>Miriam Posner</editors>
+  <translator>Felipe Lamarca</translator>
+  <translation-editor>Jimmy Medeiros</translation-editor>
+  <translation-reviewer>Ana Carolina Erthal,Andr&#233; Salvo</translation-reviewer>
+  <difficulty>2</difficulty>
+  <review-ticket>https://github.com/programminghistorian/ph-submissions/issues/463</review-ticket>
+  <activity>transforming</activity>
+  <topics>python,website</topics>
+  <abstract>Esta li&#231;&#227;o usa os pares de frequ&#234;ncia criados na li&#231;&#227;o &#8216;Contar Frequ&#234;ncias de Palavras com Python&#8217; e cria um ficheiro HTML com esses dados.</abstract>
+  <original>output-data-as-html-file</original>
+  <avatar_alt>Uma mulher usando um vestido elaborado acompanhada por duas crian&#231;as</avatar_alt>
+  <doi>10.46430/phpt0032</doi>
+</metadata>
+  <text>
+    <body>
+      <div n="1"><head>Objetivos da Li&#231;&#227;o</head>
+<p>Essa li&#231;&#227;o usa os pares de frequ&#234;ncia criados na li&#231;&#227;o <link target="/pt/licoes/contar-frequencias-palavras-python">Contar Frequ&#234;ncias de Palavras com Python</link> e cria um ficheiro HTML com esses dados.</p>
+<p>Aqui aprender&#225; como apresentar dados como um ficheiro HTML usando Python. Tamb&#233;m vai aprender sobre formata&#231;&#227;o de strings. O resultado final &#233; um ficheiro HTML que apresenta as palavras-chave encontradas na fonte original em ordem decrescente de frequ&#234;ncia, junto com o n&#250;mero de vezes que cada palavra-chave aparece.</p>
+</div>
+      <div n="1"><head>Ficheiros Necess&#225;rios para esta Li&#231;&#227;o</head>
+<ul>
+<li><code type="inline">obo.py</code></li>
+</ul>
+<p>Caso n&#227;o possua esses ficheiros da li&#231;&#227;o anterior, pode fazer o <emph>download</emph> do programming-historian-6, um <link target="/assets/python-lessons6.zip">ficheiro zip da li&#231;&#227;o anterior</link>. </p>
+</div>
+      <div n="1"><head>Construindo um <emph>HTML wrapper</emph></head>
+<p>Na li&#231;&#227;o anterior, aprendeu como incorporar a mensagem "Ol&#225; mundo!" em <emph>tags</emph> HTML, escrever o resultado em um ficheiro e abri-lo automaticamente no seu navegador. Um programa que coloca c&#243;digos de formata&#231;&#227;o em torno de algo de modo que ele possa ser usado por outro programa &#224;s vezes &#233; chamado de <emph>wrapper</emph> (embalagem ou inv&#243;lucro podem ser poss&#237;veis tradu&#231;&#245;es). O que faremos agora &#233; desenvolver um <emph>HTML wrapper</emph> para a sa&#237;da do nosso c&#243;digo que computa frequ&#234;ncias de palavras. Tamb&#233;m adicionaremos alguns metadados din&#226;micos e &#250;teis para complementar os dados de frequ&#234;ncia coletados em <link target="/pt/licoes/contar-frequencias-palavras-python">Contar Frequ&#234;ncias de Palavras com Python</link>.</p>
+</div>
+      <div n="1"><head>Metadados</head>
+<p>A distin&#231;&#227;o entre dados e metadados &#233; crucial para a ci&#234;ncia da informa&#231;&#227;o. Metadados s&#227;o dados sobre dados. Esse conceito j&#225; deve ser bastante familiar, ainda que n&#227;o tenha escutado o termo anteriormente. Considere um livro tradicional. Se tomarmos o texto do livro como um dado, h&#225; uma s&#233;rie de outras caracter&#237;sticas associadas a esse texto, mas que podem ou n&#227;o estar explicitamente exibidas no livro. O t&#237;tulo da obra, o autor, a editora, o local e a data de publica&#231;&#227;o s&#227;o metadados que tipicamente est&#227;o apresentados na obra. O local e a data de escrita, o nome do editor de texto, os dados de cataloga&#231;&#227;o usadas nas bibliotecas e o nome da fonte usada para formatar o livro &#224;s vezes s&#227;o exibidos nele. A pessoa que comprou uma c&#243;pia particular pode ou n&#227;o escrever o seu nome no livro. Se o livro pertence &#224; cole&#231;&#227;o de uma biblioteca, essa biblioteca manter&#225; metadados adicionais, apenas alguns dos quais ser&#227;o fisicamente anexados ao livro. Os registros de empr&#233;stimo, por exemplo, geralmente s&#227;o mantidos em algum tipo de banco de dados conectado ao livro por um identificador &#250;nico. Bibliotecas, arquivos e museus possuem sistemas elaborados para gerar e manter controle de metadados.</p>
+<p>Quando estiver trabalhando com dados digitais, &#233; uma boa ideia incorporar metadados nos seus pr&#243;prios ficheiros sempre que poss&#237;vel. N&#243;s agora desenvolveremos algumas estrat&#233;gias b&#225;sicas para criar metadados nos nossos ficheiros. No nosso <emph>wrapper</emph>, queremos incluir informa&#231;&#245;es din&#226;micas sobre o ficheiro, como o hor&#225;rio e a data em que foi criado, assim como um t&#237;tulo HTML relevante para este ficheiro. Nesse caso poder&#237;amos simplesmente nome&#225;-lo de forma isolada, mas quando come&#231;armos a trabalhar com m&#250;ltiplos ficheiros, criar documenta&#231;&#227;o de metadados automaticamente economizar&#225; muito tempo, ent&#227;o vamos praticar agora. E, para isso, precisaremos aprender a tirar proveito de algumas op&#231;&#245;es mais poderosas de formata&#231;&#227;o de string.</p>
+</div>
+      <div n="1"><head>Formata&#231;&#227;o de string com Python</head>
+<p>O Python inclui um operador de formata&#231;&#227;o especial que permite inserir uma string dentro de outra. Ele &#233; representado pelo sinal de percentual seguido de um "s". Abra um Python <emph>shell</emph> e tente os exemplos a seguir:</p>
+<pre><code class="language-python" xml:id="code_saida-dados-ficheiro-html-python_0" type="block" corresp="code_saida-dados-ficheiro-html-python_0.txt"></code></pre>
+<p>H&#225; tamb&#233;m uma maneira que permite interpolar uma lista de strings em outra.</p>
+<pre><code class="language-python" xml:id="code_saida-dados-ficheiro-html-python_1" type="block" corresp="code_saida-dados-ficheiro-html-python_1.txt"></code></pre>
+<p>Nesses exemplos, <code type="inline">%s</code> em uma string indica que outra string ser&#225; incorporada naquele ponto. H&#225; uma gama de outros c&#243;digos de formata&#231;&#227;o de string, dentre os quais a maioria permite incorporar n&#250;meros em strings de v&#225;rios formatos, como <code type="inline">%i</code> para inteiro (ex.: 1, 2, 3), <code type="inline">%f</code> para decimal de ponto flutuante (ex.: 3.023, 4.59, 1.0) e assim por diante. Usando esse m&#233;todo, podemos inserir informa&#231;&#245;es exclusivas do ficheiro. </p>
+</div>
+      <div n="1"><head>Ficheiro de Dados com Metadados</head>
+<p>Vamos agrupar alguns dos c&#243;digos que j&#225; escrevemos na forma de fun&#231;&#245;es. Uma delas receber&#225; uma URL e retornar&#225; uma string de texto em letras min&#250;sculas a partir da p&#225;gina web. Copie esse c&#243;digo no m&#243;dulo <code type="inline">obo.py</code>:</p>
+<pre><code class="language-python" xml:id="code_saida-dados-ficheiro-html-python_2" type="block" corresp="code_saida-dados-ficheiro-html-python_2.txt"></code></pre>
+<p>Tamb&#233;m vamos desejar uma fun&#231;&#227;o que tome uma string de qualquer tipo e a torne o corpo de um ficheiro HTML que &#233; aberto automaticamente no Firefox. Essa fun&#231;&#227;o deve incluir alguns metadados b&#225;sicos, como o hor&#225;rio e a data em que foi criado e o nome do programa que o criou. Estude o c&#243;digo a seguir cuidadosamente e depois copie-o no m&#243;dulo <code type="inline">obo.py</code>. </p>
+<div n="2"><head>Instru&#231;&#245;es para Mac</head>
+<p>Se estiver usando um Mac, certifique-se de incluir o caminho de ficheiro apropriado na vari&#225;vel <code type="inline">filename</code> na pen&#250;ltima linha para refletir o local onde est&#225; armazenando os seus ficheiros.</p>
+<pre><code class="language-python" xml:id="code_saida-dados-ficheiro-html-python_3" type="block" corresp="code_saida-dados-ficheiro-html-python_3.txt"></code></pre>
+</div><div n="2"><head>Instru&#231;&#245;es para Windows</head>
+<pre><code class="language-python" xml:id="code_saida-dados-ficheiro-html-python_4" type="block" corresp="code_saida-dados-ficheiro-html-python_4.txt"></code></pre>
+<p>***</p>
+<p>Note que essa fun&#231;&#227;o faz uso do operador de formata&#231;&#227;o de string sobre o qual acabamos de aprender. Caso ainda tenha problemas com essa ideia, verifique o ficheiro HTML que foi aberto numa nova guia do Firefox e ver&#225; como isso funcionou. Se ainda estiver preso nisso, d&#234; uma olhada em</p>
+<pre><code xml:id="code_saida-dados-ficheiro-html-python_5" type="block" corresp="code_saida-dados-ficheiro-html-python_5.txt"></code></pre>
+<p>abra o ficheiro HTML e investigue como o programa coloca o valor da URL l&#225;.</p>
+<p>A fun&#231;&#227;o tamb&#233;m chama a biblioteca Python <code type="inline">datetime</code> para determinar o hor&#225;rio e a data atuais. Como o operador de formata&#231;&#227;o de string <code type="inline">%s</code>, essa biblioteca usa <code type="inline">%</code> como substitutos para valores. Nesse caso, <code type="inline">%Y %m %d %H %M %S</code> representa ano (<emph>year</emph>), m&#234;s (<emph>month</emph>), data (<emph>date</emph>), hora (<emph>hour</emph>), minuto (<emph>minute</emph>) e segundo (<emph>second</emph>) respectivamente. Diferente de <code type="inline">%s</code>, o programa determinar&#225; o valor dessas vari&#225;veis usando o rel&#243;gio do seu computador. &#201; importante reconhecer essa diferen&#231;a.</p>
+<p>Esse metadado de data, junto com o nome do programa que chamou a fun&#231;&#227;o, &#233; armazenado no t&#237;tulo da <emph>tag</emph> HTML. O ficheiro HTML que &#233; criado possui o mesmo nome do programa Python que o criou, mas com uma extens&#227;o <code type="inline">.html</code> ao inv&#233;s de uma <code type="inline">.py</code>.</p>
+</div></div>
+      <div n="1"><head>Juntando Tudo</head>
+<p>Agora podemos criar outra vers&#227;o do nosso programa para computar frequ&#234;ncias. Ao inv&#233;s de enviar o seu resultado para um ficheiro de texto ou uma janela de sa&#237;da, ele envia o resultado para um ficheiro HTML que &#233; aberto numa nova guia do Firefox. Da&#237; em diante, as sa&#237;das do programa podem ser facilmente adicionadas como entradas bibliogr&#225;ficas no Zotero. Digite ou copie o comando a seguir no seu editor de texto, armazene-o como <code type="inline">html-to-freq-3.py</code> e execute-o para confirmar que ele funciona como esperado.</p>
+<p>Use tamb&#233;m <code type="inline">obo.wrapStringInHTMLMac()</code> ou <code type="inline">obo.wrapStringInHTMLWindows()</code> de acordo com o que for apropriado para o seu sistema: </p>
+<pre><code class="language-python" xml:id="code_saida-dados-ficheiro-html-python_6" type="block" corresp="code_saida-dados-ficheiro-html-python_6.txt"></code></pre>
+<p>Note que intercalamos nossos pares palavra-frequ&#234;ncia com a <emph>tag</emph> HTML de quebra <code type="inline">&lt;br\&gt;</code>, que atua como uma nova linha. Se tudo correu bem, dever&#225; ver as mesmas frequ&#234;ncias de palavra que calculou na &#250;ltima se&#231;&#227;o, desta vez na janela do navegador.</p>
+</div>
+      <div n="1"><head>Leituras Sugeridas</head>
+<ul>
+<li>
+Lutz, Learning Python<ul>
+<li>Re-read and review Chs. 1-17</li>
+</ul>
+</li>
+</ul>
+</div>
+      <div n="1"><head>Sincroniza&#231;&#227;o de C&#243;digo</head>
+<p>Para acompanhar li&#231;&#245;es futuras, &#233; importante ter os ficheiros e programas corretos no seu diret&#243;rio &#8220;programming-historian&#8221;. Ao final de cada cap&#237;tulo pode fazer o <emph>download</emph> do ficheiro zip "programming-historian" para garantir que possui o c&#243;digo correto. Caso esteja acompanhando com a vers&#227;o para Mac / Linux, deve ter que abrir o ficheiro <code type="inline">obo.py</code> e mudar "file:///Users/username/Desktop/programming-historian/" para o caminho at&#233; o diret&#243;rio no seu pr&#243;prio computador.</p>
+<ul>
+<li><link target="/assets/python-lessons7.zip">python-lessons7.zip</link></li>
+</ul>
+</div>
+    </body>
+  </text>
+</TEI>

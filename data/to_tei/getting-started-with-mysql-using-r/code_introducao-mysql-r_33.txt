@@ -1,0 +1,31 @@
+library(RMariaDB)
+rmariadb.settingsfile<-"/Program Files/MySQL/MySQL Server 8.0/periodicos_resultados_pesquisa.cnf"
+
+rmariadb.db<-"periodicos_resultados_pesquisa"
+artigosDb<-dbConnect(RMariaDB::MariaDB(),default.file=rmariadb.settingsfile,group=rmariadb.db)
+
+# A função "setwd" define o directório de trabalho. Deve mudar o caminho desse directório para o directório onde guardou os ficheiros .csv.
+setwd("C:/Users/User/Documents")
+
+# Realiza uma busca nos dados de amostra dos periódicos pelos termos "Allotment" e "Garden"
+dadosAmostraJardim <- read.csv(file="dados-amostra-jardim.csv", header=TRUE, sep=",")
+
+# Uma coluna titulo_artigo na tabela do banco de dados pode armazenar valores até 99 caracteres.
+# Esta declaração reduz qualquer título de artigo maior que 99 caracteres.
+dadosAmostraJardim$titulo_artigo <- substr(dadosAmostraJardim$titulo_artigo,0,99)
+
+# Esta declaração formata data_publicacao_artigo para representar o tipo de dado DATETIME.
+dadosAmostraJardim$data_publicacao_artigo <- paste(dadosAmostraJardim$data_publicacao_artigo," 00:00:00",sep="")
+
+dbWriteTable(artigosDb, value = dadosAmostraJardim, row.names = FALSE, name = "tbl_periodicos_resultados_pesquisa", append = TRUE )
+
+# Realiza um busca nos dados de amostra dos periódicos pelos termos German+Submarine.
+dadosAmostraSubmarino <- read.csv(file="dados-amostra-submarino.csv", header=TRUE, sep=",")
+
+dadosAmostraSubmarino$titulo_artigo <- substr(dadosAmostraSubmarino$titulo_artigo,0,99)
+dadosAmostraSubmarino$data_publicacao_artigo <- paste(dadosAmostraSubmarino$data_publicacao_artigo," 00:00:00",sep="")
+
+dbWriteTable(artigosDb, value = dadosAmostraSubmarino, row.names = FALSE, name = "tbl_periodicos_resultados_pesquisa", append = TRUE )
+
+# Desconecta para limpar a conexão com o banco de dados.
+dbDisconnect(artigosDb)

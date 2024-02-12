@@ -1,0 +1,21 @@
+#!/usr/bin/python
+
+import internetarchive
+import time
+
+reporte_error = open('errores-bpl-marcs.log', 'a')
+
+buscar = internetarchive.search_items('collection:bplscas')
+
+for resultado in buscar:
+   elementoid = resultado['identifier']
+   elemento = internetarchive.get_item(elementoid)
+   marc = elemento.get_file(elementoid + '_marc.xml')
+   try:
+      marc.download()
+   except Exception as e:
+      reporte_error.write('No es posible descargar' + elementoid + ' debido al error: %s\n' % e)
+      print "Hubo un error, escribiendo reporte."
+   else:
+      print "En proceso de descarga de " + elementoid + " ..."
+      time.sleep(1)

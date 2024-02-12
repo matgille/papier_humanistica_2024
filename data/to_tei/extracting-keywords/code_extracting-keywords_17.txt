@@ -1,0 +1,76 @@
+
+#NEW!
+import csv
+import time
+
+#OLD! Import the keywords
+f = open('gazetteer.txt', 'r')
+allKeywords = f.read().lower().split("\n")
+f.close()
+
+
+#CHANGED! Import the 'Details' column from the CSV file
+allTexts = []
+fullRow = []
+with open('The_Dataset_-_Alumni_Oxonienses-Jas1.csv') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        #the full row for each entry, which will be used to recreate the improved CSV file in a moment
+        fullRow.append((row['Name'], row['Details'], row['Matriculation Year']))
+
+        #the column we want to parse for our keywords
+        row = row['Details'].lower()
+        allTexts.append(row)
+
+#NEW! a flag used to keep track of which row is being printed to the CSV file
+counter = 0
+
+#NEW! use the current date and time to create a unique output filename
+timestr = time.strftime("%Y-%m-%d-(%H-%M-%S)")
+filename = 'output-' + str(timestr) + '.csv'
+
+#NEW! Open the new output CSV file to append ('a') rows one at a time.
+with open(filename, 'a') as csvfile:
+
+    #NEW! define the column headers and write them to the new file
+    fieldnames = ['Name', 'Details', 'Matriculation Year', 'Placename']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer.writeheader()
+
+    #NEW! define the output for each row and then print to the output csv file
+    writer = csv.writer(csvfile)
+
+    #OLD! this is the same as before, for currentRow in fullRow:
+    for entry in allTexts:
+
+        matches = 0
+        storedMatches = []
+
+        #for each entry:
+        allWords = entry.split(' ')
+        for words in allWords:
+
+            #remove punctuation that will interfere with matching
+            words = words.replace(',', '')
+            words = words.replace('.', '')
+            words = words.replace(';', '')
+
+            #if a keyword match is found, store the result.
+            if words in allKeywords:
+                if words in storedMatches:
+                    continue
+                else:
+                    storedMatches.append(words)
+                matches += 1
+
+        #CHANGED! send any matches to a new row of the csv file.
+        if matches == 0:
+            newRow = fullRow[counter]
+        else:
+            matchTuple = tuple(storedMatches)
+            newRow = fullRow[counter] + matchTuple
+
+        #NEW! write the result of each row to the csv file
+        writer.writerows([newRow])
+        counter += 1
+

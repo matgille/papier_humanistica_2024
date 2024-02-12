@@ -1,0 +1,9 @@
+for (i in 1:length(palabras)) {
+  tabla <- table(palabras[[i]])
+  tabla <- data_frame(word = names(tabla), count = as.numeric(tabla))
+  tabla <- arrange(tabla, desc(count))
+  tabla <- inner_join(tabla, palabras_frecuentes)
+  tabla <- filter(tabla, frequency < 0.002)
+  resultado <- c(metadatos$president[i], metadatos$year[i], tabla$word[1:5])
+  descripcion <- c(descripcion, paste(resultado, collapse = "; "))
+}

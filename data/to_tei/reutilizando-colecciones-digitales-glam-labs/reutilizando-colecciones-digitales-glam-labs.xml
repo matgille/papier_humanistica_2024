@@ -1,0 +1,244 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>Reutilizar colecciones digitales: GLAM Labs</title>
+  <collection>lessons</collection>
+  <layout>lesson</layout>
+  <slug>reutilizando-colecciones-digitales-glam-labs</slug>
+  <date>2021-08-30</date>
+  <authors>Gustavo Candela,Mar&#237;a Dolores S&#225;ez,Mar&#237;a Pilar Escobar,Manuel Marco Such</authors>
+  <reviewers>Silvia Guti&#233;rrez De la Torre,V&#237;ctor Gayol</reviewers>
+  <editors>Maria Jos&#233; Afanador-Llach</editors>
+  <review-ticket>https://github.com/programminghistorian/ph-submissions/issues/313</review-ticket>
+  <difficulty>3</difficulty>
+  <activity>transforming</activity>
+  <topics>data-manipulation,python,lod,data-visualization</topics>
+  <abstract>Esta lecci&#243;n muestra c&#243;mo reutilizar colecciones digitales publicadas por instituciones de patrimonio cultural.</abstract>
+  <avatar_alt>Grabado que muestra a tres personas trabajando en un laboratorio alqu&#237;mico</avatar_alt>
+  <doi>10.46430/phes0054</doi>
+</metadata>
+  <text>
+    <body>
+      <div n="1"><head>Objetivos de la lecci&#243;n</head>
+<p>Esta lecci&#243;n muestra c&#243;mo reutilizar colecciones digitales publicadas por instituciones de patrimonio cultural y tiene como objetivos principales los siguientes:</p>
+<ul>
+<li>Conocer qu&#233; es un Lab en el marco de una instituci&#243;n GLAM</li>
+<li>Reutilizar de forma innovadora y creativa colecciones digitales</li>
+<li>Enriquecer los datos a trav&#233;s de diferentes t&#233;cnicas</li>
+</ul>
+</div>
+      <div n="1"><head>Prerrequisitos</head>
+<p>En esta lecci&#243;n asumimos que tienes cierto conocimiento sobre <link target="https://es.wikipedia.org/wiki/Python">Python</link>. Si conoces otro lenguaje de programaci&#243;n tambi&#233;n te ser&#225; &#250;til. Si necesitas un lugar donde empezar, te recomendamos trabajar con los excelentes tutoriales sobre Python con los que cuenta  <link target="/es/lecciones/?topic=python">Programming Historian en espa&#241;ol</link>. Tambi&#233;n necesitar&#225;s conocimientos sobre <link target="https://es.wikipedia.org/wiki/Proyecto_Jupyter">Jupyter Notebooks</link>, para ello te recomendamos la lecci&#243;n <link target="/en/lessons/jupyter-notebooks">Introduction to Jupyter Notebooks</link>. Adem&#225;s, para los ejemplos de reutilizaci&#243;n, ser&#225; necesario tener algunos conocimientos sobre <link target="https://es.wikipedia.org/wiki/Est%C3%A1ndares_MARC#MARC-XML">MARCXML</link>, <link target="https://es.wikipedia.org/wiki/Datos_enlazados">Linked Open Data</link> y <link target="https://es.wikipedia.org/wiki/SPARQL">SPARQL</link>; para esto te recomendamos la lecci&#243;n de <link target="/es/lecciones/introduccion-datos-abiertos-enlazados">datos abiertos enlazados</link>.</p>
+</div>
+      <div n="1"><head>Introducci&#243;n</head>
+<p>Tradicionalmente las instituciones de patrimonio cultural conocidas como <link target="https://es.wikipedia.org/wiki/GLAM_(cultura)">GLAM</link> (del ingl&#233;s, <emph>Galleries, Libraries, Archives and Museums</emph>) han publicado colecciones digitales que incluyen todo tipo de materiales con el objetivo de facilitar a la sociedad el acceso a la informaci&#243;n.
+El avance de las tecnolog&#237;as ha favorecido un nuevo contexto en el que las colecciones digitales pueden ser utilizadas en investigaci&#243;n por medio de diferentes m&#233;todos, como visi&#243;n por computador o t&#233;cnicas de aprendizaje autom&#225;tico. Actualmente, las instituciones GLAM promueven e incentivan la reutilizaci&#243;n de sus colecciones digitales a trav&#233;s de programas de colaboraci&#243;n directa con investigadores pero tambi&#233;n con empresas e instituciones acad&#233;micas.</p>
+<p>Las instituciones de patrimonio cultural han comenzado a experimentar de forma creativa e innovadora con las colecciones digitales, que tradicionalmente han puesto a disposici&#243;n del p&#250;blico, lo que ha favorecido la creaci&#243;n de nuevos espacios en el seno de las instituciones, conocidos como "Labs".
+Uno de los primeros, l&#237;der en este &#225;mbito, y que ha establecido las bases para el resto, es el de la <link target="http://labs.bl.uk">Biblioteca Brit&#225;nica</link>, financiado por la <link target="https://mellon.org/">Mellon Foundation</link>. Como resultado de dos encuentros de car&#225;cter internacional en la sede de la Biblioteca Brit&#225;nica y en la <link target="https://www.kb.dk/en">Biblioteca Real de Dinamarca</link>, en Copenhague, se cre&#243; la <link target="https://glamlabs.io">Comunidad Internacional GLAM Labs</link> compuesta por numerosas instituciones, que se muestran en la Figura 1.</p>
+<figure><desc>Mapa que representa las instituciones de la Comunidad Internacional GLAM Labs</desc><graphic url="reutilizando-colecciones-digitales-glam-labs1.png"/></figure>
+<p>En septiembre de 2019, diecis&#233;is personas pertenecientes a dicha comunidad se reunieron en Doha, Catar, para escribir, a partir de la metodolog&#237;a <link target="https://www.booksprints.net/book/book-sprint-open-a-glam-lab/">Book Sprint</link>, el libro <link target="https://glamlabs.io/books/open-a-glam-lab/">Open a GLAM Lab</link> que actualmente ha sido traducido a diversos idiomas, entre ellos <link target="http://rua.ua.es/dspace/handle/10045/110281">espa&#241;ol</link> y <link target="https://qspace.qu.edu.qa/handle/10576/13484">&#225;rabe</link>.</p>
+<p>Una colecci&#243;n digital publicada por una instituci&#243;n GLAM puede estar formada por cualquier tipo de contenido incluyendo metadatos, textos, im&#225;genes, mapas, videos o audios. En este sentido, reutilizar una colecci&#243;n digital consiste en analizar el contenido para adquirir nuevo conocimiento. El an&#225;lisis puede constar de fases tales como extracci&#243;n, transformaci&#243;n y enriquecimiento. Como resultado podemos obtener una nueva colecci&#243;n descrita con otro vocabulario m&#225;s expresivo y rico, una visualizaci&#243;n que facilite el descubrimiento de conocimiento, o una agregaci&#243;n de diferentes colecciones digitales basadas en un tema espec&#237;fico.</p>
+<p>A la hora de reutilizar una colecci&#243;n digital existen diferentes aspectos que deben ser tenidos en cuenta, como por ejemplo la licencia o el tipo de material. Las instituciones han comenzado a utilizar licencias abiertas, pero en algunos casos la licencia no es evidente, lo que impide su reutilizaci&#243;n. Dependiendo del m&#233;todo de investigaci&#243;n a aplicar ser&#225; necesario un tipo espec&#237;fico de material. Por ejemplo, si deseamos realizar reconocimiento de formas necesitaremos un repositorio que se base en im&#225;genes.</p>
+<p>Recientemente se public&#243; el estudio <emph><link target="https://collectionsasdata.github.io/">Collections as data</link></emph>, que proporciona un nuevo enfoque para publicar las colecciones digitales que facilitan el procesamiento por parte de las computadoras. Por ejemplo, es posible utilizar un corpus de miles de textos para identificar personas o lugares de forma autom&#225;tica. Las computadoras permiten la aplicaci&#243;n de m&#233;todos de investigaci&#243;n en Humanidades Digitales como <link target="https://es.wikipedia.org/wiki/Miner%C3%ADa_de_textos">miner&#237;a de textos</link>, <link target="https://es.wikipedia.org/wiki/Visualizaci%C3%B3n_de_datos">visualizaci&#243;n de datos</link> o el uso de <link target="https://es.wikipedia.org/wiki/Sistema_de_informaci%C3%B3n_geogr%C3%A1fica">Sistemas de Informaci&#243;n Geogr&#225;fica (SIG)</link>, como tambi&#233;n <link target="https://es.wikipedia.org/wiki/Procesamiento_de_lenguajes_naturales">procesamiento de lenguaje natural</link>, <link target="https://es.wikipedia.org/wiki/Inteligencia_artificial">inteligencia artificial</link> y <link target="https://es.wikipedia.org/wiki/Visi%C3%B3n_artificial">visi&#243;n por computador</link>.</p>
+<p>La combinaci&#243;n de las colecciones digitales proporcionadas por las instituciones GLAM, junto a c&#243;digo y narrativa, proporcionan el marco ideal para la reproducci&#243;n de los resultados de investigaci&#243;n. En este sentido, los Jupyter Notebooks permiten integrar estos tres elementos y se han convertido en un recurso muy popular tanto en la comunidad investigadora como en la educativa. Numerosos proyectos se centran en la publicaci&#243;n de colecciones de notebooks, como por ejemplo <link target="https://glam-workbench.github.io/">GLAM Workbench</link> o <link target="http://data.cervantesvirtual.com/blog/notebooks/">GLAM Jupyter Notebooks</link>. Los Labs favorecen un espacio para poner de manifiesto estas nuevas tendencias para mejorar y mantener la relevancia de las instituciones de patrimonio cultural.</p>
+<p>En esta lecci&#243;n se incluyen varias opciones para localizar colecciones digitales publicadas por instituciones GLAM para su reutilizaci&#243;n. A continuaci&#243;n, se introducen dos ejemplos implementados como Jupyter Notebooks que muestran de forma reproducible c&#243;mo reutilizar las colecciones digitales a trav&#233;s de diferentes t&#233;cnicas que se encuentran disponibles en <link target="https://zenodo.org/record/5340157">Zenodo</link><ref type="footnotemark" target="#1"/>. El &#250;ltimo apartado corresponde a las conclusiones.</p>
+</div>
+      <div n="1"><head>Buscar colecciones digitales para su reutilizaci&#243;n</head>
+<p>Actualmente existen numerosos sitios web donde es posible localizar colecciones digitales para su reutilizaci&#243;n. Muchos de ellos corresponden al espacio Lab dentro de una instituci&#243;n GLAM. En otros casos, la colecci&#243;n digital se puede localizar en plataformas como <link target="https://zenodo.org/">Zenodo</link> que permite la publicaci&#243;n de <link target="https://es.wikipedia.org/wiki/Conjunto_de_datos">datasets</link>. La siguiente tabla proporciona un resumen de instituciones GLAM, donde podemos localizar sus colecciones digitales con licencias abiertas para su reutilizaci&#243;n.</p>
+<table>
+<thead>
+<tr>
+<th>Instituci&#243;n</th>
+<th>Colecci&#243;n</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bibliot&#232;que Nationale de France</td>
+<td>BnF API et jeux de donn&#233;es</td>
+<td><link target="http://api.bnf.fr/">http://api.bnf.fr/</link></td>
+</tr>
+<tr>
+<td>Biblioth&#232;que Nationale du Luxembourg</td>
+<td>BnL Open Data</td>
+<td><link target="https://data.bnl.lu/">https://data.bnl.lu/</link></td>
+</tr>
+<tr>
+<td>British Library</td>
+<td>BL Labs</td>
+<td>[temporalmente no disponible]</td>
+</tr>
+<tr>
+<td>Biblioteca Virtual Miguel de Cervantes</td>
+<td>BVMC Labs</td>
+<td><link target="http://data.cervantesvirtual.com/blog/labs">http://data.cervantesvirtual.com/blog/labs</link></td>
+</tr>
+<tr>
+<td>Det Kgl. Bibliotek</td>
+<td>KB Labs</td>
+<td><link target="https://labs.kb.dk/">https://labs.kb.dk/</link></td>
+</tr>
+<tr>
+<td>Europeana</td>
+<td>Europeana IIIF APIs</td>
+<td><link target="https://pro.europeana.eu/page/iiif">https://pro.europeana.eu/page/iiif</link></td>
+</tr>
+<tr>
+<td>History Trust of South Australia</td>
+<td>Learn section</td>
+<td><link target="https://history.sa.gov.au/">https://history.sa.gov.au/</link></td>
+</tr>
+<tr>
+<td>National Library of Netherlands</td>
+<td>KB Lab</td>
+<td><link target="https://lab.kb.nl/">https://lab.kb.nl/</link></td>
+</tr>
+<tr>
+<td>National Library of Scotland</td>
+<td>Data Foundry</td>
+<td><link target="https://data.nls.uk/">https://data.nls.uk/</link></td>
+</tr>
+<tr>
+<td>Library of Congress</td>
+<td>LC Labs</td>
+<td><link target="https://labs.loc.gov/data-for-exploration">https://labs.loc.gov/data-for-exploration</link></td>
+</tr>
+<tr>
+<td>&#214;sterreichische Nationalbibliothek</td>
+<td>ONB Labs</td>
+<td><link target="https://labs.onb.ac.at/en/">https://labs.onb.ac.at/en/</link></td>
+</tr>
+<tr>
+<td>Staatsbibliothek zu Berlin</td>
+<td>SBB Labs</td>
+<td><link target="https://lab.sbb.berlin/?lang=en">https://lab.sbb.berlin/?lang=en</link></td>
+</tr>
+<tr>
+<td>State Library New South Wales</td>
+<td>DX Lab</td>
+<td><link target="https://dxlab.sl.nsw.gov.au">https://dxlab.sl.nsw.gov.au</link></td>
+</tr>
+</tbody></table><p>Las instituciones GLAM publican colecciones digitales en diferentes formatos. Tradicionalmente han publicado diversos tipos de materiales como im&#225;genes, textos y mapas. Recientemente, han aparecido nuevas formas de publicaci&#243;n que utilizan tecnolog&#237;as basadas en la <link target="https://es.wikipedia.org/wiki/Web_sem%C3%A1ntica">Web Sem&#225;ntica</link>. Estas t&#233;cnicas permiten el enriquecimiento con repositorios externos a partir de la creaci&#243;n de enlaces. <link target="https://www.wikidata.org">Wikidata</link> se ha convertido en un repositorio muy popular en el &#225;mbito de las instituciones GLAM y muchas de ellas ya disponen de propiedades espec&#237;ficas para enlazar sus recursos como autores y obras. Por ejemplo, la <link target="http://www.cervantesvirtual.com/">Biblioteca Virtual Miguel de Cervantes</link> dispone de la propiedad <link target="https://www.wikidata.org/wiki/Property:P2799">P2799</link> para enlazar autores desde su repositorio de datos abiertos hacia Wikidata.</p>
+</div>
+      <div n="1"><head>Extracci&#243;n y visualizaci&#243;n de datos</head>
+<p>Para este ejemplo vamos a utilizar la colecci&#243;n <link target="https://data.nls.uk/data/metadata-collections/moving-image-archive/">Moving Image Archive</link> proporcionada por el <link target="https://data.nls.uk/">Data Foundry de la Biblioteca Nacional de Escocia</link>, publicada bajo dominio p&#250;blico y que contiene alrededor de 6.000 registros descritos con el est&#225;ndar <link target="https://www.loc.gov/standards/marcxml/">MARC 21 XML</link>. Esta colecci&#243;n contiene informaci&#243;n sobre im&#225;genes en movimiento como v&#237;deos, pel&#237;culas y documentales, que est&#225;n relacionadas con Escocia y que fueron creadas por aficionados o profesionales. Este ejemplo est&#225; disponible en <link target="https://zenodo.org/record/5340157">Zenodo</link> y puede ser ejecutado en <link target="https://mybinder.org/v2/zenodo/10.5281/zenodo.5340157/">MyBinder</link>.</p>
+<p>Para poder procesar de forma sencilla la colecci&#243;n digital vamos a cambiar de MARCXML a un formato m&#225;s sencillo de manipular como el <link target="https://es.wikipedia.org/wiki/Valores_separados_por_comas">CSV</link>. Posteriormente, haciendo uso de varias librer&#237;as, es posible identificar y obtener un listado de los temas, favoreciendo as&#237; el descubrimiento de nuevo conocimiento.</p>
+<p>En primer lugar, importamos las librer&#237;as que vamos a necesitar para trabajar con la colecci&#243;n, incluyendo librer&#237;as para el manejo de MARC<ref type="footnotemark" target="#2"/>, CSV, <link target="https://es.wikipedia.org/wiki/Expresi%C3%B3n_regular">expresiones regulares</link>, visualizaci&#243;n y empaquetado de datos. El uso de Binder nos facilita la ejecuci&#243;n sin necesidad de instalar ning&#250;n software; sin embargo, si deseamos ejecutar la colecci&#243;n de Jupyter Notebooks en nuestro ordenador es necesario instalar cada librer&#237;a mediante el comando pip (por ejemplo, <code type="inline">pip install pymarc</code>). Si quieres conocer m&#225;s detalles sobre este comando, te recomendamos la lecci&#243;n <link target="/es/lecciones/instalar-modulos-python-pip">instalar m&#243;dulos de Python con pip</link>.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_0" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_0.txt"></code></pre>
+<p>Despu&#233;s, creamos un fichero CSV con el contenido de la colecci&#243;n descrito en MARCXML y que previamente hemos descargado. El fichero CSV debe incluir la cabecera con los campos que vamos a extraer.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_1" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_1.txt"></code></pre>
+<p>A continuaci&#243;n, comenzamos a extraer la informaci&#243;n del fichero MARCXML. El formato <link target="https://es.wikipedia.org/wiki/MARC_21">MARC21</link> facilita la descripci&#243;n de los registros bibliogr&#225;ficos, estructur&#225;ndolos en campos (que identifica mediante n&#250;meros) y subcampos (que identifica por caracteres). Por ejemplo, el campo <code type="inline">245 $a</code> corresponde al t&#237;tulo principal de una obra y el campo <code type="inline">100 $a</code> representa su autor principal. Como se observa en el siguiente fragmento de c&#243;digo, mediante la librer&#237;a pymarc recorremos los registros y localizamos los campos que deseamos recuperar mediante sus identificadores para generar y almacenar el resultado en el fichero CSV.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_2" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_2.txt"></code></pre>
+<p>Una vez que ya hemos generado el fichero CSV, podemos cargarlo mediante la librer&#237;a <link target="https://pandas.pydata.org/docs/index.html">Pandas</link><ref type="footnotemark" target="#3"/>, que permite cargar y manipular datos tabulados por medio de su estructura b&#225;sica: el DataFrame.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_3" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_3.txt"></code></pre>
+<p>Para ver el contenido del DataFrame debemos mostrar la variable <code type="inline">df</code>, como se ilustra en la Figura 2. Tambi&#233;n podemos comprobar las columnas existentes, as&#237; como el n&#250;mero de registros.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_4" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_4.txt"></code></pre>
+<figure><desc>Primeras cinco filas del contenido del DataFrame</desc><graphic url="reutilizando-colecciones-digitales-glam-labs2.png"/></figure>
+<p>Tambi&#233;n podemos mostrar las columnas que tiene nuestro fichero CSV con el m&#233;todo <code type="inline">df.columns</code>, como se observa en la Figura 3. Para obtener el n&#250;mero de registros en nuestro DataFrame ejecutamos el comando <code type="inline">len(df)</code>.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_5" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_5.txt"></code></pre>
+<figure><desc>Nombres de las columnas incluidas en el DataFrame</desc><graphic url="reutilizando-colecciones-digitales-glam-labs3.png"/></figure>
+<p>Pandas permite la manipulaci&#243;n y visualizaci&#243;n del DataFrame de diferentes formas. Por ejemplo, podemos identificar la lista de materias (corresponde a la columna materias) y ordenarla alfab&#233;ticamente.</p>
+<p>Cada registro contiene el metadato materia que consiste en un listado de elementos separados por dos guiones. Por ejemplo, <code type="inline">Ceremonies -- Emotions, Attitudes and Behaviour -- Local Government -- Transport -- Edinburgh -- amateur</code>. Pandas permite dividir este tipo de cadenas para tratar los elementos individuales mediante el comando <link target="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.str.split.html">split</link>, que recibe como par&#225;metros el car&#225;cter a usar para dividir la cadena de texto y mediante la opci&#243;n <code type="inline">expand=True</code> crea una nueva columna para cada elemento. El m&#233;todo <link target="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.stack.html">stack</link>, por su parte, permite convertir las columnas a un &#237;ndice. El resto de c&#243;digo ordena alfab&#233;ticamente los elementos, como se puede observar en la Figura 4.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_6" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_6.txt"></code></pre>
+<figure><desc>Listado de materias ordenadas alfab&#233;ticamente</desc><graphic url="reutilizando-colecciones-digitales-glam-labs4.png"/></figure>
+<p>Con el objetivo de demostrar que el c&#243;digo se puede adaptar y modificar a otras colecciones digitales, se ha incluido un ejemplo adicional basado en la <link target="https://datos.gob.es/es/catalogo/e00123904-bibliografia-espanola-de-cartografia-2017">Bibliograf&#237;a Espa&#241;ola de Cartograf&#237;a</link> de la Biblioteca Nacional de Espa&#241;a, que incluye mapas, planos, cartas n&#225;uticas, atlas, etc&#233;tera, tanto en formato impreso como electr&#243;nico. Tras el an&#225;lisis de las materias se obtiene que la mayor&#237;a de los registros tratan sobre mapas, excursionismo, carreteras, senderismo, planos y comercio.</p>
+<p>De forma adicional y para quienes quieran profundizar en la reutilizaci&#243;n de estas dos colecciones, los ejemplos proporcionan la documentaci&#243;n necesaria para identificar y visualizar la frecuencia de t&#243;picos, lo que puede ser interesante para una primera exploraci&#243;n de los metadatos. Para realizar el proceso completo es necesario consultar los Jupyter Notebooks dedicados a estos dos ejemplos que se encuentran en <link target="https://zenodo.org/record/5340157">Zenodo</link> y que se pueden ejecutar en <link target="https://mybinder.org/v2/zenodo/10.5281/zenodo.5340157/">Binder</link>.</p>
+</div>
+      <div n="1"><head>Crear mapas a partir de Linked Open Data</head>
+<p>Para el segundo ejemplo nos vamos a basar en un repositorio creado mediante tecnolog&#237;as avanzadas, como <link target="https://es.wikipedia.org/wiki/Datos_enlazados#Proyecto_de_comunidad_para_la_inter-conexi%C3%B3n_de_datos_abiertos">Linked Open Data</link>. Puedes consultar m&#225;s informaci&#243;n sobre Linked Open Data y <link target="https://es.wikipedia.org/wiki/SPARQL">SPARQL</link> en la lecci&#243;n de <link target="/es/lecciones/introduccion-datos-abiertos-enlazados">datos abiertos enlazados</link>.</p>
+<p>La plataforma <link target="https://bnb.data.bl.uk/">BNB Linked Data</link> provee acceso a la <link target="https://bnb.data.bl.uk/">British National Bibliography (BNB)</link> como Linked Open Data proporcionando acceso a trav&#233;s de SPARQL.
+Este ejemplo se basa en la recuperaci&#243;n de localizaciones geogr&#225;ficas relacionadas con las obras de un autor. La localizaci&#243;n corresponde al lugar de publicaci&#243;n original de una obra en particular. Una vez recuperadas las localizaciones, y gracias a que los datos est&#225;n enlazados a <link target="https://www.geonames.org/">GeoNames</link>, es posible obtener informaci&#243;n adicional sobre esa localizaci&#243;n, como por ejemplo la latitud y longitud, que nos servir&#225; para representarla en un mapa.</p>
+<p>En este sentido, este ejemplo pretende introducir los pasos necesarios para reutilizar una colecci&#243;n digital publicada, siguiendo los principios de Linked Open Data que facilitan el establecimiento de enlaces a repositorios externos. Los repositorios sem&#225;nticos publicados por instituciones GLAM son una fuente de informaci&#243;n de gran valor que se encuentran a disposici&#243;n de los investigadores sin ning&#250;n tipo de restricci&#243;n para su uso. Sin embargo, su reutilizaci&#243;n no es sencilla ya que requiere conocimientos avanzados en tecnolog&#237;as como <link target="https://es.wikipedia.org/wiki/Resource_Description_Framework">RDF</link> (del ingl&#233;s Resource Description Framework) o SPARQL para poder realizar las consultas.</p>
+<p>Este ejemplo utiliza los metadatos del repositorio que indican localizaciones, como por ejemplo las propiedades <code type="inline">blt:publication</code> y <code type="inline">blt:projectedPublication</code> que indican lugares de publicaci&#243;n. Gracias a que los registros est&#225;n enlazados a GeoNames, vamos a poder acceder a Wikidata para recuperar las coordenadas geogr&#225;ficas de las localizaciones y mostrar los beneficios de Linked Open Data. El vocabulario utilizado por BNB Linked Data es <link target="http://bibliontology.com/">Bibliographic Ontology (BIBO)</link> que es un vocabulario sencillo que permite describir los metadatos de un repositorio bibliogr&#225;fico.</p>
+<p>En primer lugar, importamos las librer&#237;as necesarias para procesar esta colecci&#243;n: <link target="https://pypi.org/project/folium/0.1.4/">folium</link><ref type="footnotemark" target="#4"/> para visualizar informaci&#243;n geogr&#225;fica en un mapa; csv y json para el procesamiento de los formatos de entrada y salida; request para la realizaci&#243;n de peticiones HTTP; pandas para la gesti&#243;n de datos tabulares con columnas de tipo heterog&#233;neo y <link target="https://matplotlib.org/">matplotlib</link><ref type="footnotemark" target="#5"/> para la creaci&#243;n de gr&#225;ficas.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_7" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_7.txt"></code></pre>
+<p>A continuaci&#243;n, vemos un ejemplo de consulta SPARQL que recupera las obras publicadas en un lugar en concreto: &#8220;York&#8221;. Las sentencias SPARQL de este apartado las podemos ejecutar en el punto de acceso <link target="https://bnb.data.bl.uk/flint-sparql">SPARQL</link>, como se observa en la Figura 5.</p>
+<pre><code class="language-sql" xml:id="code_reutilizando-colecciones-digitales-glam-labs_8" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_8.txt"></code></pre>
+<figure><desc>Punto de acceso SPARQL para la plataforma BNB Linked Data</desc><graphic url="reutilizando-colecciones-digitales-glam-labs5.png"/></figure>
+<p>En el modelo de la plataforma BNB Linked Data, un recurso de tipo publicaci&#243;n contiene una propiedad <code type="inline">c4dm:place</code> que enlaza a GeoNames en alrededor de cuatro millones de registros (un 50% del cat&#225;logo completo). Sin embargo, el resultado de la sentencia SPARQL anterior no proporciona las coordenadas geogr&#225;ficas, a pesar de que algunos datos se encuentren enlazados a GeoNames.</p>
+<p>Con la siguiente sentencia SPARQL recuperamos las obras relacionadas con el autor <link target="https://es.wikipedia.org/wiki/Miguel_de_Cervantes">Miguel de Cervantes Saavedra</link> que tienen un lugar de publicaci&#243;n y que adem&#225;s este est&#225; enlazado a GeoNames. En este caso, la variable <code type="inline">?p</code> que se usa en la tripleta que filtra los resultados del autor puede ser cualquier rol, como por ejemplo colaborador, creador o autor en el caso de la BNB. En este sentido, podr&#237;a ser interesante filtrar por un rol en concreto para obtener resultados m&#225;s espec&#237;ficos.</p>
+<pre><code class="language-sql" xml:id="code_reutilizando-colecciones-digitales-glam-labs_9" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_9.txt"></code></pre>
+<p>Para poder ejecutar esta sentencia SPARQL en Python, necesitamos especificar el punto de acceso SPARQL y la sentencia SPARQL a ejecutar:</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_10" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_10.txt"></code></pre>
+<p>A continuaci&#243;n, recuperamos el resultado mediante la configuraci&#243;n de la cabecera de la petici&#243;n para que devuelva un objeto <link target="https://es.wikipedia.org/wiki/JSON">JSON</link>. La Figura 6 muestra un ejemplo del resultado de la petici&#243;n.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_11" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_11.txt"></code></pre>
+<figure><desc>Resultados de la petici&#243;n a la plataforma BNB Linked Data</desc><graphic url="reutilizando-colecciones-digitales-glam-labs6.png"/></figure>
+<p>Y almacenamos el resultado en un fichero CSV m&#225;s sencillo de manipular.
+En primer lugar cargamos en un objeto JSON el resultado obtenido.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_12" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_12.txt"></code></pre>
+<p>Despu&#233;s creamos el fichero CSV y volcamos el contenido del objeto JSON a este fichero. Para ello, recorreremos cada &#237;tem del listado de resultados dentro del objeto JSON con la variable <code type="inline">bnbdatos</code> y accederemos a los atributos <code type="inline">['results']['bindings']</code>. Cada propiedad tiene un atributo <code type="inline">value</code> que contiene el valor que necesitamos recuperar.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_13" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_13.txt"></code></pre>
+<p>Una vez que tenemos creado el fichero CSV, podemos cargarlo en un objeto DataFrame de Pandas que nos facilita el an&#225;lisis y tratamiento. La Figura 7 muestra el DataFrame con las filas y columnas.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_14" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_14.txt"></code></pre>
+<figure><desc>Visualizaci&#243;n del objeto DataFrame con los resultados</desc><graphic url="reutilizando-colecciones-digitales-glam-labs7.png"/></figure>
+<p>A continuaci&#243;n, podemos analizar cu&#225;ntos enlaces diferentes tenemos a GeoNames en el listado de resultados. Pandas permite acceder a las columnas del objeto DataFrame mediante el operador <code type="inline">groupby</code>. En este ejemplo agrupamos por la columna lugar de publicaci&#243;n (<code type="inline">lugar</code>) y en la segunda posici&#243;n marcamos la columna que queremos utilizar para realizar la agregaci&#243;n, en este caso, la obra (<code type="inline">recurso</code>). La Figura 8 muestra el resultado.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_15" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_15.txt"></code></pre>
+<figure><desc>Enlaces a GeoNames en el listado de resultados</desc><graphic url="reutilizando-colecciones-digitales-glam-labs8.png"/></figure>
+<p>La plataforma BNB Linked Data proporciona los enlaces a GeoNames pero no contiene las coordenadas geogr&#225;ficas. Sin embargo, esta informaci&#243;n puede ser recuperada de otros repositorios, como por ejemplo Wikidata. Las entidades en Wikidata disponen de un conjunto de propiedades que las describen y tambi&#233;n incluyen un segundo apartado para identificadores externos. La Figura 9 corresponde a la entidad <link target="https://www.wikidata.org/wiki/Q84?uselang=es">Londres en Wikidata</link> y en ella podemos observar el identificador de GeoNames.</p>
+<figure><desc>Enlace a GeoNames desde Wikidata</desc><graphic url="reutilizando-colecciones-digitales-glam-labs9.png"/></figure>
+<p>Hasta ahora disponemos de las URIs de cada elemento de GeoNames. Para poder enlazar a Wikidata necesitamos &#250;nicamente el identificador. El siguiente c&#243;digo extrae los identificadores haciendo tratamiento de cadenas, como se puede observar en la Figura 10.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_16" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_16.txt"></code></pre>
+<figure><desc>Extracci&#243;n de identificadores de GeoNames</desc><graphic url="reutilizando-colecciones-digitales-glam-labs10.png"/></figure>
+<p>Una vez tenemos preparado nuestro listado de identificadores a GeoNames, vamos a recuperar las coordenadas geogr&#225;ficas de Wikidata. Para ello es necesario crear una consulta SPARQL. Vamos a utilizar la instrucci&#243;n <code type="inline">VALUES</code> que permite especificar los valores para una determinada variable, en nuestro caso, los identificadores de GeoNames. La propiedad <link target="https://www.wikidata.org/wiki/Property:P1566">P1566</link> corresponde al identificador de GeoNames en Wikidata y la propiedad <link target="https://www.wikidata.org/wiki/Property:P625">P625</link> corresponde a las propiedades geogr&#225;ficas.</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_17" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_17.txt"></code></pre>
+<p>A continuaci&#243;n, creamos un objeto folium para implementar un mapa y a&#241;adir las coordenadas recuperadas desde Wikidata en el paso anterior. Recuperamos cada coordenada geogr&#225;fica (variables <code type="inline">lat</code> y <code type="inline">lon</code>) y montamos el texto (<code type="inline">popup</code>) que se mostrar&#225; al hacer click sobre cada localizaci&#243;n en el mapa. Finalmente, a&#241;adimos al mapa cada elemento (<code type="inline">marker</code>).</p>
+<pre><code class="language-python" xml:id="code_reutilizando-colecciones-digitales-glam-labs_18" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_18.txt"></code></pre>
+<p>Y como resultado se obtiene un mapa que se puede consultar en la Figura 11 con los lugares de publicaci&#243;n de las obras del autor seleccionado, en nuestro caso, Miguel de Cervantes Saavedra.</p>
+<figure><desc>Lugares de publicaci&#243;n de las obras de Miguel de Cervantes</desc><graphic url="reutilizando-colecciones-digitales-glam-labs11.png"/></figure>
+<p>Tambi&#233;n es posible realizar un estudio de todas las localizaciones geogr&#225;ficas incluidas en el repositorio enlazadas a GeoNames. Para ello podemos calcular el n&#250;mero total de obras por localizaci&#243;n geogr&#225;fica relacionada con GeoNames a trav&#233;s de la propiedad <code type="inline">c4dm:place</code> de la siguiente forma:</p>
+<pre><code class="language-sql" xml:id="code_reutilizando-colecciones-digitales-glam-labs_19" type="block" corresp="code_reutilizando-colecciones-digitales-glam-labs_19.txt"></code></pre>
+<p>De forma similar a como se ha creado el mapa en el ejemplo de Miguel de Cervantes Saavedra, podemos obtener una visualizaci&#243;n m&#225;s representativa a trav&#233;s de un mapa que muestra el total de localizaciones enlazadas a GeoNames incluidas en el repositorio (alrededor de cuatro millones de resultados). Como se puede observar en la Figura 12, la localizaci&#243;n m&#225;s relevante es Inglaterra.</p>
+<figure><desc>Lugares de publicaci&#243;n enlazados a GeoNames en BNB</desc><graphic url="reutilizando-colecciones-digitales-glam-labs12.png"/></figure>
+</div>
+      <div n="1"><head>Discusi&#243;n</head>
+<p>En el primer ejemplo se han reutilizado dos colecciones digitales descritas con MARCXML. Aunque la mayor&#237;a del c&#243;digo es reutilizable para ambos casos, los campos utilizados para describir los metadatos en cada colecci&#243;n son diferentes y por lo tanto es necesario un an&#225;lisis previo.</p>
+<p>En el caso de la BNB, y teniendo en cuenta la forma de representar los distintos roles que se pueden dar en un repositorio bibliogr&#225;fico, la elecci&#243;n del vocabulario a utilizar puede ser crucial a la hora de dotar de suficiente expresividad a los metadatos. En este sentido, vocabularios ricos en t&#233;rminos sem&#225;nticos como <link target="http://www.rdaregistry.info">Resource Description and Access (RDA)</link> proporcionan un listado de elementos para representar numerosos roles con el objetivo de relacionar las obras con los autores como por ejemplo director, ilustrador, impresor o narrador. Adem&#225;s, es relevante resaltar que tan solo alrededor de un 50% de las obras se encuentran enlazadas a GeoNames y que el mapa que obtenemos como resultado no incluye el total de ubicaciones del repositorio.</p>
+</div>
+      <div n="1"><head>Conclusiones</head>
+<p>En este tutorial se han introducido varios ejemplos de reutilizaci&#243;n de colecciones digitales publicadas por instituciones GLAM. Los ejemplos facilitan la  reproducci&#243;n y an&#225;lisis de los resultados, teniendo en cuenta las limitaciones de los metadatos proporcionados por las instituciones ya sea debido a la forma de utilizar los vocabularios o al n&#250;mero de enlaces externos incluido en la colecci&#243;n. La combinaci&#243;n de los Labs, las colecciones digitales y su acceso computacional a trav&#233;s de Jupyter Notebooks facilita un nuevo entorno en el que es posible reutilizar las colecciones digitales para construir nuevo conocimiento.</p>
+<p>Las instituciones GLAM se est&#225;n adaptando al nuevo entorno proporcionando colecciones aptas para el procesamiento por computador. Los Labs en el seno de las instituciones GLAM desempe&#241;an un papel fundamental en este sentido para promover las colecciones digitales y su reutilizaci&#243;n de forma innovadora. La Comunidad Internacional GLAM Labs ha fomentado la creaci&#243;n de Labs por todo el mundo; sin embargo, se observa una escasez de Labs en los pa&#237;ses hispanohablates, lo que limita el potencial y la reutilizaci&#243;n de las colecciones digitales en espa&#241;ol. Adem&#225;s, todav&#237;a es posible mejorar en lo que respecta a las licencias para proporcionar colecciones digitales libres de derechos, como tambi&#233;n a la publicaci&#243;n de ejemplos y prototipos de uso. En ese sentido, los Jupyter Notebooks pueden promover la creaci&#243;n de prototipos basados en m&#233;todos de investigaci&#243;n de Humanidades Digitales facilitando su reproducibilidad en entornos basados en la nube.</p>
+</div>
+      <div n="1"><head>Glosario</head>
+<dl>
+  <dt><hi rend="bold">Collections as data</hi></dt>
+  <dd>Movimiento para promover el acceso computacional a las colecciones digitales.</dd>
+  <dt><hi rend="bold">CSV (del ingl&#233;s Comma Separated Values)</hi></dt>
+  <dd>Un archivo CSV consiste en un fichero de texto que contiene filas formadas columnas y separadas por comas.</dd>
+  <dt><hi rend="bold">DataFrame</hi></dt>
+  <dd>Estructura que permite almacenar y manipular datos tabulados en filas formadas por columnas de variables.</dd>
+  <dt><hi rend="bold">Folium</hi></dt>
+  <dd>Biblioteca de software Python que permite crear mapas interactivos.</dd>
+  <dt><hi rend="bold">GeoNames</hi></dt>
+  <dd>Repositorio geogr&#225;fico gratuito que proporciona un identificador &#250;nico para cada recurso.</dd>
+  <dt><hi rend="bold">GLAM Workbench</hi></dt>
+  <dd>Conjunto de herramientas, tutoriales y ejemplos basados en collectiones digitales publicadas por instituciones GLAM y desarrollado por el australiano Tim Sherratt.</dd>
+  <dt><hi rend="bold">Jupyter Notebook</hi></dt>
+  <dd>Plataforma de c&#243;digo abierto que permite crear y compartir documentos compuestos por c&#243;digo, gr&#225;ficas y documentaci&#243;n.</dd>
+  <dt><hi rend="bold">Linked Open Data</hi></dt>
+  <dd>Publicaci&#243;n de informaci&#243;n basada en RDF y conectada con repositorios externos de diferentes fuentes e instituciones.</dd>
+  <dt><hi rend="bold">MARCXML</hi></dt>
+  <dd>Formato para la codificaci&#243;n de un registro MARC en XML.</dd>
+  <dt><hi rend="bold">MyBinder</hi></dt>
+  <dd>Plataforma gratuita para la ejecuci&#243;n de Jupyter Notebooks alojados en repositorios como GitHub o Zenodo evitando la instalaci&#243;n de software.</dd>
+  <dt><hi rend="bold">Pandas</hi></dt>
+  <dd>Biblioteca de software Python que permite crear y manipular conjuntos de datos.</dd>
+  <dt><hi rend="bold">Python</hi></dt>
+  <dd>Lenguaje de programaci&#243;n interpretado y multiplataforma, de libre uso y con una curva de aprendizaje amigable y corta.</dd>
+  <dt><hi rend="bold">RDF (del ingl&#233;s Resource Description Framework)</hi></dt>
+  <dd>Marco de descripci&#243;n de recursos publicado por el W3C para publicar informaci&#243;n en Internet a modo de tripletas.</dd>  
+  <dt><hi rend="bold">SPARQL</hi></dt>
+  <dd>Lenguaje de consulta para informaci&#243;n almacenada en formato RDF.</dd>
+  <dt><hi rend="bold">URI (del ingl&#233;s Universal Resource Identifier)</hi></dt>
+  <dd>Identificador uniforme de recursos para la web.</dd>
+</dl>
+</div>
+      <div n="1"><head>Notas</head>
+<p><note id="1"> Candela, Gustavo, Mar&#237;a Dolores S&#225;ez, Mar&#237;a Pilar Escobar y Manuel Marco-Such. <emph>hibernator11/notebook-ph: Release 1</emph> v1.0 (2021). <link target="https://doi.org/10.5281/zenodo.5340157">https://doi.org/10.5281/zenodo.5340157</link></note></p>
+<p><note id="2"> Summers, Ed. <emph>pymarc</emph> v4.0.0 (2020). <link target="https://pymarc.readthedocs.io/en/stable/">https://pymarc.readthedocs.io/en/stable/</link></note></p>
+<p><note id="3"> The Pandas Development Team. <emph>pandas-dev/pandas: Pandas.</emph> v.1.2.2 (2020). <link target="https://doi.org/10.5281/zenodo.4524629">https://doi.org/10.5281/zenodo.4524629</link></note></p>
+<p><note id="4"> Filipe, Martin Journois, Frank, Rob Story, James Gardiner, Halfdan Rump, Andrew Bird, et al. <emph>Python-visualization/folium:</emph> v0.10.1 (2019). <link target="https://doi.org/10.5281/zenodo.3559751">https://doi.org/10.5281/zenodo.3559751</link>.</note></p>
+<p><note id="5"> Thomas A Caswell, Michael Droettboom, John Hunter, Eric Firing, Antony Lee, Jody Klymak, David Stansby, et al. <emph>Matplotlib/matplotlib</emph> v2.2.4 (2019). <link target="https://doi.org/10.5281/zenodo.2669103">https://doi.org/10.5281/zenodo.2669103</link>.</note></p>
+</div>
+    </body>
+  </text>
+</TEI>

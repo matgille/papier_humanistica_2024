@@ -1,0 +1,4 @@
+# file-append.py
+f = open('helloworld.txt','a')
+f.write('\n' + 'hello world')
+f.close()

@@ -1,0 +1,102 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>De HTML para Lista de Palavras (parte 1)</title>
+  <layout>lesson</layout>
+  <collection>lessons</collection>
+  <slug>HTML-lista-palavras-1</slug>
+  <date>2012-07-17</date>
+  <translation_date>2022-10-27</translation_date>
+  <authors>William J. Turkel,Adam Crymble</authors>
+  <reviewers>Jim Clifford,Frederik Elwert</reviewers>
+  <editors>Miriam Posner</editors>
+  <translator>Felipe Lamarca</translator>
+  <translation-editor>Jimmy Medeiros</translation-editor>
+  <translation-reviewer>Daniel Bonatto Seco,Diana Rebelo Rodriguez</translation-reviewer>
+  <difficulty>2</difficulty>
+  <review-ticket>https://github.com/programminghistorian/ph-submissions/issues/442</review-ticket>
+  <activity>transforming</activity>
+  <topics>python</topics>
+  <abstract>Nesta li&#231;&#227;o de duas partes, aprofundaremos o que aprendeu sobre o Download de P&#225;ginas Web com Python, aprendendo como remover a marca&#231;&#227;o HTML de uma p&#225;gina web da transcri&#231;&#227;o do julgamento criminal de Benjamin Bowsey em 1780. Faremos isso usando uma variedade de operadores de string, m&#233;todos de string e habilidades de leitura atenta. Introduziremos looping e branching de modo que os programas possam repetir tarefas e testar certas condi&#231;&#245;es, tornando poss&#237;vel a separa&#231;&#227;o do conte&#250;do das tags HTML. Finalmente, faremos a convers&#227;o do conte&#250;do de uma string longa para uma lista de palavras, que podem ser ordenadas, indexadas e contabilizadas posteriormente.</abstract>
+  <original>from-html-to-list-of-words-1</original>
+  <avatar_alt>Uma girafa a ser imitada por um humano</avatar_alt>
+  <doi>10.46430/phpt0027</doi>
+</metadata>
+  <text>
+    <body>
+      <div n="1"><head>Objetivos da li&#231;&#227;o</head>
+<p>Nesta li&#231;&#227;o de duas partes, aprofundaremos o que aprendeu sobre o <link target="/pt/licoes/download-paginas-web-python">Download de P&#225;ginas Web com Python</link>, aprendendo como remover a <emph>marca&#231;&#227;o HTML</emph> de uma p&#225;gina web da <link target="https://perma.cc/8LM6-W39K">transcri&#231;&#227;o do julgamento criminal de Benjamin Bowsey em 1780</link>. Faremos isso usando uma variedade de <emph>operadores de string</emph>, <emph>m&#233;todos de string</emph> e habilidades de leitura atenta. Introduziremos <emph>looping</emph> e <emph>branching</emph> de modo que os programas possam repetir tarefas e testar certas condi&#231;&#245;es, tornando poss&#237;vel a separa&#231;&#227;o do conte&#250;do das tags HTML. Finalmente, faremos a convers&#227;o do conte&#250;do de uma string longa para uma <emph>lista de palavras</emph>, que podem ser ordenadas, indexadas e contabilizadas posteriormente.</p>
+</div>
+      <div n="1"><head>O Desafio</head>
+<p>Para ter uma ideia mais clara da tarefa que temos pela frente, abra o ficheiro <emph>obo-t17800628-33.html</emph> que criou em <link target="/pt/licoes/download-paginas-web-python">Download de P&#225;ginas Web com Python</link> (ou fa&#231;a o <link target="/assets/obo-t17800628-33.html">download e guarde a transcri&#231;&#227;o do julgamento</link> caso ainda n&#227;o tenha uma c&#243;pia) e depois verifique o c&#243;digo-fonte do HTML clicando em <emph>Ferramentas -&gt; Ferramentas do Navegador -&gt; Fonte da p&#225;gina</emph> (para usu&#225;rios do navegador Firefox). &#192; medida que for olhando o c&#243;digo-fonte, notar&#225; que h&#225; tags HTML misturadas com texto. Caso n&#227;o tenha experi&#234;ncia com HTML, recomendamos que fa&#231;a o tutorial do W3 Schools <link target="http://www.w3schools.com/html/">HTML</link> para se familiarizar com a marca&#231;&#227;o HTML. Se o seu trabalho frequentemente requer que remova a marca&#231;&#227;o HTML, certamente ser&#225; &#250;til entend&#234;-la ao visualiz&#225;-la.</p>
+</div>
+      <div n="1"><head>Ficheiros Necess&#225;rios para esta Li&#231;&#227;o</head>
+<ul>
+<li><emph><link target="/assets/obo-t17800628-33.html">obo-t17800628-33.html</link></emph></li>
+</ul>
+</div>
+      <div n="1"><head>Idealizando um Algoritmo</head>
+<p>Uma vez que o objetivo &#233; nos livrarmos do HTML, o primeiro passo &#233; criar um algoritmo que retorna apenas o texto (removendo as tags HTML) do artigo. Um algoritmo &#233; um procedimento suficientemente detalhado a ponto de poder ser implementado em um computador. Facilita escrever o seu algoritmo no portugu&#234;s direto; &#233; uma &#243;tima maneira de delinear exatamente o que deseja fazer antes de mergulhar no c&#243;digo. Para construir esse algoritmo, utilizaremos as nossas habilidades de leitura atenta para descobrir um modo de capturar apenas o conte&#250;do textual da biografia.</p>
+<p>Ao verificar o c&#243;digo-fonte do <emph>obo-t17800628-33.html</emph>, notar&#225; que a transcri&#231;&#227;o real n&#227;o come&#231;a imediatamente. Na verdade, h&#225; um n&#250;mero de tags HTML e algumas informa&#231;&#245;es de cita&#231;&#227;o. Nesse caso, o conte&#250;do n&#227;o come&#231;a antes da linha 81!</p>
+<pre><code class="language-xml" xml:id="code_HTML-lista-palavras-1_0" type="block" corresp="code_HTML-lista-palavras-1_0.txt"></code></pre>
+<p>Estamos interessados apenas na transcri&#231;&#227;o em si e n&#227;o nos metadados extras contidos nas tags. No entanto, ir&#225; notar que o final dos metadados corresponde ao in&#237;cio da transcri&#231;&#227;o. Isso torna a localiza&#231;&#227;o dos metadados uma marca&#231;&#227;o potencialmente &#250;til para isolar o texto transcrito.</p>
+<p>&#192; primeira vista, percebemos que a transcri&#231;&#227;o do julgamento em si come&#231;a com uma tag HTML: <code type="inline">&lt;p&gt;</code>, que significa 'par&#225;grafo'. Essa &#233; coincidentemente a primeira tag de par&#225;grafo no documento. Podemos usar isso para encontrar o ponto de partida do nosso texto transcrito. Temos sorte nesse caso porque essa tag &#233; uma maneira confi&#225;vel de encontrar o in&#237;cio do texto transcrito no julgamento (caso deseje, d&#234; uma olhada em alguns outros julgamentos para verificar).</p>
+<p>O texto do julgamento termina na linha 82 com outra tag HTML: <code type="inline">&lt;br/&gt;</code>, que significa uma quebra de linha. Essa &#233; a &#250;ltima quebra de linha no documento. Essas duas tags (tag de primeiro par&#225;grafo e &#250;ltima quebra de linha), portanto, nos oferecem uma forma de isolar o texto desejado. Sites bem formatados quase sempre ter&#227;o uma forma &#250;nica de sinalizar o fim de um conte&#250;do. Voc&#234; frequentemente s&#243; precisa verificar de forma atenta.</p>
+<p>A pr&#243;xima tarefa &#233; remover toda a marca&#231;&#227;o HTML que permanece mesclada ao conte&#250;do. Como sabe que tags HTML s&#227;o sempre encontradas em pares correspondentes de par&#234;nteses angulares, &#233; provavelmente uma aposta segura o fato de que, se remover tudo o que estiver entre par&#234;nteses angulares, todo o HTML ser&#225; removido e restar&#225; somente a transcri&#231;&#227;o. Note que estamos assumindo que a transcri&#231;&#227;o n&#227;o possuir&#225; os s&#237;mbolos matem&#225;ticos de "menor que" ou "maior que". Se Bowsey fosse um matem&#225;tico, essa suposi&#231;&#227;o n&#227;o seria t&#227;o segura.</p>
+<p>A seguir, descreve-se o algoritmo em palavras.</p>
+<p>Para isolar o conte&#250;do:</p>
+<ul>
+<li>Fazer o download do texto transcrito</li>
+<li>Buscar no HTML e guardar a localiza&#231;&#227;o da primeira tag <code type="inline">&lt;p&gt;</code></li>
+<li>Buscar no HTML e guardar a localiza&#231;&#227;o da &#250;ltima tag <code type="inline">&lt;br/&gt;</code></li>
+<li>Armazenar tudo que vier ap&#243;s a tag <code type="inline">&lt;p&gt;</code> e antes da tag <code type="inline">&lt;br/&gt;</code> numa string: <emph>pageContents</emph></li>
+</ul>
+<p>Neste ponto, temos o texto da transcri&#231;&#227;o do julgamento, al&#233;m da marca&#231;&#227;o HTML. Em seguida:</p>
+<ul>
+<li>Verificar cada caractere na string <emph>pageContents</emph>, um por um</li>
+<li>Se o caractere for um colchete angular esquerdo (&lt;), estamos dentro de uma tag e deve-se ignorar os caracteres subsequentes</li>
+<li>Se o caractere for um colchete angular direito (&gt;), estamos deixando a tag; deve-se ignorar este caractere, mas verificar cada um dos caracteres subsequentes</li>
+<li>Se n&#227;o estivermos dentro de uma tag, adiciona-se cada caractere a uma nova vari&#225;vel: <emph>text</emph></li>
+</ul>
+<p>Finalmente:</p>
+<ul>
+<li>Separar a string de texto em uma lista de palavras individuais, que podem ser manipuladas posteriormente.</li>
+</ul>
+</div>
+      <div n="1"><head>Isolar o Conte&#250;do Desejado</head>
+<p>Os pr&#243;ximos passos utilizam os comandos de Python introduzidos na li&#231;&#227;o <link target="/pt/licoes/manipular-strings-python">Manipular strings com Python</link> para implementar a primeira metade do algoritmo: remover todo o conte&#250;do antes da tag <code type="inline">&lt;p&gt;</code> e depois da tag <code type="inline">&lt;br/&gt;</code>. Para recapitular, o algoritmo era o seguinte:</p>
+<ul>
+<li>Fazer o download do texto transcrito</li>
+<li>Buscar no HTML e guardar a localiza&#231;&#227;o da primeira tag <code type="inline">&lt;p&gt;</code></li>
+<li>Buscar no HTML e guardar a localiza&#231;&#227;o da &#250;ltima tag <code type="inline">&lt;br/&gt;</code></li>
+<li>Armazenar tudo que vier ap&#243;s a tag <code type="inline">&lt;p&gt;</code> e antes da tag <code type="inline">&lt;br/&gt;</code> numa string: <emph>pageContents</emph></li>
+</ul>
+<p>Para fazer isso, voc&#234; utilizar&#225; o m&#233;todo de string 'find', o m&#233;todo .rfind() (que encontra a &#250;ltima correspond&#234;ncia de algo) e criar&#225; uma nova substring contendo apenas o conte&#250;do desejado entre essas posi&#231;&#245;es de &#237;ndice.</p>
+<p>Enquanto trabalha, desenvolver&#225; ficheiros separados para armazenar o seu c&#243;digo. Um deles ser&#225; chamado <code type="inline">obo.py</code> (para "Old Bailey Online"). Esse ficheiro conter&#225; todo o c&#243;digo que deseja reutilizar; em outras palavras, <code type="inline">obo.py</code> &#233; um m&#243;dulo. Discutimos a ideia de m&#243;dulo em <link target="/pt/licoes/reutilizacao-codigo-modularidade-python">Reutiliza&#231;&#227;o de c&#243;digo e modularidade em Python</link>, quando salvamos nossas fun&#231;&#245;es em <code type="inline">cumprimento.py</code>.</p>
+<p>Crie um novo ficheiro chamado <code type="inline">obo.py</code> e armazene-o no seu diret&#243;rio <emph>programming-historian</emph>. Utilizaremos esse ficheiro para manter c&#243;pias das fun&#231;&#245;es necess&#225;rias para processar o The Old Bailey Online. Digite ou copie o c&#243;digo a seguir no seu ficheiro:</p>
+<pre><code class="language-python" xml:id="code_HTML-lista-palavras-1_1" type="block" corresp="code_HTML-lista-palavras-1_1.txt"></code></pre>
+<p>Crie um segundo ficheiro, <code type="inline">trial-content.py</code>, e salve o programa mostrado abaixo:</p>
+<pre><code class="language-python" xml:id="code_HTML-lista-palavras-1_2" type="block" corresp="code_HTML-lista-palavras-1_2.txt"></code></pre>
+<p>Quando executar o <code type="inline">trial-content.py</code>, ele acessar&#225; a p&#225;gina web da transcri&#231;&#227;o do julgamento de Bowsey e depois verificar&#225; o m&#243;dulo <code type="inline">obo.py</code> para buscar a fun&#231;&#227;o <emph>stripTags</emph>. Ele utilizar&#225; essa fun&#231;&#227;o para extrair tudo ap&#243;s a primeira tag <code type="inline">&lt;p&gt;</code> e antes da &#250;ltima tag <code type="inline">&lt;br/&gt;</code>. Com alguma sorte, esse deve ser o conte&#250;do textual da transcri&#231;&#227;o de Bowsey, al&#233;m de alguma marca&#231;&#227;o HTML. N&#227;o se preocupe se a sua tela de Sa&#237;da de Comando terminar em uma linha preta grossa. A tela de sa&#237;da do Komodo Edit possui um n&#250;mero m&#225;ximo de caracteres para exibi&#231;&#227;o, ap&#243;s o qual os caracteres come&#231;ar&#227;o a literalmente escrever uns sobre os outros na tela, dando a apar&#234;ncia de uma linha preta. N&#227;o se preocupe: o texto est&#225; l&#225;, ainda que n&#227;o consiga v&#234;-lo; pode cort&#225;-lo e col&#225;-lo em um ficheiro de texto para verificar.</p>
+<p>Vamos reservar um momento para ter certeza de que entendemos como <code type="inline">trial-contents.py</code> &#233; capaz de usar as fun&#231;&#245;es armazenadas em <code type="inline">obo.py</code>. A fun&#231;&#227;o <emph>stripTags</emph> que salvamos em <code type="inline">obo.py</code> requer um argumento. Em outras palavras, para que seja executada apropriadamente ela precisa que uma informa&#231;&#227;o seja oferecida. Lembre-se do exemplo do c&#227;o treinado na li&#231;&#227;o anterior. Para latir, o cachorro precisa de duas coisas: ar e uma guloseima deliciosa. A fun&#231;&#227;o <emph>stripTags</emph> em <code type="inline">obo.py</code> precisa de uma coisa: a string chamada <emph>pageContents</emph>. Mas voc&#234; perceber&#225; que, quando chamamos <emph>stripTags</emph> no programa final (<code type="inline">trial-contents.py</code>), n&#227;o h&#225; men&#231;&#227;o ao "<emph>pageContents</emph>". Em vez disso, a fun&#231;&#227;o recebe HTML como um argumento. Isso pode ser confuso para muitas pessoas quando come&#231;am a programar. Uma vez que uma fun&#231;&#227;o foi declarada, n&#227;o precisamos usar o mesmo nome de vari&#225;vel quando chamamos a fun&#231;&#227;o. Desde que forne&#231;amos o mesmo tipo de argumento, tudo deve funcionar bem, independente de como o chamarmos. Nesse caso, quer&#237;amos que <emph>pageContents</emph> usasse o conte&#250;do da nossa vari&#225;vel HTML. Voc&#234; poderia ter passado qualquer string, inclusive uma que voc&#234; insira diretamente entre aspas. Tente executar novamente <code type="inline">trial-content.py</code>, alterando o argumento de <emph>stripTags</emph> para "Eu gosto muito de cachorros" e veja o que acontece. Note que, dependendo de como defina a sua fun&#231;&#227;o (e o que ela faz), o seu argumento pode precisar ser algo que n&#227;o seja uma string: um n&#250;mero inteiro (<emph>integer</emph>), por exemplo.</p>
+</div>
+      <div n="1"><head>Leituras sugeridas</head>
+<ul>
+<li>
+Lutz, <emph>Learning Python</emph><ul>
+<li>Ch. 7: Strings</li>
+<li>Ch. 8: Lists and Dictionaries</li>
+<li>Ch. 10: Introducing Python Statements</li>
+<li>Ch. 15: Function Basics</li>
+</ul>
+</li>
+</ul>
+</div>
+      <div n="1"><head>Sincroniza&#231;&#227;o de C&#243;digo</head>
+<p>Para acompanhar li&#231;&#245;es futuras, &#233; importante ter os ficheiros e programas corretos no seu diret&#243;rio &#8220;programming-historian&#8221;. No final de cada li&#231;&#227;o, &#233; poss&#237;vel fazer o download do ficheiro zip &#8220;programming-historian&#8221; para ter a certeza de que o ficheiro correto est&#225; a ser utilizado. Observe que removemos os ficheiros desnecess&#225;rios das li&#231;&#245;es anteriores. Seu diret&#243;rio pode conter mais ficheiros e n&#227;o h&#225; problema!</p>
+<ul>
+<li>programming-historian-2 (<link target="/assets/python-lessons2.zip">zip</link>)</li>
+</ul>
+</div>
+    </body>
+  </text>
+</TEI>

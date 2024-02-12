@@ -1,0 +1,25 @@
+#This code only looks at the first two pages of 'JHS_1872_HenryIVandQueenJoanCanterburyCathedral.pdf', but you can of course iterate through all the JSON files.
+#Get the data from your bucket as a blob.
+page_1_2 = bucket.get_blob('docs_to_OCR/json_output/JHS_1872_HenryIVandQueenJoanCa_output-1-to-2.json')
+#Read the blob content as byte.
+json_string = page_1_2.download_as_string()
+#Turn JSON enconded data into a Python object.
+response=json.loads(json_string)
+
+#Consecutive for loops to access the deeply-nested elements wanted.
+for page in response['responses']:
+    for block in page['fullTextAnnotation']['pages'][0]['blocks']:
+        for paragraph in block['paragraphs']:
+            for word in paragraph['words']:
+
+                #Condition:
+                if word['confidence'] < 0.8:
+                    #Since the JSON data provides characters one by one, you need to join them to create the word.
+                    word_text = ''.join(symbol['text'] for symbol in word['symbols'])
+                    #Discard non-alphabetic characters.
+                    if word_text.isalpha():
+                        #Not all words have a 'detectedLanguages' attribute. The 'try-except' structure allows you to take them into account.
+                        try:
+                            print(word_text, '\t', word['confidence'], '\tLanguage Code: ', word['property']['detectedLanguages'][0]['languageCode'])
+                        except:
+                            print(word_text, '\t', word['confidence'])

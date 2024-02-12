@@ -1,0 +1,44 @@
+# choisir le fichier de données à ouvrir et le nommer 'f'
+with open('ph-jupyter-notebook-example.csv') as f:
+
+    # créer un fichier de sortie, appelé 'out', dans lequel enregistrer vos résultats
+    with open('ph-jupyter-notebook-example-jours-de-semaine.csv', 'w') as out:
+
+        # 'csv_lecteur' appplique la fonction de lecture csv.reader au fichier de données
+        csv_lecteur = csv.reader(f, delimiter=',')
+
+        # 'csv_redacteur' applique la fonction d'écriture csv.writer au fichier de sortie
+        csv_redacteur = csv.writer(out)
+
+        # Pour chaque rangée du fichier f lue par csv_lecteur...
+        for rang in csv_lecteur:
+            # Créer une liste appelée 'valeurs' contenant les éléments de la rangée
+            valeurs = list(rang)
+
+            # L'évaluation du texte est le premier item de la liste
+            # note: en Python, on compte à partir de 0, pas de 1
+            evaluation = valeurs[0]
+
+            # La date de publication est le deuxième item de la liste (donc le #1)
+            # on la convertit à l'aide de dateutil.parser tout en spécifiant que le
+            # jour vient en premier dans la description de la date
+            date_publication = dateutil.parser.parse(valeurs[1], dayfirst=True)
+
+            # Même processus pour la date de mise à jour, troisième item de la liste (donc #2)
+            date_mise_a_jour = dateutil.parser.parse(values[2], dayfirst=True)
+
+            # joursemaine_publication est le jour de publication converti
+            # %A est le code nécessaire pour afficher le jour de la semaine
+            # Vous pouvez consulter la liste des autres formats au
+            # https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
+            joursemaine_publication = datetime.date.strftime(date_publication, '%A')
+
+            # Même processus pour la date de mise à jour
+            joursemaine_mise_a_jour = datetime.date.strftime(date_mise_a_jour, '%A')
+
+            # Créer une liste contenant l'évaluation et les deux dates converties
+            valeurs_nouvelles = [evaluation, joursemaine_publication, joursemaine_mise_a_jour]
+
+            # Et écrire les résultats dans le fichier de sortie et sous cette cellule de code
+            csv_redacteur.writerow(valeurs_nouvelles)
+            print(valeurs_nouvelles)

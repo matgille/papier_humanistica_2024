@@ -1,0 +1,32 @@
+# Load term frequency data, convert to list of dictionaries
+dicts_non_binary = []
+for row in df_non_binary.iterrows():
+    if row[1]['cluster_id'] == 'none':
+        txt_file_name = ''.join(['term-frequency-tables/', row[1]['nyt_id'], '.csv'])
+    else:
+        txt_file_name = ''.join(['term-frequency-tables/', row[1]['nyt_id'], '-',
+        row[1]['cluster_id'], '.csv'])
+
+    df = pd.read_csv(txt_file_name).dropna().reset_index(drop=True)
+    mydict = dict(zip(list(df['term']), list(df['count'])))
+
+    dicts_non_binary.append(mydict)
+
+# Transform to document-term matrix
+X_non_binary = v_binary.transform(dicts_non_binary)
+# Transform to TF-IDF values
+Z_non_binary = tfidf_binary.transform(X_non_binary)
+# Apply feature selection model
+Z_non_binary_selected = features_binary.transform(Z_non_binary)
+# Make label predictions on new data
+results_non_binary = lr_binary.predict(Z_non_binary_selected)
+# Get probability scores for predictions
+probs_non_binary = lr_binary.predict_proba(Z_non_binary_selected)
+# Make results DataFrame
+results_df_non_binary = pd.DataFrame()
+results_df_non_binary['predicted'] = list(results_non_binary)
+results_df_non_binary['prob_f'] = [i[0] for i in list(probs_non_binary)]
+results_df_non_binary['prob_m'] = [i[1] for i in list(probs_non_binary)]
+results_df_non_binary['highest_prob'] = results_df_non_binary[['prob_f', 'prob_m']].max(axis=1)
+results_df_non_binary = results_df_non_binary.merge(df_non_binary, left_index=True, right_index=True)
+results_df_non_binary = results_df_non_binary.sort_values(by='highest_prob', ascending=False).reset_index(drop=True)

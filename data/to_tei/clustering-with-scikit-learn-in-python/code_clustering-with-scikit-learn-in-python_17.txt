@@ -1,0 +1,18 @@
+# lemmatization (optional step)
+import spacy
+import re
+nlp = spacy.load("en_core_web_sm")
+
+def lemmatizeAbstracts(x):
+        doc = nlp(x)
+        new_text = []
+        for token in doc:
+            new_text.append(token.lemma_)
+        text_string = " ".join(new_text)
+        # getting rid of non-word characters
+        text_string = re.sub(r"<ref type='footnotemark' target='#\w\s'/>+", "", text_string)
+        text_string = re.sub(r"\s{2,}", " ", text_string)
+        return text_string
+
+df_abstracts["abstract_lemma"] = df_abstracts["abstract"].apply(lemmatizeAbstracts)
+df_abstracts.to_csv("data/RELIGION_abstracts_lemmatized.csv")

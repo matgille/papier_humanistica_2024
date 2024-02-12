@@ -1,0 +1,23 @@
+# Load nltk
+import nltk
+nltk.download('punkt')
+%matplotlib inline
+
+# Compare the disputed papers to those written by everyone,
+# including the shared ones.
+authors = ("Hamilton", "Madison", "Disputed", "Jay", "Shared")
+
+# Transform the authors' corpora into lists of word tokens
+federalist_by_author_tokens = {}
+federalist_by_author_length_distributions = {}
+for author in authors:
+    tokens = nltk.word_tokenize(federalist_by_author[author])
+
+    # Filter out punctuation
+    federalist_by_author_tokens[author] = ([token for token in tokens
+                                            if any(c.isalpha() for c in token)])
+
+# Get a distribution of token lengths
+token_lengths = [len(token) for token in federalist_by_author_tokens[author]]
+federalist_by_author_length_distributions[author] = nltk.FreqDist(token_lengths)
+federalist_by_author_length_distributions[author].plot(15,title=author)

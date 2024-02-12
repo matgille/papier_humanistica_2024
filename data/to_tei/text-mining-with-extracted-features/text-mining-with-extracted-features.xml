@@ -1,0 +1,855 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>Text Mining in Python through the HTRC Feature Reader</title>
+  <authors>Peter Organisciak,Boris Capitanu</authors>
+  <date>2016-11-22</date>
+  <reviewers>St&#233;fan Sinclair,Catherine DeRose</reviewers>
+  <editors>Ian Milligan</editors>
+  <layout>lesson</layout>
+  <activity>analyzing</activity>
+  <topics>distant-reading,data-visualization</topics>
+  <difficulty>3</difficulty>
+  <review-ticket>https://github.com/programminghistorian/ph-submissions/issues/29</review-ticket>
+  <abstract>Explains how to use Python to summarize and visualize data on millions of texts from the HathiTrust Research Center's Extracted Features dataset.
+</abstract>
+  <redirect_from>/lessons/text-mining-with-extracted-features</redirect_from>
+  <mathjax>True</mathjax>
+  <avatar_alt>A book inside a torn case</avatar_alt>
+  <doi>10.46430/phen0058</doi>
+</metadata>
+  <text>
+    <body><p>Summary: <emph>We introduce a toolkit for working with the 13.6 million volume Extracted Features Dataset from the HathiTrust Research Center. You will learn how to peer at the words and trends of any book in the collection, while developing broadly useful Python data analysis skills.</emph></p>
+<p>The <link target="https://www.hathitrust.org">HathiTrust</link> holds nearly 15 million digitized volumes from libraries around the world. In addition to their individual value, these works in aggregate are extremely valuable for historians. Spanning many centuries and genres, they offer a way to learn about large-scale trends in history and culture, as well as evidence for changes in language or even the structure of the book. To simplify access to this collection the HathiTrust Research Center (HTRC) has released the Extracted Features dataset (Capitanu et al. 2015): a dataset that provides quantitative information describing every page of every volume in the collection.</p>
+<p>In this lesson, we introduce the HTRC Feature Reader, a library for working with the HTRC Extracted Features dataset using the Python programming language. The HTRC Feature Reader is structured to support work using popular data science libraries, particularly Pandas. Pandas provides simple structures for holding data and powerful ways to interact with it. The HTRC Feature Reader uses these data structures, so learning how to use it will also cover general data analysis skills in Python.</p>
+<p>Today, you'll learn:</p>
+<ul>
+<li>How to work with <emph>notebooks</emph>, an interactive environment for data science in Python;</li>
+<li>Methods to read and visualize text data for millions of books with the HTRC Feature Reader; and</li>
+<li>Data malleability, the skills to select, slice, and summarize extracted features data using the flexible "DataFrame" structure.</li>
+</ul>
+<h2>Background</h2>
+<p>The <hi rend="bold">HathiTrust Research Center</hi> (<hi rend="bold">HTRC</hi>) is the research arm of the HathiTrust, tasked with supporting research usage of the works held by the HathiTrust. Particularly, this support involves mediating large-scale access to materials in a non-consumptive manner, which aims to allow research over a work without enabling that work to be traditionally enjoyed or read by a human reader.  Huge digital collections can be of public benefit by allowing scholars to discover insights about history and culture, and the non-consumptive model allows for these uses to be sought within the restrictions of intellectual property law.</p>
+<p>As part of its mission, the HTRC has released the <hi rend="bold">Extracted Features</hi> (<hi rend="bold">EF</hi>) dataset containing features derived for every page of 13.6 million 'volumes' (a generalized term referring to the different types of materials in the HathiTrust collection, of which books are the most prevalent type).</p>
+<p>What is a feature? A <hi rend="bold">feature</hi> is a quantifiable marker of something measurable, a datum. A computer cannot understand the meaning of a sentence implicitly, but it can understand the counts of various words and word forms, or the presence or absence of stylistic markers, from which it can be trained to better understand text. Many text features are non-consumptive in that they don't retain enough information to reconstruct the book text.</p>
+<p>Not all features are useful, and not all algorithms use the same features. With the HTRC EF Dataset, we have tried to include the most generally useful features, as well as adapt to scholarly needs. We include per-page information such as counts of words tagged by part of speech (e.g. <emph>how many times does the word <code type="inline">jaguar</code> appear as a lowercase noun on this page</emph>), line and sentence counts, and counts of characters at the leftmost and rightmost sides of a page. No positional information is provided, so the data would not specify if 'brown' is followed by 'dog', though the information is shared for every single page, so you can at least infer how often 'brown' and 'dog' occurred in the same general vicinity within a text.</p>
+<p>Freely accessible and preprocessed, the Extracted Features dataset offers a great entry point to programmatic text analysis and text mining. To further simplify beginner usage, the HTRC has released the HTRC Feature Reader. The <hi rend="bold">HTRC Feature Reader</hi> scaffolds use of the dataset with the Python programming language.</p>
+<p>This tutorial teaches the fundamentals of using the Extracted Features dataset with the HTRC Feature Reader. The HTRC Feature Reader is designed to make use of data structures from the most popular scientific tools in Python, so the skills taught here will apply to other settings of data analysis. In this way, the Extracted Features dataset is a particularly good use case for learning more general text analysis skills. We will look at data structures for holding text, patterns for querying and filtering that information, and ways to summarize, group, and visualize the data.</p>
+<h2>Possibilities</h2>
+<p>Though it is relatively new, the Extracted Features dataset is already seeing use by scholars, as seen on a <link target="https://wiki.htrc.illinois.edu/display/COM/Extracted+Features+in+the+Wild">page collected by the HTRC</link>.</p>
+<p><link target="https://doi.org/10.6084/m9.figshare.1279201">Underwood</link> leveraged the features for identifying genres, such as fiction, poetry, and drama (2014). Associated with this work, he has released a dataset of 178k books classified by genre alongside genre-specific word counts (<link target="https://doi.org/10.13012/J8JW8BSJ">Underwood 2015</link>).</p>
+<p>The Underwood subset of the Extracted Features dataset was used by Forster (2015) to <link target="https://web.archive.org/web/20160105003327/http://cforster.com/2015/09/gender-in-hathitrust-dataset/">observe gender in literature</link>, illustrating the decline of woman authors through the 19th century.</p>
+<p>The Extracted Features dataset also underlies higher-level analytic tools. <link target="http://mimno.infosci.cornell.edu/wordsim/nearest.html">Mimno</link> processed word co-occurrence tables per year, allowing others to view how correlations between topics change over time (2014). The <link target="https://analytics.hathitrust.org/bookworm">HT Bookworm</link> project has developed an API and visualization tools to support exploration of trends within the HathiTrust collection across various classes, genres, and languages. Finally, we have developed an approach to <link target="https://github.com/organisciak/htrc-book-models">within-book topic modelling</link> which functions as a mnemonic accompaniment to a previously-read book (Organisciak 2014).</p>
+<h2>Suggested Prior Skills</h2>
+<p>This lesson provides a gentle but technical introduction to text analysis in Python with the HTRC Feature Reader. Most of the code is provided, but is most useful if you are comfortable tinkering with it and seeing how outputs change when you do.</p>
+<p>We recommend a baseline knowledge of Python conventions, which can be learned with Turkel and Crymble's <link target="/lessons/introduction-and-installation">series of Python lessons</link> on Programming Historian.</p>
+<p>The skills taught here are focused on flexibly accessing and working with already-computed text features. For a better understanding of the process of deriving word features, Programming Historian provides a lesson on <link target="/lessons/counting-frequencies">Counting Frequencies</link>, by Turkel and Crymble.</p>
+<p>A more detailed look at text analysis with Python is provided in the <link target="https://github.com/sgsinclair/alta/blob/master/ipynb/ArtOfLiteraryTextAnalysis.ipynb">Art of Literary Text Analysis</link> (Sinclair). The Art of Literary Text Analysis (ALTA) provides a deeper introduction to foundation Python skills, as well as introduces further text analytics concepts to accompany the skills we cover in this lesson. This includes lessons on extracting features (<link target="https://github.com/sgsinclair/alta/blob/master/ipynb/Nltk.ipynb">tokenization</link>, <link target="https://github.com/sgsinclair/alta/blob/master/ipynb/RepeatingPhrases.ipynb">collocations</link>), and <link target="https://github.com/sgsinclair/alta/blob/master/ipynb/GettingGraphical.ipynb">visualizing trends</link>.</p>
+<div n="1"><head>Download the Lesson Files</head>
+<p>To follow along, download <link target="/assets/text-mining-with-extracted-features/extracted-features-lesson_files.zip">lesson_files.zip</link> and unzip it to any directory you choose.</p>
+<p>The lesson files include a sample of files from the HTRC Extracted Features dataset. After you learn to use the feature data in this lesson, you may want to work with the entirety of the dataset. The details on how to do this are described in <link target="#appendix-downloading-custom-files-via-rsync">Appendix: rsync</link>.</p>
+<div n="2"><head>Installation</head>
+<p>For this lesson, you need to install the HTRC Feature Reader library for Python alongside the data science libraries that it depends on.</p>
+<p>For ease, this lesson will focus on installing Python through a scientific distribution called Anaconda. Anaconda is an easy-to-install Python distribution that already includes most of the dependencies for the HTRC Feature Reader.</p>
+<p>To install Anaconda, download the installer for your system from the <link target="https://www.continuum.io">Anaconda download page</link> and follow their instructions for installation of either the Windows 64-bit Graphical Installer or the Mac OS X 64-bit Graphical Installer. You can choose either version of Python for this lesson. If you have followed earlier lessons on Python at the <emph>Programming Historian</emph>, you are using Python 2, but the HTRC Feature Reader also supports Python 3.</p>
+<figure><desc>Conda Install</desc><graphic url="conda-install.PNG"/></figure>
+<div n="3"><head>Installing the HTRC Feature Reader</head>
+<p>The HTRC Feature Reader can be installed by command line. First open a terminal application:</p>
+<ul>
+<li><emph>Windows</emph>: Open 'Command Prompt' from the Start Menu and type: <code type="inline">activate</code>.</li>
+<li><emph>Mac OS/Linux</emph>: Open 'Terminal' from Applications and type <code type="inline">source activate</code>.</li>
+</ul>
+<p>If Anaconda was properly installed, you should see something similar to this:</p>
+<figure><desc>Activating the default Anaconda environment.</desc><graphic url="activating-env.PNG"/></figure>
+<p>Now, you need to type one command:</p>
+<pre><code class="language-bash" xml:id="code_text-mining-with-extracted-features_0" type="block" corresp="code_text-mining-with-extracted-features_0.txt"></code></pre>
+<p>This command installs the HTRC Feature Reader and its necessary dependencies. We specify <code type="inline">-c htrc</code> so the installation command knows to find the library from the <code type="inline">htrc</code> organization.</p>
+<p>That's it! At this point you have everything necessary to start reading HTRC Feature Reader files.</p>
+<blockquote>
+<p><emph>psst</emph>, advanced users: You can install the HTRC Feature Reader <emph>without</emph> Anaconda with <code type="inline">pip install htrc-feature-reader</code>, though for this lesson you'll need to install two additional libraries <code type="inline">pip install matplotlib jupyter</code>. Also, note that not all manual installations are alike because of hard-to-configure system optimizations: this is why we recommend Anaconda. If you think your code is going slow, you should check that Numpy has access to <link target="http://stackoverflow.com/a/19350234/233577">BLAS and LAPACK libraries</link> and install <link target="http://pandas.pydata.org/pandas-docs/version/0.15.2/install.html#recommended-dependencies">Pandas recommended packages</link>. The rest is up to you, advanced user!</p>
+</blockquote>
+</div></div><div n="2"><head>Start a Notebook</head>
+<p>Using Python the traditional way -- writing a script to a file and running it -- can become clunky for text analysis, where the ability to look at and interact with data is invaluable.
+This lesson uses an alternative approach: Jupyter notebooks.</p>
+<p>Jupyter gives you an interactive version of Python (called IPython) that you can access in a "notebook" format in your web browser. This format has many benefits. The interactivity means that you don't need to re-run an entire script each time: you can run or re-run blocks of code as you go along, without losing your enviroment (i.e. the variables and code that are already loaded). The notebook format makes it easier to examine bits of information as you go along, and allows for text blocks to intersperse a narrative.</p>
+<p>Jupyter was installed alongside Anaconda in the previous section, so it should be available to load now.</p>
+<p>From the Start Menu (Windows) or Applications directory (Mac OS), open "Jupyter notebook". This will start Jupyter on your computer and open a browser window. Keep the console window in the background, the browser is where the magic happens.</p>
+<figure><desc>Opening Jupyter on Windows</desc><graphic url="open-notebook.PNG"/></figure>
+<p>If your web browser does not open automatically, Jupyter can be accessed by going to the address "localhost:8888" - or a different port number, which is noted in the console ("The Jupyter Notebook is running at..."):</p>
+<figure><desc>A freshly started Jupyter notebook instance.</desc><graphic url="notebook-start.png"/></figure>
+<p>Jupyter is now showing a directory structure from your home folder. Navigate to the lesson folder where you unzipped <link target="/assets/text-mining-with-extracted-features/extracted-features-lesson_files.zip">lesson_files.zip</link>.</p>
+<p>In the lesson folder, open <code type="inline">Start Here.pynb</code>: your first notebook!</p>
+<figure><desc>Hello world in a notebook</desc><graphic url="notebook-hello-world.png"/></figure>
+<p>Here there are instructions for editing a cell of text or code, and running it. Try editing and running a cell, and notice that it only affects itself. Here are a few tips for using the notebook as the lesson continues:</p>
+<ul>
+<li>New cells are created with the <i class="fa-plus fa"> Plus</i> button in the toolbar. When not editing, this can be done by pressing 'b' on your keyboard.</li>
+<li>New cells are "code" cells by default, but can be changed to "Markdown" (a type of text input) in a dropdown menu on the toolbar. In edit mode, you can paste in code from this lesson or type it yourself.</li>
+<li>Switching a cell to edit mode is done by pressing Enter.</li>
+<li>Running a cell is done by clicking <i class="fa-step-forward fa"> Play</i> in the toolbar, or with <code type="inline">Ctrl+Enter</code> (<code type="inline">Ctrl+Return</code> on Mac OS). To run a cell and immediately move forward, use <code type="inline">Shift+Enter</code> instead.</li>
+</ul>
+<blockquote>
+<p>An example of a full-fledged notebook is included with the lesson files in <code type="inline">example/Lesson Draft.ipynb</code>.</p>
+</blockquote>
+<p>In this notebook, it's time to give the HTRC Feature Reader a try. When it is time to try some code, start a new cell with <i class="fa-plus fa"> Plus</i>, and run the code with <i class="fa-step-forward fa"> Play</i>. Before continuing, click on the title to change it to something more descriptive than "Start Here".</p>
+</div><div n="2"><head>Reading your First Volume</head>
+<p>The HTRC Feature Reader library has three main objects: <hi rend="bold">FeatureReader</hi>, <hi rend="bold">Volume</hi>, and <hi rend="bold">Page</hi>.</p>
+<p>The <hi rend="bold">FeatureReader</hi> object is the interface for loading the dataset files and making sense of them. The files are originally formatted in a notation called JSON (which <emph>Programming Historian</emph> discusses <link target="/lessons/json-and-jq">here</link>) and compressed, which FeatureReader makes sense of and returns as Volume objects. A <hi rend="bold">Volume</hi> is a representation of a single book or other work. This is where you access features about a work. Many features for a volume are collected from individual pages; to access Page information, you can use the <hi rend="bold">Page</hi> object.</p>
+<p>Let's load two volumes to understand how the FeatureReader works. Create a cell in the already-open Jupyter notebook and run the following code. This should give you the input shown below.</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_1" type="block" corresp="code_text-mining-with-extracted-features_1.txt"></code></pre>
+<pre><code xml:id="code_text-mining-with-extracted-features_2" type="block" corresp="code_text-mining-with-extracted-features_2.txt"></code></pre>
+<p>Here, the FeatureReader is imported and initialized with file paths pointing to two Extracted Features files. The files are in a directory called 'data'. Different systems do file paths differently: Windows uses back slashes ('data\...') while Linux and Mac OS use forward slashes ('data/...'). <code type="inline">os.path.join</code> is used to make sure that the file path is correctly structured, a convention to ensure that code works on these different platforms.</p>
+<p>With <code type="inline">fr = FeatureReader(paths)</code>, the FeatureReader is initialized, meaning it is ready to use. An initialized FeatureReader is holding references to the file paths that we gave it, and will load them into Volume objects when asked.</p>
+<p>Consider the last bit of code:</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_3" type="block" corresp="code_text-mining-with-extracted-features_3.txt"></code></pre>
+<p>This code asks for volumes in a way that can be iterated through. The <code type="inline">for</code> loop is saying to <code type="inline">fr.volumes()</code>, "give me every single volume that you have, one by one." Each time the <code type="inline">for</code> loop gets a volume, it starts calling it <code type="inline">vol</code>, runs what is inside the loop on it, then asks for the next one. In this case, we just told it to print the title of the volume.</p>
+<p>You may recognize <code type="inline">for</code> loops from past experience iterating through what is known as a <code type="inline">list</code> in Python. However, it is important to note that <code type="inline">fr.volumes()</code> is <emph>not</emph> a list. If you try to access it directly, it won't print all the volumes; rather, it identifies itself as something known as a generator:</p>
+<figure><desc>Identifying a generator</desc><graphic url="generator.png"/></figure>
+<p>What is a generator, and why do we iterate over it?</p>
+<p>Generators are the key to working with lots of data. They allow you to iterate over a set of items that don't exist yet, preparing them only when it is their turn to be acted upon.</p>
+<p>Remember that there are 13.6 million volumes in the Extracted Features dataset. When coding at that scale, you need to be be mindful of two rules:</p>
+<ol>
+<li>Don't hold everything in memory: you can't. Use it, reduce it, and move on.</li>
+<li>Don't devote cycles to processing something before you need it.</li>
+</ol>
+<p>A generator simplifies such on-demand, short term usage. Think of it like a pizza shop making pizzas when a customer orders, versus one that prepares them beforehand. The traditional approach to iterating through data is akin to making <emph>all</emph> the pizzas for the day before opening. Doing so would make the buying process quicker, but also adds a huge upfront time cost, needs larger ovens, and necessitates the space to hold all the pizzas at once. An alternate approach is to make pizzas on-demand when customers buy them, allowing the pizza place to work with smaller capacities and without having pizzas laying around the shop. This is the type of approach that a generator allows.</p>
+<p>Volumes need to be prepared before you do anything with them, being read, decompressed and parsed. This 'initialization' of a volume is done when you ask for the volume, <emph>not</emph> when you create the FeatureReader. In the above code, after you run <code type="inline">fr = FeatureReader(paths)</code>, there are are still no <code type="inline">Volume</code> objects held behind the scenes: just the references to the file locations. The files are only read when their time comes in the loop on the generator <code type="inline">fr.volumes()</code>. Note that because of this one-by-one reading, the items of a generator cannot be accessed out of order (e.g. you cannot ask for the third item of <code type="inline">fr.volumes()</code> without going through the first two first).</p>
+</div><div n="2"><head>What's in a Volume?</head>
+<p>Let's take a closer look at what features are accessible for a Volume object. For clarity, we'll grab the first Volume to focus on, which can conveniently be accessed with the <code type="inline">first()</code> method. Any code you write can easily be run later with a <code type="inline">for vol in fr.volumes()</code> loop.</p>
+<p>Again here, start a new code cell in the same notebook that you had open before and run the following code. The FeatureReader does not need to be loaded again: it is still initialized and accessible as <code type="inline">fr</code> from earlier.</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_4" type="block" corresp="code_text-mining-with-extracted-features_4.txt"></code></pre>
+<pre><code xml:id="code_text-mining-with-extracted-features_5" type="block" corresp="code_text-mining-with-extracted-features_5.txt"></code></pre>
+<p>While the majority of the HTRC Extracted Features dataset is <emph>features</emph>, quantitative abstractions of a book's written content, there is also a small amount of metadata included for each volume. We already saw <code type="inline">Volume.title</code> accessed earlier. Other metadata attributes include:</p>
+<ul>
+<li><code type="inline">Volume.id</code>: A unique identifier for the volume in the HathiTrust and the HathiTrust Research Center.</li>
+<li><code type="inline">Volume.year</code>: The publishing date of the volume.</li>
+<li><code type="inline">Volume.language</code>: The classified language of the volume.</li>
+<li><code type="inline">Volume.oclc</code>: The OCLC control number(s).</li>
+</ul>
+<p>The volume id can be used to pull more information from other sources. The scanned copy of the book can be found from the HathiTrust Digital Library, when available, by accessing <code type="inline">http://hdl.handle.net/2027/{VOLUME ID}</code>. In the feature reader, this url is retrieved by calling <code type="inline">vol.handle_url</code>:</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_6" type="block" corresp="code_text-mining-with-extracted-features_6.txt"></code></pre>
+<pre><code xml:id="code_text-mining-with-extracted-features_7" type="block" corresp="code_text-mining-with-extracted-features_7.txt"></code></pre>
+<figure><desc>Digital copy of sample book</desc><graphic url="June-cover.PNG"/></figure>
+<p>Hopefully by now you are growing more comfortable with the process of running code in a Jupyter notebook, starting a cell, writing code, and running the cell. A valuable property of this type of interactive coding is that there is room for error. An error doesn't cause the whole program to crash, requiring you to rerun everything from the start. Instead, just fix the code in your cell and try again.</p>
+<p>In Jupyter, pressing the 'TAB' key will guess at what you want to type next. Typing <code type="inline">vo</code> then TAB will fill in <code type="inline">vol</code>, typing <code type="inline">Fea</code> then TAB will fill in <code type="inline">FeatureReader</code>.</p>
+<p>Auto-completion with the tab key also provides more information about what you can get from an object. Try typing <code type="inline">vol.</code> (with the period) in a new cell, then press TAB. Jupyter shows everything that you can access for that Volume.</p>
+<figure><desc>Tab Autocomplete in Jupyter</desc><graphic url="autocomplete.png"/></figure>
+<p>The Extracted Features dataset does not hold all the metadata that the HathiTrust has for the book. More in-depth metadata like genre and subject class needs to be grabbed from other sources, such as the <link target="https://www.hathitrust.org/bib_api">HathiTrust Bibliographic API</link>. The URL to access this information can be retrieved with <code type="inline">vol.ht_bib_url</code>.</p>
+</div><div n="2"><head>Our First Feature Access: Visualizing Words Per Page</head>
+<p>It's time to access the first features of <code type="inline">vol</code>: a table of total words for every single page. These can be accessed by calling <code type="inline">vol.tokens_per_page()</code>. Try the following code.</p>
+<blockquote>
+<p>If you are using a Jupyter notebook, returning this table at the end of a cell formats it nicely in the browser. Below, you'll see us append <code type="inline">.head()</code> to the <code type="inline">tokens</code> table, which allows us to look at just the top few rows: the 'head' of the data.</p>
+</blockquote>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_8" type="block" corresp="code_text-mining-with-extracted-features_8.txt"></code></pre>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th/>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>page</th>
+      <th/>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<blockquote>
+<p>No print! We didn't call 'print()' to make Jupyter show the table. Instead, it automatically guessed that you want to display the information from the last code line of the cell.</p>
+</blockquote>
+<p>This is a straightforward table of information, similar to what you would see in Excel or Google Spreadsheets. Listed in the table are page numbers and the count of words on each page. With only two dimensions, it is trivial to plot the number of words per page. The table structure holding the data has a <code type="inline">plot</code> method for data graphics. Without extra arguments, <code type="inline">tokens.plot()</code> will assume that you want a line chart with the page on the x-axis and word count on the y-axis.</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_9" type="block" corresp="code_text-mining-with-extracted-features_9.txt"></code></pre>
+<figure><desc>Output graph.</desc><graphic url="draft_23_1.png"/></figure>
+<blockquote>
+<p><code type="inline">%matplotlib inline</code> tells Jupyter to show the plotted image directly in the notebook web page. It only needs to be called once, and isn't needed if you're not using notebooks.</p>
+</blockquote>
+<p>On some systems, this may take some time the first time. It is clear that pages at the start of a book have fewer words per page, after which the count is fairly steady except for occasional valleys.</p>
+<p>You may have some guesses for what these patterns mean. A look at the <link target="http://hdl.handle.net/2027/nyp.33433074811310">scans</link> confirms that the large valleys are often illustration pages or blank pages, small valleys are chapter headings, and the upward pattern at the start is from front matter.</p>
+<p>Not all books will have the same patterns so we can't just codify these correlations for millions of books. However, looking at this plot makes clear an inportant assumption in text and data mining: that there are patterns underlying even the basic statistics derived from a text. The trick is to identify the consistent and interesting patterns and teach them to a computer.</p>
+<div n="3"><head>Understanding DataFrames</head>
+<p>Wait... how did we get here so quickly!? We went from a volume to a data visualization in two lines of code. The magic is in the data structure used to hold our table of data: a DataFrame.</p>
+<p>A <hi rend="bold">DataFrame</hi> is a type of object provided by the data analysis library, Pandas. <hi rend="bold">Pandas</hi> is very common for data analysis, allowing conveniences in Python that are found in statistical languages like R or Matlab.</p>
+<p>In the first line, <code type="inline">vol.tokens_per_page()</code> returns a DataFrame, something that can be confirmed if you ask Python about its type with <code type="inline">type(tokens)</code>. This means that <emph>after setting <code type="inline">tokens</code>, we're no longer working with HTRC-specific code, just book data held in a common and very robust table-like construct from Pandas</emph>. <code type="inline">tokens.head()</code> used a DataFrame method to look at the first few rows of the dataset, and <code type="inline">tokens.plot()</code> uses a method from Pandas to visualize data.</p>
+<p>Many of the methods in the HTRC Feature Reader return DataFrames. The aim is to fit into the workflow of an experienced user, rather than requiring them to learn proprietary new formats. For new Python data mining users, learning to use the HTRC Feature Reader means learning many data mining skills that will translate to other uses.</p>
+</div></div><div n="2"><head>Loading a Token List</head>
+<p>The information contained in <code type="inline">vol.tokens_per_page()</code> is minimal, a sum of all words in the body of each page.
+The Extracted Features dataset also provides token counts with much more granularity: for every part of speech (e.g. noun, verb) of every occurring capitalization of every word of every section (i.e. header, footer, body) of every page of the volume.</p>
+<p><code type="inline">tokens_per_page()</code> only kept the "for every page" grouping; <code type="inline">vol.tokenlist()</code> can be called to return section-, part-of-speech-, and word-specific details:</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_10" type="block" corresp="code_text-mining-with-extracted-features_10.txt"></code></pre>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th/>
+      <th/>
+      <th/>
+      <th/>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>page</th>
+      <th>section</th>
+      <th>token</th>
+      <th>pos</th>
+      <th/>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">27</th>
+      <th rowspan="2" valign="top">body</th>
+      <th>those</th>
+      <th>DT</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>within</th>
+      <th>IN</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">28</th>
+      <th rowspan="5" valign="top">body</th>
+      <th>a</th>
+      <th>DT</th>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>be</th>
+      <th>VB</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>deserted</th>
+      <th>VBN</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>faintly</th>
+      <th>RB</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>important</th>
+      <th>JJ</th>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>As before, the data is returned as a Pandas DataFrame. This time, there is much more information. Consider a single row:</p>
+<figure><desc>Single row of tokenlist.</desc><graphic url="single-row-tokencount.png"/></figure>
+<p>The columns in bold are an index. Unlike the typical one-dimensional index seen before, here there are four dimensions to the index: page, section, token, and pos. This row says that for the 24th page, in the body section (i.e. ignoring any words in the header or footer), the word 'years' occurs 1 time as an plural noun. The part-of-speech tag for a plural noun, <code type="inline">NNS</code>, follows the <link target="https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html">Penn Treebank</link> definition.</p>
+<blockquote>
+<p>The "words" on the first page seems to be OCR errors for the cover of the book. The HTRC Feature Reader refers to "pages" as the $$n^{th}$$ scanned image of the volume, not the actual number printed on the page. This is why "page 1" for this example is the cover.</p>
+</blockquote>
+<p>Tokenlists can be retrieved with arguments that combine information by certain dimensions, such as <code type="inline">case</code>, <code type="inline">pos</code>, or <code type="inline">page</code>. For example, <code type="inline">case=False</code> specified that "Jaguar" and "jaguar" should be counted together. You may also notice that, by default, only 'body' is returned, a default that can be overridden.</p>
+<p>Look at the following list of commands: can you guess what the output will look like? Try for yourself and observe how the output changes.</p>
+<ul>
+<li><code type="inline">vol.tokenlist(case=False)</code></li>
+<li><code type="inline">vol.tokenlist(pos=False)</code></li>
+<li><code type="inline">vol.tokenlist(pages=False, case=False, pos=False)</code></li>
+<li><code type="inline">vol.tokenlist(section='header')</code></li>
+<li><code type="inline">vol.tokenlist(section='group')</code></li>
+</ul>
+<p>Details for these arguments are available in the code <link target="http://htrc.github.io/htrc-feature-reader/htrc_features/feature_reader.m.html#htrc_features.feature_reader.Volume.tokenlist">documentation</link> for the Feature Reader.</p>
+<p>Jupyter provides another convenience here. Documentation can be accessed within the notebook by adding a '?' to the start of a piece of code. Try it with <code type="inline">?vol.tokenlist</code>, or with other objects or variables.</p>
+</div><div n="2"><head>Working with DataFrames</head>
+<p>The Pandas DataFrame type returned by the HTRC Feature Reader is very malleable. To work with the tokenlist that you retrieved earlier, three skills are particularily valuable:</p>
+<ol>
+<li>Selecting subsets by a condition</li>
+<li>Slicing by named row index</li>
+<li>Grouping and aggregating</li>
+</ol>
+<div n="3"><head>Selecting Subsets of a DataFrame by a Condition</head>
+<p>Consider this example: <emph>I only want to look at tokens that occur more than a hundred times in the book.</emph></p>
+<p>Remembering that the table-like output from the HTRC Feature Reader is a Pandas DataFrame, the way to pursue this goal is to learn to filter and subset DataFrames. Knowing how to do so is important for working with just the data that you need.</p>
+<p>To subset individual rows of a DataFrame, you can provide a series of True/False values to the DataFrame, formatted in square brackets. When True, the DataFrame returns that row; when False, the row is excluded from what is returned.</p>
+<p>To see this in context, first load a basic tokenlist without parts-of-speech or individual pages:</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_11" type="block" corresp="code_text-mining-with-extracted-features_11.txt"></code></pre>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th/>
+      <th/>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>section</th>
+      <th>token</th>
+      <th/>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">body</th>
+      <th>halleluya</th>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>realty</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>addressed</th>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>win-</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>broke</th>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>To select just the relevant tokens, we need to look at each row and evaluate whether it matches the criteria that "this token has a count greater than 100". Let's try to convert that requirement to code.</p>
+<p>"This token has a count" means that we are concerned specifically with the 'count' column, which can be singled out from the <code type="inline">tl</code> table with <code type="inline">tl['count']</code>. "greater than 100" is formalized as <code type="inline">&gt; 100</code>. Putting it together, try the following and see what you get:</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_12" type="block" corresp="code_text-mining-with-extracted-features_12.txt"></code></pre>
+<p>It is a DataFrame of True/False values. Each value indicates whether the 'count' column in the corresponding row matches the criteria or not. We haven't selected a subset yet, we simply asked a question and were told for each row when the question was true or false.</p>
+<blockquote>
+<p>You may wonder why section and token are still seen, even though 'count' was selected. These are part of the DataFrame <hi rend="bold">index</hi>, so they're considered part of the information <emph>about</emph> that row rather than data <emph>in</emph> the row. You can convert the index to data columns with <code type="inline">reset_index()</code>. In this lesson we will keep the index intact, though there are advanced cases where there are benefits to resetting it.</p>
+</blockquote>
+<p>Armed with the True/False values of whether each token's 'count' value is or isn't greater than 100, we can give those values to <code type="inline">tl_simple</code> in square brackets.</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_13" type="block" corresp="code_text-mining-with-extracted-features_13.txt"></code></pre>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th/>
+      <th/>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>section</th>
+      <th>token</th>
+      <th/>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">body</th>
+      <th>they</th>
+      <td>127</td>
+    </tr>
+    <tr>
+      <th>have</th>
+      <td>210</td>
+    </tr>
+    <tr>
+      <th>The</th>
+      <td>107</td>
+    </tr>
+    <tr>
+      <th>about</th>
+      <td>110</td>
+    </tr>
+    <tr>
+      <th>,</th>
+      <td>3258</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>You can move the comparison straight into the square brackets, the more conventional equivalent of the above:</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_14" type="block" corresp="code_text-mining-with-extracted-features_14.txt"></code></pre>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th/>
+      <th/>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>section</th>
+      <th>token</th>
+      <th/>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">body</th>
+      <th>not</th>
+      <td>220</td>
+    </tr>
+    <tr>
+      <th>had</th>
+      <td>455</td>
+    </tr>
+    <tr>
+      <th>have</th>
+      <td>210</td>
+    </tr>
+    <tr>
+      <th>,</th>
+      <td>3258</td>
+    </tr>
+    <tr>
+      <th>his</th>
+      <td>206</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>As might be expected, many of the tokens that occur very often are common words like "she" and "and", as well as various punctuation.</p>
+<p>Multiple conditions can be chained with <code type="inline">&amp;</code> (and) or <code type="inline">|</code> (or), using regular brackets so that Python knows the order of operations. For example, words with a count greater than 150 <emph>and</emph> a count less than 200 are selected in this way:</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_15" type="block" corresp="code_text-mining-with-extracted-features_15.txt"></code></pre>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th/>
+      <th/>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>section</th>
+      <th>token</th>
+      <th/>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="7" valign="top">body</th>
+      <th>Mr.</th>
+      <td>159</td>
+    </tr>
+    <tr>
+      <th>be</th>
+      <td>196</td>
+    </tr>
+    <tr>
+      <th>but</th>
+      <td>178</td>
+    </tr>
+    <tr>
+      <th>do</th>
+      <td>179</td>
+    </tr>
+    <tr>
+      <th>is</th>
+      <td>170</td>
+    </tr>
+    <tr>
+      <th>on</th>
+      <td>190</td>
+    </tr>
+    <tr>
+      <th>&#8212;</th>
+      <td>167</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div><div n="3"><head>Slicing DataFrames</head>
+<p>Above, subsets of the DataFrame were selected based on a matching criteria for columns. It is also possible to select a DataFrame subset by specifying the values of its index, a process called <hi rend="bold">slicing</hi>. For example, you can ask, <emph>"give me all the verbs for pages 9-12"</emph>.</p>
+<p>In the DataFrame returned by <code type="inline">vol.tokenlist()</code>, page, section, token, and POS were part of the index (try the command <code type="inline">tl.index.names</code> to confirm). One can think of an index as the margin content of an Excel spreadsheet: the letters along the top and numbers along the left side are the indices. A cell can be referred to as A1, A2, B1... In Pandas, however, you can name these, so instead of A, B, C, or 1,2,3, columns and rows can be referred to by more descriptive names. You can also have multiple levels, so you're not bound by the two-dimensions of a table format. With a multi-indexed DataFrame, you can ask for <code type="inline">Page=24,section=Body, ...</code>.</p>
+<figure><desc>One can think of an index as the margin notations in Excel (i.e. 1,2,3... and A,B,C,..), except it can be named and can have multiple levels.</desc><graphic url="Excel.PNG"/></figure>
+<p>Slicing a DataFrame against a labelled index is done using <code type="inline">DataFrame.loc[]</code>. Try the following examples and see what is returned:</p>
+<ul>
+<li>
+Select information from page 17:<ul>
+<li><code type="inline">tl.loc[(17),]</code></li>
+</ul>
+</li>
+<li>
+Select 'body' section of page 17:<ul>
+<li><code type="inline">tl.loc[(17, 'body'),]</code></li>
+</ul>
+</li>
+<li>
+Select counts of the word 'Anne' in the 'body' section of page 17:<ul>
+<li><code type="inline">tl.loc[(17, 'body', 'Anne'),]</code></li>
+</ul>
+</li>
+</ul>
+<p>The levels of the index are specified in order, so in this case the first value refers to 'page', then 'section', and so on. To skip specifying anything for an index level -- that is, to select everything for that level -- <code type="inline">slice(None)</code> can be used as a placeholder:</p>
+<ul>
+<li>
+Select counts of the word 'Anne' for all pages and all page sections<ul>
+<li><code type="inline">tl.loc[(slice(None), slice(None), "Anne"),]</code></li>
+</ul>
+</li>
+</ul>
+<p>Finally, it is possible to select multiple labels for a level of the index, with a list of labels (i.e. <code type="inline">['label1', 'label2']</code>) or a sequence covering everything from one value to another (i.e. <code type="inline">slice(start, end)</code>):</p>
+<ul>
+<li>
+Select pages 37, 38, and 52<ul>
+<li><code type="inline">tl.loc[([37, 38, 52]),]</code></li>
+</ul>
+</li>
+<li>
+Select all pages from 37 to 40<ul>
+<li><code type="inline">tl.loc[(slice(37, 40)),]</code></li>
+</ul>
+</li>
+<li>
+Select counts for 'Anne' or 'Hilary' from all pages<ul>
+<li><code type="inline">tl.loc[(slice(None), slice(None), ["Anne", "Hilary"]),]</code></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>The reason for the comma in <code type="inline">tl.loc[(...),]</code> is because columns can be selected in the same way after the comma. Pandas DataFrames can have a multiple-level index for columns, but the HTRC Feature Reader does not use this.</p>
+</blockquote>
+<p>Knowing how to slice, let's try to find the word "CHAPTER" in this book, and compare where that shows up to the token-per-page pattern previously plotted.</p>
+<p>The token list we previously set to <code type="inline">tl</code> only included body text; to include headers and footers in a search for <code type="inline">CHAPTER</code> we'll grab a new tokenlist with <code type="inline">section='all'</code> specified.</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_16" type="block" corresp="code_text-mining-with-extracted-features_16.txt"></code></pre>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th/>
+      <th/>
+      <th/>
+      <th/>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>page</th>
+      <th>section</th>
+      <th>token</th>
+      <th>pos</th>
+      <th/>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>19</th>
+      <th>header</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <th>header</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>56</th>
+      <th>header</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>73</th>
+      <th>header</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>91</th>
+      <th>header</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>115</th>
+      <th>header</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>141</th>
+      <th>header</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>158</th>
+      <th>header</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>174</th>
+      <th>header</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>193</th>
+      <th>header</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>217</th>
+      <th>body</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>231</th>
+      <th>header</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>246</th>
+      <th>header</th>
+      <th>CHAPTER</th>
+      <th>NNP</th>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>Earlier, token counts were visualized using <code type="inline">tokens.plot()</code>, a built-in function of DataFrames that uses the Matplotlib visualization library.</p>
+<p>We can add to the earlier visualization by using Matplotlib directly. Try the following code in a new cell, which goes through every page number in the earlier search for 'CHAPTER' and adds a red vertical line at the place in the chart with <code type="inline">matplotlib.pyplot.axvline()</code>:</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_17" type="block" corresp="code_text-mining-with-extracted-features_17.txt"></code></pre>
+<figure><desc>Output graph.</desc><graphic url="draft_41_0.png"/></figure>
+<blockquote>
+<p>Advanced: Though slicing with <code type="inline">loc</code> is more common when working with the index, it is possible to create a True/False list from an index to select rows as we did earlier. Here's an advanced example that grabs the 'token' part of the index and, using the <code type="inline">isalpha()</code> string method that Pandas provides, filters to fully alphabetical words.</p>
+</blockquote>
+<pre><code xml:id="code_text-mining-with-extracted-features_18" type="block" corresp="code_text-mining-with-extracted-features_18.txt"></code></pre>
+<p>Readers familiar with regular expressions (see <link target="/lessons/understanding-regular-expressions">Understanding Regular Expressions</link> by Doug Knox) can adapt this example for even more robust selection using the <code type="inline">contains()</code> string method.</p>
+</div></div><div n="2"><head>Sorting DataFrames</head>
+<p>A DataFrame can be sorted with <code type="inline">DataFrame.sort_values()</code>, specifying the column to sort by as the first argument. By default, sorting is done in ascending order:</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_19" type="block" corresp="code_text-mining-with-extracted-features_19.txt"></code></pre>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th/>
+      <th/>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>section</th>
+      <th>token</th>
+      <th/>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">body</th>
+      <th>gratified</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>reminding</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>dome</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>remembering</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>remains</th>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>Descending order is possible with the argument <code type="inline">ascending=False</code>, which puts the most common tokens at the top. For example:</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_20" type="block" corresp="code_text-mining-with-extracted-features_20.txt"></code></pre>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th/>
+      <th/>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>section</th>
+      <th>token</th>
+      <th/>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">body</th>
+      <th>,</th>
+      <td>3258</td>
+    </tr>
+    <tr>
+      <th>"</th>
+      <td>1670</td>
+    </tr>
+    <tr>
+      <th>the</th>
+      <td>1565</td>
+    </tr>
+    <tr>
+      <th>.</th>
+      <td>1532</td>
+    </tr>
+    <tr>
+      <th>and</th>
+      <td>1252</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>The most common tokens are 'the' and 'and', alongside punctuation.</p>
+<p><emph>Exercise: Try to retrieve the five most-common tokens used as a noun ('NNP') or a plural noun ('NNS') in the book</emph>. You will have to get a new tokenlist, without pages but with parts-of-speech, then slice by the criteria, sort, and output the first five rows. (<link target="https://gist.github.com/organisciak/163e59ea6cf71c3cd12de410d075567c">Solution</link>)</p>
+<div n="3"><head>Grouping DataFrames</head>
+<p>Up to this point, the token count DataFrames have been subsetted, but not modified from the way they were returned by the HTRC Feature Reader. There are many cases where one may want to perform aggregation or transformation based on subsets of data. To do this, Pandas supports the 'split-apply-combine' pattern (Wickham 2011).</p>
+<p>Split-apply-combine refers to the process of dividing a dataset into groups (<emph>split</emph>), performing some activity for each of those groups (<emph>apply</emph>), and joining the new groups back together into a single DataFrame (<emph>combine</emph>).</p>
+<figure><desc>Graph demonstrating Split-Apply-Combine.</desc><graphic url="split-apply-combine.png"/></figure>
+<figure><desc>Example of Split-Apply-Combine, averaging movie grosses by director.</desc><graphic url="example-split-apply-combine.png"/></figure>
+<p>Split-apply-combine processes are supported on DataFrames with <code type="inline">groupby()</code>, which tells Pandas to split by some criteria. From there, it is possible to apply some change to each group individually, after which Pandas combines the affected groups into a single DataFrame again.</p>
+<p>Try the following, can you tell what happens?</p>
+<pre><code xml:id="code_text-mining-with-extracted-features_21" type="block" corresp="code_text-mining-with-extracted-features_21.txt"></code></pre>
+<p>The output is a count of how often each part-of-speech tag ("pos") occurs in the entire book.</p>
+<ul>
+<li><emph>Split</emph> with <code type="inline">groupby()</code>: We took the token count dataframe that is set to <code type="inline">tl</code> and grouped by the part-of-speech (<code type="inline">pos</code>) level of the index. This means that rather than thinking in terms of rows, Pandas is now thinking of the <code type="inline">tl</code> DataFrame as a series of smaller groups, the groups selected by a common value for part of speech. So, all the personal pronouns ("PRP") are in one group, and all the adverbs ("RB") are in another, and so on.</li>
+<li><emph>Apply</emph> with <code type="inline">sum()</code>: These groups were sent to an apply function, <code type="inline">sum()</code>. Sum is an aggregation function, so it sums all the information in the 'count' column for each group. For example, all the rows of data in the adverb group are summed up into a single count of all adverbs.</li>
+<li><emph>Combine</emph>: The combine step is implicit: the DataFrame knows from the <code type="inline">groupby</code> pattern to take everything that the apply function gives back (in the case of 'sum', just one row for every group) and stick it together.</li>
+</ul>
+<p><code type="inline">sum()</code> is one of many convenient functions <link target="http://pandas.pydata.org/pandas-docs/stable/groupby.html">built-in</link> to Pandas. Other useful functions are <code type="inline">mean()</code>, <code type="inline">count()</code>, <code type="inline">max()</code>. It is also possible to send your groups to any function that you write with <code type="inline">apply()</code>.</p>
+<blockquote>
+<p>groupby can be used on data columns or an index. To run against an index, use <code type="inline">level=[index_level_name]</code> as above. To group against columns, use <code type="inline">by=[column_name]</code>.</p>
+</blockquote>
+<p>Below are some examples of grouping token counts.</p>
+<ul>
+<li>
+Find most common tokens in the entire volume (sorting by most to least occurrences)<ul>
+<li><code type="inline">tl.groupby(level="token").sum().sort_values("count", ascending=False)</code></li>
+</ul>
+</li>
+<li>
+Count how many pages each token/pos combination occurs on<ul>
+<li><code type="inline">tl.groupby(level=["token", "pos"]).count()</code></li>
+</ul>
+</li>
+</ul>
+<p>Remember from earlier that certain information can be called by sending arguments to <code type="inline">vol.tokenlist()</code>, so you don't always have to do the grouping yourself.</p>
+<p>With <code type="inline">sum</code>, the data is being reduced: only one row is left for each group. It is also possible to 'transform' a group, where the same number of rows are returned. This is useful if processing is necessary based on the group statistics, such as percentages. Here is an advanced example of transformation, a <link target="https://web.archive.org/web/20161108211721/https://porganized.com/2016/03/09/term-weighting-for-humanists/">TF*IDF</link> function. TF*IDF weighs a token's value to a document based on how common it is. In this case, it highlights words that are notable for a page but not the entire book.</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_22" type="block" corresp="code_text-mining-with-extracted-features_22.txt"></code></pre>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th/>
+      <th/>
+      <th/>
+      <th/>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>page</th>
+      <th>section</th>
+      <th>token</th>
+      <th>pos</th>
+      <th/>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>24</th>
+      <th>body</th>
+      <th>years</th>
+      <th>NNS</th>
+      <td>2.315830</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">25</th>
+      <th rowspan="3" valign="top">body</th>
+      <th>asked</th>
+      <th>VBD</th>
+      <td>1.730605</td>
+    </tr>
+    <tr>
+      <th>him</th>
+      <th>PRP</th>
+      <td>2.994040</td>
+    </tr>
+    <tr>
+      <th>n't</th>
+      <th>RB</th>
+      <td>1.250162</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>Compare the parts of the function given to <code type="inline">transform()</code> with the equation:</p>
+<p>$$ IDF_w = log(1 + \frac{N}{df_w}) $$</p>
+<p>N is the total number of pages. Document frequency, $$df_w$$, is 'how many pages (docs) does the word occur on?' That is the <code type="inline">x.count()</code>. Can you modify the above to use corpus frequency, which is 'how many times does the word occur overall in the corpus (i.e. across all pages)?' You'd want to add everything up.</p>
+</div></div></div><div n="1"><head>More Features in the HTRC Extracted Features Dataset</head>
+<p>So far we have mainly used token-counting features, accessed through <code type="inline">Volume.tokenlist()</code>. The HTRC Extracted Features Dataset provides more features at the volume level. Here are other features that are available to Volume objects. Try them on <code type="inline">vol</code> and see what the output is:</p>
+<ul>
+<li><code type="inline">vol.line_counts()</code>: How many vertically spaced lines of text, a measure related to the phyical format of the page.</li>
+<li><code type="inline">vol.sentence_counts()</code>: How many sentences of text: a measure related to the content on a page.</li>
+<li><code type="inline">vol.empty_line_counts()</code>: How many larger vertical spaces are there on the page between lines of text? In many cases, this can be used as a proxy for paragraph count. This is based on what software was used to OCR so there are inconsistencies: not all scans in the HathiTrust are OCR'd identically.</li>
+<li><code type="inline">vol.begin_line_chars()</code>, <code type="inline">vol.end_line_chars()</code>: The count of different characters along the left-most and right-most sides of a page. This can tell you about what kind of page it is: for example, a table of contents might have a lot of numbers or roman numerals at the end of each line</li>
+</ul>
+<p>Earlier, we saw that the number of words on a page gave some indication of whether it was a page of the story or a different kind of page (chapter, front matter, etc). We can see that line count is another contextual 'hint':</p>
+<pre><code class="language-python" xml:id="code_text-mining-with-extracted-features_23" type="block" corresp="code_text-mining-with-extracted-features_23.txt"></code></pre>
+<figure><desc>Output graph.</desc><graphic url="draft_52_1.png"/></figure>
+<p>The majority of pages have 20-25 lines, confirmable with a histogram: <code type="inline">plt.hist(line_counts)</code>. This is likely what a full page of text looks like in this book. A scholar trying to focus on patterns only in the text and comfortable missing a few short pages might choose to filter to just these pages.</p>
+<div n="2"><head>Page-Level Features</head>
+<p>If you open the raw dataset file for a HTRC EF volume on your computer, you may notice that features are provided for each page. While this lesson has focused on volumes, most of the features that we have seen can be accessed for a single page; e.g. <code type="inline">Page.tokenlist()</code> instead of <code type="inline">Volume.tokenlist()</code>. The methods to access the features are named the same, with the exception that <code type="inline">line_count</code>, <code type="inline">empty_line_count</code>, and <code type="inline">sentence_count</code> are not pluralized.</p>
+<p>Like iterating over <code type="inline">FeatureReader.volumes()</code> to get Volume objects, it is possible to iterate across pages with <code type="inline">Volume.pages()</code>.</p>
+</div></div><div n="1"><head>Next Steps</head>
+<p>Now that you know the basics of the HTRC Feature Reader, you can learn more about the <link target="https://analytics.hathitrust.org/features">Extracted Features dataset</link>. The <link target="https://github.com/htrc/htrc-feature-reader/blob/master/README.ipynb">Feature Reader home page</link> contains a lesson similar to this one but for more advanced users (that's you now!), and the <link target="http://htrc.github.io/htrc-feature-reader/htrc_features/feature_reader.m.html">code documentation</link> gives exact information about what types of information can be called.</p>
+<p>Underwood (2015) has released <link target="https://analytics.hathitrust.org/genre">genre classifications of public-domain texts in the HTRC EF Dataset</link>, comprised of fiction, poetry, and drama. Though many historians will be interested in other corners of the dataset, fiction is a good place to tinker with text mining ideas because of its expressiveness and relative format consistency.</p>
+<p>Finally, the repository for the HTRC Feature Reader has <link target="https://github.com/htrc/htrc-feature-reader/tree/master/examples">advanced tutorial notebooks</link> showing how to use the library further. One such tutorial shows how to <link target="https://github.com/htrc/htrc-feature-reader/blob/master/examples/Within-Book%20Sentiment%20Trends.ipynb">derive 'plot arcs' for a text</link>, a process popularized by Jockers (2015).</p>
+<figure><desc>Plot Arc Example.</desc><graphic url="plot-arc.png"/></figure>
+</div><div n="1"><head>References</head>
+<p>Boris Capitanu, Ted Underwood, Peter Organisciak, Timothy Cole, Maria Janina Sarol, J. Stephen Downie (2016). The HathiTrust Research Center Extracted Feature Dataset (1.0) [Dataset]. <emph>HathiTrust Research Center</emph>. <link target="https://doi.org/10.13012/J8X63JT3">https://doi.org/10.13012/J8X63JT3</link></p>
+<p>Chris Forster. "A Walk Through the Metadata: Gender in the HathiTrust Dataset." Blog. <link target="https://web.archive.org/web/20160105003327/http://cforster.com/2015/09/gender-in-hathitrust-dataset/">http://cforster.com/2015/09/gender-in-hathitrust-dataset/</link>.</p>
+<p>Matthew L. Jockers (Feb 2015). "Revealing Sentiment and Plot Arcs with the Syuzhet Package". <emph>Matthew L. Jockers</emph>. Blog. <link target="http://www.matthewjockers.net/2015/02/02/syuzhet/">http://www.matthewjockers.net/2015/02/02/syuzhet/</link>.</p>
+<p>Peter Organisciak, Loretta Auvil, J. Stephen Downie (2015). &#8220;Remembering books: A within-book topic mapping technique.&#8221; Digital Humanities 2015. Sydney, Australia.</p>
+<p>St&#233;fan Sinclair &amp; Geoffrey Rockwell (2016). "The Art of Literary Text Analysis." Github.com. Commit b04bc18. <link target="https://github.com/sgsinclair/alta">https://github.com/sgsinclair/alta</link>.</p>
+<p>William J. Turkel and Adam Crymble (2012). "Counting Word Frequencies with Python". The Programming Historian. /lessons/counting-frequencies.</p>
+<p>Ted Underwood (2014): Understanding Genre in a Collection of a Million Volumes, Interim Report. figshare.
+<link target="https://doi.org/10.6084/m9.figshare.1281251.v1">https://doi.org/10.6084/m9.figshare.1281251.v1</link></p>
+<p>Ted Underwood, Boris Capitanu, Peter Organisciak, Sayan Bhattacharyya, Loretta Auvil, Colleen Fallaw, J. Stephen Downie (2015). "Word Frequencies in English-Language Literature, 1700-1922" (0.2) [Dataset]. <emph>HathiTrust Research Center</emph>. <link target="https://doi.org/10.13012/J8JW8BSJ">https://doi.org/10.13012/J8JW8BSJ</link></p>
+<p>Hadley Wickham (2011). "The split-apply-combine strategy for data analysis". <emph>Journal of Statistical Software</emph>, 40(1), 1-29.</p>
+</div><div n="1"><head>Appendix: Downloading custom files via rsync</head>
+<p>The full HTRC Extracted Features dataset is accessible using <emph>rsync</emph>, a Unix command line program for syncing files. It is already preinstalled on Linux or Mac OS. Windows users need to use <emph>rsync</emph> by downloading a program such as <link target="https://cygwin.com/">Cygwin</link>, which provides a Unix-like command line environment in Windows.</p>
+<p>To download all <emph>4 TB</emph> comprising the EF dataset, you can use this command (be aware the full transfer will take a very long time):</p>
+<pre><code class="language-bash" xml:id="code_text-mining-with-extracted-features_24" type="block" corresp="code_text-mining-with-extracted-features_24.txt"></code></pre>
+<p>This command recurses (the <code type="inline">-r</code> flag) through all the folders on the HTRC server, and syncs all the files to a location on your system; in this case the <code type="inline">.</code> at the end means "the current folder". The <code type="inline">-v</code> flag means <code type="inline">--verbose</code>, which tells rsync to show you more information.</p>
+<p>It is possible to sync individual files by specifying a full file path. Files are organized in a <link target="https://wiki.ucop.edu/display/Curation/PairTree">PairTree structure</link>, meaning that you can find an exact dataset file from a volume's HathiTrust id. The HTRC Feature Reader has a tools and instructions for <link target="https://github.com/htrc/htrc-feature-reader/blob/master/examples/ID_to_Rsync_Link.ipynb">getting the path for a volume</link>. A list of all file paths is available:</p>
+<pre><code class="language-bash" xml:id="code_text-mining-with-extracted-features_25" type="block" corresp="code_text-mining-with-extracted-features_25.txt"></code></pre>
+<p>Finally, it is possible to download many files from a list. To try, we've put together lists for public-domain <link target="http://data.analytics.hathitrust.org/genre/fiction_paths.txt">fiction</link>, <link target="http://data.analytics.hathitrust.org/genre/drama_paths.txt">drama</link>, and <link target="http://data.analytics.hathitrust.org/genre/poetry_paths.txt">poetry</link> (Underwood 2014). For example:</p>
+<pre><code class="language-bash" xml:id="code_text-mining-with-extracted-features_26" type="block" corresp="code_text-mining-with-extracted-features_26.txt"></code></pre>
+</div></body>
+  </text>
+</TEI>

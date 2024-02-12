@@ -1,0 +1,11 @@
+map_df = reactive({
+
+  title_list %>%
+    filter(first_date_held > input$years[1] & first_date_held < input$years[2]) %>%
+    count(coverage_city, name = 'titles') %>%
+    left_join(coordinates_list, by = 'coverage_city')%>%
+    filter(!is.na(lng) & !is.na(lat)) %>%
+    st_as_sf(coords = c('lng', 'lat')) %>%
+    st_set_crs(4326)
+
+})

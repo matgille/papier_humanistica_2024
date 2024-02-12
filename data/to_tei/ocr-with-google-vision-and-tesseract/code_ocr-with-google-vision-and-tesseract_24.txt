@@ -1,0 +1,28 @@
+def region_segmentation(input_dir, filename):
+
+    #Initiate empty dictionary.
+    dict_pages={}
+
+    #Convert PDF to list of images.
+    pages = convert_from_path(os.path.join(input_dir, filename))
+
+    #Initiate page count.
+    pn=0
+    for p in pages:
+        pn+=1
+        with PyTessBaseAPI() as api:
+            api.SetImage(p)
+
+            #The "regions" variable is a list of tuples. Each tuple contains an image of a text region and a dictionary containing the coordinates of the same text region.
+            regions = api.GetRegions()
+
+            #Assign to a variable the list of dictionaries containing the coordinates of each text region of the page.
+            r=[region[1] for region in regions]
+
+            #Add to the dictionary initiated above the page number as key and the list of dictionaries as value.
+            dict_pages[pn]=r
+
+            #Add keys and values for the width and height of the page.
+            dict_pages[str(pn)+'_width'], dict_pages[str(pn)+'_height']=p.size
+
+    return dict_pages

@@ -1,0 +1,54 @@
+library(tidyverse)
+library(shiny)
+library(sf)
+library(leaflet)
+
+title_list = read_csv('BritishAndIrishNewspapersTitleList_20191118.csv')
+
+coordinates_list = read_csv('newspaper_coordinates.csv')
+
+ui = fluidPage(
+
+  titlePanel("Newspaper Map"),
+
+  sidebarLayout(
+
+    sidebarPanel = sidebarPanel(sliderInput('years', 'Years', min = 1621, max = 2000, value = c(1700, 1750))),
+    mainPanel = mainPanel(
+
+      leafletOutput(outputId = 'map')
+
+    )
+  )
+
+)
+
+server = function(input, output){
+
+  map_df = reactive({
+
+    title_list %>%
+      filter(first_date_held > input$years[1] & first_date_held < input$years[2]) %>%
+      count(coverage_city, name = 'titles') %>%
+      left_join(coordinates_list, by = 'coverage_city')%>%
+      filter(!is.na(lng) & !is.na(lat)) %>%
+      st_as_sf(coords = c('lng', 'lat')) %>%
+      st_set_crs(4326)
+
+  })
+
+  output$map = renderLeaflet({
+
+    leaflet() %>%
+      addTiles() %>%
+      setView(lng = -5, lat = 54, zoom = 5) %>%
+      addCircleMarkers(data = map_df(), radius = ~sqrt(titles))
+
+  })
+
+
+}
+
+shinyApp(ui, server)
+
+

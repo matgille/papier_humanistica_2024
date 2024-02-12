@@ -1,0 +1,16 @@
+# html-vers-freqs-2.py
+
+import urllib.request, urllib.error, urllib.parse
+import obo
+
+url = 'http://www.oldbaileyonline.org/browse.jsp?id=t17800628-33&div=t17800628-33'
+
+reponse_url = urllib.request.urlopen(url)
+html = reponse_url.read()
+texte_brut = obo.stripTags(html).lower()
+liste_mots = obo.stripNonAlphaNum(texte_brut)
+liste_mots_filtree = obo.removeStopwords(liste_mots, obo.stopwords)
+frequences_mots = obo.wordListToFreqDict(liste_mots_filtree)
+frequences_en_ordre = obo.sortFreqDict(frequences_mots)
+
+for paire in frequences_en_ordre: print(str(paire))
