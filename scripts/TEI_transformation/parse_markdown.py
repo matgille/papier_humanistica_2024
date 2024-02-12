@@ -110,8 +110,6 @@ def xmlify(path):
                 for node in nodes:
                     element_and_childs.append(node)
                 parent.append(element_and_childs)
-    write_tree(parsed_doc, "debug_after")
-    exit(0)
     
     # Getting the path to output file
     original_file = parsed_doc.xpath("//original")
@@ -135,51 +133,20 @@ def xmlify(path):
         with open(f"../../data/to_tei/{dir_name}/{id}.txt", "w") as output_code:
             output_code.write(content)
     
-    # TODO: turn the following lines into a function to avoid redundancy
-    # Let's move block codes in the previous paragraph
-    for block_code in parsed_doc.xpath("//pre/code", namespaces=ns_decl):
-        previous_p = block_code.xpath("parent::pre/preceding-sibling::p[1]")[0]
-        nodes_number = int(previous_p.xpath("count(child::node())"))
-        previous_p.insert(nodes_number, block_code)
-    # Now remove the empty pre
-    for empty_pre in parsed_doc.xpath("//pre", namespaces=ns_decl):
-        empty_pre.getparent().remove(empty_pre)
+    # TODO: move block codes in the previous paragraph (doesnt work, see in the future)
+    # for index, block_code in enumerate(parsed_doc.xpath("//pre/code", namespaces=ns_decl)):
+    #     try:
+    #         previous_p = block_code.xpath("parent::pre/preceding-sibling::p[1]")[0]
+    #     except IndexError:
+    #         traceback.print_exc()
+    #         print(lesson_name)
+    #         print(index)
+    #     nodes_number = int(previous_p.xpath("count(child::node())"))
+    #     previous_p.insert(nodes_number, block_code)
+    # # Now remove the empty pre
+    # for empty_pre in parsed_doc.xpath("//pre", namespaces=ns_decl):
+    #     empty_pre.getparent().remove(empty_pre)
         
-        
-    # Let's do the same with the lists
-    for index, xml_list in enumerate(parsed_doc.xpath("//node()[self::ul or self::ol]", namespaces=ns_decl)):
-        try:
-            previous_p = xml_list.xpath("preceding-sibling::p[1]")[0]
-            nodes_number = int(previous_p.xpath("count(child::node())"))
-            previous_p.insert(nodes_number, xml_list)
-        except Exception:
-            traceback.print_exc()
-            print(lesson_name)
-            print(index)
-            write_tree(parsed_doc)
-            exit(0)
-            following_p = xml_list.xpath("following-sibling::p[1]")[0]
-            following_p.insert(0, xml_list)
-    
-        
-    # And with the inclusions
-    for index, inclusion in enumerate(parsed_doc.xpath("//p/inclusion", namespaces=ns_decl)):
-        try:
-            previous_p = inclusion.xpath("parent::p/preceding-sibling::p[1]")[0]
-            nodes_number = int(previous_p.xpath("count(child::node())"))
-            previous_p.insert(nodes_number, inclusion)
-        except IndexError as e:
-            traceback.print_exc()
-            print(lesson_name)
-            print(index)
-            following_p = inclusion.xpath("parent::p/following-sibling::p[1]")[0]
-            following_p.insert(0, inclusion)
-            with open("/home/mgl/Documents/test/debug.xml", "w") as debug:
-                debug.write(ET.tostring(parsed_doc).decode('utf8'))
-    # Now remove the empty pre
-    for empty_pre in parsed_doc.xpath("//p[not(node())]", namespaces=ns_decl):
-        empty_pre.getparent().remove(empty_pre)
-    
     
     # Let's TEIfy it
     root = parsed_doc.xpath("/node()")[0]
@@ -206,7 +173,7 @@ if __name__ == '__main__':
     # Let's select the lessons in all languages
     regexp = r"/home/mgl/Bureau/Travail/PH/jekyll/(es|fr|en|pt)/l[^/]*/[^/]*\.md"
     lessons = [f for f in glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/*.md") if re.search(regexp, f)]
-    lessons = glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/generating-an-ordered-data-set-from-an-OCR-text-file.md")
+    # lessons = glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/generating-an-ordered-data-set-from-an-OCR-text-file.md")
     for lesson in lessons:
         print(lesson)
         xmlify(lesson)
