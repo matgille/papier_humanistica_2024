@@ -1,5 +1,6 @@
 import glob
 import os
+import traceback
 import uuid
 import lxml.etree as ET
 import re
@@ -9,6 +10,12 @@ from marko.ext.gfm import gfm
 
 tei_ns = "https://tei-c.org/ns/1-0/"
 ns_decl = {"tei": tei_ns}
+
+
+def write_tree(tree, name):
+    with open(f"/home/mgl/Documents/test/{name}.xml", "w") as debug:
+        debug.write(ET.tostring(tree).decode('utf8'))
+
 
 def xmlify(path):
     """
@@ -66,36 +73,45 @@ def xmlify(path):
     
     parser = ET.HTMLParser(recover=True)
     parsed_doc = ET.fromstring(document, parser=parser)
-    for section_level in reversed(range(6)):
+    
+    # We then
+    write_tree(parsed_doc, "debug_before")
+    for section_level in range(6):
         level = section_level + 1
         print(f"Processing level {level}")
         all_headings = parsed_doc.xpath(f"//h{level}")
-        first_node = parsed_doc.xpath(f"descendant::h{level}[1]")
-        all_same_level_nodes = parsed_doc.xpath(f"descendant::h{level}[1]/following-sibling::node()")
-        filtered_same_level_nodes = first_node + [element for element in all_same_level_nodes if isinstance(element, ET._Element)]
-        clustered_nodes = {}
-        headings_number = 0
-        for index, node in enumerate(filtered_same_level_nodes):
-            if node.tag == f"h{level}":
-                current_heading = node
-                headings_number += 1
-                clustered_nodes[current_heading] = []
-            else:
-                clustered_nodes[current_heading].append(node)
-        for heading, nodes in clustered_nodes.items():
-            anchor = heading.xpath("preceding-sibling::node()[1]")
-            parent = heading.getparent()
-            heading_level = heading.tag.replace("h", "")
-            heading.tag = "head"
-            position = int(heading.xpath("count(preceding-sibling::node())"))
-            element_and_childs = ET.Element(f"div")
-            element_and_childs.set("n", heading_level)
-            print(heading_level)
-            element_and_childs.append(heading)
-            for node in nodes:
-                element_and_childs.append(node)
-            parent.append(element_and_childs)
-    print(ET.tostring(parsed_doc))
+        print(all_headings)
+        if level == 1:
+            parent_nodes = [parsed_doc]
+        else:
+            parent_nodes = parsed_doc.xpath(f"//div[@n = '{level - 1}']")
+        for parent_node in parent_nodes:
+            first_node = parent_node.xpath(f"descendant::h{level}[1]")
+            all_same_level_nodes = parent_node.xpath(f"descendant::h{level}[1]/following-sibling::node()")
+            filtered_same_level_nodes = first_node + [element for element in all_same_level_nodes if isinstance(element, ET._Element)]
+            clustered_nodes = {}
+            print(filtered_same_level_nodes)
+            for index, node in enumerate(filtered_same_level_nodes):
+                if node.tag == f"h{level}":
+                    current_heading = node
+                    clustered_nodes[current_heading] = []
+                else:
+                    clustered_nodes[current_heading].append(node)
+            print(f"Found {len(clustered_nodes)} nodes.")
+            for heading, nodes in clustered_nodes.items():
+                print(heading)
+                parent = heading.getparent()
+                heading_level = heading.tag.replace("h", "")
+                heading.tag = "head"
+                element_and_childs = ET.Element(f"div")
+                element_and_childs.set("n", heading_level)
+                print(heading_level)
+                element_and_childs.append(heading)
+                for node in nodes:
+                    element_and_childs.append(node)
+                parent.append(element_and_childs)
+    write_tree(parsed_doc, "debug_after")
+    exit(0)
     
     # Getting the path to output file
     original_file = parsed_doc.xpath("//original")
@@ -119,6 +135,7 @@ def xmlify(path):
         with open(f"../../data/to_tei/{dir_name}/{id}.txt", "w") as output_code:
             output_code.write(content)
     
+    # TODO: turn the following lines into a function to avoid redundancy
     # Let's move block codes in the previous paragraph
     for block_code in parsed_doc.xpath("//pre/code", namespaces=ns_decl):
         previous_p = block_code.xpath("parent::pre/preceding-sibling::p[1]")[0]
@@ -128,11 +145,37 @@ def xmlify(path):
     for empty_pre in parsed_doc.xpath("//pre", namespaces=ns_decl):
         empty_pre.getparent().remove(empty_pre)
         
-    # Let's do the same with the inclusions
-    for inclusion in parsed_doc.xpath("//p/inclusion", namespaces=ns_decl):
-        previous_p = inclusion.xpath("parent::p/preceding-sibling::p[1]")[0]
-        nodes_number = int(previous_p.xpath("count(child::node())"))
-        previous_p.insert(nodes_number, inclusion)
+        
+    # Let's do the same with the lists
+    for index, xml_list in enumerate(parsed_doc.xpath("//node()[self::ul or self::ol]", namespaces=ns_decl)):
+        try:
+            previous_p = xml_list.xpath("preceding-sibling::p[1]")[0]
+            nodes_number = int(previous_p.xpath("count(child::node())"))
+            previous_p.insert(nodes_number, xml_list)
+        except Exception:
+            traceback.print_exc()
+            print(lesson_name)
+            print(index)
+            write_tree(parsed_doc)
+            exit(0)
+            following_p = xml_list.xpath("following-sibling::p[1]")[0]
+            following_p.insert(0, xml_list)
+    
+        
+    # And with the inclusions
+    for index, inclusion in enumerate(parsed_doc.xpath("//p/inclusion", namespaces=ns_decl)):
+        try:
+            previous_p = inclusion.xpath("parent::p/preceding-sibling::p[1]")[0]
+            nodes_number = int(previous_p.xpath("count(child::node())"))
+            previous_p.insert(nodes_number, inclusion)
+        except IndexError as e:
+            traceback.print_exc()
+            print(lesson_name)
+            print(index)
+            following_p = inclusion.xpath("parent::p/following-sibling::p[1]")[0]
+            following_p.insert(0, inclusion)
+            with open("/home/mgl/Documents/test/debug.xml", "w") as debug:
+                debug.write(ET.tostring(parsed_doc).decode('utf8'))
     # Now remove the empty pre
     for empty_pre in parsed_doc.xpath("//p[not(node())]", namespaces=ns_decl):
         empty_pre.getparent().remove(empty_pre)
@@ -158,13 +201,12 @@ def xmlify(path):
         output_file.write(ET.tostring(parsed_doc, pretty_print=True).decode('utf-8'))
 
         
-        
 if __name__ == '__main__':
     
     # Let's select the lessons in all languages
     regexp = r"/home/mgl/Bureau/Travail/PH/jekyll/(es|fr|en|pt)/l[^/]*/[^/]*\.md"
     lessons = [f for f in glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/*.md") if re.search(regexp, f)]
-    lessons = glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/extracting-keywords.md")
+    lessons = glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/generating-an-ordered-data-set-from-an-OCR-text-file.md")
     for lesson in lessons:
         print(lesson)
         xmlify(lesson)
