@@ -12,6 +12,24 @@ tei_ns = "https://tei-c.org/ns/1-0/"
 ns_decl = {"tei": tei_ns}
 
 
+def pop_element(tree, element_name):
+    for element in tree.xpath(f"//{element_name}"):
+        element.getparent().remove(element)
+
+def change_element_name(tree, element, replacement, attr=None, attr_value=None, attr_change:tuple=None):
+    for element in tree.xpath(f"//{element}"):
+        element.tag = replacement
+        if attr:
+            element.set(attr, attr_value)
+        if attr_change:
+            orig, reg = attr_change
+            current_attr_value = element.xpath(f"@{orig}")[0]
+            element.set(reg, current_attr_value)
+            element.attrib.pop(orig)
+            write_tree(tree, "test")
+            
+
+
 def write_tree(tree, name):
     with open(f"/home/mgl/Documents/test/{name}.xml", "w") as debug:
         debug.write(ET.tostring(tree).decode('utf8'))
@@ -23,6 +41,9 @@ def xmlify(path):
     :param path: path to the md file
     :return: None; creates a TEI file
     """
+    # TODO: get back to endnotes
+
+    # Getting the path to output file
     with open(path, "r") as input_file:
         as_text = input_file.read()
         
@@ -30,7 +51,6 @@ def xmlify(path):
     
     ## Metadata management; yaml-xml conversion
     metadata_as_yaml = as_text.split("---")[1]
-    print(metadata_as_yaml)
     python_dict=yaml.load(metadata_as_yaml,Loader=yaml.SafeLoader)
     metadata = ET.Element("metadata")
     for key, values in python_dict.items():
@@ -46,6 +66,8 @@ def xmlify(path):
     ## Metadata management
     
     
+
+    
     # Let's remove some unuseful data
     transformed = transformed.replace("{% include toc.html %}", "")
     transformed = transformed.replace("<hr/>", "")
@@ -59,14 +81,13 @@ def xmlify(path):
     transformed = re.sub(footnotemarks_pattern, rf"<ref type='footnotemark' target='#\1'/>", transformed)
     
     # Inclusions
-    inclusion_pattern = re.compile(r"\{% include figure.html filename=\"(.*)\" caption=\"(.*)\" %\}")
-    replacement = rf'<inclusion href="\1"><desc>\2</desc></inclusion>'
+    inclusion_pattern = re.compile(r"\{% include .* filename=\"(.*)\" caption=\"(.*)\" %\}", re.MULTILINE)
+    replacement = rf'<figure><desc>\2</desc><graphic url="\1"></graphic></figure>'
     transformed = re.sub(inclusion_pattern, replacement, transformed)
     
     
     # GFM extension of marko parses tables too.
     transformed = gfm.convert(transformed)
-    print(transformed)
     
     document = transformed
     
@@ -74,64 +95,59 @@ def xmlify(path):
     parser = ET.HTMLParser(recover=True)
     parsed_doc = ET.fromstring(document, parser=parser)
     
-    # We then
-    write_tree(parsed_doc, "debug_before")
+    
+    
+    # We then Structure the document
+    
+    ## First we need to correct the structure. The first level of division will be 1.
+    all_headings = []
     for section_level in range(6):
+        all_headings.extend([element.tag.replace("h", "") for element in parsed_doc.xpath(f"//h{section_level}")])
+    different_headings = [int(val) for val in list(set(all_headings))]
+    minimal_heading = min(different_headings)
+    if minimal_heading != 1:
+        difference = minimal_heading - 1
+        print(difference)
+        for section_level in range(minimal_heading, 7):
+            all_nodes = parsed_doc.xpath(f"descendant::h{section_level}")
+            for heading in all_nodes:
+                heading.tag = f"h{str(section_level - difference)}"
+    ## First we need to correct the structure. The first level of division will be 1.
+    
+    ## After that, we can start restructuring the document, using the headers. 
+    # Here we start with the larger divisions, narrowing gradually the scope, and parsing each part of the tree
+    #  in successive order.
+    for section_level in range(0, 6):
         level = section_level + 1
-        print(f"Processing level {level}")
-        all_headings = parsed_doc.xpath(f"//h{level}")
-        print(all_headings)
         if level == 1:
             parent_nodes = [parsed_doc]
         else:
+            # We use the tree updated in a previous run (h1 > div @n=1, then h2 > div @n=2, etc  
             parent_nodes = parsed_doc.xpath(f"//div[@n = '{level - 1}']")
         for parent_node in parent_nodes:
             first_node = parent_node.xpath(f"descendant::h{level}[1]")
             all_same_level_nodes = parent_node.xpath(f"descendant::h{level}[1]/following-sibling::node()")
             filtered_same_level_nodes = first_node + [element for element in all_same_level_nodes if isinstance(element, ET._Element)]
             clustered_nodes = {}
-            print(filtered_same_level_nodes)
             for index, node in enumerate(filtered_same_level_nodes):
                 if node.tag == f"h{level}":
                     current_heading = node
                     clustered_nodes[current_heading] = []
                 else:
                     clustered_nodes[current_heading].append(node)
-            print(f"Found {len(clustered_nodes)} nodes.")
             for heading, nodes in clustered_nodes.items():
-                print(heading)
                 parent = heading.getparent()
                 heading_level = heading.tag.replace("h", "")
                 heading.tag = "head"
                 element_and_childs = ET.Element(f"div")
                 element_and_childs.set("n", heading_level)
-                print(heading_level)
                 element_and_childs.append(heading)
                 for node in nodes:
                     element_and_childs.append(node)
                 parent.append(element_and_childs)
     
-    # Getting the path to output file
-    original_file = parsed_doc.xpath("//original")
-    if len(original_file) == 1:
-        dir_name = original_file[0].text
-    else:
-        dir_name = lesson_name
-    try:
-        os.mkdir(f"../../data/to_tei/{dir_name}")
-    except FileExistsError:
-        pass
     
-    # Block code management: extract them from the document, and write them 
-    # to a text file.
-    for block_code in parsed_doc.xpath("//pre/code"):
-        id = "id_" + str(uuid.uuid4()).split("-")[0]
-        content = block_code.text
-        block_code.text = ""
-        block_code.set("xml:id", id)
-        block_code.set("corresp", f"{id}.txt")
-        with open(f"../../data/to_tei/{dir_name}/{id}.txt", "w") as output_code:
-            output_code.write(content)
+    
     
     # TODO: move block codes in the previous paragraph (doesnt work, see in the future)
     # for index, block_code in enumerate(parsed_doc.xpath("//pre/code", namespaces=ns_decl)):
@@ -158,6 +174,36 @@ def xmlify(path):
     body = root.xpath("//body")
     text_element.append(body[0])
     root.insert(1, text_element)
+
+    original_file = parsed_doc.xpath("//original")
+    if len(original_file) == 1:
+        dir_name = original_file[0].text
+    else:
+        dir_name = lesson_name
+    try:
+        os.mkdir(f"../../data/to_tei/{dir_name}")
+    except FileExistsError:
+        pass
+
+    # Block code management: extract them from the document, and write them 
+    # to a text file.
+    for index, block_code in enumerate(parsed_doc.xpath("//pre/code")):
+        id = f"code_{lesson_name}_{index}"
+        content = block_code.text
+        block_code.text = ""
+        block_code.set("xml:id", id)
+        block_code.set("type", "block")
+        block_code.set("corresp", f"{id}.txt")
+        with open(f"../../data/to_tei/{dir_name}/{id}.txt", "w") as output_code:
+            output_code.write(content)
+    
+    # Let's modify some tagnames, clean some other
+    change_element_name(root, "strong", "hi", "rend", "bold")
+    change_element_name(root, "em", "emph")
+    change_element_name(root, "code[not(@type)]", "code", "type", "inline")
+    change_element_name(root, "a[@href]", "link", attr_change=('href', 'target'))
+    pop_element(root, "hr")
+    
     
             
     with open(f"../../data/to_tei/{dir_name}/{lesson_name}.xml", "w") as output_file:
