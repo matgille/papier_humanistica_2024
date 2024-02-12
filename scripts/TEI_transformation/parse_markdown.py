@@ -1,6 +1,6 @@
 import glob
 import os
-
+import uuid
 import lxml.etree as ET
 import re
 import yaml
@@ -8,10 +8,20 @@ import marko
 from marko.ext.gfm import gfm
 
 tei_ns = "https://tei-c.org/ns/1-0/"
+ns_decl = {"tei": tei_ns}
+
 def xmlify(path):
+    """
+    This function takes a md file and returns a TEI-like document (not fully compliant though)
+    :param path: path to the md file
+    :return: None; creates a TEI file
+    """
     with open(path, "r") as input_file:
         as_text = input_file.read()
+        
     lesson_name = path.split("/")[-1].replace(".md", "")
+    
+    ## Metadata management; yaml-xml conversion
     metadata_as_yaml = as_text.split("---")[1]
     print(metadata_as_yaml)
     python_dict=yaml.load(metadata_as_yaml,Loader=yaml.SafeLoader)
@@ -24,58 +34,35 @@ def xmlify(path):
             new_element.text = str(values)
         metadata.append(new_element)
     metadata_as_xml = ET.tostring(metadata, pretty_print=True, encoding='utf8').decode()
+    # We remove the metadata from the text file
     transformed = as_text.replace(metadata_as_yaml, "")
+    ## Metadata management
     
+    
+    # Let's remove some unuseful data
+    transformed = transformed.replace("{% include toc.html %}", "")
+    transformed = transformed.replace("<hr/>", "")
+    
+    
+    ## Next, some regexp-based rules to identify tricky elements (footnotes, etc)
     footnotes_pattern = re.compile(r"\[\^([^\[\]\^]*)\]:([^\n]*)\n", re.DOTALL)
     transformed = re.sub(footnotes_pattern, rf"<note id='\1'>\2</note>\n", transformed)
     
     footnotemarks_pattern = re.compile(r"\[\^([^\[\]\^]*)\]")
     transformed = re.sub(footnotemarks_pattern, rf"<ref type='footnotemark' target='#\1'/>", transformed)
     
-    # GFM extension parses tables too.
-    transformed = gfm.convert(transformed)
-    
-    inclusion_pattern = re.compile(r"\{% include .* filename=\"([^\"]*)\" caption=\"([^\"]*)\" %\}")
+    # Inclusions
+    inclusion_pattern = re.compile(r"\{% include figure.html filename=\"(.*)\" caption=\"(.*)\" %\}")
     replacement = rf'<inclusion href="\1"><desc>\2</desc></inclusion>'
-    transformed = re.sub(inclusion_pattern, replacement, transformed, re.DOTALL)
+    transformed = re.sub(inclusion_pattern, replacement, transformed)
     
     
-    list_items_pattern = re.compile(r"^\s*[-*]([^\n]*)\n", re.MULTILINE)
-    transformed = re.sub(list_items_pattern, rf"<item>\1</item>\n", transformed)
-    
-    
-    inline_code_pattern = re.compile("```([^`\n]*)```")
-    transformed = re.sub(inline_code_pattern, rf"`\1`", transformed)
-    multiline_code_pattern = re.compile("```([^`]*)```")
-    transformed = re.sub(multiline_code_pattern, rf"<span type='block_code'>\1</span>", transformed, re.MULTILINE)
-    inline_code_pattern = re.compile("`([^`\n]*)`")
-    transformed = re.sub(inline_code_pattern, rf"<span type='code'>\1</span>", transformed)
-    
-    
-    emph_pattern = re.compile(r"\*([^\*]*)\*")
-    transformed = re.sub(emph_pattern, rf"<emph>\1</emph>", transformed)
-    transformed = transformed.replace("&laquo;&#x202F;", "<soCalled>")
-    transformed = transformed.replace("&#x202F;&raquo;", "</soCalled>").replace("&nbsp;", "").replace("&#x202F;", "").replace("«", "<quote>").replace("»", "</quote>")
-    
-    h1_pattern = re.compile("^# ([^\n]*)", re.MULTILINE)
-    transformed = re.sub(h1_pattern, rf"<h1>\1</h1>", transformed)
-    h2_pattern = re.compile("^## ([^\n]*)", re.MULTILINE)
-    transformed = re.sub(h2_pattern, rf"<h2>\1</h2>", transformed)
-    h3_pattern = re.compile("^### ([^\n]*)", re.MULTILINE)
-    transformed = re.sub(h3_pattern, rf"<h3>\1</h3>", transformed)
-    
-    url_pattern = re.compile(r"\[([^\[\]]*)\]\(([^\(\)\s]*)\)")
-    transformed = re.sub(url_pattern, rf"<ref target='\2'>\1</ref>", transformed)
-    
-    numbered_list_pattern = re.compile(r"^(\d+)([^\n]*)\n", re.MULTILINE)
-    transformed = re.sub(numbered_list_pattern, rf"<item n='\1'>\2</item>\n", transformed)
-    
+    # GFM extension of marko parses tables too.
+    transformed = gfm.convert(transformed)
     print(transformed)
     
-    document =  transformed 
-    with open("/home/mgl/Documents/test/markdown.xml", "w") as output_file:
-        output_file.write(document)
-        
+    document = transformed
+    
     
     parser = ET.HTMLParser(recover=True)
     parsed_doc = ET.fromstring(document, parser=parser)
@@ -110,8 +97,50 @@ def xmlify(path):
             parent.append(element_and_childs)
     print(ET.tostring(parsed_doc))
     
+    # Getting the path to output file
+    original_file = parsed_doc.xpath("//original")
+    if len(original_file) == 1:
+        dir_name = original_file[0].text
+    else:
+        dir_name = lesson_name
+    try:
+        os.mkdir(f"../../data/to_tei/{dir_name}")
+    except FileExistsError:
+        pass
+    
+    # Block code management: extract them from the document, and write them 
+    # to a text file.
+    for block_code in parsed_doc.xpath("//pre/code"):
+        id = "id_" + str(uuid.uuid4()).split("-")[0]
+        content = block_code.text
+        block_code.text = ""
+        block_code.set("xml:id", id)
+        block_code.set("corresp", f"{id}.txt")
+        with open(f"../../data/to_tei/{dir_name}/{id}.txt", "w") as output_code:
+            output_code.write(content)
+    
+    # Let's move block codes in the previous paragraph
+    for block_code in parsed_doc.xpath("//pre/code", namespaces=ns_decl):
+        previous_p = block_code.xpath("parent::pre/preceding-sibling::p[1]")[0]
+        nodes_number = int(previous_p.xpath("count(child::node())"))
+        previous_p.insert(nodes_number, block_code)
+    # Now remove the empty pre
+    for empty_pre in parsed_doc.xpath("//pre", namespaces=ns_decl):
+        empty_pre.getparent().remove(empty_pre)
+        
+    # Let's do the same with the inclusions
+    for inclusion in parsed_doc.xpath("//p/inclusion", namespaces=ns_decl):
+        previous_p = inclusion.xpath("parent::p/preceding-sibling::p[1]")[0]
+        nodes_number = int(previous_p.xpath("count(child::node())"))
+        previous_p.insert(nodes_number, inclusion)
+    # Now remove the empty pre
+    for empty_pre in parsed_doc.xpath("//p[not(node())]", namespaces=ns_decl):
+        empty_pre.getparent().remove(empty_pre)
+    
+    
     # Let's TEIfy it
     root = parsed_doc.xpath("/node()")[0]
+    # Converting HTML root to TEI, adding correct namespace
     root.tag = "TEI"
     root.set('xmlns', tei_ns)
     root.insert(0, ET.fromstring(metadata_as_xml))
@@ -121,18 +150,21 @@ def xmlify(path):
     root.insert(1, text_element)
     
             
-    with open(f"/home/mgl/Documents/test/{lesson_name}_clean.xml", "w") as output_file:
+    with open(f"../../data/to_tei/{dir_name}/{lesson_name}.xml", "w") as output_file:
         # TODO: single asterisks are not rendered and break the HTML. After ET recovery, they are lost. I suppose the same
         # TODO: happens with other chars. It's annoying.
         # TODO: Another problem with regexp lesson: last urls disapear.
+        # TODO: linebreaks in code are removed by lxml. 
         output_file.write(ET.tostring(parsed_doc, pretty_print=True).decode('utf-8'))
 
-    exit(0)
         
         
 if __name__ == '__main__':
+    
+    # Let's select the lessons in all languages
     regexp = r"/home/mgl/Bureau/Travail/PH/jekyll/(es|fr|en|pt)/l[^/]*/[^/]*\.md"
     lessons = [f for f in glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/*.md") if re.search(regexp, f)]
+    lessons = glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/extracting-keywords.md")
     for lesson in lessons:
         print(lesson)
         xmlify(lesson)
