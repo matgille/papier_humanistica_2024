@@ -26,25 +26,25 @@
 </metadata>
   <text>
     <body>
-      <div n="1"><head>Objetivos de la lecci&#243;n</head>
+      <div n="2"><head>Objetivos de la lecci&#243;n</head>
 <p>Al igual que en <link target="/es/lecciones/salida-de-datos-como-archivo-html">Salida de datos como archivo HTML</link>, esta lecci&#243;n retoma los pares de frecuencias recolectados en <link target="/es/lecciones/contar-frecuencias">Contar frecuencias de palabras</link> y crea una salida de datos en HTML. Esta vez el objetivo son las palabras clave en contexto ("KWIC&#8221;, por sus siglas en ingl&#233;s) que crea n-gramas del contenido del documento original -en este caso la transcripci&#243;n de un juicio del "Old Bailey Online". Puedes utilizar tu programa para seleccionar una palabra clave y la computadora producir&#225; una salida de datos con todas las veces en que aparece esa palabra clave, junto con las palabras a la derecha e izquierda de la misma, haciendo sencillo observar a simple vista c&#243;mo es utilizada dicha palabra.</p>
 <p>Una vez que se han creado las KWCIs, se envuelven en HTML y se env&#237;an al navegador en donde se pueden ver. Esto refuerza lo aprendido en <link target="salida-de-datos-como-archivo-html">Salida de datos como archivo HTML</link> optando por una salida ligeramente distinta.</p>
 <p>Al final de la lecci&#243;n ser&#225;s capaz de extraer todos los n-gramas posibles del texto. En la siguiente lecci&#243;n, aprender&#225;s c&#243;mo crear salida de todos los n-gramas de una palabra clave dada en un documento descargado de Internet, y visualizarla claramente en la ventana de tu navegador.</p>
 </div>
-      <div n="1"><head>Archivos necesarios para esta lecci&#243;n</head>
+      <div n="2"><head>Archivos necesarios para esta lecci&#243;n</head>
 <ul>
 <li><code type="inline">obo.py</code></li>
 </ul>
 <p>Si no tienes estos archivos de las lecciones anteriores, puedes descargar python-es-lecciones7, un <link target="/assets/python-es-lecciones7.zip">archivo zip de las lecciones anteriores</link>.</p>
 </div>
-      <div n="1"><head>De texto a n-gramas a KWIC</head>
+      <div n="2"><head>De texto a n-gramas a KWIC</head>
 <p>Ahora que ya sabes c&#243;mo recolectar el contenido textual de una p&#225;gina Web de manera autom&#225;tica con Python, y has empezado a utilizar cadenas de caracteres, listas y diccionarios para procesamiento de texto, hay muchas otras cosas que puedes hacer con los textos aparte de contar frecuencias. Quienes estudian las propiedades estad&#237;sticas del lenguaje han encontrado que el estudiar las secuencias lineales de unidades ling&#252;&#237;sticas puede decirnos muchas cosas acerca de un texto. Estas secuencias lineales son conocidas como *bigramas+ (2 unidades), <emph>trigramas</emph> (3 unidades) o m&#225;s generalmente como <emph>n-gramas</emph>.</p>
 <p>Probablemente has visto con anterioridad n-gramas muchas veces. Se utilizan generalmente en p&#225;ginas de resultados de investigaci&#243;n para dar una previsualizaci&#243;n del lugar en que aparece tu palabra clave en un documento y cu&#225;l es el contexto que la rodea. Esta aplicaci&#243;n de los n-gramas es conocida como "palabras clave en contexto" (generalmente abreviada como KWIC). Por ejemplo, si la cadena en cuesti&#243;n fuese "it was the best of times it was the worst of times it was the age of wisdom it was the age of foolishness", entonces un 7-grama para la palabra clave "wisdom" ser&#237;a:</p>
 <pre><code xml:id="code_palabras-clave-en-contexto-n-grams_0" type="block" corresp="code_palabras-clave-en-contexto-n-grams_0.txt"></code></pre>
 <p>Un n-grama puede contener cualquier tipo de unidad ling&#252;&#237;stica que quieras. Los historiadores tienen m&#225;s probabilidades de utilizar caracteres como en el bigrama "qu" o palabras como en el trigrama "el perro ladr&#243;"; sin embargo, puedes utilizar tambi&#233;n fonemas, s&#237;labas o cualquier n&#250;mero de otras unidades en funci&#243;n de tu pregunta de investigaci&#243;n.</p>
 <p>Lo que vamos a hacer ahora es desarrollar la habilidad de visualizar KWIC para cualquier palabra clave en un cuerpo de texto y mostrarla en el contexto de un n&#250;mero fijo de palabras en cada lado. Como antes, vamos a "encerrar" (en HTML) la salida de datos para que se pueda ver en Firefox y a&#241;adir f&#225;cilmente a Zotero.</p>
 </div>
-      <div n="1"><head>De texto a n-gramas</head>
+      <div n="2"><head>De texto a n-gramas</head>
 <p>Dado que queremos trabajar con palabras en lugar de caracteres o fonemas, ser&#225; mucho m&#225;s f&#225;cil crear n-gramas utilizando una lista de palabras en vez de cadenas. Como ya sabes, Python puede convertir f&#225;cilmente una cadena en una lista utilizando la operaci&#243;n dividir (<code type="inline">split</code>). Una vez dividida resulta sencillo recuperar una subsecuencia de palabras adyacentes en la lista utilizando un <emph>fragmento</emph> representado por dos &#237;ndices separados por dos puntos. Aprendimos esto cuando trabajamos con cadenas en <link target="/es/lecciones/manipular-cadenas-de-caracteres-en-python">Manipular cadenas de caracteres en Python</link></p>
 <pre><code class="language-python" xml:id="code_palabras-clave-en-contexto-n-grams_1" type="block" corresp="code_palabras-clave-en-contexto-n-grams_1.txt"></code></pre>
 <p>Sin embargo, tambi&#233;n podemos utilizar esta t&#233;cnica para tomar un n&#250;mero predeterminado de palabras vecinas de la lista con poco esfuerzo. Estudia los siguientes ejemplos que puedes probar en un int&#233;rprete de Python.</p>
@@ -65,7 +65,7 @@
 <p>En este ejemplo vemos dos cosas que debes tener en cuenta. En primer lugar, como nuestra funci&#243;n espera una lista de palabras en lugar de una cadena, tenemos que convertir las cadenas en listas antes de que nuestro programa pueda manejarlas. Podr&#237;amos haberlo hecho mediante la adici&#243;n de otra l&#237;nea de c&#243;digo por encima de la llamada a la funci&#243;n, pero en su lugar utilizamos el m&#233;todo <code type="inline">split</code> directamente en el argumento de la funci&#243;n como una especie de atajo.</p>
 <p>En segundo lugar, &#191;por qu&#233; el primer ejemplo devuelve una lista vac&#237;a en lugar del n-grama que buscamos? En <emph>test1</emph> hemos pedido un n-grama que es m&#225;s largo que el n&#250;mero de palabras en nuestra lista, lo cual ha resutado en una lista en blanco. En <emph>test2</emph> no tenemos tal problema y obtuvimos todos los posibles 5-gramas para una lista de palabras m&#225;s larga. Si quieres puedes adaptar tu funci&#243;n para que imprima un mensaje de advertencia o para recuperar toda la cadena en lugar de una lista vac&#237;a.</p>
 <p>Ahora tenemos una manera de extraer todos los posibles n-gramas de un cuerpo de texto. En la siguiente lecci&#243;n podemos centrar nuestra atenci&#243;n en aislar los n-gramas que sean de inter&#233;s para nosotros.</p>
-<div n="2"><head>Sincronizaci&#243;n de c&#243;digo</head>
+<div n="3"><head>Sincronizaci&#243;n de c&#243;digo</head>
 <p>Para seguir a lo largo de las lecciones futuras es importante que tengas los archivos correctos y programas en el directorio "programming-historian" de tu disco duro. Al final de cada lecci&#243;n puedes descargar el archivo zip "python-es-lecciones" para asegurarte que tienes el c&#243;digo correcto. Si est&#225;s trabajando con la versi&#243;n Mac o Linux de las lecciones deber&#225;s abrir el archivo <code type="inline">obo.py</code> y cambiar "file:///Users/username/Desktop/programming-historian/" a la ruta del directorio de tu propia computadora.</p>
 <ul>
 <li>python-es-lecciones8.zip (<link target="/assets/python-es-lecciones8.zip">zip sync</link>)</li>

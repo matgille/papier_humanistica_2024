@@ -21,10 +21,10 @@
 </metadata>
   <text>
     <body>
-      <div n="1"><head>Requisitos</head>
+      <div n="2"><head>Requisitos</head>
 <p>En esta lecci&#243;n asumimos que tienes cierto conocimiento sobre R. Si no has completado el tutorial de <link target="/es/lecciones/datos-tabulares-en-r">datos tabulares b&#225;sicos con R</link>, te recomendamos hacerlo. Saber otro lenguaje de programaci&#243;n tambi&#233;n te ser&#225; &#250;til. Si necesitas un lugar donde empezar, recomendamos trabajar con los excelentes tutoriales sobre <link target="/es/lecciones/?topic=python">Python</link> en <emph>The Programming Historian en espa&#241;ol</emph>.</p>
 </div>
-      <div n="1"><head>Objetivos de la lecci&#243;n</head>
+      <div n="2"><head>Objetivos de la lecci&#243;n</head>
 <p>Al final de la lecci&#243;n,</p>
 <ol>
 <li>sabr&#225;s c&#243;mo trabajar con datos ordenados y su importancia.</li>
@@ -33,7 +33,7 @@
 <li>aprender&#225;s las bases del an&#225;lisis exploratorio de datos a trav&#233;s de algunos ejemplos b&#225;sicos de manipulaci&#243;n de datos.</li>
 </ol>
 </div>
-      <div n="1"><head>Introducci&#243;n</head>
+      <div n="2"><head>Introducci&#243;n</head>
 <p>Los datos que puedes encontrar disponibles en red raramente est&#225;n en el formato necesario para su an&#225;lisis y necesitar&#225;s manipularlos antes de explorar las preguntas que te interesan. &#161;Esto puede llevar m&#225;s tiempo que el an&#225;lisis! En este tutorial vamos a aprender algunas t&#233;cnicas b&#225;sicas de manipulaci&#243;n, manejo y administraci&#243;n de tus datos en R. M&#225;s espec&#237;ficamente, vamos a seguir la filosof&#237;a de "datos limpios" o <link target="https://www.jstatsoft.org/article/view/v059i10"><emph>"tidy data"</emph></link> articulada por Hadley Wickham.</p>
 <p>Seg&#250;n <link target="http://hadley.nz">Wickham</link>, los datos est&#225;n "limpios" cuando cumplen tres criterios:</p>
 <ol>
@@ -59,7 +59,7 @@
 <p>Copia el siguiente c&#243;digo en R Studio. Para ejecutarlo tienes que marcar las l&#237;neas y clicar Ctrl+Intro (Cmd+Intro en Mac OS):</p>
 <pre><code xml:id="code_administracion-de-datos-en-r_0" type="block" corresp="code_administracion-de-datos-en-r_0.txt"></code></pre>
 </div>
-      <div n="1"><head>Un ejemplo de dplyr en acci&#243;n</head>
+      <div n="2"><head>Un ejemplo de dplyr en acci&#243;n</head>
 <p>Veamos un ejemplo de c&#243;mo dyplr nos puede ayudar a los historiadores. Vamos a cargar los datos del censo decenal de 1790 a 2010 de Estados Unidos. Descarga los datos haciendo <link target="/assets/ejemplo_introductorio_estados.csv">click aqu&#237;</link><ref type="footnotemark" target="#2"/> y ponlos en la carpeta que vas a utilizar para trabajar en los ejemplos de este tutorial.</p>
 <p>Como los datos est&#225;n en un archivo CSV, vamos a usar el comando de lectura <code type="inline">read_csv()</code> en el paquete <link target="https://cran.r-project.org/web/packages/readr/vignettes/readr.html">readr</link> de "tidyverse".</p>
 <p>La funci&#243;n <code type="inline">read_csv</code> (leer archivo de valores separados por comas) toma la ruta del archivo que queremos importar como una variable, as&#237; que aseg&#250;rate de escribirlo correctamente.</p>
@@ -73,7 +73,7 @@
 <figure><desc>Gr&#225;fico de la poblaci&#243;n de los estados de Mississippi y de Virginia</desc><graphic url="mississipi_virginia_poblacion.png"/></figure>
 <p>Hacer cambios r&#225;pidos en el c&#243;digo y reanalizar nuestros datos es una parte fundamental del an&#225;lisis exploratorio de datos (AED, o EDA por sus siglas en ingl&#233;s). En vez de tratar de "probar" una hip&#243;tesis, el an&#225;lisis exploratorio de datos nos ayuda a entender nuestros datos mejor y a hacernos preguntas sobre ellos. Para los historiadores el AED ofrece una forma de saber cu&#225;ndo indagar m&#225;s en un tema y cuando dejarlo a un lado, y esto es en el &#225;rea en el que R sobresale.</p>
 </div>
-      <div n="1"><head>L&#237;nea de operaciones</head>
+      <div n="2"><head>L&#237;nea de operaciones</head>
 <p>Antes de ver <code type="inline">dplyr</code>, tenemos que entender lo que es la l&#237;nea de operaciones <code type="inline">%&gt;%</code> en R porque la vamos a utilizar mucho en nuestros ejemplos. Como dec&#237;amos, la l&#237;nea de operaciones es parte del paquete  <link target="https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html">magittr</link> creado por <link target="http://stefanbache.dk">Stefan Milton Bache</link> y <link target="http://hadley.nz/">Hadley Wickham</link> y est&#225; incluida en tidyverse. Su nombre es un homenaje al pintor surrealista Rene Magritte y su famosa obra "<link target="https://historia-arte.com/obras/la-traicion-de-las-imagenes">La traici&#243;n de las im&#225;genes</link>", que muestra una pipa con las palabras "esto no es una pipa" debajo, en franc&#233;s.</p>
 <p>La l&#237;nea de operaciones te permite pasar lo que est&#225; a su izquierda como la primera variable en una funci&#243;n especificada a la derecha. Aunque pueda parecer extra&#241;o al principio, una vez que lo aprendas ver&#225;s que hace tu c&#243;digo m&#225;s f&#225;cil de leer al evitar declaraciones anidadas. No te preocupes si esto te resulta un poco complicado ahora. Ser&#225; m&#225;s f&#225;cil una vez que trabajemos con ejemplos.</p>
 <p>Digamos que nos interesa saber la ra&#237;z cuadrada del valor de cada poblaci&#243;n y luego queremos sumar todas las ra&#237;ces cuadradas antes de calcular la media. Obviamente, esto no es una medida &#250;til pero demuestra cu&#225;n r&#225;pido puede complicarse la lectura del c&#243;digo de R. Normalmente, anidar&#237;amos las siguientes declaraciones:</p>
@@ -87,7 +87,7 @@
 <p>Por favor, nota que los vectores o marcos de datos que la l&#237;nea de operaci&#243;n crea son descartados cuando se completa la operaci&#243;n. Si quieres guardarlos, tienes que pasarlos a una nueva variable:</p>
 <pre><code xml:id="code_administracion-de-datos-en-r_8" type="block" corresp="code_administracion-de-datos-en-r_8.txt"></code></pre>
 </div>
-      <div n="1"><head>Necesitamos un nuevo conjunto de datos</head>
+      <div n="2"><head>Necesitamos un nuevo conjunto de datos</head>
 <p>Ahora que entendemos la l&#237;nea de operaciones, estamos preparados para empezar a mirar y administrar otro conjunto de datos. Desafortunadamente, para los historiadores, solo hay unos pocos conjuntos disponibles - &#161;a lo mejor t&#250; nos puedas ayudar a cambiar esto haciendo los tuyos p&#250;blicos! Aqu&#237; contamos con el paquete <link target="https://cran.r-project.org/web/packages/historydata/index.html">history data</link> (datos hist&#243;ricos) creado por <link target="https://lincolnmullen.com">Lincoln Mullen</link>.</p>
 <p>Vamos a instalar y cargar el paquete:</p>
 <pre><code xml:id="code_administracion-de-datos-en-r_9" type="block" corresp="code_administracion-de-datos-en-r_9.txt"></code></pre>
@@ -98,31 +98,31 @@
 <pre><code xml:id="code_administracion-de-datos-en-r_11" type="block" corresp="code_administracion-de-datos-en-r_11.txt"></code></pre>
 <p>Ahora que tenemos nuestros datos en formato limpio, podemos formatearlos a trav&#233;s del paquete <code type="inline">dplyr</code>.</p>
 </div>
-      <div n="1"><head>&#191;Qu&#233; es Dplyr?</head>
+      <div n="2"><head>&#191;Qu&#233; es Dplyr?</head>
 <p><link target="https://cran.rstudio.com/web/packages/dplyr/vignettes/dplyr.html">Dplyr</link> es otra parte de tidyverse que proporciona funciones para manipular y transformar tu datos. Dado que nuestros datos van a seguir estando ordenados (<emph>tidy</emph>), solamente necesitamos un conjunto peque&#241;o de herramientas para explorarlo. Compar&#225;ndolo con el R Base, el uso de <code type="inline">dplyr</code> es m&#225;s r&#225;pido y garantiza que si los datos introducidos (<emph>input</emph>) est&#225;n ordenados los datos que obtendremos (<emph>output</emph>) tambi&#233;n lo estar&#225;n. Quiz&#225;s de manera m&#225;s importante, <code type="inline">dplyr</code> hace nuestro c&#243;digo f&#225;cil de leer y utiliza "verbos" que son, en su mayor&#237;a, intuitivos (para el hablante de ingl&#233;s). Cada funci&#243;n en <code type="inline">dplyr</code> corresponde a estos verbos, siendo los cinco principales filtrar (<code type="inline">filter</code>), seleccionar (<code type="inline">select</code>), ordenar (<code type="inline">arrange</code>), mutar (<code type="inline">mutate</code>) y resumir (<code type="inline">summarise</code> - con ortograf&#237;a de ingl&#233;s brit&#225;nico- o <code type="inline">summarize</code> - con ortograf&#237;a de ingl&#233;s de EEUU-). Vamos a ver cada una de ellas para entender su funcionamiento en la pr&#225;ctica.</p>
-<div n="2"><head><code type="inline">select</code> (seleccionar)</head>
+<div n="3"><head><code type="inline">select</code> (seleccionar)</head>
 <p>Si miramos el conjunto <code type="inline">early_colleges</code> (primeras_universidades), podemos ver que hay muchos "NA" en la columna de nombres originales. NA significa que los datos no est&#225;n disponibles (del ingl&#233;s <emph>not available</emph>), y quiz&#225;s queramos ver nuestros datos sin esta columna. La funci&#243;n <code type="inline">select()</code> de <code type="inline">dplyr</code> nos posibilita esto precisamente. Toma el marco de datos que quieres manipular como el primer argumento, seguido de la lista indicando qu&#233; columnas queremos mantener:</p>
 <pre><code xml:id="code_administracion-de-datos-en-r_12" type="block" corresp="code_administracion-de-datos-en-r_12.txt"></code></pre>
 <p>Escribamos tambi&#233;n esto mismo usando la l&#237;nea de operador <code type="inline">%&gt;%</code>:</p>
 <pre><code xml:id="code_administracion-de-datos-en-r_13" type="block" corresp="code_administracion-de-datos-en-r_13.txt"></code></pre>
 <p>Hacer referencia a cada una de las columnas que queremos mantener para deshacernos de una es un tanto tedioso. Podemos usar el s&#237;mbolo de restar (-) para indicar que queremos descartar una columna, con su nombre.</p>
 <pre><code xml:id="code_administracion-de-datos-en-r_14" type="block" corresp="code_administracion-de-datos-en-r_14.txt"></code></pre>
-</div><div n="2"><head><code type="inline">filter</code> (filtrar)</head>
+</div><div n="3"><head><code type="inline">filter</code> (filtrar)</head>
 <p>La funci&#243;n <code type="inline">filter()</code> hace lo mismo que la funci&#243;n <code type="inline">select</code> pero en vez de escoger el nombre de la columna, la podemos usar para filtrar filas usando un test de requisitos. Por ejemplo, podemos ver todas las universidades que exist&#237;an antes del cambio de siglo:</p>
 <pre><code xml:id="code_administracion-de-datos-en-r_15" type="block" corresp="code_administracion-de-datos-en-r_15.txt"></code></pre>
-</div><div n="2"><head><code type="inline">mutate</code> (mutar)</head>
+</div><div n="3"><head><code type="inline">mutate</code> (mutar)</head>
 <p>El comando <code type="inline">mutate</code> nos permite a&#241;adir una columna al conjunto de datos. Ahora mismo, tenemos la ciudad y el estado en dos columnas diferentes. Podemos usar el comando de pegar (<code type="inline">paste</code>) para combinar dos cadenas de caracteres y especificar un separador. Pong&#225;moslas en una &#250;nica columna llamada "location" (lugar):</p>
 <pre><code xml:id="code_administracion-de-datos-en-r_16" type="block" corresp="code_administracion-de-datos-en-r_16.txt"></code></pre>
 <p>Recuerda que <code type="inline">dplyr</code> no guarda los datos ni manipula el original. Al contrario, crea marcos de datos temporales en cada paso. Si quieres guardarlos, tienes que crear una variable permanente con <code type="inline">&lt;-</code>:</p>
 <pre><code xml:id="code_administracion-de-datos-en-r_17" type="block" corresp="code_administracion-de-datos-en-r_17.txt"></code></pre>
-</div><div n="2"><head><code type="inline">arrange</code>(ordenar)</head>
+</div><div n="3"><head><code type="inline">arrange</code>(ordenar)</head>
 <p>La funci&#243;n <code type="inline">arrange</code> nos permite ordenar nuestras columnas de una nueva forma. Ahora mismo, las universidades est&#225;n organizadas por a&#241;o en orden ascendiente. Pong&#225;moslas en el orden descendiente de fundaci&#243;n desde, en este caso, el fin de la guerra con M&#233;xico en 1848.<ref type="footnotemark" target="#5"/></p>
 <pre><code xml:id="code_administracion-de-datos-en-r_18" type="block" corresp="code_administracion-de-datos-en-r_18.txt"></code></pre>
-</div><div n="2"><head><code type="inline">summarise</code> (resumir)</head>
+</div><div n="3"><head><code type="inline">summarise</code> (resumir)</head>
 <p>La &#250;ltima funci&#243;n clave en <code type="inline">dplyr</code> es <code type="inline">summarise()</code> - en ortograf&#237;a brit&#225;nica (con 's') o en estadounidense (con 'z'). <code type="inline">summarise()</code> toma una funci&#243;n u operaci&#243;n y generalmente se usa para crear un <emph>data frame</emph> que contiene los datos estad&#237;sticos de resumen y que podemos visualizar en forma de gr&#225;fico. Aqu&#237; la vamos a usar para calcular el a&#241;o promedio en que se fundaron las universidades antes de 1848.</p>
 <pre><code xml:id="code_administracion-de-datos-en-r_19" type="block" corresp="code_administracion-de-datos-en-r_19.txt"></code></pre>
 </div></div>
-      <div n="1"><head>Poni&#233;ndolo todo junto</head>
+      <div n="2"><head>Poni&#233;ndolo todo junto</head>
 <p>Ahora que hemos aprendido los cinco verbos principales para <code type="inline">dplyr</code>, podemos usarlos para crear r&#225;pidas visualizaciones de nuestros datos. Vamos a crear un gr&#225;fico de barras mostrando el n&#250;mero de universidades laicas y religiosas antes de la Guerra de EEUU de 1812<note id="6"/></p>
 <pre><code xml:id="code_administracion-de-datos-en-r_20" type="block" corresp="code_administracion-de-datos-en-r_20.txt"></code></pre>
 <p>Primero, se ejecuta la funci&#243;n de filtrado para escoger aquellas universidades establecidas antes de 1812. Luego, en la funci&#243;n <code type="inline">mutate</code> la funci&#243;n interna <code type="inline">ifelse</code> (<emph>if...else...</emph> o si...si no...) genera un test de verdadero (TRUE) o falso (FALSE) sobre los valores de la columna "sponsorship" y genera otra columna "es_laica" con los resultados; tal que "si el valor en la columna no es igual a (<code type="inline">!=</code>) "Secular" a&#241;ade un "no" en la nueva columna, si dice "Secular" a&#241;ade un "si", repitiendo la operaci&#243;n para cada fila, en este caso para cada universidad [N. de la T.].</p>
@@ -133,10 +133,10 @@
 <pre><code xml:id="code_administracion-de-datos-en-r_22" type="block" corresp="code_administracion-de-datos-en-r_22.txt"></code></pre>
 <figure><desc>N&#250;mero de universidades laicas y religiosas despu&#233;s de la Guerra de 1812</desc><graphic url="universidades_seculares_despues_1812.png"/></figure>
 </div>
-      <div n="1"><head>Conclusi&#243;n</head>
+      <div n="2"><head>Conclusi&#243;n</head>
 <p>Este tutorial deber&#237;a darte una idea de c&#243;mo organizar y manipular tus datos en R. M&#225;s adelante quiz&#225;s quieras visualizar tus datos de alguna otra forma. Te recomiendo que empieces por explorar el paquete <link target="https://ggplot2.tidyverse.org/">ggplot2</link> (ver abajo) porque su conjunto de herramientas funciona muy bien con <code type="inline">dplyr</code>. Adem&#225;s, puede que quieras examinar alguna otra funci&#243;n de las que viene con <code type="inline">dplyr</code> para mejorar tus habilidades. En todo caso, esto te proporciona una buena base sobre la que construir para abarcar algunos de los problemas comunes que encontrar&#225;s.</p>
 </div>
-      <div n="1"><head>Recursos adicionales en espa&#241;ol</head>
+      <div n="2"><head>Recursos adicionales en espa&#241;ol</head>
 <ul>
 <li>
 <p><link target="https://swcarpentry.github.io/r-novice-gapminder-es/">R para An&#225;lisis Cient&#237;ficos Reproducibles</link> de Software Carpentry (2018) tiene m&#225;s informaci&#243;n sobre c&#243;mo utilizar <code type="inline">dplyr</code> para tus datos.</p>

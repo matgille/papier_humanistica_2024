@@ -23,17 +23,17 @@
 </metadata>
   <text>
     <body>
-      <div n="1"><head>Objetivos da Li&#231;&#227;o</head>
+      <div n="2"><head>Objetivos da Li&#231;&#227;o</head>
 <p>A lista que cri&#225;mos na li&#231;&#227;o <link target="/pt/licoes/HTML-lista-palavras-2">De HTML para Lista de Palavras (parte 2)</link> precisa ser normalizada antes de poder ser utilizada. Faremos isso atrav&#233;s da aplica&#231;&#227;o de alguns m&#233;todos de string adicionais, bem como utilizando express&#245;es regulares. Uma vez normalizados, estaremos aptos a analisar os nossos dados mais facilmente.</p>
 </div>
-      <div n="1"><head>Ficheiros Necess&#225;rios para esta Li&#231;&#227;o</head>
+      <div n="2"><head>Ficheiros Necess&#225;rios para esta Li&#231;&#227;o</head>
 <ul>
 <li><code type="inline">html-to-list1.py</code></li>
 <li><code type="inline">obo.py</code></li>
 </ul>
 <p>Caso n&#227;o tenha esses ficheiros das li&#231;&#245;es anteriores, pode fazer o <emph>download</emph> de um <link target="/assets/python-lessons3.zip">zip</link>.</p>
 </div>
-      <div n="1"><head>Limpando a Lista</head>
+      <div n="2"><head>Limpando a Lista</head>
 <p>Na li&#231;&#227;o <link target="/pt/licoes/HTML-lista-palavras-2">De HTML para Lista de Palavras (parte 2)</link>, escrevemos um programa em Python chamado <code type="inline">html-to-list1.py</code> que fazia o <emph>download</emph> de uma <link target="https://perma.cc/8LM6-W39K">p&#225;gina web</link>, removia a formata&#231;&#227;o HTML e os metadados e retornava uma lista de "palavras" como a apresentada abaixo. Tecnicamente, essas entidades s&#227;o chamadas de "<emph>tokens</emph>" ao inv&#233;s de "palavras". Elas incluem alguns elementos que, estritamente falando, n&#227;o s&#227;o palavras (como a abrevia&#231;&#227;o &amp;c. para "etcetera"). Elas tamb&#233;m incluem elementos que podem ser considerados composi&#231;&#245;es de mais de uma palavra. O possessivo "Akerman's", por exemplo, &#233; ocasionalmente analisado por linguistas como duas palavras: "Akerman" e um marcador de posse. "o'clock" &#233; uma palavra ou duas? E assim por diante.</p>
 <p>Volte ao seu programa <code type="inline">html-to-list1.py</code> e certifique-se de que o seu resultado se assemelha ao seguinte:</p>
 <pre><code class="language-python" xml:id="code_normalizacao-dados-textuais-python_0" type="block" corresp="code_normalizacao-dados-textuais-python_0.txt"></code></pre>
@@ -46,7 +46,7 @@
 <li>Remover palavras excessivamente comuns como "it", "the", "and", etc.</li>
 </ul>
 </div>
-      <div n="1"><head>Converter para Min&#250;sculas</head>
+      <div n="2"><head>Converter para Min&#250;sculas</head>
 <p>Tipicamente tokens s&#227;o convertidos em letras min&#250;sculas ao contar frequ&#234;ncias, ent&#227;o faremos isso atrav&#233;s do m&#233;todo de string <code type="inline">lower</code> que foi introduzido em <link target="/pt/licoes/manipular-strings-python">Manipular strings com Python</link>. J&#225; que este &#233; um m&#233;todo de string, devemos aplic&#225;-lo &#224; string <code type="inline">text</code> no programa <code type="inline">html-to-list1.py</code>. Ajuste <code type="inline">html-to-list1.py</code> adicionando a <emph>string tag</emph> <code type="inline">lower()</code> ao final da string <code type="inline">text</code>. </p>
 <pre><code class="language-python" xml:id="code_normalizacao-dados-textuais-python_1" type="block" corresp="code_normalizacao-dados-textuais-python_1.txt"></code></pre>
 <p>Agora deve ver a mesma lista de palavras de antes, mas com todos os caracteres min&#250;sculos.</p>
@@ -55,7 +55,7 @@
 <p>Neste ponto, podemos examinar uma s&#233;rie de outras entradas do <emph>Old Bailey Online</emph> e uma ampla gama de outras fontes em potencial para termos certeza de que n&#227;o h&#225; outros caracteres especiais que causar&#227;o problema posteriormente. Tamb&#233;m podemos tentar antecipar situa&#231;&#245;es nas quais n&#227;o desejamos nos livrar de pontua&#231;&#227;o (por exemplo, para distinguir valores monet&#225;rios como "$1629&#8221; ou &#8220;&#163;1295&#8221; de datas, ou reconhecer que &#8220;1629-40&#8221; carrega um significado diferente de &#8220;1629 40&#8221;). Isso &#233; o que programadores profissionais s&#227;o pagos para fazer: tentar pensar em tudo que pode dar errado e tratar isso com anteced&#234;ncia.</p>
 <p>Vamos adotar uma abordagem diferente. O nosso objetivo principal &#233; desenvolver t&#233;cnicas que um historiador em exerc&#237;cio pode utilizar durante o processo de investiga&#231;&#227;o. Isso significa que quase sempre preferiremos solu&#231;&#245;es aproximadamente corretas que possam ser desenvolvidas rapidamente. Ent&#227;o, ao inv&#233;s de perder tempo neste momento para tornar o nosso programa robusto em face de exce&#231;&#245;es, vamos simplesmente nos livrar de tudo que n&#227;o seja uma letra com ou sem acento ou um algarismo ar&#225;bico. Programa&#231;&#227;o &#233; tipicamente um processo de "refinamento gradual". Come&#231;amos com um problema e parte de uma solu&#231;&#227;o, e depois continuamos refinando a solu&#231;&#227;o at&#233; obter um resultado que funcione melhor.</p>
 </div>
-      <div n="1"><head>Express&#245;es Regulares de Python</head>
+      <div n="2"><head>Express&#245;es Regulares de Python</head>
 <p>N&#243;s eliminamos as letras mai&#250;sculas. Agora s&#243; precisamos nos livrar da pontua&#231;&#227;o. A pontua&#231;&#227;o prejudicar&#225; as nossas contagens de frequ&#234;ncia se as mantivermos l&#225;. Desejamos que "evening?" seja contabilizado como "evening" e "1780." como "1780", claro.</p>
 <p>&#201; poss&#237;vel utilizar o m&#233;todo de string <code type="inline">replace</code> para remover cada tipo de pontua&#231;&#227;o:</p>
 <pre><code class="language-python" xml:id="code_normalizacao-dados-textuais-python_2" type="block" corresp="code_normalizacao-dados-textuais-python_2.txt"></code></pre>
@@ -69,10 +69,10 @@
 <pre><code class="language-python" xml:id="code_normalizacao-dados-textuais-python_4" type="block" corresp="code_normalizacao-dados-textuais-python_4.txt"></code></pre>
 <p>Ao executar o programa e verificar a sa&#237;da no painel "Sa&#237;da de Comando", ver&#225; que ele fez um bom trabalho. Esse c&#243;digo ir&#225; dividir formas hifenizadas como "coach-wheels" em duas palavras e ir&#225; transformar o possessivo "s" ou "o'clock" em palavras separadas ao perderem o ap&#243;strofo. Ainda assim, o c&#243;digo faz uma aproxima&#231;&#227;o boa o suficiente para os nossos objetivos e devemos agora passar para a contagem de frequ&#234;ncias antes de tentar melhor&#225;-lo. (Caso trabalhe com fontes em mais de um idioma, precisa aprender um pouco mais a respeito do padr&#227;o <link target="https://perma.cc/7ACH-KCDN">Unicode</link> e sobre o <link target="https://web.archive.org/web/20180502053841/http://www.diveintopython.net/xml_processing/unicode.html">suporte de Python</link> a ele.)</p>
 </div>
-      <div n="1"><head>Leituras Sugeridas</head>
+      <div n="2"><head>Leituras Sugeridas</head>
 <p>Para praticar mais as Express&#245;es Regulares, o cap&#237;tulo 7 de "<link target="https://web.archive.org/web/20180416143856/http://www.diveintopython.net/regular_expressions/index.html">Dive into Python</link>" de Mark Pilgrim pode ser um tutorial &#250;til.</p>
 </div>
-      <div n="1"><head>Sincroniza&#231;&#227;o de C&#243;digo</head>
+      <div n="2"><head>Sincroniza&#231;&#227;o de C&#243;digo</head>
 <p>Para acompanhar as li&#231;&#245;es futuras, &#233; importante que tenha os ficheiros e programas corretos no seu diret&#243;rio <emph>programming historian</emph>. Ao final de cada cap&#237;tulo nesta s&#233;rie pode fazer o <emph>download</emph> do ficheiro zip do programming historian para garantir que possui o c&#243;digo correto. </p>
 <ul>
 <li>python-lessons4.zip (<link target="/assets/python-lessons4.zip">zip sync</link>)</li>

@@ -20,7 +20,7 @@
 </metadata>
   <text>
     <body>
-      <div n="1"><head>Learning Goals</head>
+      <div n="2"><head>Learning Goals</head>
 <p>A substantial amount of historical data is now available in the form of raw, digitized text. Common examples include letters, newspaper articles, personal notes, diary entries, legal documents and transcribed speeches. While some stand-alone software applications provide tools for analyzing text data, a programming language offers increased flexibility to analyze a corpus of text documents. In this tutorial we guide users through the basics of text analysis within the R programming language. The approach we take involves only using a tokenizer that parses text into elements such as words, phrases and sentences. By the end of the lesson users will be able to:</p>
 <ul>
 <li>employ exploratory analyses to check for errors and detect high-level patterns;</li>
@@ -32,8 +32,8 @@ elements in a corpus.</li>
 <p>We assume that users have only a very basic understanding of the R programming language. The <link target="/lessons/r-basics-with-tabular-data">'R Basics with Tabular Data' lesson by Taryn Dewar</link><ref type="footnotemark" target="#1"/> is an excellent guide that covers all of the R knowledge assumed here, such as installing and starting R, installing and loading packages, importing data and working with basic R data. Users can download R for their operating system from <link target="https://cran.r-project.org/">The Comprehensive R Archive Network</link>. Though not required, we also recommend that new users download <link target="https://www.rstudio.com/products/rstudio/#Desktop">RStudio</link>, an open source development environment for writing and executing R programs.</p>
 <p>All of the code in this lesson was tested in R version 3.3.2, though we expect it to run properly on any future version of the software.</p>
 </div>
-      <div n="1"><head>A Small Example</head>
-<div n="2"><head>Package Set-up</head>
+      <div n="2"><head>A Small Example</head>
+<div n="3"><head>Package Set-up</head>
 <p>Two R packages need to be installed before moving on through the tutorial. These are <hi rend="bold">tidyverse</hi><ref type="footnotemark" target="#8"/> and <hi rend="bold">tokenizers</hi>.<ref type="footnotemark" target="#9"/> The first provides convenient tools for reading in and working with data sets, and the second contains the functions that allow us to split text data into words and sentences. To install these, simply start R on your computer and run the following two lines in the console:</p>
 <pre><code class="language-{r}" xml:id="code_basic-text-processing-in-r_0" type="block" corresp="code_basic-text-processing-in-r_0.txt"></code></pre>
 <p>Depending on your system setup, these may open a dialog box asking you to choose a mirror to download from. Select one near your current location. The download and installation should follow automatically.</p>
@@ -42,7 +42,7 @@ elements in a corpus.</li>
 <p>While the <code type="inline">install.packages</code> command will only need to be run the very first time
 you use this tutorial, the <code type="inline">library</code> commands must be run each and every time you
 restart R.</p>
-</div><div n="2"><head>Word Tokenization</head>
+</div><div n="3"><head>Word Tokenization</head>
 <p>In this section, we will work with a single paragraph of text. The
 example here is a paragraph from the opening of Barack Obama's final State of the Union address in 2016.</p>
 <p>To read this into R, copy and paste the following into the R console.</p>
@@ -82,7 +82,7 @@ lines of code:</p>
 <pre><code class="language-{r}" xml:id="code_basic-text-processing-in-r_12" type="block" corresp="code_basic-text-processing-in-r_12.txt"></code></pre>
 <p>The most common words are pronouns and functions words such as "and", "i", "the", and "we". Notice how taking the lower-case version of every word helps in the analysis here. The word "We" at the start of the sentence is not treated differently than the "we" in the middle of a sentence.</p>
 <p>A popular technique is to maintain a list of highly used words and removing these prior to any formal analysis. The words on such a list are called "stopwords", and usually include words such as pronouns, conjugations of the most common verbs, and conjunctions. In this tutorial we will use a nuanced variation of this technique.</p>
-</div><div n="2"><head>Detecting Sentence Boundaries</head>
+</div><div n="3"><head>Detecting Sentence Boundaries</head>
 <p>The <hi rend="bold">tokenizer</hi> package also supplies the function <code type="inline">tokenize_sentences</code> that splits a text into sentences rather than words. It can be applied as follows:</p>
 <pre><code class="language-{r}" xml:id="code_basic-text-processing-in-r_13" type="block" corresp="code_basic-text-processing-in-r_13.txt"></code></pre>
 <p>With output:</p>
@@ -101,8 +101,8 @@ lines of code:</p>
 <p>We can see that we have four sentences that are length 19, 32, 29 and 9. We will
 use this function to manage larger documents.</p>
 </div></div>
-      <div n="1"><head>Analyzing Barack Obama's 2016 State of the Union Address</head>
-<div n="2"><head>Exploratory Analysis</head>
+      <div n="2"><head>Analyzing Barack Obama's 2016 State of the Union Address</head>
+<div n="3"><head>Exploratory Analysis</head>
 <p>Let us now apply the techniques from the previous section to an entire State of the Union address. For consistency, we will use the same 2016 Obama speech. Here we will load the data in from a file as copying directly becomes too difficult at scale.</p>
 <p>To do so, we will combine the <code type="inline">readLines</code> function to read the text into R and the <code type="inline">paste</code> function to combine all of the lines into a single object. We will build the URL of the text file using the <code type="inline">sprintf</code> function as this format will make it easily modified to grab other addresses.<ref type="footnotemark" target="#3"/></p>
 <pre><code class="language-{r}" xml:id="code_basic-text-processing-in-r_20" type="block" corresp="code_basic-text-processing-in-r_20.txt"></code></pre>
@@ -129,7 +129,7 @@ to the top because we might speculate that it is used a lot in speeches by polit
 <p>Which now gives the following result:</p>
 <pre><code class="language-{r}" xml:id="code_basic-text-processing-in-r_29" type="block" corresp="code_basic-text-processing-in-r_29.txt"></code></pre>
 <p>Now, these seem to suggest some of the key themes of the speech such as "syria", "terrorist", and "qaida" (al-qaida is split into "al" and "qaida" by the tokenizer).</p>
-</div><div n="2"><head>Document Summarization</head>
+</div><div n="3"><head>Document Summarization</head>
 <p>To supply contextual information for the dataset we are analyzing we have provided a table with metadata about each State of the Union speech. Let us read that into R now:</p>
 <pre><code class="language-{r}" xml:id="code_basic-text-processing-in-r_30" type="block" corresp="code_basic-text-processing-in-r_30.txt"></code></pre>
 <p>The first ten rows of the dataset will be printed; they should look like this:</p>
@@ -141,19 +141,19 @@ to the top because we might speculate that it is used a lot in speeches by polit
 <pre><code xml:id="code_basic-text-processing-in-r_33" type="block" corresp="code_basic-text-processing-in-r_33.txt"></code></pre>
 <p>Does this line capture everything in the speech? Of course not. Text processing will never replace doing a close reading of a text, but it does help to give a high level summary of the themes discussed (laughter come from notations of audience laughter in the speech text). This summary is useful in several ways. It may give a good ad-hoc title and abstract for a document that has neither; it may serve to remind readers who have read or listened to a speech what exactly the key points discussed were; taking many summaries together at once may elucidate large-scale patterns that get lost over a large corpus. It is this last application that we turn to now as we apply the techniques from this section to the large set of State of the Union addresses.</p>
 </div></div>
-      <div n="1"><head>Analyzing Every State of the Union Address from 1790 to 2016</head>
-<div n="2"><head>Loading the Corpus</head>
+      <div n="2"><head>Analyzing Every State of the Union Address from 1790 to 2016</head>
+<div n="3"><head>Loading the Corpus</head>
 <p>The first step in analyzing the entire State of the Union corpus is to read all of the
 addresses into R together. This involves the same <code type="inline">paste</code> and <code type="inline">readLines</code> functions as before, but we must put this function in a <code type="inline">for</code> loop that applies it over each of the 236 text files. These are combined using the <code type="inline">c</code> function.</p>
 <pre><code class="language-{r}" xml:id="code_basic-text-processing-in-r_34" type="block" corresp="code_basic-text-processing-in-r_34.txt"></code></pre>
 <p>This technique loads all of the files one by one off of GitHub. Optionally, you can download a zip file of the entire corpus and read these files in manually. This technique is described in the next section.</p>
-</div><div n="2"><head>Alternative Method for Loading the Corpus (Optional)</head>
+</div><div n="3"><head>Alternative Method for Loading the Corpus (Optional)</head>
 <p>The entire corpus can be downloaded from here: <link target="/assets/basic-text-processing-in-r/sotu_text.zip">sotu_text.zip</link>. Unzip the repository somewhere on your machine and set the variable <code type="inline">input_loc</code> to the full path of the directory where your unzipped file is. For example, if the file is on the desktop of a computer running macOS and the username is stevejobs, <code type="inline">input_loc</code> should be set to:</p>
 <pre><code class="language-{r}" xml:id="code_basic-text-processing-in-r_35" type="block" corresp="code_basic-text-processing-in-r_35.txt"></code></pre>
 <p>Once this is done, the following code block can be used to read in all of the texts:</p>
 <pre><code class="language-{r}" xml:id="code_basic-text-processing-in-r_36" type="block" corresp="code_basic-text-processing-in-r_36.txt"></code></pre>
 <p>This same technique can be used to read in your own corpus of text.</p>
-</div><div n="2"><head>Exploratory Analysis</head>
+</div><div n="3"><head>Exploratory Analysis</head>
 <p>Once again calling the <code type="inline">tokenize_words</code> function, we now see the length of each address in total number of words.</p>
 <pre><code class="language-{r}" xml:id="code_basic-text-processing-in-r_37" type="block" corresp="code_basic-text-processing-in-r_37.txt"></code></pre>
 <p>Is there a temporal pattern to the length of addresses? How do the lengths of the past several administration's speeches compare to those of FDR, Abraham Lincoln, and George Washington?</p>
@@ -168,7 +168,7 @@ to denote whether a speech is written or delivered orally explains a large part 
 <p>This yields the following plot:</p>
 <figure><desc>Number of words in each State of the Union Address plotted by year, with color denoting whether it was a written or oral message.</desc><graphic url="sotu-number-of-words-and-type.jpg"/></figure>
 <p>We see that the rise in the 19th century occurred when the addresses switched to written documents, and the dramatic drop comes when Woodrow Wilson broke tradition and gave his State of the Union as a speech in Congress. The outliers we saw previously were all written addresses given after the end of World War II .</p>
-</div><div n="2"><head>Stylometric Analysis</head>
+</div><div n="3"><head>Stylometric Analysis</head>
 <p>Stylometry, the study of linguistic style, makes extensive use of computational methods to describe the style of an author's writing. With our corpus, it is possible to detect changes in writing style over the course of the 19th and 20th centuries. A more formal stylometric analysis would usually entail the application of part of speech codes or complex, dimensionality reduction algorithms such as principal component analysis to study patterns over time of across authors. For this tutorial we will stick to studying sentence length.</p>
 <p>The corpus can be split into sentences using the <code type="inline">tokenize_sentences</code> function. In this case the result is a list with 236 items in it, each representing a specific
 document.</p>
@@ -187,7 +187,7 @@ document.</p>
 <pre><code class="language-{r}" xml:id="code_basic-text-processing-in-r_45" type="block" corresp="code_basic-text-processing-in-r_45.txt"></code></pre>
 <figure><desc>Median sentence length for each State of the Union Address, with a smoothing line.</desc><graphic url="sotu-sentence-length-smooth.jpg"/></figure>
 <p>Smoothing lines are a great addition to many plots. They have a dual purpose of picking out the general trend of time series data, while also highlighting any outlying data points.</p>
-</div><div n="2"><head>Document Summarization</head>
+</div><div n="3"><head>Document Summarization</head>
 <p>As a final task, we want to apply the one-line summarization function we used in the previous section to each of the documents in this larger corpus. This again requires the use of a for loop, but the inner code stays largely the same with the exception of needing to save the results as an element of the vector <code type="inline">description</code>.</p>
 <pre><code class="language-{r}" xml:id="code_basic-text-processing-in-r_46" type="block" corresp="code_basic-text-processing-in-r_46.txt"></code></pre>
 <p>This will print out a line that says <hi rend="bold">Joining, by = "word"</hi> as each file is processed as a result of the <code type="inline">inner_join</code> function. As the loop may take a minute or more to run, this is a helpful way of being sure that the code is actually processing the files as we wait for it to finish. We can see the output of our loop by simply typing <code type="inline">description</code> in the console, but a slightly cleaner view is given through the use of the <code type="inline">cat</code> function.</p>
@@ -197,7 +197,7 @@ document.</p>
 <p>As before, these thematic summaries in no way replace a careful reading of each document. They do however serve as a great high-level summary of each presidency. We see, for example,
 Bill Clinton's initial focus on the deficit in the first few years, his turn towards bipartisanship as the House and Senate flipped towards the Republicans in the mid-1990s, and a turn towards Medicare reform at the end of his term. George W. Bush's speeches focus primarily on terrorism, with the exception of the 2001 speech, which occurred prior to the 9/11 terrorist attacks. Barack Obama returned the focus towards the economy in the shadow of the recession of 2008. The word "laughter" occurs frequently because it was added to the transcripts whenever the audience was laughing long enough to force the speaker to pause.</p>
 </div></div>
-      <div n="1"><head>Next Steps</head>
+      <div n="2"><head>Next Steps</head>
 <p>In this short tutorial we have explored some basic ways in which textual data may be analyzed within the R programming language. There are several directions one can pursue to dive further into the cutting edge techniques in text analysis. Three particularly interesting examples are:</p>
 <ul>
 <li>running a full NLP annotation pipeline on the text to extract features such as named entities, part of speech tags, and dependency relationship. These are available in several R packages, including <hi rend="bold">cleanNLP</hi>.<ref type="footnotemark" target="#6"/></li>
@@ -206,7 +206,7 @@ Bill Clinton's initial focus on the deficit in the first few years, his turn tow
 </ul>
 <p>Many generic tutorials exist for all three of these, as well as extensive package documentation.<ref type="footnotemark" target="#7"/> We hope to offer tutorials particularly focused on historical applications on these in the near future.</p>
 </div>
-      <div n="1"><head>Endnotes</head>
+      <div n="2"><head>Endnotes</head>
 <p><note id="1"> Taryn Dewar, "R Basics with Tabular Data," Programming Historian (05 September 2016), <link target="/lessons/r-basics-with-tabular-data">/lessons/r-basics-with-tabular-data</link>.</note></p>
 <p><note id="2"> Our corpus has 236 State of the Union addresses. Depending on exactly what is counted, this number can be slightly higher or lower.</note></p>
 <p><note id="3"> All Presidential State of the Union Addresses were downloaded from The American Presidency Project at the University of California Santa Barbara. (Accessed 2016-11-11) <link target="http://www.presidency.ucsb.edu/sou.php">http://www.presidency.ucsb.edu/sou.php</link>.</note></p>

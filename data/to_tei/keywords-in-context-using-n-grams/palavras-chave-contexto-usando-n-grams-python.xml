@@ -22,25 +22,25 @@
 </metadata>
   <text>
     <body>
-      <div n="1"><head>Objetivos da Li&#231;&#227;o</head>
+      <div n="2"><head>Objetivos da Li&#231;&#227;o</head>
 <p>Como em <link target="/pt/licoes/saida-dados-ficheiro-html-python">Sa&#237;da de Dados como um Ficheiro HTML com Python</link>, esta li&#231;&#227;o toma os pares de frequ&#234;ncia criados na li&#231;&#227;o <link target="/pt/licoes/contar-frequencias-palavras-python">Contar Frequ&#234;ncias de Palavras com Python</link> e os apresenta em um ficheiro HTML. Dessa vez o foco est&#225; nas palavras-chave em contexto, ou <emph>keywords in context</emph> (KWIC) no ingl&#234;s, que criam n-gramas a partir do conte&#250;do do documento original - nesse caso, uma transcri&#231;&#227;o do julgamento do <emph>Old Bailey Online</emph>. Pode usar o seu programa para selecionar uma palavra-chave e o computador retornar&#225; todas as inst&#226;ncias dessa palavra-chave, junto com as palavras &#224; esquerda e &#224; direita dela, tornando mais f&#225;cil visualizar rapidamente como a palavra-chave &#233; usada.</p>
 <p>Uma vez que as KWICs forem criadas, elas s&#227;o envolvidas em HTML (isto &#233;, passam pelo <emph>HTML wrapper</emph>) e s&#227;o enviadas ao navegador, onde podem ser visualizadas. Isso refor&#231;a o que foi aprendido em <link target="/pt/licoes/saida-dados-ficheiro-html-python">Sa&#237;da de Dados como um Ficheiro HTML com Python</link>, optando por uma sa&#237;da ligeiramente diferente.</p>
 <p>No final dessa li&#231;&#227;o, ser&#225; capaz de extrair todos os n-gramas poss&#237;veis de um texto. Na pr&#243;xima li&#231;&#227;o, aprender&#225; como gerar todos os n-gramas de uma determinada palavra-chave em um documento baixado da Internet e exibi-los claramente na janela do navegador.</p>
 </div>
-      <div n="1"><head>Ficheiros Necess&#225;rios para esta Li&#231;&#227;o</head>
+      <div n="2"><head>Ficheiros Necess&#225;rios para esta Li&#231;&#227;o</head>
 <ul>
 <li><code type="inline">obo.py</code></li>
 </ul>
 <p>Caso n&#227;o possua esses ficheiros da li&#231;&#227;o anterior, pode fazer o <emph>download</emph> do programming-historian-7, um <link target="/assets/python-lessons7.zip">ficheiro zip da li&#231;&#227;o anterior</link>. </p>
 </div>
-      <div n="1"><head>De Texto para N-gramas e para KWIC</head>
+      <div n="2"><head>De Texto para N-gramas e para KWIC</head>
 <p>Agora que j&#225; sabe como coletar o conte&#250;do textual de uma p&#225;gina <emph>web</emph> automaticamente com Python e come&#231;ou a usar strings, listas e dicion&#225;rios para processamento de texto, h&#225; muitas outras coisas que pode fazer com texto al&#233;m de contar frequ&#234;ncias. Pessoas que estudam propriedades estat&#237;sticas da linguagem descobriram que estudar sequ&#234;ncias lineares de unidades lingu&#237;sticas pode nos dizer muito a respeito de um texto. Essas sequ&#234;ncias lineares s&#227;o conhecidas como bigramas (2 unidades), trigramas (3 unidades) e de forma geral como n-gramas.</p>
 <p>Provavelmente j&#225; viu n-gramas muitas vezes antes. Eles s&#227;o comumente utilizados em p&#225;ginas de resultados de pesquisa para oferecer uma pr&#233;via de onde a sua palavra-chave aparece em um documento e qual &#233; o contexto ao redor da palavra-chave. Essa aplica&#231;&#227;o de n-gramas &#233; conhecida como palavras-chave em contexto (<emph>keywords in context</emph>, &#224;s vezes abreviada como KWIC). Por exemplo, se a string em quest&#227;o fosse "<emph>it was the best of times it was the worst of times it was the age of wisdom it was the age of foolishness</emph>", ent&#227;o o 7-grama para a palavra-chave "<emph>wisdom</emph>" seria:</p>
 <pre><code xml:id="code_palavras-chave-contexto-usando-n-grams-python_0" type="block" corresp="code_palavras-chave-contexto-usando-n-grams-python_0.txt"></code></pre>
 <p>Um n-grama poderia conter qualquer tipo de unidade lingu&#237;stica desejada. Para historiadores, &#233; mais prov&#225;vel que use caracteres como no bigrama "qu" ou palavras como no trigrama "o c&#227;o ladrou"; no entanto, tamb&#233;m poderia utilizar fonemas, s&#237;labas, ou qualquer n&#250;mero de outras unidades dependendo da sua pergunta de investiga&#231;&#227;o.</p>
 <p>O que faremos a seguir &#233; desenvolver a habilidade de exibir KWIC para qualquer palavra-chave em um corpo de texto, mostrando-a no contexto de um n&#250;mero fixo de palavras em cada um dos lados. Como antes, envolveremos a sa&#237;da de modo que ela possa ser visualizada no Firefox e adicionada ao Zotero facilmente.</p>
 </div>
-      <div n="1"><head>De Texto para N-gramas</head>
+      <div n="2"><head>De Texto para N-gramas</head>
 <p>Uma vez que desejamos trabalhar com palavras ao inv&#233;s de caracteres ou fonemas, ser&#225; muito mais f&#225;cil criar um n-grama usando uma lista de palavras em vez de strings. Como j&#225; sabe, o Python pode facilmente transformar strings em uma lista usando a opera&#231;&#227;o <code type="inline">split</code>. Uma vez dividida, torna-se simples recuperar uma subsequ&#234;ncia de palavras adjacentes na lista usando um <code type="inline">slice</code>, representado por dois &#237;ndices separados por dois pontos. Isso foi introduzido ao trabalhar com strings em <link target="/pt/licoes/manipular-strings-python">Manipular strings com Python</link>:</p>
 <pre><code class="language-python" xml:id="code_palavras-chave-contexto-usando-n-grams-python_1" type="block" corresp="code_palavras-chave-contexto-usando-n-grams-python_1.txt"></code></pre>
 <p>No entanto, tamb&#233;m podemos utilizar essa t&#233;cnica para obter um n&#250;mero pr&#233;-determinado de palavras vizinhas em uma lista com pouqu&#237;ssimo esfor&#231;o. Estude os exemplos a seguir, os quais voc&#234; pode testar em um Python <emph>shell</emph>:</p>
@@ -62,7 +62,7 @@
 <p>Em segundo lugar, por que o primeiro exemplo retornou uma lista vazia em vez dos n-gramas que est&#225;vamos procurando? Em <code type="inline">test1</code>, tentamos pedir um n-grama maior que o n&#250;mero de palavras em nossa lista. Isso resultou em uma lista em branco. Em <code type="inline">test2</code> n&#227;o temos esse problema e recebemos todos os 5-gramas poss&#237;veis para a lista de palavras mais longa. Se desejasse, poderia adaptar a sua fun&#231;&#227;o para exibir uma mensagem de aviso (<emph>warning message</emph>) ou para retornar a string completa em vez de uma lista vazia.</p>
 <p>Agora temos uma maneira de extrair todos os n-gramas poss&#237;veis de um corpo textual. Na pr&#243;xima li&#231;&#227;o, poderemos concentrar a nossa aten&#231;&#227;o em isolar aqueles n-gramas que forem do nosso interesse.</p>
 </div>
-      <div n="1"><head>Sincroniza&#231;&#227;o de C&#243;digo</head>
+      <div n="2"><head>Sincroniza&#231;&#227;o de C&#243;digo</head>
 <p>Para acompanhar li&#231;&#245;es futuras, &#233; importante ter os ficheiros e programas corretos no seu diret&#243;rio &#8220;programming-historian&#8221;. Ao final de cada cap&#237;tulo pode fazer o <emph>download</emph> do ficheiro zip "programming-historian" para garantir que possui o c&#243;digo correto. Caso esteja acompanhando com a vers&#227;o para Mac / Linux, deve ter que abrir o ficheiro <code type="inline">obo.py</code> e mudar "file:///Users/username/Desktop/programming-historian/" para o caminho at&#233; o diret&#243;rio no seu pr&#243;prio computador.</p>
 <ul>
 <li><link target="/assets/python-lessons8.zip">python-lessons8.py</link></li>

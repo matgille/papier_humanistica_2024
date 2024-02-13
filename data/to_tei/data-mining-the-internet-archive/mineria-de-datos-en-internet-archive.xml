@@ -23,16 +23,16 @@
 </metadata>
   <text>
     <body>
-      <div n="1"><head>Objetivos de la lecci&#243;n</head>
+      <div n="2"><head>Objetivos de la lecci&#243;n</head>
 <p>Las colecciones del <link target="http://archive.org/">Internet Archive</link> (IA) incluyen muchas fuentes digitalizadas de inter&#233;s para los historiadores, entre las cuales se incluyen el <link target="https://archive.org/details/jstor_ejc">JSTOR Early Journal
 Content</link>, la <link target="https://archive.org/details/johnadamsBPL">biblioteca personal de John Adams</link> y la <link target="https://archive.org/details/jcbhaiti">colecci&#243;n Hait&#237;</link> de la biblioteca John Carter Brown. En resumen, para citar al historiador-programador <link target="http://activehistory.ca/2013/09/the-internet-archive-rocks-or-two-million-plus-free-sources-to-explore/">Ian Milligan</link>, "The Internet Archive rocks."</p>
 <p>En esta lecci&#243;n aprender&#225;s a descargar archivos desde esas colecciones usando un m&#243;dulo de Python dise&#241;ado espec&#237;ficamente para el an&#225;lisis sem&#225;ntico de registros MARC XML, un est&#225;ndar usado com&#250;nmente para dar formato a los metadatos bibliogr&#225;ficos.</p>
 <p>Para fines demostrativos, esta lecci&#243;n se enfocar&#225; en trabajar con la versi&#243;n digitalizada de la <link target="http://archive.org/details/bplscas">Anti-Slavery Collection</link> de la Biblioteca P&#250;blica de Boston de Copley Square. Primero descargaremos una cantidad relativamente grande de registros MARC desde esa colecci&#243;n, luego, usaremos Python para recolectar y analizar la informaci&#243;n bibliogr&#225;fica asociada a los elementos en esta colecci&#243;n. Por ejemplo, al finalizar esta lecci&#243;n, ser&#225;s capaz de crear una lista con el nombre de cada lugar desde el cual las cartas de la <emph>Anti-Slavery Collection</emph> fueron escritas, la cual podr&#225;s utilizar posteriormente para un proyecto de creaci&#243;n de mapas o alg&#250;n otro tipo de an&#225;lisis.</p>
 </div>
-      <div n="1"><head>&#191;Para qui&#233;n es &#250;til esta lecci&#243;n?</head>
+      <div n="2"><head>&#191;Para qui&#233;n es &#250;til esta lecci&#243;n?</head>
 <p>Esta lecci&#243;n de nivel intermedio es &#250;til para los usuarios de <emph>Programming Historian</emph> que hayan completado las lecciones generales acerca de c&#243;mo descargar archivos y llevar a cabo an&#225;lisis de textos en ellos, o que quieran ejemplos aplicados de aquellos principios. Tambi&#233;n puede ser de inter&#233;s para historiadores o archivistas que trabajen regularmente con formato MARC o con el Internet Archive.</p>
 </div>
-      <div n="1"><head>Antes de empezar</head>
+      <div n="2"><head>Antes de empezar</head>
 <p>Es necesario <link target="https://archive.org/account/login.createaccount.php">crear una cuenta</link> para poder esccribir <emph>scripts</emph> que interact&#250;en con el Internet Archive. Sigue los pasos necesarios para confirmar tu cuenta, con especial cuidado de tu cuenta de correo y  contrase&#241;a.</p>
 <p>Trabajaremos con dos m&#243;dulos de Python que no est&#225;n incluidos en la librer&#237;a est&#225;ndar.</p>
 <p>El primero, <link target="https://pypi.python.org/pypi/internetarchive">internetarchive</link>, provee acceso program&#225;tico al Internet Archive. El segundo, <link target="https://pypi.python.org/pypi/pymarc/">pymarc</link>, hace m&#225;s sencillo el an&#225;lisis  de los registros MARC.</p>
@@ -43,14 +43,14 @@ Content</link>, la <link target="https://archive.org/details/johnadamsBPL">bibli
 <pre><code class="language-bash" xml:id="code_mineria-de-datos-en-internet-archive_1" type="block" corresp="code_mineria-de-datos-en-internet-archive_1.txt"></code></pre>
 <p>&#161;Ahora est&#225;s listo para trabajar!</p>
 </div>
-      <div n="1"><head>La Antislavery Collection en el Internet Archive</head>
+      <div n="2"><head>La Antislavery Collection en el Internet Archive</head>
 <p>La Anti-Slavery Collection de la Biblioteca P&#250;blica de Boston en Copley Square contiene no solo las cartas de William Lloyd Garrison, uno de los personajes ic&#243;nicos en el movimiento abolicionista estadounidense; tambi&#233;n custodia una inmensa colecci&#243;n de cartas enviadas y recibidas por los reformadores conectados de alguna manera con su persona. Y por "inmensa colecci&#243;n" me refiero a gigantesca. De acuerdo con los c&#225;lculos de la biblioteca hay m&#225;s de 16 000 elementos en Copley.</p>
 <p>En el momento de escribir esta lecci&#243;n, aproximadamente 7 000 de aquellos elementos hab&#237;an sido digitalizados y subidos al <link target="http://archive.org/">Internet Archive</link>. Esta es una buena noticia, no solo porque IA est&#233; comprometido en poner sus considerables recursos culturales para la libre consulta, tambi&#233;n porque cada elemento incorporado est&#225; acompa&#241;ado por una riqueza de metadatos apropiada para la lectura por parte del ordenador.</p>
 <p>Consulta <link target="http://archive.org/details/lettertowilliaml00doug">esta carta</link> enviada por Frederick Douglass a William Lloyd
 Garrison. Cualquiera puede leer el <link target="http://archive.org/stream/lettertowilliaml00doug/39999066767938#page/n0/mode/2up">manuscrito original</link> en l&#237;nea sin hacer el viaje a Boston, y solo eso ser&#237;a suficiente para revolucionar y democratizar la futura historiograf&#237;a del abolicionismo. Pero puedes, tambi&#233;n, descargar <link target="http://archive.org/download/lettertowilliaml00doug">m&#250;ltiples archivos</link> asociados con la carta, que ha sido enriquecida con metadatos, como un registro <link target="http://archive.org/download/lettertowilliaml00doug/lettertowilliaml00doug_dc.xml">Dublin Core</link> y un completo registro <link target="http://archive.org/download/lettertowilliaml00doug/lettertowilliaml00doug_marc.xml">MARCXML</link> que usa el <link target="http://www.loc.gov/marc/bibliographic/">formato MARC 21 de la Biblioteca del Congreso para datos bibliogr&#225;ficos</link>.</p>
 <p>Detente y piensa por un momento: ahora mismo, cada elemento subido a la colecci&#243;n contiene esas cosas, lo cual significa que los historiadores tienen acceso a metadatos enriquecidos, im&#225;genes completas y descripciones parciales de <link target="http://archive.org/search.php?query=collection%3Abplscas&amp;sort=-publicdate">cientos de cartas, manuscritos y  publicaciones antiesclavistas</link>.</p>
 </div>
-      <div n="1"><head>Acceder a una colecci&#243;n del IA con Python</head>
+      <div n="2"><head>Acceder a una colecci&#243;n del IA con Python</head>
 <p>Todas las colecciones y archivos del Internet Archive (IA) tienen un identificador &#250;nico, por lo cual todas las URL de las colecciones y archivos se ven as&#237;:</p>
 <pre><code xml:id="code_mineria-de-datos-en-internet-archive_2" type="block" corresp="code_mineria-de-datos-en-internet-archive_2.txt"></code></pre>
 <p>Por ejemplo, esta es una URL al elemento mencionado arriba, la carta de Douglass a Garrison:</p>
@@ -66,7 +66,7 @@ Garrison. Cualquiera puede leer el <link target="http://archive.org/stream/lette
 <pre><code class="language-python" xml:id="code_mineria-de-datos-en-internet-archive_6" type="block" corresp="code_mineria-de-datos-en-internet-archive_6.txt"></code></pre>
 <p>Despu&#233;s de pulsar <emph>Enter</emph> en el comando de impresi&#243;n deber&#237;as ser capaz de ver un n&#250;mero que corresponde con la cantidad de resultados que ver&#237;as al hacer una <link target="http://archive.org/search.php?query=collection%3Abplscas">b&#250;squeda avanzada en una colecci&#243;n</link> [] desde el navegador.</p>
 </div>
-      <div n="1"><head>Aceder a un elemento del IA en Python</head>
+      <div n="2"><head>Aceder a un elemento del IA en Python</head>
 <p>El m&#243;dulo <code type="inline">internetarchive</code> tambi&#233;n permite acceder a elementos individuales mediante el uso de sus identificadores. Probemos modificando el <link target="http://internetarchive.readthedocs.io/en/latest/quickstart.html#downloading">c&#243;digo de ejemplo de la documentaci&#243;n del m&#243;dulo</link> de tal manera que obtengamos la carta de Douglass que discutimos anteriormente.</p>
 <p>Si est&#225;s todav&#237;a en el int&#233;rprete de comandos de Python no necesitas declarar <code type="inline">import internetarchive</code> de nuevo. Como ya hemos importado el m&#243;dulo completo tan s&#243;lo necesitamos modificar el c&#243;digo de ejemplo para que nuestro int&#233;rprete sepa que <code type="inline">get_item</code> pertenece al m&#243;dulo <code type="inline">internetarchive</code>. Tambi&#233;n necesitamos modificar el identificador de ejemplo <code type="inline">stairs</code> por nuestro identificador del elemento, <emph>lettertowilliaml00doug</emph> (n&#243;tese que el car&#225;cter entre los dos ceros es una L min&#250;scula, no el n&#250;mero 1):</p>
 <pre><code class="language-python" xml:id="code_mineria-de-datos-en-internet-archive_7" type="block" corresp="code_mineria-de-datos-en-internet-archive_7.txt"></code></pre>
@@ -77,7 +77,7 @@ Garrison. Cualquiera puede leer el <link target="http://archive.org/stream/lette
 <p>Ahora que sabemos c&#243;mo usar las funciones <emph>Search</emph> y <emph>Item</emph> en el
 m&#243;dulo <code type="inline">internetarchive</code> podemos pensar en c&#243;mo llevar a cabo este proceso de manera m&#225;s eficaz para descargar grupos de informaci&#243;n desde las colecciones para un posterior an&#225;lisis.</p>
 </div>
-      <div n="1"><head>Descargar los registros MARC de una colecci&#243;n</head>
+      <div n="2"><head>Descargar los registros MARC de una colecci&#243;n</head>
 <p>Descargar un elemento est&#225; bien, pero &#191;y si queremos revisar miles de elementos en una colecci&#243;n? Estamos de suerte, porque la funci&#243;n <emph>Search</emph> del m&#243;dulo <code type="inline">internetarchive</code> nos permite iterar sobre todos los resultados de una b&#250;squeda.</p>
 <p>Para ver c&#243;mo, comencemos iniciando nuevamente el int&#233;rprete de Python. Necesitaremos importar una vez m&#225;s nuestro m&#243;dulo y hacer de nuevo una b&#250;squeda:</p>
 <pre><code class="language-python" xml:id="code_mineria-de-datos-en-internet-archive_10" type="block" corresp="code_mineria-de-datos-en-internet-archive_10.txt"></code></pre>
@@ -89,7 +89,7 @@ m&#243;dulo <code type="inline">internetarchive</code> podemos pensar en c&#243;
 <pre><code class="language-python" xml:id="code_mineria-de-datos-en-internet-archive_12" type="block" corresp="code_mineria-de-datos-en-internet-archive_12.txt"></code></pre>
 <p>Recuerda que los espacios en blanco cuentan en Python y necesitas indentar las l&#237;neas en un <emph>for loop</emph> para que Python pueda saber qu&#233; comandos ejecutar en cada elemento del bucle.</p>
 </div>
-      <div n="1"><head>Entender el bucle <emph>for</emph></head>
+      <div n="2"><head>Entender el bucle <emph>for</emph></head>
 <p>El bucle <emph>for</emph>, explicado de manera simple, le dice a Python que debe hacer algo en cada cosa dentro de un grupo de cosas. En el ejemplo anterior, hemos impreso el identificador para cada producto dentro de los resultados de la b&#250;squeda hecha en nuestra colecci&#243;n. Dos consideraciones adicionales acerca del bucle <emph>for</emph>:</p>
 <p>Primero, la palabra que usamos antes de <code type="inline">for</code> es denominada en Python <emph>variable local</emph> (<emph>local variable</emph>) y funciona como un marcador de posici&#243;n para cualquier instancia o elemento con el cual vayamos a trabajar dentro del bucle. En general, tiene sentido escoger un nombre que describa el tipo de cosa con la que estemos trabajando (en este caso, un resultado de b&#250;squeda) pero podemos utilizar otros nombres en su lugar. Por ejemplo, intenta ejecutar el bucle anterior de nuevo pero esta vez substituye la variable local por otro nombre como:</p>
 <pre><code class="language-python" xml:id="code_mineria-de-datos-en-internet-archive_13" type="block" corresp="code_mineria-de-datos-en-internet-archive_13.txt"></code></pre>
@@ -100,7 +100,7 @@ m&#243;dulo <code type="inline">internetarchive</code> podemos pensar en c&#243;
 <pre><code class="language-python" xml:id="code_mineria-de-datos-en-internet-archive_14" type="block" corresp="code_mineria-de-datos-en-internet-archive_14.txt"></code></pre>
 <p>Debido a que los archivos del IA <link target="https://archive.org/about/faqs.php#140">son nombrados de acuerdo a reglas espec&#237;ficas</link> podemos saber con anterioridad cu&#225;l es el nombre del archivo MARC con tan s&#243;lo conocer el identificador &#250;nico del elemento. Armados de tal conocimiento podemos proceder a&#8230;</p>
 </div>
-      <div n="1"><head>Descargar todos los archivos MARC XML de una colecci&#243;n</head>
+      <div n="2"><head>Descargar todos los archivos MARC XML de una colecci&#243;n</head>
 <p>Para la pr&#243;xima secci&#243;n pasaremos de usar el int&#233;rprete de Python a escribir un archivo <emph>script</emph> que descargue los archivos MARC de cada elemento en la BPL Anti-Slavery Collection. Intenta escribir este programa en Komodo o en tu editor de texto preferido:</p>
 <pre><code class="language-python" xml:id="code_mineria-de-datos-en-internet-archive_15" type="block" corresp="code_mineria-de-datos-en-internet-archive_15.txt"></code></pre>
 <p>Este programa se parece mucho a los experimentos que hicimos previamente con la carta de Frederick Douglass, pero debido a que queremos descargar los archivos MARC de cada elemento de nuestra b&#250;squeda en la colecci&#243;n, estamos usando una variable <code type="inline">elementoid</code> para considerar el hecho que el identificador y el nombre del archivo ser&#225;n diferentes para cada resultado.</p>
@@ -108,7 +108,7 @@ m&#243;dulo <code type="inline">internetarchive</code> podemos pensar en c&#243;
 <p>(En caso de recibir una mensaje como <code type="inline">ConnectionError</code> en tu primer intento debes revisar tu conexi&#243;n a Internet, esperar unos minutos e intentarlo de nuevo.)</p>
 <p>Si todo funciona correctamente, podr&#225;s ver que el programa empieza a imprimir mensajes de actualizaci&#243;n dici&#233;ndote que est&#225; en proceso de descarga de los archivos MARC, pero permitir que el programa ejecute la funci&#243;n hasta finalizar tomar&#225;, probablemente, unas cuantas horas, as&#237; que det&#233;n el programa y revisa m&#225;s detenidamente posibles maneras de mejorarlo. Presiona <code type="inline">ctrl-c</code> mientras est&#233;s en la ventana de tu terminal y har&#225;s que se detenga el programa.</p>
 </div>
-      <div n="1"><head>Construir un reporte de errores en el programa</head>
+      <div n="2"><head>Construir un reporte de errores en el programa</head>
 <p>Descargar todos esos archivos puede tomar un tiempo y probablemente queramos alejarnos de la computadora mientras tanto. Sin embargo, hay altas probabilidades de que durante esas dos horas algo salga mal e impida que nuestro programa funcione.</p>
 <p>Digamos, por ejemplo, que hemos olvidado descargar previamente un archivo individual en esa carpeta o tal vez tu ordenador pierda brevemente la conexi&#243;n a Internet o alg&#250;n tipo de corte suceda en el servidor del IA que impida que el programa descargue el archivo que quiere.</p>
 <p>En estos y otros casos de error, Python puede hacer una "excepci&#243;n" al decirte cu&#225;l es el problema. Desafortunadamente una excepci&#243;n tambi&#233;n har&#225; que tu programa deje de funcionar en lugar de continuar con el siguiente archivo.</p>
@@ -121,7 +121,7 @@ m&#243;dulo <code type="inline">internetarchive</code> podemos pensar en c&#243;
 <p>Intenta actualizar tu programa para que se vea como el de arriba y ejec&#250;talo nuevamente en el directorio donde guardaste tus archivos MARC. No te sorprendas si inmediatamente encuentras una cadena con un mensaje de error &#161;eso significa que el programa hace lo que se supone debe hacer! Revisa tranquilamente tu editor de texto mientras el programa sigue ejecut&#225;ndose y abre el archivo <code type="inline">errores-bpl-marcs.log</code> para ver cu&#225;les excepciones han sido registradas. Probablemente veas que el programa registr&#243; la excepci&#243;n "File already exist" para cada uno de los archivos que se hab&#237;an descargado anteriormente cuando se ejecut&#243; el programa m&#225;s corto.</p>
 <p>Si ejecutas el programa por un tiempo m&#225;s el c&#243;digo llegar&#225; hasta los elementos que no has descargado &#161;y continuar&#225;n recolectando tus archivos MARC!</p>
 </div>
-      <div n="1"><head>Recolecci&#243;n autom&#225;tica de informaci&#243;n desde un archivo MARC</head>
+      <div n="2"><head>Recolecci&#243;n autom&#225;tica de informaci&#243;n desde un archivo MARC</head>
 <p>Una vez que hayas el programa de descarga haya terminado estar&#225;s en la posesi&#243;n de cerca de 7 000 registros detallados MARC XML relacionados con elementos de la Anti-Slavery Collection (o cualquier otra colecci&#243;n que hayas decidido descargar, el m&#233;todo arriba explicado puede funcionar en cualquier colecci&#243;n cuyos elementos tengan archivos MARC asociados).</p>
 <p>Y &#191;ahora qu&#233;?</p>
 <p>El pr&#243;ximo paso depende de cual tipo de pregunta quieras responder relacionada con la colecci&#243;n. El formato de lenguaje MARC captura una rica cantidad de datos relativos a un elemento, como puedes ver si revisas el <link target="http://archive.org/download/lettertowilliaml00doug/lettertowilliaml00doug_marc.xml">registro MARC XML de la carta de Frederick Douglass</link> mencionado al inicio.</p>

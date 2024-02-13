@@ -23,18 +23,18 @@
     <body><div class="alert alert-warning">
 Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allows users to search and download Twitter data. Unfortunately, this means that elements of this lesson will only work for those who are paying for an upgraded plan. At the moment, there are no special access plans for researchers or academics. [2023]
 </div>
-<div n="1"><head>Lesson Goals</head>
+<div n="2"><head>Lesson Goals</head>
 <p>Web APIs are tools for making information and application functionality accessible over the internet. In this lesson, you will:</p>
 <ul>
 <li>Learn what an API is and when you should use one.</li>
 <li>Learn how to build a web API that returns data to its users.</li>
 <li>Learn some principles of good API design, applying them to an API that draws book metadata from a database.</li>
 </ul>
-</div><div n="1"><head>Setting Up</head>
-<div n="2"><head>Prerequisites</head>
+</div><div n="2"><head>Setting Up</head>
+<div n="3"><head>Prerequisites</head>
 <p>You can use the Windows, macOS, or Linux operating systems to complete this tutorial, and those few instructions that are not the same across platforms will be explicitly noted. Python 3, the Flask web framework, and a web browser are required for this tutorial, and installation instructions for all platforms are outlined below.</p>
 <p>The only knowledge explicitly assumed for this lesson is the ability to use a text editor, such as BBEdit on macOS or Notepad++ on Windows. However, knowledge of the command line, Python, and web concepts such as HTTP may make this tutorial easier to follow. If you're new to Python, consider working through the Programming Historian series on <link target="/lessons/introduction-and-installation">dealing with online sources</link> to familiarize yourself with fundamental concepts in Python programming.</p>
-</div><div n="2"><head>Installing Python and Flask</head>
+</div><div n="3"><head>Installing Python and Flask</head>
 <p>For this tutorial, you will need Python 3 and the Flask web framework. You'll also require a web browser (such as Firefox) and a text editor (such as Notepad++ or BBEdit).</p>
 <p>To download Python, follow <link target="https://www.python.org/downloads/">this link</link>, select the button that says <code type="inline">Download Python 3.x.x</code>, and then run the installer as you normally would to install applications on your operating system. The default settings should be fine.</p>
 <p>To confirm that Python installed successfully, first open the command line. In macOS, click the spotlight icon on the top right corner of your desktop (the magnifying glass) and type terminal. The terminal should be the first application that appears. On Windows, click the Start menu icon and type <code type="inline">cmd</code> in the search box, then press <code type="inline">Enter</code>.</p>
@@ -47,11 +47,11 @@ Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allo
 <p>As an alternative to the above installation instructions, you can install the Python 3 version of Anaconda, which can be downloaded <link target="https://www.continuum.io">here</link>. Anaconda comes with Flask, so if you go this route you will not need to install Flask using the pip package manager.</p>
 <p>If you're running into trouble installing Python, you may find <link target="/lessons/introduction-and-installation">this Programming Historian article on installing Python</link> helpful. Note that the instructions in that tutorial are for installing Python 2&#8212;make sure you choose Python 3 when downloading installers from the Python website, since this tutorial uses Python 3.</p>
 <p>If you don't have a preferred text editor, I recommend <link target="https://www.barebones.com/products/bbedit/download.html">BBEdit</link> for macOS or <link target="https://notepad-plus-plus.org/">Notepad++</link> for Windows.</p>
-</div></div><div n="1"><head>Introducing APIs</head>
-<div n="2"><head>What is an API?</head>
+</div></div><div n="2"><head>Introducing APIs</head>
+<div n="3"><head>What is an API?</head>
 <p>If you've heard the term API before, chances are it's been used not to refer to APIs in general, but instead to a specific kind of API, the web API. A web API allows for information or functionality to be manipulated by other programs via the internet. For example, with Twitter's web API, you can write a program in a language like Python or Javascript that can perform tasks such as favoriting tweets or collecting tweet metadata.</p>
 <p>In programming more generally, the term API, short for Application Programming Interface, refers to a part of a computer program designed to be used or manipulated by another program, as opposed to an interface designed to be used or manipulated by a human. Computer programs frequently need to communicate amongst themselves or with the underlying operating system, and APIs are one way they do it. In this tutorial, however, we'll be using the term API to refer specifically to web APIs.</p>
-</div><div n="2"><head>When to Create an API</head>
+</div><div n="3"><head>When to Create an API</head>
 <p>In general, consider an API if:</p>
 <ol>
 <li>Your data set is large, making download via FTP unwieldy or resource-intensive.</li>
@@ -62,7 +62,7 @@ Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allo
 </ol>
 <p>If you have data you wish to share with the world, an API is one way you can get it into the hands of others. However, APIs are not always the best way of sharing data with users. If the size of the data you are providing is relatively small, you can instead provide a "data dump" in the form of a downloadable JSON, XML, CSV, or SQLite file. Depending on your resources, this approach can be viable up to a download size of a few gigabytes.</p>
 <p>Remember that you can provide both a data dump and an API, and individual users may find one or the other to better match their use case. <link target="https://openlibrary.org/">Open Library</link>, for example, provides both <link target="https://openlibrary.org/developers/dumps">a data dump</link> and <link target="https://openlibrary.org/developers/api">an API</link>, each of which serves different use cases for different users.</p>
-</div><div n="2"><head>API Terminology</head>
+</div><div n="3"><head>API Terminology</head>
 <p>When using or building APIs, you will encounter these terms frequently:</p>
 <ul>
 <li><hi rend="bold">HTTP (Hypertext Transfer Protocol)</hi> is the primary means of communicating data on the web. HTTP implements a number of "methods," which tell which direction data is moving and what should happen to it. The two most common are GET, which pulls data from a server, and POST, which pushes new data to a server.</li>
@@ -70,10 +70,10 @@ Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allo
 <li><hi rend="bold">JSON (JavaScript Object Notation)</hi> is a text-based data storage format that is designed to be easy to read for both humans and machines. JSON is generally the most common format for returning data through an API, XML being the second most common.</li>
 <li><hi rend="bold">REST (REpresentational State Transfer)</hi> is a philosophy that describes some best practices for implementing APIs. APIs designed with some or all of these principles in mind are called REST APIs. While the API outlined in this lesson uses some REST principles, there is a great deal of disagreement around this term. For this reason, I do not describe the example APIs here as REST APIs, but instead as web or HTTP APIs.</li>
 </ul>
-</div></div><div n="1"><head>Using APIs</head>
-<div n="2"><head>Why Use APIs as a Researcher?</head>
+</div></div><div n="2"><head>Using APIs</head>
+<div n="3"><head>Why Use APIs as a Researcher?</head>
 <p>The primary focus of this lesson is on creating an API, not exploring or using an API that has already been implemented. However, before we start building our own API, it may be useful to discuss how APIs are useful for researchers. In this section, we'll see how APIs can be useful for approaching historical, textual, or sociological questions using a "macroscopic" or "distant reading" approach that makes use of relatively large amounts of information. In doing so, we'll familiarize ourselves with the basic elements of a good API. Considering APIs from the perspective of a user will come in useful when we begin to design our own API later in the lesson.</p>
-</div><div n="2"><head>An API Case Study: Sensationalism and Historical Fires</head>
+</div><div n="3"><head>An API Case Study: Sensationalism and Historical Fires</head>
 <p>Imagine that our research area is sensationalism and the press: has newspaper coverage of major events in the United States become more or less sensational over time? Narrowing the topic, we might ask whether press coverage of, for example, urban fires has increased or decreased with government reporting on fire-related relief spending.</p>
 <p>While we won't be able to explore this question thoroughly, we can begin to approach this research space by collecting historical data on newspaper coverage of fires using an API&#8212;in this case, the <link target="http://chroniclingamerica.loc.gov/about/api/">Chronicling America Historical Newspaper API</link>. The Chronicling America API allows access to metadata and text for millions of scanned newspaper pages. In addition, unlike many other APIs, it also does not require an authentication process, allowing us to immediately explore the available data without signing up for an account.</p>
 <p>Our initial goal in approaching this research question is to find all newspaper stories in the Chronicling America database that use the term "fire." Typically, use of an API starts with its documentation. On the <link target="http://chroniclingamerica.loc.gov/about/api/">Chronicling America API page</link>, we find two pieces of information critical for getting the data we want from the API: the API's <hi rend="bold">base URL</hi> and the <hi rend="bold">path</hi> corresponding to the function we want to perform on the API&#8212;in this case, searching the database.</p>
@@ -94,14 +94,14 @@ Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allo
 <div class="alert alert-warning">
 Note that in this section, we skipped an important step: finding an appropriate API in the first place. Some resources for researching APIs are available at the end of this lesson.
 </div>
-</div><div n="2"><head>What Users Want in an API</head>
+</div><div n="3"><head>What Users Want in an API</head>
 <p>As we've learned, documentation is a user's starting place when working with a new API, and well-designed URLs make it easier for users to intuitively find resources. Because they help users to quickly access information through your API, these elements&#8212;documentation and well-conceived URLs&#8212;are the <emph>sine qua non</emph> of a good API. We'll discuss these elements in greater depth later in this tutorial.</p>
 <p>As you use other APIs in your research, you'll develop a sense of what makes a good API from the perspective of a potential user. Just as strong readers often make strong writers, using APIs created by others and critically evaluating their implementation and documentation will help you better design your own APIs.</p>
-</div></div><div n="1"><head>Implementing Our API</head>
-<div n="2"><head>Overview</head>
+</div></div><div n="2"><head>Implementing Our API</head>
+<div n="3"><head>Overview</head>
 <p>This section will show you how to build a prototype API using Python and the Flask web framework. Our example API will take the form of a distant reading archive&#8212;a book catalog that goes beyond standard bibliographic information to include data of interest to those working on digital projects. In this case, besides title and date of publication, our API will also serve the first sentence of each book. This should be enough data to allow us to envision some potential research questions without overwhelming us as we focus on the design of our API.</p>
 <p>We'll begin by using Flask to create a home page for our site. In this step, we'll learn the basics of how Flask works and make sure our software is configured correctly. Once we have a small Flask application working in the form of a home page, we'll iterate on this site, turning it into a functioning API.</p>
-</div><div n="2"><head>Creating a Basic Flask Application</head>
+</div><div n="3"><head>Creating a Basic Flask Application</head>
 <p><link target="http://flask.pocoo.org/">Flask</link> is a web framework for Python, meaning that it provides functionality for building web applications, including managing HTTP requests and rendering templates. In this section, we will create a basic Flask application. In later sections, we'll add to this application to create our API. Don't worry if you don't understand each individual line of code yet&#8212;explanations will be forthcoming once you have this initial version of the application working.</p>
 <div class="alert alert-warning">
 <p><hi rend="bold">Why Flask?</hi></p>
@@ -116,7 +116,7 @@ Note that in this section, we skipped an important step: finding an appropriate 
 <p>Next, open a text editor (such as Notepad++ or BBEdit) and enter the following code:</p>
 <pre><code class="language-python" xml:id="code_creating-apis-with-python-and-flask_9" type="block" corresp="code_creating-apis-with-python-and-flask_9.txt"></code></pre>
 <p>Save this code as <code type="inline">api.py</code> in the <code type="inline">api</code> folder you created for this tutorial.</p>
-</div><div n="2"><head>Running the Application</head>
+</div><div n="3"><head>Running the Application</head>
 <p>In the command line, navigate to your <code type="inline">api</code> folder:</p>
 <pre><code xml:id="code_creating-apis-with-python-and-flask_10" type="block" corresp="code_creating-apis-with-python-and-flask_10.txt"></code></pre>
 <p>You can check if you're in the correct folder by running the <code type="inline">pwd</code> command. Once you're in your project directory, run the Flask application with the command:</p>
@@ -126,7 +126,7 @@ Note that in this section, we skipped an important step: finding an appropriate 
 <p>You may also see some lines related to debugging. This message means that Flask is running your application locally (on your computer) at that address. Follow the link above, <link target="http://127.0.0.1:5000/">http://127.0.0.1:5000/</link>, using your web browser to see the running application:</p>
 <figure><desc>The home page when rendered in a browser.</desc><graphic url="welcome.png"/></figure>
 <p>Congratulations, you've created a working web application!</p>
-</div><div n="2"><head>What Flask Does</head>
+</div><div n="3"><head>What Flask Does</head>
 <p>Now that we have a homepage for our archive, let's talk about how Flask works and what the above code is doing.</p>
 <p>Flask maps HTTP requests to Python functions. In this case, we've mapped one URL path ('<code type="inline">/</code>') to one function, <code type="inline">home</code>. When we connect to the Flask server at <link target="http://127.0.0.1:5000/">http://127.0.0.1:5000/</link>, Flask checks if there is a match between the path provided and a defined function. Since <code type="inline">/</code>, or no additional provided path, has been mapped to the <code type="inline">home</code> function, Flask runs the code in the function and displays the returned result in the browser. In this case, the returned result is HTML markup for a home page welcoming visitors to the site hosting our API.</p>
 <p>The process of mapping URLs to functions is called <hi rend="bold">routing</hi>. The</p>
@@ -138,7 +138,7 @@ Note that in this section, we skipped an important step: finding an appropriate 
 <p><code type="inline">app.config["DEBUG"] = True</code> &#8212; Starts the debugger. With this line, if your code is malformed, you'll see an error when you visit your app. Otherwise you'll only see a generic message such as <code type="inline">Bad Gateway</code> in the browser when there's a problem with your code.</p>
 <p><code type="inline">app.run()</code> &#8212; A method that runs the application server.</p>
 <p>While it's useful to have a familiarity with what's going on in the script, don't worry if you don't understand precisely what every element is doing at this stage. If you understand the general outline of how this portion works, the details of how Flask renders pages are likely to become more understandable as we continue to develop our API.</p>
-</div><div n="2"><head>Creating the API</head>
+</div><div n="3"><head>Creating the API</head>
 <p>Now that we have a running Flask application and know a little about what Flask does, we're finally ready to implement a small API with data that we'll define right in our application.</p>
 <p>We'll be adding our data as a list of Python dictionaries. Dictionaries in Python group pairs of keys and values, like this:</p>
 <pre><code class="language-python" xml:id="code_creating-apis-with-python-and-flask_14" type="block" corresp="code_creating-apis-with-python-and-flask_14.txt"></code></pre>
@@ -152,7 +152,7 @@ Note that in this section, we skipped an important step: finding an appropriate 
 <p><link target="http://127.0.0.1:5000/api/v1/resources/books/all">http://127.0.0.1:5000/api/v1/resources/books/all</link></p>
 <p>You should see JSON output for the three entries in our test catalog. Flask provides us with a <code type="inline">jsonify</code> function that allows us to convert lists and dictionaries to JSON format. In the route we created, our book entries are converted from a list of Python dictionaries to JSON before being returned to a user.</p>
 <p>At this point, you've created a working, if limited, API. In the next section, we'll allow users to find books via more specific data, such as an entry's ID.</p>
-</div><div n="2"><head>Finding Specific Resources</head>
+</div><div n="3"><head>Finding Specific Resources</head>
 <p>Right now, users can only view our entire database&#8212;they can't filter or find specific resources. While this isn't a problem with our test catalog, this will quickly become less useful as we add data. In this section, we'll add a function that allows users to filter their returned results using a more specific request.</p>
 <p>Below is the code for our new application with filtering capability. As before, we'll examine the code more carefully once you have it running.</p>
 <pre><code class="language-python" xml:id="code_creating-apis-with-python-and-flask_17" type="block" corresp="code_creating-apis-with-python-and-flask_17.txt"></code></pre>
@@ -162,7 +162,7 @@ Note that in this section, we skipped an important step: finding an appropriate 
 <link target="http://127.0.0.1:5000/api/v1/resources/books?id=2">127.0.0.1:5000/api/v1/resources/books?id=2</link>
 <link target="http://127.0.0.1:5000/api/v1/resources/books?id=3">127.0.0.1:5000/api/v1/resources/books?id=3</link></p>
 <p>Each of these should return a different entry, except for the last, which should return an empty list: <code type="inline">[]</code>, since there is no book for which the id value is 3. (Counting in programming typically starts from 0, so id=3 would be a request for a nonexistent fourth item.) In the next section, we'll explore our updated API in more detail.</p>
-</div><div n="2"><head>Understanding Our Updated API</head>
+</div><div n="3"><head>Understanding Our Updated API</head>
 <p>In this code, we first create a new function, called <code type="inline">api_id</code>, with the <code type="inline">@app.route</code> syntax that maps the function to the path <code type="inline">/api/v1/resources/books</code>. That means that this function will run when we access <link target="http://127.0.0.1:5000/api/v1/resources/books">http://127.0.0.1:5000/api/v1/resources/books</link>. (Note that accessing this link without providing an ID will give the error message we provided in the code: <code type="inline">Error: No id field provided. Please specify an id.</code>)</p>
 <p>Inside our function, we do two things:</p>
 <p>First, examine the provided URL for an id and select the books that match that id. The id must be provided like this: <code type="inline">?id=0</code>. Data passed through URLs like this (after the <code type="inline">?</code>) are called <hi rend="bold">query parameters</hi>&#8212;we've seen them before when we worked with the Chronicling America API. They're a feature of HTTP used for filtering for specific kinds of data.</p>
@@ -172,10 +172,10 @@ Note that in this section, we skipped an important step: finding an appropriate 
 <pre><code xml:id="code_creating-apis-with-python-and-flask_19" type="block" corresp="code_creating-apis-with-python-and-flask_19.txt"></code></pre>
 <p>Finally, the <code type="inline">return jsonify(results)</code> line takes the list of results and renders them in the browser as JSON.</p>
 <p>If you've gotten this far, you've created an actual API. Celebrate! At the end of this lesson, you'll be exposed to a somewhat more complex API that uses a database, but most of the principles and patterns we've used so far will still apply. In the next section, we'll discuss some guidelines for creating a well-designed API that others will actually want to use. In the last section of the tutorial, we'll apply these principles to a version of our API that pulls in results from a database.</p>
-</div></div><div n="1"><head>API Design Principles</head>
+</div></div><div n="2"><head>API Design Principles</head>
 <p>Thus far, we've created a working API with test data that we've provided right in our application. Our next version of our API will pull in data from a database before providing it to a user. It will also take additional query parameters, allowing users to filter by fields other than ID.</p>
 <p>Before building more functionality into our application, let's reflect on some of the API design decisions that we've made so far. Two aspects of a good API are usability and maintainability, and as we build more functionality into our API, we'll be keeping many of the following considerations in mind.</p>
-<div n="2"><head>Designing Requests</head>
+<div n="3"><head>Designing Requests</head>
 <p>The prevailing design philosophy of modern APIs is called REST. For our purposes, the most important thing about REST is that it's based on the four methods defined by the HTTP protocol: POST, GET, PUT, and DELETE. These correspond to the four traditional actions performed on data in a database: CREATE, READ, UPDATE, and DELETE. In this tutorial, we'll only be concerned with GET requests, which correspond to reading from a database.</p>
 <p>Because HTTP requests are so integral to using a REST API, many design principles revolve around how requests should be formatted. We've already created one HTTP request, which returns all books provided in our sample data. To understand the considerations that go into formatting this request, let's first consider a weak or poorly-designed example of an API endpoint:</p>
 <pre><code xml:id="code_creating-apis-with-python-and-flask_20" type="block" corresp="code_creating-apis-with-python-and-flask_20.txt"></code></pre>
@@ -190,11 +190,11 @@ Note that in this section, we skipped an important step: finding an appropriate 
 <p>Another way to plan for your API's future is to add a version number to the path. This means that, should you have to redesign your API, you can continue to support the old version of the API under the old version number while releasing, for example, a second version (<code type="inline">v2</code>) with improved or different functionality. This way, applications and scripts built using the old version of your API won't cease to function after your upgrade.</p>
 <p>After incorporating these design improvements, a request to our API might look like this:</p>
 <pre><code xml:id="code_creating-apis-with-python-and-flask_25" type="block" corresp="code_creating-apis-with-python-and-flask_25.txt"></code></pre>
-</div><div n="2"><head>Documentation and Examples</head>
+</div><div n="3"><head>Documentation and Examples</head>
 <p>Without documentation, even the best-designed API will be unusable. Your API should have documentation describing the resources or functionality available through your API that also provides concrete working examples of request URLs or code for your API. You should have a section for each resource that describes which fields, such as <code type="inline">id</code> or <code type="inline">title</code>, it accepts. Each section should have an example in the form of a sample HTTP request or block of code.</p>
 <p>A fairly common practice in documenting APIs is to provide annotations in your code that are then automatically collated into documentation using a tool such as <link target="http://www.doxygen.org/">Doxygen</link> or <link target="http://www.sphinx-doc.org/en/stable/">Sphinx</link>. These tools create documentation from <hi rend="bold">docstrings</hi>&#8212;comments you make on your function definitions. While this kind of documentation is a good idea, you shouldn't consider your job done if you've only documented your API to this level. Instead, try to imagine yourself as a potential user of your API and provide working examples. In an ideal world, you would have three kinds of documentation for your API: a reference that details each route and its behavior, a guide that explains the reference in prose, and at least one or two tutorials that explain every step in detail.</p>
 <p>For inspiration on how to approach API documentation, see the <link target="http://api.repo.nypl.org/">New York Public Library Digital Collections API</link>, which sets a standard of documentation achievable for many academic projects. For an extensively documented (though sometimes overwhelming) API, see the <link target="https://www.mediawiki.org/wiki/API:Main_page">MediaWiki Action API</link>, which provides documentation to users who pass partial queries to the API. (In our example above, we returned an error on a partial query.) For other professionally maintained API documentation examples, consider the <link target="https://datahelpdesk.worldbank.org/knowledgebase/articles/889392-api-documentation">World Bank API</link>, the various <link target="https://developer.nytimes.com/">New York Times APIs</link>, or the <link target="https://pro.europeana.eu/resources/apis">Europeana Pro API</link>.</p>
-</div></div><div n="1"><head>Connecting Our API to a Database</head>
+</div></div><div n="2"><head>Connecting Our API to a Database</head>
 <p>This last example of our Distant Reading Archive API pulls in data from a database, implements error handling, and can filter books by publication date. The database used is SQLite, a lightweight database engine that is supported in Python by default. SQLite files typically end with the <code type="inline">.db</code> file extension.</p>
 <p>Before we modify our code, first <link target="/assets/creating-apis-with-python-and-flask/books.db">download the example database from this location</link> and copy the file to your <code type="inline">api</code> folder using your graphical user interface. The final version of our API will query this database when returning results to users.</p>
 <p>Copy the below code into your text editor. As before, we'll examine the code more closely once you have it running.</p>
@@ -209,7 +209,7 @@ Note that in this section, we skipped an important step: finding an appropriate 
 <p>The database downloaded for this lesson has 67 entries, one for each of the winners of the Hugo Award for best science fiction novel between 1953 and 2014 (avoiding the voting controversy of 2015). The data set includes the novel's title, author, year of publication, and first sentence. Our API allows users to filter by three fields: <code type="inline">id</code>, <code type="inline">published</code> (year of publication), and <code type="inline">author</code>.</p>
 <p>The first request returns all entries in the database, similar to the <code type="inline">/all</code> request we implemented for the last version of our API. The second request returns all books by the author Connie Willis (<code type="inline">?author=Connie+Willis</code>). Note that, within a query parameter, spaces between words are denoted with a <code type="inline">+</code> sign, hence <code type="inline">Connie+Willis</code>. The third request filters by two fields&#8212;author and year of publication. Instead of the three books returned by requesting <code type="inline">?author=Connie+Willis</code>, this request returns only the entry to <emph>The Doomsday Book</emph>, published in 1993. The last request returns all Hugo winners from the year 2010 (note that, in some years, more than one Hugo is awarded).</p>
 <p>As we can see this version of our API serves a larger number of results, results that are stored in an SQLite database (<code type="inline">books.db</code>). When our user requests an entry or set of entries, our API pulls that information from the database by building and executing an SQL query. This iteration of our API also allows for filtering by more than one field. We'll discuss potential uses for this functionality after examining our code more closely.</p>
-<div n="2"><head>Understanding Our Database-Powered API</head>
+<div n="3"><head>Understanding Our Database-Powered API</head>
 <p>Relational databases allow for the storage and retrieval of data, which is stored in tables. Tables are similar to spread sheets in that they have columns and rows&#8212;columns indicate what the data representes, such as "title" or "date." Rows represent individual entries, which could be books, users, transactions, or any other kind of entity.</p>
 <p>The database we're working with has five columns <code type="inline">id</code>, <code type="inline">published</code>, <code type="inline">author</code>, <code type="inline">title</code>, and <code type="inline">first_sentence</code>. Each row represents one book that won the Hugo award in the year under the <code type="inline">published</code> heading, and the text of which begins with the sentence in the <code type="inline">first_sentence</code> column.</p>
 <p>Rather than use test data defined in the application, our <code type="inline">api_all</code> function pulls in data from our Hugo database:</p>
@@ -238,22 +238,22 @@ Note that in this section, we skipped an important step: finding an appropriate 
 <p>Finally, we return the results of our executed SQL query as JSON to the user:</p>
 <pre><code xml:id="code_creating-apis-with-python-and-flask_38" type="block" corresp="code_creating-apis-with-python-and-flask_38.txt"></code></pre>
 <p>Whew! When all is said and done, this section of code reads query parameters provided by the user, builds an SQL query based on those parameters, executes that query to find matching books in the database, and returns those matches as JSON to the user. This section of code makes our API's filtering capability considerably more sophisticated&#8212;users can now find books by, for example, Ursula K. Le Guin that were published in 1975 or all books in the database published in 2010.</p>
-</div><div n="2"><head>Our API in Practice</head>
+</div><div n="3"><head>Our API in Practice</head>
 <p>Now that we have implemented our Distant Reading API, let's consider how it might be of use in digital projects and in research.</p>
 <p>One of the advantages of providing data through an API, as opposed to providing some kind of downloadable database or file for users, is that, as new data or additional resources are added, they become immediately available to projects built using the API. Imagine that we make our API publicly available, and a user creates a visualization that plots the length of a novel's first sentence in characters against its year of publication:</p>
 <figure><desc>Scatterplot of first sentence length against date of publication.</desc><graphic url="hugo.png"/></figure>
 <p>As new Hugo winners were added to the database, the script that generated this visualization would immediately be able to use the new information. If the visualization were created in D3 or another web-based utility, this plot would actually reflect additional data added to the book archive as soon as the archive was updated&#8212;that is, in real time. As additional data accrued, we might, for example, learn if John Scalzi's unusually lengthy opening to his 2013 <emph>Red Shirts</emph> was an aberration or the continuation of a longer trend toward wordiness in science fiction. Conversely, if your API were to change its URL structure or cease to function, applications based on it will no longer work. Remember that, when creating an API, you are assuming some responsibility for the applications that others may build with it.</p>
 <p>A strong API can be considered the backbone of a potentially limitless number of projects or avenues of research. Though the above example takes the form of a visualization of the limited amount of data we've provided in our Distant Reading Archive, a project based on this API might just as easily take the form of a Twitterbot that shares first sentences (learn how to make one with <link target="/lessons/intro-to-twitterbots">this</link> Programming Historian lesson) or a library webpage that displays book openings and year of publication alongside other book metadata. In many cases, it makes sense to first create an API interface to your core data or functionality before extrapolating on it to create a visualization, application, or website. Not only does it make your work accessible to researchers working on other projects, but it often leads to a more comprehensible and maintainable project.</p>
-</div></div><div n="1"><head>Resources</head>
+</div></div><div n="2"><head>Resources</head>
 <p>The below resources provide information on useful APIs for researchers in the humanities and social sciences as well as further reading on API concepts.</p>
-<div n="2"><head>APIs for Humanities Researchers</head>
+<div n="3"><head>APIs for Humanities Researchers</head>
 <p><link target="http://chroniclingamerica.loc.gov/">Chronicling America (Library Of Congress)</link> - A digitized collection of American newspaper articles from the 18th to the 20th century.</p>
 <p><link target="https://core.ac.uk/">Connecting Repositories (CORE)</link> - A collection of open access articles from various sources hosted by the Open University.</p>
 <p><link target="https://diggingintodata.org/repositories/english-broadside-ballad-archive-ebba">English Broadside Ballad Archive (EBBA)</link></p>
 <p><link target="http://hds.essex.ac.uk/">History Data Service (HDS)</link> - A collection of data from a wide variety of historical sources.</p>
 <p><link target="https://pro.europeana.eu/">Europeana</link></p>
 <p><link target="https://diggingintodata.org/repositories">Digging into Data API List</link></p>
-</div><div n="2"><head>API Resources</head>
+</div><div n="3"><head>API Resources</head>
 <p><link target="https://doepud.co.uk/blog/anatomy-of-a-url">Anatomy of a URL</link> - Explains the different sections of a URL (protocol, domain, path, and so on) in greater detail.</p>
 <p><link target="https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm">Original Paper on REST</link>  - PhD thesis by Roy Thomas Fielding that introduced the concepts behind the REST philosophy of API design.</p>
 <p><link target="https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world">The Flask Mega Tutorial</link> - The most well-known tutorial for learning the Flask web framework.</p>

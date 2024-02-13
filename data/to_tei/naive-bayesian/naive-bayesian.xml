@@ -17,7 +17,7 @@
 </metadata>
   <text>
     <body>
-      <div n="1"><head>Introduction</head>
+      <div n="2"><head>Introduction</head>
 <p>A few years back, William Turkel wrote a series of blog posts called <link target="http://digitalhistoryhacks.blogspot.com/2008/05/naive-bayesian-in-old-bailey-part-1.html">A
 Naive Bayesian in the Old Bailey</link>, which showed how one could use
 machine learning to extract interesting documents out of a digital archive.
@@ -56,7 +56,7 @@ markup) and does a couple of other useful things.</li>
 <li>write a couple of helper scripts to assist in testing the learners.</li>
 <li>write a script that tests the performance of the learner.</li>
 </ol>
-<div n="2"><head>Files you will need</head>
+<div n="3"><head>Files you will need</head>
 <ul>
 <li><code type="inline">save-trialtxts-by-category.py</code></li>
 <li><code type="inline">tenfold-crossvalidation.py</code></li>
@@ -76,7 +76,7 @@ of the part where we actually begin to code.</p>
 installations, except for <link target="http://www.crummy.com/software/BeautifulSoup/">BeautifulSoup</link> (used in the data creation step,
 not in the learner code itself).</emph></p>
 </div></div>
-      <div n="1"><head>The Old Bailey Digital Archive</head>
+      <div n="2"><head>The Old Bailey Digital Archive</head>
 <p>The <link target="http://www.oldbaileyonline.org/">Old Bailey digital archive</link>
 contains 197,745 criminal trials held at the Old Bailey, aka the Central
 Criminal Court in London. The trials were held between 1674 and 1913,
@@ -103,7 +103,7 @@ Old Bailey documents. That, in turn, helps us decide how (or whether) a
 learner could help us explore other digital document collections, most
 of which are not as richly annotated.</p>
 </div>
-      <div n="1"><head>Machine learning</head>
+      <div n="2"><head>Machine learning</head>
 <p>Machine learning can mean a lot of different things, but the most common
 tasks are <link target="http://en.wikipedia.org/wiki/Statistical_classification">classification</link> and <link target="http://home.deib.polimi.it/matteucc/Clustering/tutorial_html/">clustering</link>.</p>
 <p>Classification is performed by supervised learners &#8212; "supervised"
@@ -151,7 +151,7 @@ to perform document classification. We give our learner a set of
 documents along with their correct classes, and then test it on a set of
 documents they haven't seen, with the hope that it will succeed in
 guessing the document's correct classification.</p>
-<div n="2"><head>A Naive Bayesian learner</head>
+<div n="3"><head>A Naive Bayesian learner</head>
 <p>A Naive Bayesian is a supervised learner: we give it things marked with
 group labels, and its job is basically to learn the probability that a
 thing that looks a particular way belongs in a particular group.</p>
@@ -199,7 +199,7 @@ works. Instead, let's look at the classifier in a more procedural
 manner. (Meanwhile, if you prefer, you can check out <link target="http://www.yudkowsky.net/rational/bayes">an explanation
 of Bayes' rule and conditional probabilities</link> that does a very nice
 job and is also a good read.)</p>
-<div n="3"><head>Understanding Naive Bayesian classification using a generative story</head>
+<div n="4"><head>Understanding Naive Bayesian classification using a generative story</head>
 <p>To understand Naive Bayesian classification, we will start by telling a
 story about how documents come into being. Telling such a story &#8212; called
 a "generative story" in the business &#8212; often simplifies the
@@ -403,7 +403,7 @@ perfect, so you may want to do some further research before entering the
 newfound materials into the library catalog as works by Gibbons, Becker,
 and Warren, respectively.</p>
 </div></div></div>
-      <div n="1"><head>OK, so let's code already!</head>
+      <div n="2"><head>OK, so let's code already!</head>
 <p>So, our aim is to apply a Naive Bayesian learner to data from the Old
 Bailey. First we get the data; then we clean it up and write some
 routines to extract information from it; then we write the code that
@@ -450,7 +450,7 @@ offense category that has the highest probability.</p>
 <p>Finally, the testing script evaluates the performance of the learner and
 lets us know how good it was at guessing the offense associated with
 each trial.</p>
-<div n="2"><head>Preliminaries</head>
+<div n="3"><head>Preliminaries</head>
 <p>Many of the tools we are using to deal with the preliminaries have been
 discussed at Programming Historian before. You may find it helpful to
 check out (or revisit) the following tutorials:</p>
@@ -486,7 +486,7 @@ one another).</li>
 </ul>
 <p>On my Mac, the structure looks like this:</p>
 <figure><desc>Bailey Folders</desc><graphic url="naive-bayesian-2.png"/></figure>
-<div n="3"><head>Downloading trials</head>
+<div n="4"><head>Downloading trials</head>
 <p>The Old Bailey lets you download trials in zip files of 10 trials each,
 so that's what we'll do. This is how we do it: we first look at how the
 Old Bailey system requests files, and then we write a script that
@@ -545,7 +545,7 @@ snippet from one trial:</p>
 the trials by offense category (and subcategory), so that's the
 information we're going to extract before converting the XML into a text
 file that we can then feed to our learner.</p>
-</div><div n="3"><head>Saving the trials into text files</head>
+</div><div n="4"><head>Saving the trials into text files</head>
 <p>Now that we have the XML files, we can start extracting information and
 plain text from them to feed to our learner. We want to sort the trials
 into text files, so that each text file contains all the trials in a
@@ -593,7 +593,7 @@ following commands to run this script:</p>
 <pre><code class="language-bash" xml:id="code_naive-bayesian_11" type="block" corresp="code_naive-bayesian_11.txt"></code></pre>
 <p>This will take a while. After it's done, you should have the directories
 and files described above.</p>
-</div><div n="3"><head>Creating the cross-validation samples</head>
+</div><div n="4"><head>Creating the cross-validation samples</head>
 <p>Now that we have all our trials saved where we want them, all we need to
 do is to create the cross-validation samples and we're ready to test our
 learners.</p>
@@ -642,7 +642,7 @@ this:</p>
 <p>From the output, we can conclude that the distribution of instances of
 "breakingpeace" is more or less even. If it isn't, we can re-run the
 <code type="inline">tenfold-crossvalidation.py</code> script, and then check the distribution again.</p>
-</div></div><div n="2"><head>Testing the learner</head>
+</div></div><div n="3"><head>Testing the learner</head>
 <p>All right, we are ready to train and test our Naive Bayesian! The script
 that does this is called <code type="inline">test-nb-learner.py</code>. It starts by defining a few
 variables:</p>
@@ -716,7 +716,7 @@ call it on the command line (assuming you're still in the directory
 task you have chosen. The output should look something like this:</p>
 <pre><code xml:id="code_naive-bayesian_23" type="block" corresp="code_naive-bayesian_23.txt"></code></pre>
 <p>Next, let's take a look at what these measures of accuracy mean.</p>
-<div n="3"><head>Measures of classification</head>
+<div n="4"><head>Measures of classification</head>
 <p>The basic measure of classification prowess is <emph>accuracy</emph>: how often did
 classifier guess the class of a document correctly? This is calculated
 by simply dividing the number of correct guesses by the total number of
@@ -769,7 +769,7 @@ actual number of examples &#8212; would be:</p>
 since it merely means that your minion was smart enough to leave most of
 the library books in the library, it's not very helpful in this case
 (except inasmuch as it is nice not to be buried under 100,000 volumes.)</p>
-</div><div n="3"><head>How well does our Naive Bayesian do?</head>
+</div><div n="4"><head>How well does our Naive Bayesian do?</head>
 <p>Our tests on the Naive Bayesian use the data set consisting of all the
 trials from the 1830s. It contains 17,549 different trials in 50
 different offense categories (which can be grouped into 9 broad
@@ -965,7 +965,7 @@ us, since as historians we might be happier to see more of the
 "interesting" documents and do the additional culling ourselves than to
 have our learner miss a lot of good documents. We'll return to the
 question of the meaning of classification errors below.</p>
-</div><div n="3"><head>Extracting the most indicative features</head>
+</div><div n="4"><head>Extracting the most indicative features</head>
 <p>The <code type="inline">naivebayes.py</code> script has a feature
 that allows you to extract the most (and least) indicative features of
 your classification exercise. This allows you to see what weighs a lot
@@ -1002,7 +1002,7 @@ help us determine whether something is skewing our results in a way we
 don't wish, something we may be able to correct for with different
 weighting or different selection of features (see the section on
 <link target="#Tuning">Tuning</link> below).</p>
-</div></div><div n="2"><head>The meanings of misclassification</head>
+</div></div><div n="3"><head>The meanings of misclassification</head>
 <p>Again, it's good to keep in mind that in classifying documents we are
 not always after an abstract "true" classification, but simply a useful
 or interesting one. Thus, it is a good idea to look a bit more closely
@@ -1086,7 +1086,7 @@ Bailey, using a machine learner to extract documents may be useful for a
 historian: in this case, it would help you extract trials from different
 offense categories that share features of interest to you, regardless of
 the offense label.</p>
-</div><div n="2"><head>Tuning</head>
+</div><div n="3"><head>Tuning</head>
 <p>The possibilities for tuning are practically endless.</p>
 <p>For example, you might consider tweaking your data. For instance,
 instead of giving your classifier all the words in the document, you

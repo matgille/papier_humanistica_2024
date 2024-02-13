@@ -19,7 +19,7 @@
     <body><div class="alert alert-warning">
 Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allows users to search and download Twitter data. Unfortunately, this means that elements of this lesson will only work for those who are paying for an upgraded plan. At the moment, there are no special access plans for researchers or academics. [2023]
 </div>
-<div n="1"><head>Lesson goals</head>
+<div n="2"><head>Lesson goals</head>
 <p>JSON (JavaScript Object Notation) is a common data sharing format that can describe complex relationships.
 Many libraries, archives, museums, and social media sites expose their data through JSON-based APIs.
 (On accessing APIs, see <link target="/lessons/applied-archival-downloading-with-wget">downloading structured data with wget</link> and the <link target="/lessons/intro-to-the-zotero-api">series of lessons on working with APIs</link>.)</p>
@@ -28,7 +28,7 @@ Many libraries, archives, museums, and social media sites expose their data thro
 This lesson will begin with an overview of the basic operators of the jq query syntax.
 Next, you will learn progressively more complex ways of connecting these operators together.
 By the end of the lesson, you will understand how to combine basic operators to create queries that can reshape many types of JSON data.</p>
-</div><div n="1"><head>What is JSON?</head>
+</div><div n="2"><head>What is JSON?</head>
 <p><link target="http://www.json.org/">You may find a short and cogent primer on JSON here.</link>
 In brief, a JSON <hi rend="bold">object</hi> is a series of key/value pairs, where <hi rend="bold">keys</hi> are the names for the <hi rend="bold">values</hi> they are paired with.
 For example, the tiny JSON object:</p>
@@ -48,7 +48,7 @@ These objects must be wrapped in curly braces. (<code type="inline">{}</code>)</
 In this object, the array only has one value, <code type="inline">"Amsterdam"</code>, however it could have multiple values, e.g. <code type="inline">["Amsterdam", "Kloveniersdoelen"]</code>.
 Remember, values of an array have no keys - they are all considered to be semantically equivalent to each other.</li>
 </ul>
-</div><div n="1"><head>Lesson Setup</head>
+</div><div n="2"><head>Lesson Setup</head>
 <p>For the bulk of this lesson, we will be working with a web-based version of jq at the site <link target="https://jqplay.org/">jq play</link>.
 For this, you will only need your internet browser.
 <link target="https://jqplay.org/">jq play</link> cannot handle very large JSON files, but it is a great sandbox for learning the query language for jq.
@@ -63,11 +63,11 @@ If you see an error displayed in the "Results" field of jq play, don't panic; ju
 <p>In some instances, we will interact with the checkboxes on the upper-right.
 These set various jq <link target="https://stedolan.github.io/jq/manual/#Invokingjq">command-line options, or <emph>flags</emph></link>, that affect things like input handling, and the final formatting of the output.
 <hi rend="bold">Start the lesson with all of them unchecked.</hi></p>
-</div><div n="1"><head>Core jq filters</head>
+</div><div n="2"><head>Core jq filters</head>
 <p>jq operates by way of <emph>filters</emph>: a series of text commands that you can string together, and which dictate how jq should transform the JSON you give it.</p>
 <p>To learn the basic jq filters, we'll work with a sample response from the Rijksmuseum API: <link target="/assets/jq_rkm.json">rkm.json</link>
 Select all the text at that link, copy it, and paste it into the "JSON" box at <link target="https://jqplay.org/">jq play</link> on the left hand side.</p>
-<div n="2"><head>The dot: <code type="inline">.</code></head>
+<div n="3"><head>The dot: <code type="inline">.</code></head>
 <p>The basic jq operator is the dot: <code type="inline">.</code>
 Used by itself, <code type="inline">.</code> leaves the input unmodified.
 Add the name of a key to it, however, and the filter will return the value of that key.
@@ -84,7 +84,7 @@ If you want to access a value in an object that's already within another object,
 <p>Note that jq has returned the entire array.
 Rather than being wrapped in <code type="inline">{}</code>, the result is a series of objects wrapped within an array (<code type="inline">[{},{},{}]</code>)
 The significance of this will be discussed in the next section.</p>
-</div><div n="2"><head>The array operator: <code type="inline">[]</code></head>
+</div><div n="3"><head>The array operator: <code type="inline">[]</code></head>
 <p><code type="inline">.artObjects</code> returned one big array of JSON objects.
 Before we can access the values inside those objects, we need to break them out of the array that they're in.
 By adding <code type="inline">[]</code> onto the end of our filter, jq will break up this one array into 10 separate objects:</p>
@@ -105,7 +105,7 @@ This is because JavaScript, like quite a few other programming languages (<link 
 <p>This filter returns just the first element of the <code type="inline">artObjects</code> array.
 <code type="inline">.artObjects[1]</code> would return the second, and so on.</p>
 <p>Uncheck the "Compact Output" box again before continuing with the lesson.</p>
-</div><div n="2"><head>The pipe: <code type="inline">|</code></head>
+</div><div n="3"><head>The pipe: <code type="inline">|</code></head>
 <p>The magic of jq is that you can connect, or <emph>pipe</emph>, several operators together to accomplish some very complex transformations of your data.
 What's more, jq will repeat the filter for each JSON object provided by the previous step.
 Therefore, while we started with just one big JSON object, <code type="inline">.artObjects[]</code> created 10 smaller JSON objects.
@@ -113,7 +113,7 @@ Any operator we put after the <code type="inline">|</code> will be repeated for 
 <p>For example, try the following query:</p>
 <pre><code class="language-txt" xml:id="code_json-and-jq_7" type="block" corresp="code_json-and-jq_7.txt"></code></pre>
 <p>This will return a list of every value at the key <code type="inline">id</code> within the <code type="inline">artObjects</code> array, separated by a line break.</p>
-</div><div n="2"><head>Filter: <code type="inline">select()</code></head>
+</div><div n="3"><head>Filter: <code type="inline">select()</code></head>
 <p>Normally jq repeats every filter operation for each line of input that it receives, passing each answer on to the following filter operation.
 <code type="inline">select()</code> will only pass on a subset of the input onto the next step of the filter.</p>
 <p>Let's filter the Rijksmuseum JSON to only return the ids of objects that have at least one value assigned to their <code type="inline">productionPlaces</code>:</p>
@@ -140,7 +140,7 @@ For example, let's select only those objects whose primary maker has the particl
 <p>The results:</p>
 <pre><code class="language-json" xml:id="code_json-and-jq_11" type="block" corresp="code_json-and-jq_11.txt"></code></pre>
 <p>To see other types of rules for <code type="inline">select()</code>, <link target="https://stedolan.github.io/jq/manual/#ConditionalsandComparisons">consult the full list of jq conditionals and comparisons.</link></p>
-</div><div n="2"><head>Create new JSON: <code type="inline">[]</code> and <code type="inline">{}</code></head>
+</div><div n="3"><head>Create new JSON: <code type="inline">[]</code> and <code type="inline">{}</code></head>
 <p>By wrapping <code type="inline">.</code> operators within either <code type="inline">[]</code> or <code type="inline">{}</code>, jq can synthesize new JSON arrays and objects.
 This can be useful if you want to output a new JSON file.
 As we will see below, this can also be a crucial intermediate step when reshaping complex JSON.</p>
@@ -155,7 +155,7 @@ The resulting set of JSON objects have just two keys: <code type="inline">id</co
 <pre><code class="language-json" xml:id="code_json-and-jq_15" type="block" corresp="code_json-and-jq_15.txt"></code></pre>
 <p>Unlike objects made using <code type="inline">{}</code>, arrays have no keys; they are just simple lists of values.
 Creating simple arrays is crucial, however, for mapping our JSON into a CSV file.</p>
-</div><div n="2"><head>Output a CSV: <code type="inline">@csv</code></head>
+</div><div n="3"><head>Output a CSV: <code type="inline">@csv</code></head>
 <p>To create a CSV table with jq we want to filter our input JSON into a series of arrays, with each array being a row of the CSV.</p>
 <p>The previous filter gave us an array with the <code type="inline">id</code> and <code type="inline">title</code> keys of each painting.
 Let's add the primary artist for each artwork as well:</p>
@@ -170,8 +170,8 @@ Let's add the primary artist for each artwork as well:</p>
 <p>The results:</p>
 <pre><code class="language-txt" xml:id="code_json-and-jq_19" type="block" corresp="code_json-and-jq_19.txt"></code></pre>
 <p>This is a valid CSV file, which we could now import into an analysis program.</p>
-</div></div><div n="1"><head>Advanced operations</head>
-<div n="2"><head>JSON vs. JSON Lines</head>
+</div></div><div n="2"><head>Advanced operations</head>
+<div n="3"><head>JSON vs. JSON Lines</head>
 <p>You may encounter two different types of JSON files in the wild: files with one large JSON object, and so-called "JSON lines" files, which have multiple, separate JSON objects each on one single line, not wrapped by <code type="inline">[]</code>.</p>
 <p>You will commonly find larger data dumps of JSON will come in a JSON lines format.
 For example, the <link target="https://github.com/NYPL-publicdomain/data-and-utilities/tree/master/items">New York Public Library released their public domain collections in multiple JSON lines-formatted files</link>.
@@ -186,7 +186,7 @@ One of the easiest ways to search and download Twitter data is using the excelle
 <p>For this lesson, we will use a small sample of 50 public tweets.
 Clear the "Filter", "JSON" and "Result" boxes on <link target="https://jqplay.org/">jq play</link>, and ensure all the checkboxes are unchecked.
 <link target="/assets/jq_twitter.json">Then copy this sample Twitter data</link> into <link target="https://jqplay.org/">jq play</link>.</p>
-</div><div n="2"><head>One-to-many relationships: Tweet hashtags</head>
+</div><div n="3"><head>One-to-many relationships: Tweet hashtags</head>
 <p>Often you may wish to create a table that expresses a one-to-many relationship, such as a tweet and its hashtags.
 A tweet will always have exactly one tweet ID, while it may have zero, one, or more hashtags.
 There are a few ways to express this as a CSV table, but we will implement two common solutions here:</p>
@@ -194,7 +194,7 @@ There are a few ways to express this as a CSV table, but we will implement two c
 <li>One row per tweet, with multiple hashtags in the same cell</li>
 <li>One row per hashtag/tweet combination (<link target="https://en.wikipedia.org/wiki/Wide_and_narrow_data">also known as "long" or "narrow" data</link>), with tweet IDs and hashtags repeated as necessary</li>
 </ol>
-<div n="3"><head>One row per tweet</head>
+<div n="4"><head>One row per tweet</head>
 <p>Let's create a table with one column with a tweet ID, and a second column with all the hashtags in each tweet, separated by a semicolon: <code type="inline">;</code></p>
 <p>This is a relatively complex query that will require a multi-step filter.
 First, let's reduce the Twitter JSON to just ids and the objects describing the hashtags.
@@ -242,7 +242,7 @@ Let's review its components one more time:</p>
 <p>The final results:</p>
 <pre><code class="language-txt" xml:id="code_json-and-jq_29" type="block" corresp="code_json-and-jq_29.txt"></code></pre>
 <p>There are ways to get the same results using an even shorter query, but in most cases, it pays to break up your jq transformations into small steps.</p>
-</div><div n="3"><head>One row per hashtag</head>
+</div><div n="4"><head>One row per hashtag</head>
 <p>This is actually simpler to implement in jq, because we can take advantage of jq's natural behavior of repeating filters.</p>
 <p>We will start with the same set of operations that extract the tweet ID and the hashtag objects from the original Twitter JSON:</p>
 <pre><code class="language-txt" xml:id="code_json-and-jq_30" type="block" corresp="code_json-and-jq_30.txt"></code></pre>
@@ -251,7 +251,7 @@ All we need to do is construct the CSV row arrays and pipe them through the <cod
 <pre><code class="language-txt" xml:id="code_json-and-jq_31" type="block" corresp="code_json-and-jq_31.txt"></code></pre>
 <p>The results:</p>
 <pre><code class="language-txt" xml:id="code_json-and-jq_32" type="block" corresp="code_json-and-jq_32.txt"></code></pre>
-</div></div><div n="2"><head>Grouping and Counting</head>
+</div></div><div n="3"><head>Grouping and Counting</head>
 <p>Often times, your JSON will be structured around one type of entity (say, artworks from the Rijksmuseum API, or tweets from the Twitter API) when you, the researcher, may be more interested in collecting information about a related, but secondary entity, like an artist, a Twitter hashtag, or a Twitter user.
 In this section, we will use jq to extract a table of information about Twitter <emph>users</emph> from the tweet-based JSON, as well as grouping and counting tweet <emph>hashtags</emph>.</p>
 <p>For the previous examples, we have only needed to consider each tweet individually.
@@ -262,7 +262,7 @@ This is where we want to use "Slurp" (or the <code type="inline">-s</code> flag 
 <p>With the Twitter data still in the input box on <link target="https://jqplay.org/">jq play</link>, check the "Slurp" box, and just put <code type="inline">.</code> in the filter.
 Note that it's wrapped the objects in <code type="inline">[]</code>.
 Now we can build even more complex commands that require knowledge of the entire input file.</p>
-<div n="3"><head>Extracting user data</head>
+<div n="4"><head>Extracting user data</head>
 <p>Because the Twitter API returns per-tweet information, info about the <emph>users</emph> who send those tweets is repeated with each tweet within an object assigned to the key <code type="inline">user</code>.
 Let's look at the user data in the very first tweet in this dataset (remember to keep the "Slurp" option checked.)</p>
 <pre><code class="language-txt" xml:id="code_json-and-jq_33" type="block" corresp="code_json-and-jq_33.txt"></code></pre>
@@ -309,7 +309,7 @@ Don't forget to check both the "Slurp" and "Raw Output" options when creating a 
 <p>The results should start like this:</p>
 <pre><code class="language-txt" xml:id="code_json-and-jq_40" type="block" corresp="code_json-and-jq_40.txt"></code></pre>
 <p>Although this table happens to start with users who only have one tweet each in these sample data, you can scroll down through the results to find several users who made multiple tweets.</p>
-</div><div n="3"><head>Counting Twitter hashtags</head>
+</div><div n="4"><head>Counting Twitter hashtags</head>
 <p>In the previous example we combined <code type="inline">group_by()</code> with <code type="inline">join()</code> to collect multiple values into a text field.
 However, we can also use <code type="inline">group_by()</code> in conjunction with <code type="inline">length</code> to compute new values.
 In this final exercise, we will use jq to count the number of times unique hashtags appear in this dataset.</p>
@@ -351,15 +351,15 @@ Finally, we create the CSV and format the CSV rows.</p>
 <li><code type="inline">[.tag, .count] |</code> Create simple arrays with just the tag name and count</li>
 <li><code type="inline">@csv</code> Format each array as a CSV row</li>
 </ol>
-</div></div><div n="2"><head>Challenges</head>
+</div></div><div n="3"><head>Challenges</head>
 <p>These final challenges will help you test your understanding of how to pipe together <link target="https://stedolan.github.io/jq/">jq</link> commands on your own.</p>
-<div n="3"><head>Filter before counting</head>
+<div n="4"><head>Filter before counting</head>
 <p>What function do we need to add to the hashtag-counting filter to only count hashtags when their tweet has been retweeted at least 200 times?
 Hint: the retweet count is saved under the key <code type="inline">retweet_count</code>.</p>
 <p>You should get the following table:</p>
 <pre><code class="language-txt" xml:id="code_json-and-jq_46" type="block" corresp="code_json-and-jq_46.txt"></code></pre>
 <p><link target="/assets/filter_retweets.txt">There are multiple ways to solve this with jq. See my answer here.</link></p>
-</div><div n="3"><head>Count total retweets per user</head>
+</div><div n="4"><head>Count total retweets per user</head>
 <p>One more challenge to test your mastery of jq: from this dataset, try to compute the total number of times each user has had their tweets (at least within this dataset) retweeted.</p>
 <p>Hints:</p>
 <ul>
@@ -369,23 +369,23 @@ Hint: the retweet count is saved under the key <code type="inline">retweet_count
 </ul>
 <p>As a way to verify your results, user <code type="inline">356854246</code> should have a total retweet count of <code type="inline">51</code> based on this dataset.</p>
 <p><link target="/assets/count_retweets.txt">See my answer.</link></p>
-</div></div></div><div n="1"><head>Using jq on the command line</head>
+</div></div></div><div n="2"><head>Using jq on the command line</head>
 <p><link target="https://jqplay.org/">jq play</link> is fine when you have under 100-200 lines of JSON to parse.
 However, it will become unusably slow on  much larger files.
 For fast processing of very large files, or of JSON lines spread across multiple files, you will need to run the command-line version of jq.</p>
-</div><div n="1"><head>Installation</head>
-<div n="2"><head>Installation on OS X</head>
+</div><div n="2"><head>Installation</head>
+<div n="3"><head>Installation on OS X</head>
 <p>The easiest way to install jq on OS X is to use the package management system <link target="http://brew.sh/">Homebrew</link>.
 This system works via OS X's "Terminal" application, which gives you access to the Bash command line.
 <link target="/lessons/intro-to-bash">For an introduction to this system, see The Programming Historian's "Introduction to the Bash Command Line".</link></p>
 <p>Follow the installation instructions for Homebrew itself, and then use this command to install jq:</p>
 <pre><code class="language-sh" xml:id="code_json-and-jq_47" type="block" corresp="code_json-and-jq_47.txt"></code></pre>
-</div><div n="2"><head>Installation on Windows</head>
+</div><div n="3"><head>Installation on Windows</head>
 <p>To access the command line easily on Windows, you will need the PowerShell application.
 <link target="/lessons/intro-to-powershell.html">See the Programming Historian's "Introduction to PowerShell"</link></p>
 <p>From PowerShell, you can install the Windows package manager <link target="https://chocolatey.org/install">Chocolatey</link>, and then install jq with the following command:</p>
 <pre><code class="language-sh" xml:id="code_json-and-jq_48" type="block" corresp="code_json-and-jq_48.txt"></code></pre>
-</div><div n="2"><head>Invoking jq</head>
+</div><div n="3"><head>Invoking jq</head>
 <pre><code class="language-sh" xml:id="code_json-and-jq_49" type="block" corresp="code_json-and-jq_49.txt"></code></pre>
 <ol>
 <li><code type="inline">jq</code> calls the jq program.</li>
@@ -400,7 +400,7 @@ This can be useful when downloading JSON with a utility like <code type="inline"
 <pre><code class="language-sh" xml:id="code_json-and-jq_50" type="block" corresp="code_json-and-jq_50.txt"></code></pre>
 <p>Note that you must use the <code type="inline">wget</code> flag <code type="inline">-qO-</code> in order to send the output of <code type="inline">wget</code> into <code type="inline">jq</code> by way of a shell pipe.
 You can read more about command line pipes in <link target="/lessons/intro-to-bash">"Introduction to the Bash Command Line"</link> (OS X) or <link target="/lessons/intro-to-powershell.html">"Introduction to PowerShell"</link> (Windows).</p>
-</div></div><div n="1"><head>Further Resources</head>
+</div></div><div n="2"><head>Further Resources</head>
 <p>jq is incredibly powerful, but its advanced features can get quite complicated.</p>
 <p>It is possible to do <link target="https://stedolan.github.io/jq/manual/#Math">other basic math functions in jq</link>, however given the complexity of working with JSON's tree data model, I would suggest that it is only worth doing the most basic counting operations in jq.
 If basic counting is all you need to do with your JSON data, then jq can help you avoid adding another tool onto your data analysis pipeline.

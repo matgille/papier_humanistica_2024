@@ -17,7 +17,8 @@
   <doi>10.46430/phen0066</doi>
 </metadata>
   <text>
-    <body><h2>Lesson Goals</h2>
+    <body>
+      <div n="2"><head>Lesson Goals</head>
 <p>Many types of sources used by historians are inherently spatial. For example:</p>
 <ul>
 <li>Census, population or taxation data</li>
@@ -31,7 +32,8 @@
 <li>View and analyse geographical distribution within your data</li>
 </ul>
 <p>This tutorial forms part of the Mapping and GIS series on <emph>Programming Historian</emph>, and builds upon skills you will have learned in earlier tutorials, especially <link target="/lessons/qgis-layers">Installing QGIS 2.0 and Adding Layers</link>. It presumes that you have a set of <link target="https://en.wikipedia.org/wiki/Shapefile">shapefiles</link> relevant to the region for which you intend to produce a map, and data that you would like to get into those shapefiles so that it can be visualised and analysed.</p>
-<h2>About Geocoding</h2>
+</div>
+      <div n="2"><head>About Geocoding</head>
 <p>Mapping data such as these involves rendering spatial information which humans can understand (such as names of towns or counties) into a format that can be understood by <link target="https://en.wikipedia.org/wiki/Geographic_information_system">GIS</link> (mapping) software. This is limited to some kind of geometry (a point, line or polygon in a vector representation) relating to the coordinates of this place in two dimensional space &#8211; these might be latitude and longitude expressed in degrees, or as is often the case in the UK, eastings and northings of the <link target="https://www.ordnancesurvey.co.uk/resources/maps-and-geographic-resources/the-national-grid.html">British National Grid</link>. Geocoding always depends on the use of a <link target="https://en.wikipedia.org/wiki/Gazetteer">gazetter</link>, or list of places and coordinates.</p>
 <p>There is often confusion between processes of <link target="https://en.wikipedia.org/wiki/Geocoding">geocoding</link> and <link target="https://en.wikipedia.org/wiki/Georeference">georeferencing</link>.</p>
 <ul>
@@ -40,14 +42,16 @@
 </ul>
 <p>In many modern applications geocoding is completed automatically, often using the mapping tools and gazetters offered seamlessly as part of <link target="https://www.google.co.uk/maps">Google Maps</link> or <link target="https://www.openstreetmap.org/">OpenStreetMap</link>. When working with contemporary data, or data from relatively recent periods, and Western European or North American historical contexts, this is often sufficient. If you are using data containing place names that are consistent with the present day, you can use the QGIS web geocoder plugin detailed in the postscript to this tutorial, or the <link target="/lessons/geoparsing-text-with-edinburgh">Edinburgh Geoparser</link>.</p>
 <p>Many historians will be working on contexts where the place names in their data do not match the present day. Remember that street names tend to change relatively frequently, either in terms of spelling or entirely. Administrative areas have changed relatively frequently and were sometimes used inconsistently in historical sources (e.g. was Bristol in Gloucestershire, Somerset, City of Bristol, Avon?) and indeed places have moved between countries, and countries have changed in name and extent. Even town names have changed and are subject to linguistic ambiguities (e.g. <emph>Lynn Episcopi</emph>, Bishop's Lynn, Lynn, King's Lynn, Kings Lynn). For these reasons it is often better to avoid using automated online geocoding tools and create a gazetteer to suit the historical context which you are researching. The processes described in this tutorial are manual, and can be modified and applied to almost any geographical or historical context.</p>
-<h2>Lesson Structure</h2>
+</div>
+      <div n="2"><head>Lesson Structure</head>
 <p>This lesson is divided into two main sections:</p>
 <ul>
 <li>Part 1: <hi rend="bold">Joining tables</hi>, which is a simple way of mapping simple summary data such as totals or averages</li>
 <li>Part 2: <hi rend="bold">Geocoding full datasets</hi>, which maps each item of data to a location, allowing much more flexibility, detailed spatial analysis, and more interesting maps</li>
 </ul>
 <p>At the end of the tutorial there is a note on using automated geocoding tools which are available to work with modern addresses, but these are of limited relevance to historians working on eras before the late nineteenth or twentieth centuries.</p>
-<h2>Getting Started</h2>
+</div>
+      <div n="2"><head>Getting Started</head>
 <p>This tutorial assumes that you have installed QGIS version 2 or newer and have followed the <emph>Programming Historian</emph> tutorial <link target="/lessons/qgis-layers">Installing QGIS 2.0 and Adding Layers</link> by Jim Clifford, Josh MacFadyen and Daniel Macfarlane. Or, at least that you are familiar with the process of adding vector layers in QGIS.</p>
 <p>This tutorial was prepared using QGIS 2.14 'Essen' on Mac OS X 10.11. Menus, windows, and options might appear slightly different on different platforms or versions, but it should not be difficult to translate any differences. At a few points in the tutorial reference is made to how these techniques could be applied using <link target="https://www.arcgis.com/features/index.html">ArcGIS</link>, which is the industry standard commercial GIS application, and is widely available at universities, but is not always superior to QGIS.</p>
 <p>You will also need to use a relational database such as Microsoft Access or <link target="https://www.libreoffice.org/get-help/install-howto/">LibreOffice Base</link>, or alternatively be very proficient with spreadsheets. The instructions in the tutorial are designed for use with LibreOffice Base, which is a free download as part of the <link target="https://www.libreoffice.org/get-help/install-howto/">LibreOffice</link> suite.</p>
@@ -58,7 +62,7 @@
 <li><link target="/assets/geocoding-qgis/The_Dataset-Alum-Oxon-Jas1-Placenames.csv">The_Dataset-Alum-Oxon-Jas1-Placenames.csv</link></li>
 <li><link target="/assets/geocoding-qgis/AlumniCounties.csv">AlumniCounties.csv</link></li>
 </ul>
-<div n="2"><head>Part 1: Joining Tables and Maps</head>
+<h2>Part 1: Joining Tables and Maps</h2>
 <p>The simplest way to map historical data is to 'join' (connect) a table of data containing place names to a layer of map features with the same names. This technique is commonly used by historians to create a map depicting a set of descriptive statistics for a set of data, for instance the number of individuals within a group originating from each county, or the proportion of inhabitants of each county working in a certain industry.</p>
 <p>However, joining tables to features in GIS only works on a one-to-one basis (or at least only one-to-one relationships can be used to define the appearance of the map). This means that each map feature can only have one value associated with each of its attributes. You can say there are 50 students from the county Essex in your data, and thus link that to the Essex polygon feature in your shapefile (Table 1). But you cannot store the data as 50 rows, each of which represents a single student that points to the Essex feature in your shapefile (Table 2). One shapefile feature, one value. For this reason, joins are best suited to representing the results of analysis completed in a spreadsheet or database (eg, when you have already calculated the sum of people from a particular area - or whatever value you want to map).</p>
 <p><emph>Table 1: This table would work for 'joins', as each shapefile has a calculated value.</emph></p>
@@ -137,14 +141,14 @@
 <p>You may wish to experiment with the Expression Builder (accessed via the &#8721; symbol next to <code type="inline">Column</code> in <code type="inline">Properties&gt;Style</code>) to normalise these values using other columns and values that are available to you. Ideally we might normalise by population, but in the absence of this data, you might experiment by using the <code type="inline">$area</code> property, which is intrinsic to polygon shape layers in GIS. The very simple expression needed to create a map colour ramp on this would be (note that the field name contains spaces, so needs to be contained within double quotation marks):</p>
 <pre><code class="language-text" xml:id="code_geocoding-qgis_0" type="block" corresp="code_geocoding-qgis_0.txt"></code></pre>
 <p>When you alter any of these settings within the graduated style page you will need to click <code type="inline">Classify</code> again to reassign colours to the numerical ranges in your data. If you don&#8217;t reclassify, you might find that the layer becomes invisible on your map.</p>
-</div></div><div n="2"><head>Part 2: Geocoding Historical Data</head>
+<h2>Part 2: Geocoding Historical Data</h2>
 <p>Geocoding is a much more powerful technique than simple table joins because each and every line of your data remains visible and able to be analysed within the GIS software as an individual point on the map (as in table 2). Fundamentally the aim is to join each item of data to a pair of coordinates. Most historical data cannot be geocoded automatically using online tools or QGIS plugins. The geocoding process must therefore be carried out manually to match each data row with a location. This is a simple database operation joining (matching) your data with a gazetteer (a list of places with coordinates). Many gazetteers are available, but relatively few are suitable for use with historical data, for example, for England:</p>
 <ul>
 <li><link target="http://www.gazetteer.org.uk/index.php">Association of British Counties Gazetteer</link> (data available to purchase)</li>
 <li><link target="http://web.archive.org/web/20180320174206/http://www.placenames.org.uk/">The Historical Gazetteer of England's Place Names</link> allows you to geocode individual locations online only, unfortunately the API service for accessing this data for use in automated geocoding, known as DEEP, part of Unlock, has now (late 2016) been withdrawn. A better browsing interface is available for those with UK Higher Education logins at the <link target="https://epns.nottingham.ac.uk/browse">Survey of English Place-Names</link></li>
 </ul>
 <p>If no gazetteer exists for the area or period that you are studying, you can make your own relatively simply from a vector map by creating a point layer containing the information that you require within QGIS (potentially by combining information from other existing layers) and exporting that complete with XY coordinates. For some parts of the world there are neither historical gazetters, nor vector maps suitable for historical periods, in these cases you will have to investigate creating your own vector and point layer; see the tutorial <link target="/lessons/vector-layers-qgis">Creating New Vector Layers in QGIS 2.0</link>.</p>
-<div n="3"><head>Tutorial: Creating a Custom Gazetteer and Geocoding in Relational Database</head>
+</div><div n="3"><head>Tutorial: Creating a Custom Gazetteer and Geocoding in Relational Database</head>
 <p>If you have completed the first part, you can carry on and follow the steps below in the same project. If you did not, or you want to start a new clean project, follow the instructions from the first section to:</p>
 <ul>
 <li>Set up a new Project file in QGIS, and set the Coordinate Reference System to <code type="inline">OSGB 1936/the British National Grid</code> with the authority ID <code type="inline">ESPG:27700</code> as a projected coordinate system using <code type="inline">Project&gt;Project Properties&gt;CRS</code></li>
@@ -228,7 +232,7 @@
 <p>While relational database queries are very powerful tools for doing customised geocoding, by allowing you to match multiple criteria simultaneously, they can also present misleading results if not checked carefully. Any data that is not matched will usually be ignored 'silently' (i.e. you will not see an error message), so it is important to check whether the total number of lines in your results matches that in your original data.</p>
 <p>If there are too few results, this means some values cannot be matched. In this table, for example, <code type="inline">Place of origin</code> includes values such as 'London' and 'Germany', which do not match any of the places in the gazetteer that we created. You could either conclude that the lower number of results is acceptable, or try to correct it by either altering places of origin, or adding locations to your gazetteer manually. Changing the properties of the join between the two tables from <code type="inline">Inner Join</code> to <code type="inline">Right Join</code> will ensure that ALL records from the alumni table are returned, whether or not there is matching data from the gazetteer <code type="inline">counties</code> table (presuming that the alumni table is on the right). This is a very useful diagnostic step.</p>
 <p>If there are too many results, then each row in one table is matching multiple rows in the other. This is actually quite common with gazetteers, as there are likely to be duplicate points with the same, or very similar, place names in many datasets. This is especially true of very high resolution gazetteers which might have many neighbourhoods within a town individually located, but it is the 'town' column that you might want to match against. To guard against stray duplicates like this, you can use database functions to ensure only a single result is returned from your gazetteer. If you encounter this problem you should first create a query which uses the <code type="inline">minimum</code> or <code type="inline">maximum</code> functions (called sum functions in Access) on the ID field of your gazetteer, together with the <code type="inline">group by</code> function on the name field of your gazetteer, to isolate only a single occurence of each place name. You can then treat this as a subquery and add it to your existing query and join the now unique ID field to the existing gazetteer field using an <code type="inline">Inner Join</code> to ensure only one occurrence of each place name is matched.</p>
-</div></div><div n="2"><head>Postscript: Geocoding Modern Addresses</head>
+<h2>Postscript: Geocoding Modern Addresses</h2>
 <p>If you have data which contains present-day addresses (such as postal addresses using contemporary street names, post or ZIP codes, or higher-level descriptions such as town or county names that follow modern conventions) then geocoding is very easy, using online tools or tools that use online <link target="https://en.wikipedia.org/wiki/Application_programming_interface">APIs</link>. Remember that online geocoding is unlikely to work if any of these elements of an address are not consistent with the present day.</p>
 <p>Major online mapping providers such as Google, Bing, and OpenStreetMap all offer API (Application Programming Interface) connections to their highly sophisticated geocoding tools. These are the same tools that power the map search features of these websites, so are very effective at making 'best guess' decisions on ambiguous or incomplete addresses. It is worth noting that when accessed via an API, rather than their normal website, it will be necessary to provide country names as part of the address.</p>
 <ul>
@@ -241,6 +245,7 @@
 <li>The <code type="inline">GeoCode CSV using Google Maps / Open Street Map</code> dialog allows you to load a data table from a CSV file and specify the columns that contain (street) address, city, state and country. These are then processed using the selected online service. Successful results are created as points in a new layer (in the specified shapefile). Rows from the table that are not matched are listed in a new CSV file that is also created.</li>
 </ul>
 <figure><desc>Figure 9: The 'Web Service Geocode' dialog from the MMQGIS plugin</desc><graphic url="QGISFigure8.png"/></figure>
-</div></div></body>
+</div></div></div>
+    </body>
   </text>
 </TEI>

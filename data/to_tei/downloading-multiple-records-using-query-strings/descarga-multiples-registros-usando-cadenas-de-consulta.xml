@@ -26,13 +26,13 @@
 </metadata>
   <text>
     <body>
-      <div n="1"><head>Objetivos del m&#243;dulo</head>
+      <div n="2"><head>Objetivos del m&#243;dulo</head>
 <p>Descargar un solo registro de un sitio web es f&#225;cil, aunque la descarga de muchos registros a la vez &#8212;una necesidad cada vez m&#225;s frecuente para personas de humanidades&#8212; es mucho m&#225;s eficiente si se utiliza un lenguaje de programaci&#243;n como Python.
 En esta lecci&#243;n escribiremos un programa para descargar una serie de registros del <link target="https://www.oldbaileyonline.org/">Old Bailey Online</link> (<emph>OBO</emph>) utilizando criterios de b&#250;squeda personalizados y luego guardarlos en un directorio de nuestro computador.<ref type="footnotemark" target="#1"/>
 Este proceso conlleva la interpretaci&#243;n y manipulaci&#243;n de <emph>cadenas de consulta</emph> (<emph>query strings</emph>, en ingl&#233;s) en la URL.
 En este caso, el programa tratar&#225; de descargar fuentes que contengan referencias a personas de ascendencia africana, publicadas en el <emph>Old Bailey Proceedings</emph> entre 1700 y 1750.</p>
 </div>
-      <div n="1"><head>&#191;Para qui&#233;n es &#250;til esto?</head>
+      <div n="2"><head>&#191;Para qui&#233;n es &#250;til esto?</head>
 <p>Automatizar el proceso de descarga de registros de una base de datos en l&#237;nea ser&#225; &#250;til para cualquier persona que trabaje con fuentes hist&#243;ricas almacenadas en l&#237;nea de manera ordenada y accesible, y que desea guardar copias de esas fuentes en su propio computador.
 Es particularmente &#250;til para quien quiera descargar muchos registros espec&#237;ficos, en lugar de solo unos cuantos.
 Si deseas descargar <emph>todos</emph> o <emph>la mayor&#237;a</emph> de los registros de una base de datos determinada, el tutorial de Ian Milligan sobre <link target="/es/lecciones/descarga-automatizada-con-wget">Descarga automatizada con Wget</link> puede ser m&#225;s adecuado.</p>
@@ -44,7 +44,7 @@ O quiz&#225; solo desees guardar una copia de seguridad para acceder a ellos cua
 <p>Esta lecci&#243;n est&#225; dirigida a usuarios intermedios de Python.
 Si a&#250;n no has revisado las lecciones de <link target="/es/lecciones/introduccion-e-instalacion">Programaci&#243;n b&#225;sica en Python</link>, puedes encontrar en ellas un punto de partida &#250;til.</p>
 </div>
-      <div n="1"><head>C&#243;mo aplicar nuestro conocimiento hist&#243;rico</head>
+      <div n="2"><head>C&#243;mo aplicar nuestro conocimiento hist&#243;rico</head>
 <p>En esta lecci&#243;n crearemos nuestro propio corpus de casos relacionados con personas de ascendencia africana.
 A partir del <link target="https://www.oldbaileyonline.org/browse.jsp?id=t17800628-33&amp;div=t17800628-33">caso de Benjamin Bowsey</link> en el <emph>OBO</emph> en 1780, notamos que la voz "<emph>black</emph>"<ref type="footnotemark" target="#2"/> es una palabra clave &#250;til para localizar otros casos que involucren a acusados de ascendencia africana.
 Sin embargo, cuando buscamos "<emph>black</emph>" en el sitio web del <emph>OBO</emph>, encontramos que a menudo se refiere a otros usos de la palabra: caballos negros, tela negra, etc.
@@ -61,7 +61,7 @@ Si intentamos buscar por separado estos dos t&#233;rminos en el sitio web del <e
 Queremos tener todos estos registros en nuestro computador para usarlos en nuestro an&#225;lisis as&#237; que podr&#237;amos descargarlos manualmente uno por uno.
 Pero encontremos una manera program&#225;tica de automatizar esta tarea.</p>
 </div>
-      <div n="1"><head>La b&#250;squeda avanzada en el <emph>OBO</emph></head>
+      <div n="2"><head>La b&#250;squeda avanzada en el <emph>OBO</emph></head>
 <p>Las caracter&#237;sticas de b&#250;squeda de cada sitio web funcionan de manera diferente.
 Si bien las b&#250;squedas funcionan de manera similar, la complejidad en la que est&#225;n estructuradas las b&#250;squedas en bases de datos pueden no ser del todo obvias.
 Por lo tanto, es importante pensar cr&#237;ticamente sobre las opciones de b&#250;squeda en la base de datos y leer la documentaci&#243;n proporcionada en el sitio web, cuando esta est&#233; disponible.
@@ -82,7 +82,7 @@ Sin embargo, a medida queb m&#225;s datos est&#225;n disponibles en l&#237;nea, 
 La descarga de registros individuales resulta poco pr&#225;ctica y saber c&#243;mo automatizar el proceso es una herramienta muy valiosa.
 Para automatizar el proceso de descarga debemos retroceder y aprender c&#243;mo se crean las URLs de b&#250;squeda en el sitio web del <emph>OBO</emph>, un m&#233;todo com&#250;n en muchas bases de datos y sitios web en l&#237;nea.</p>
 </div>
-      <div n="1"><head>Comprender las consultas en URLs</head>
+      <div n="2"><head>Comprender las consultas en URLs</head>
 <p>Echa un vistazo a la URL producida con la &#250;ltima p&#225;gina de resultados de b&#250;squeda. Debe tener un aspecto como este:</p>
 <pre><code class="language-xml" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_0" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_0.txt"></code></pre>
 <p>Ya hemos estudiado las URLs en la lecci&#243;n <link target="/es/lecciones/ver-archivos-html">Para entender p&#225;ginas web y HTML</link>
@@ -124,7 +124,7 @@ pues ello facilitar&#225; su procesamiento;
 pero la aplicaci&#243;n web del <emph>OBO</emph> despliega los resultados en p&#225;ginas de 10 registros cada una.</p>
 <p>Ahora aprovecharemos este conocimiento para crear una serie de URLs que nos permitir&#225; descargar los 13 archivos.</p>
 </div>
-      <div n="1"><head>Descarga sistem&#225;tica de archivos</head>
+      <div n="2"><head>Descarga sistem&#225;tica de archivos</head>
 <p>En <link target="/es/lecciones/trabajar-con-paginas-web">Descargar p&#225;ginas web con Python</link> aprendimos que Python puede descargar una p&#225;gina web siempre que tengamos la URL.
 En dicha lecci&#243;n usamos la URL para descargar la <link target="https://www.oldbaileyonline.org/browse.jsp?id=t17800628-33&amp;div=t17800628-33">transcripci&#243;n del proceso de Benjamin Bowsey</link>.
 En la presente lecci&#243;n estamos intentando descargar varias transcripciones de procesos judiciales que cumplan con los criterios de b&#250;squeda que describimos anteriormente, sin tener que volver a ejecutar el programa repetidamente.
@@ -148,7 +148,7 @@ Necesitaremos:</p>
 <p>Recordar&#225;s que esto es bastante similar a las tareas que realizamos en <link target="/es/lecciones/trabajar-con-paginas-web">Descargar p&#225;ginas web con Python</link> y <link target="/es/lecciones/de-html-a-lista-de-palabras-2">De HTML a lista de palabras (parte 2)</link>.
 Primero descargamos y luego analizamos la informaci&#243;n que buscamos;
 y, en el presente caso, descargamos un poco m&#225;s.</p>
-<div n="2"><head>Descargar las p&#225;ginas de resultados de consulta</head>
+<div n="3"><head>Descargar las p&#225;ginas de resultados de consulta</head>
 <p>Primero necesitamos generar las URLs para descargar cada p&#225;gina de resultados de consulta.
 Ya tenemos el primero utilizando el formulario en el sitio web:</p>
 <pre><code class="language-xml" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_2" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_2.txt"></code></pre>
@@ -286,7 +286,7 @@ Arriba en <code type="inline">obo.py</code> la importaremos as&#237;:</p>
 <pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_19" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_19.txt"></code></pre>
 <p>Ejecuta el programa <code type="inline">descarga_consultas.py</code> una vez m&#225;s para asegurarte de que funcione
 y entiendas c&#243;mo guardar archivos en un directorio particular usando Python.</p>
-</div><div n="2"><head>Descargar las entradas individuales de los procesos judiciales</head>
+</div><div n="3"><head>Descargar las entradas individuales de los procesos judiciales</head>
 <p>A estas alturas hemos creado una funci&#243;n capaz de descargar todos los archivos HTML con los resultados de consulta del sitio web del <emph>OBO</emph>, para realizar la b&#250;squeda avanzada que hemos definido.
 Todo esto lo hemos hecho usando Python.
 Para el siguiente paso del algoritmo, debemos extraer las URLs de cada proceso judicial de los archivos HTML.
@@ -405,7 +405,7 @@ Hemos a&#241;adido tambi&#233;n un par de <code type="inline">print</code>s para
 <pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_35" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_35.txt"></code></pre>
 <p>Has creado un programa que puede solicitar y descargar archivos del sitio web del <emph>OBO</emph>,
 seg&#250;n los par&#225;metros de b&#250;squeda que definiste, &#161;todo sin visitar manualmente el sitio!</p>
-</div><div n="2"><head>Si los archivos no se descargan</head>
+</div><div n="3"><head>Si los archivos no se descargan</head>
 <p>Comprueba que los 13 archivos se hayan descargado correctamente.
 &#193;brelos en tu navegador web y verifica que est&#233;n bien.
 Si es as&#237;, &#161;genial!
@@ -450,13 +450,13 @@ Pero si tienes esp&#237;ritu de aventura puedes modificar el programa para desca
 <p>El archivo <code type="inline">obo.py</code> terminado deber&#225; verse como esto:</p>
 <pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_38" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_38.txt"></code></pre>
 </div></div>
-      <div n="1"><head>Pr&#243;ximos pasos: usar una interfaz de programaci&#243;n de aplicaciones (API)</head>
+      <div n="2"><head>Pr&#243;ximos pasos: usar una interfaz de programaci&#243;n de aplicaciones (API)</head>
 <p>Para usuarias/os m&#225;s avanzadas/os, o para adquirir m&#225;s destreza, vale la pena leer acerca de c&#243;mo lograr este mismo proceso utilizando las <link target="https://es.wikipedia.org/wiki/Interfaz_de_programaci%C3%B3n_de_aplicaciones">interfaces de programaci&#243;n de aplicaciones (API)</link>.
 Un sitio web con una API generalmente proporcionar&#225; instrucciones sobre c&#243;mo solicitar ciertos documentos.
 Es un proceso muy similar al que acabamos de hacer interpretando las cadenas de consulta de URL, pero sin el trabajo adicional de detective que hicimos para descifrar el comportamiento de cada variable.
 Si tienes inter&#233;s en el <emph>OBO</emph>, el sitio cuenta con <link target="https://www.oldbaileyonline.org/static/DocAPI.jsp">una buena API y su documentaci&#243;n es muy &#250;til</link>.</p>
 </div>
-      <div n="1"><head>Notas</head>
+      <div n="2"><head>Notas</head>
 <p><note id="1"> El <link target="https://es.wikipedia.org/wiki/Old_Bailey">Tribunal Penal Central de Inglaterra y Gales</link> es conocido tambi&#233;n como el <emph>OBO</emph>, por la calle en la que est&#225; ubicada en Londres. El sitio web del <link target="https://www.oldbaileyonline.org"><emph>OBO</emph></link> contiene los registros judiciales de dicho tribunal desde 1674 hasta* 1913. (N. de T.)</note></p>
 <p><note id="2"> Hemos dejado los t&#233;rminos de b&#250;squeda en ingl&#233;s, ya que son los que arrojan resultados en la p&#225;gina web de <emph>Old Bailey Online</emph>. (N. de T.)</note></p>
 <p><note id="3"> El eufemismo "n-word" se refiere a una de las palabras m&#225;s ofensivas que existe en lengua inglesa para designar a los afrodescendientes. Puede verse una explicaci&#243;n [aqu&#237;]<link target="https://www.wordreference.com/es/translation.asp?tranword=nigger">aqu&#237;</link>. (N. de T.)</note></p>

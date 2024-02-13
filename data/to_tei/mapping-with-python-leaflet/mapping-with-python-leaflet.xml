@@ -17,15 +17,15 @@
 </metadata>
   <text>
     <body>
-      <div n="1"><head>Lesson Goals</head>
+      <div n="2"><head>Lesson Goals</head>
 <p>In this lesson, you will learn how to create a web map based on that data.  By the end of this lesson, you will be able to:</p>
 <ul>
 <li>Manipulate tabular data programmatically to extract geonames and create location-based data</li>
 <li>Convert tabular data into a meaningful geographic data structure</li>
 <li>Understand and apply the basic concepts of web mapping to design your own web map</li>
 </ul>
-<div n="2"><head>Getting Started</head>
-<div n="3"><head>Initial Setup</head>
+<div n="3"><head>Getting Started</head>
+<div n="4"><head>Initial Setup</head>
 <p>This lesson uses:</p>
 <ul>
 <li><link target="/lessons/?topic=python">python</link> (<link target="http://pip.readthedocs.org/en/stable/">pip</link>, <link target="https://github.com/geopy/geopy">geopy</link>, <link target="http://pandas.pydata.org/pandas-docs/stable/dsintro.html#dataframe">pandas</link>)</li>
@@ -41,13 +41,13 @@
 If you are using a code editor such as Sublime Text, to import the folder you could drag and drop the folder that you want to work from into your editor window. Once you've done that, the directory will appear on the left hand sidebar as you root folder. If you click on your folder, you'll be able to see the contents of your folder. Importing a folder allows you to easily work with the files in your project. If you need to work with multiple files and directories in directories, this will make it easier to search through these files, switch between them while you're working and keep you organized.</li>
 <li>(Optional) It is recommended to use a <link target="http://docs.python-guide.org/en/latest/dev/virtualenvs/">Python virtual environment</link> to store the dependencies and versions required for your specific project.</li>
 </ol>
-</div><div n="3"><head>Getting Data: Download the CSV</head>
+</div><div n="4"><head>Getting Data: Download the CSV</head>
 <p>We're going to start with a plain comma-separated values (CSV) data file and create a web map from it.</p>
 <p><link target="/assets/mapping-with-python-leaflet/census.csv">The data file can be downloaded here</link>. You can grab this by either opening the link in your browser and saving the page, or you can use the curl command from your command line:</p>
 <p><code type="inline">curl -O https://programminghistorian.org/assets/mapping-with-python-leaflet/census.csv</code></p>
 <p>The original source of this data is from the <link target="http://data.london.gov.uk/dataset/historic-census-population">Greater London Authority London Datastore</link>.</p>
-</div></div><div n="2"><head>Geocoding with Python</head>
-<div n="3"><head>Geocode the placenames in the CSV using Geopy, Pandas</head>
+</div></div><div n="3"><head>Geocoding with Python</head>
+<div n="4"><head>Geocode the placenames in the CSV using Geopy, Pandas</head>
 <p>Now that we have data, we will use this as our source to make a web map. Web maps typically represent locations and features from geographic data formats such as geoJSON and KML. Every location in a geographic data file can be considered to have geometry (such as points, lines, polygons) as well as additional properties. Web maps typically understand locations as a series of coordinates. For example, 43.6426,-79.3871 would represent the exact coordinates of the <link target="https://en.wikipedia.org/wiki/CN_Tower">CN Tower in Toronto</link>.</p>
 <p>In our data file, we have a list of placenames in our CSV data (the Area Name column), but no coordinates. What we want to do then is to somehow generate coordinates from these locations. This process is called geocoding.</p>
 <p>So here is our first problem to solve:  how can we geocode placenames? How could we take an entry such as "CN Tower" and add the coordinates 43.6426,-79.3871 to it automatically?</p>
@@ -127,15 +127,15 @@ If you run geocoder.py too many times you might get a timeout error.</emph></p>
 <p><code type="inline">geopy.exc.GeocoderTimedOut: Service timed out</code></p>
 <p>To address the timeout error, you could add the parameter <code type="inline">timeout</code>, which specifies the time, in seconds, to wait for the geocoding service to respond before raising a geopy.exc.GeocoderTimedOut exception. So your geolocator declaration will look like this:</p>
 <p><code type="inline">geolocator = Nominatim(user_agent="email@email.com", timeout=5)</code></p>
-</div></div><div n="2"><head>Transforming Data with Python</head>
-<div n="3"><head>Making GeoJSON</head>
+</div></div><div n="3"><head>Transforming Data with Python</head>
+<div n="4"><head>Making GeoJSON</head>
 <p>Now that you have a spreadsheet full of coordinate data, we can convert the CSV spreadsheet into a format that web maps like, like GeoJSON.  GeoJSON is a web mapping standard of JSON data.  There are a couple of ways to make GeoJSON:</p>
 <p>The easiest, recommended way is to use a UI tool developed by Mapbox called <link target="http://geojson.io">geojson.io</link>.  All you have to do is click and drag your csv file into the data window (the right side of the screen, next to the map), and it will automatically format your data into GeoJSON for you. You can select the 'GeoJSON' option under 'Save.'  Save your GeoJSON file as <code type="inline">census.geojson</code>.</p>
 <figure><desc>Drag and Drop GeoJSON creation!</desc><graphic url="webmap-01-geojsonio.gif"/></figure>
 <p>Image Credit: with permission from Mauricio Giraldo Arteaga, NYPL Labs</p>
 <p>You can also do it from the command line, using the <link target="https://github.com/mapbox/csv2geojson">csv2geojson library</link> that powers geojson.io.</p>
 <p>Test this data out by importing it again into geojson.io.  You should see points generated in the preview window.  That's your data!</p>
-</div><div n="3"><head>You finally have GeoJSON... but you need to do some cleaning!</head>
+</div><div n="4"><head>You finally have GeoJSON... but you need to do some cleaning!</head>
 <p>If you've tested your GeoJSON data, you might notice that not every point is geolocated correctly.  We know that every Area_Name is a borough of London, but points appear all over United Kingdom, and some aren't located even in the country.</p>
 <p>To make the results more accurate, save another copy of the census-historic-population-borough.csv file, calling it census_country.csv and include an additional column called 'Country' and put 'United Kingdom' in every row of your data. For even greater accuracy add 'City' and put 'London' in every row of your data to provide additional context for your data.</p>
 <figure><desc>A new Country column</desc><graphic url="webmap-02-countrycolumn.png"/></figure>
@@ -151,8 +151,8 @@ If you run geocoder.py too many times you might get a timeout error.</emph></p>
 <p>Which you can now run by using the command:</p>
 <pre><code xml:id="code_mapping-with-python-leaflet_15" type="block" corresp="code_mapping-with-python-leaflet_15.txt"></code></pre>
 <p>Turn your clean data into GeoJSON by saving it as <code type="inline">census.geojson</code> and test it out at <link target="http://geojson.io">geojson.io</link>. Remember, drag the new CSV you created (<code type="inline">census_country.csv</code> into the window to create that beautiful JSON). Do the results look better now? Good!</p>
-</div></div><div n="2"><head>Using Leaflet to Create a Web Map</head>
-<div n="3"><head>I now have clean GeoJSON data.  Lets make a map!</head>
+</div></div><div n="3"><head>Using Leaflet to Create a Web Map</head>
+<div n="4"><head>I now have clean GeoJSON data.  Lets make a map!</head>
 <p>Setup a test web server to test out our maps. A web server is used to serve content from your directory to your browser.</p>
 <p>If you're in your working directory, from the command line, run:</p>
 <p><code type="inline">python -m SimpleHTTPServer</code> or <code type="inline">python3 -m http.server</code> (for Python3)</p>
@@ -162,7 +162,7 @@ If you run geocoder.py too many times you might get a timeout error.</emph></p>
 <p>Now in your text editor open a new document and save it as an html file (mymap.html).  If you want to do a quick test, copy and paste the text below, refresh your http://localhost:8080 and open the html file in your browser.</p>
 <pre><code class="language-html" xml:id="code_mapping-with-python-leaflet_16" type="block" corresp="code_mapping-with-python-leaflet_16.txt"></code></pre>
 <p>Do you see a map now?  Good! If not, you can troubleshoot by inspecting the browser, or by going back and retracing your steps.</p>
-</div><div n="3"><head>What did I just make?</head>
+</div><div n="4"><head>What did I just make?</head>
 <p>You made a web map!  Web maps use map tiles, which are pixel based images (rasters) of maps that contain geographical data. This means that each pixel of a map tile has been georeferenced, or assigned a coordinate based on the location that they represent.  When you zoom in and out of a web map, you are getting a whole new set of tiles to display at each zoom level. GeoJSON (which you are now familiar with) is a widely used data standard for web mapping.  In our example, we are using an open-source Javascript library called <link target="https://leafletjs.com/reference.html">Leaflet</link> to help us build our web map. The benefits of using an open-source library such as Leaflet is the flexibility you get and with developing and customizing your map, without worry of the technology being deprecated or no longer supported that is beyond your control.  With frameworks like Leaflet or Google Maps Javascript API, you're not building a map completely from scratch, rather, you're using pre-written functions and controls that helps you customize your own map in code.</p>
 <p>Lets go through what each part of the code is doing. But first, it's best practice to maintain your html, css, js in different files so that the web map's content, presentation and behaviour layers are kept separate (though it's not always possible). This adds a bit more structure to your code, making it easier for you and others to understand. It will be easier to focus on certain parts of the code when you're going back and making changes. So here is our code split into three files:</p>
 <p>mymap.html</p>
@@ -172,17 +172,17 @@ If you run geocoder.py too many times you might get a timeout error.</emph></p>
 <p>leafletmap.js</p>
 <pre><code class="language-javascript" xml:id="code_mapping-with-python-leaflet_19" type="block" corresp="code_mapping-with-python-leaflet_19.txt"></code></pre>
 <p>Seems a bit easier to undestand now, doesn't it? Now lets look at what the html file is doing.</p>
-<div n="4"><head>mymap.html walkthrough</head>
+<div n="5"><head>mymap.html walkthrough</head>
 <p>mymap.html</p>
 <pre><code class="language-html" xml:id="code_mapping-with-python-leaflet_20" type="block" corresp="code_mapping-with-python-leaflet_20.txt"></code></pre>
 <p>The above code is the first section, or header of your html document. We are linking to the external javascript library and css stylesheets provided by leaflet.  We're also linking to our own stylesheet, style.css.</p>
 <pre><code class="language-html" xml:id="code_mapping-with-python-leaflet_21" type="block" corresp="code_mapping-with-python-leaflet_21.txt"></code></pre>
 <p>Next, we're declaring the body and where you want the map to go on your page. We're also linking to our own javascript file, leafletmap.js.</p>
-</div><div n="4"><head>style.css walkthrough</head>
+</div><div n="5"><head>style.css walkthrough</head>
 <p>style.css</p>
 <pre><code class="language-css" xml:id="code_mapping-with-python-leaflet_22" type="block" corresp="code_mapping-with-python-leaflet_22.txt"></code></pre>
 <p>There's a bit of CSS styling here to specify the size of your map. Some optional styling will happen in your javascript file if you're using the Leaflet library.</p>
-</div><div n="4"><head>leafletmap.js walkthrough</head>
+</div><div n="5"><head>leafletmap.js walkthrough</head>
 <p>leafletmap.js</p>
 <pre><code class="language-javascript" xml:id="code_mapping-with-python-leaflet_23" type="block" corresp="code_mapping-with-python-leaflet_23.txt"></code></pre>
 <p>The javascript file is what provides the behaviour, or functionality of our web map. It's what makes our web map come alive! In the code above, we're telling the javascript to load when the browser loads. We're creating our first map layer, which is your basemap.  The basemap is the tiles provided by OpenStreetMap that provides places and streetnames found on maps.</p>
@@ -192,23 +192,23 @@ If you run geocoder.py too many times you might get a timeout error.</emph></p>
 <p>Now we're creating the view for our map.  The boundary for our map will be based on the range of our data points in <code type="inline">census.geojson</code>.  You can also manually set your your viewport by using the <link target="https://leafletjs.com/reference.html#map-set-methods">setView property</link>. For example, if you're using <code type="inline">.setView([0.0,-10.0], 2)</code> , the viewport coordinates '[0.0,-10.0], 2' means that you're setting the centre of the map to be 0.0, -10.0 and at a zoom level of 2.</p>
 <figure><desc>My Web Map</desc><graphic url="webmap-03-result.jpg"/></figure>
 <p>Finally, the map layers you created will be added to your map. Put it all together and hurrah, you've got your web map!  Now lets play around with it. The following five exercises give you tasks to do to learn some of the other elements, with answers provided.</p>
-</div></div><div n="3"><head>Exercise 1: Default Viewports</head>
+</div></div><div n="4"><head>Exercise 1: Default Viewports</head>
 <p>Let's change the map to use a viewport to 51.505 latitude, -0.09 longitude with a zoom level 9. To do this, we just need to edit one file: <code type="inline">leafletmap.js</code>.</p>
 <pre><code class="language-javascript" xml:id="code_mapping-with-python-leaflet_26" type="block" corresp="code_mapping-with-python-leaflet_26.txt"></code></pre>
 <p>What we've done there is changed the <code type="inline">.fitBounds</code> to <code type="inline">.setView</code>, with the various options mentioned above. Try reloading the file, and you'll see it loads to the correct place.</p>
 <figure><desc>Exercise 01</desc><graphic url="webmap-05-exercise01.jpg"/></figure>
-</div><div n="3"><head>Exercise 2: Marker Properties</head>
+</div><div n="4"><head>Exercise 2: Marker Properties</head>
 <p>Now let's add the 2001, 1981 and 1991 population property to each marker popup. You can use HTML to style your popup window. To do so, we again need to edit the javascript.</p>
 <pre><code class="language-javascript" xml:id="code_mapping-with-python-leaflet_27" type="block" corresp="code_mapping-with-python-leaflet_27.txt"></code></pre>
 <p>What we've done here is edit the <link target="http://leafletjs.com/SlavaUkraini/reference-1.2.0.html#geojson-oneachfeature">onEachFeature function</link>, which gets called for each feature (in this case, each marker popup) to add additional information about each marker contained in our <code type="inline">census.geojson</code> data. To add attribute information from our <code type="inline">census.geojson</code> file, we use the convention <code type="inline">feature.properties.ATTRIBUTE_NAME</code> to access the population data. In this case, we are adding <code type="inline">feature.properties.Pop_2001</code>, <code type="inline">feature.properties.Pop_1981</code>, and <code type="inline">feature.properties.Pop_1801</code>, and adding a bit of styling with html for readability.</p>
 <figure><desc>Exercise 02</desc><graphic url="webmap-06-exercise02.jpg"/></figure>
-</div><div n="3"><head>Exercise 3: Change Data Source</head>
+</div><div n="4"><head>Exercise 3: Change Data Source</head>
 <p>Change the data source to a different dataset, as an example you can use the <link target="/assets/mapping-with-python-leaflet/exercises/exercise03/stations.geojson">stations.geojson</link> file.</p>
 <p>To do this, we need to edit the javascript file.</p>
 <pre><code class="language-javascript" xml:id="code_mapping-with-python-leaflet_28" type="block" corresp="code_mapping-with-python-leaflet_28.txt"></code></pre>
 <p>Since we're loading a new dataset, we need a new view for our map. First, we've replaced <code type="inline">census.geojson</code> with <code type="inline">stations.geojson</code> to our $getJSON request. Next, we add the attribute information found in our <code type="inline">stations.geojson</code> file, including the name (<code type="inline">feature.properties.name</code>) and line (<code type="inline">features.properties.line</code>). Finally, we are using the <code type="inline">.fitBounds</code> function so that the viewport automatically centers on our new set of data points.</p>
 <figure><desc>Exercise 03</desc><graphic url="webmap-07-exercise03.jpg"/></figure>
-</div><div n="3"><head>Exercise 4: Custom Basemap</head>
+</div><div n="4"><head>Exercise 4: Custom Basemap</head>
 <p>Change your data source back to <code type="inline">census.geojson</code>. Change your basemap layer to a mapbox tileset.  You need to get a Mapbox account, create a map or style and get your Mapbox API access token.</p>
 <figure><desc>Mapbox API</desc><graphic url="webmap-04-mapboxAPI.png"/></figure>
 <p>First, you will need to add a reference to the mapbox javascript and css libraries:</p>
@@ -217,14 +217,14 @@ If you run geocoder.py too many times you might get a timeout error.</emph></p>
 <pre><code class="language-javascript" xml:id="code_mapping-with-python-leaflet_30" type="block" corresp="code_mapping-with-python-leaflet_30.txt"></code></pre>
 <p>In the javascript file, we've added our mapbox token in order to access the mapbox API that allows us to access the mapbox basemap that we want to use. Your final result (with your own basemap of choice) should look something like this:</p>
 <figure><desc>Exercise 04</desc><graphic url="webmap-08-exercise04.jpg"/></figure>
-</div><div n="3"><head>Exercise 5: Custom Marker Icon</head>
+</div><div n="4"><head>Exercise 5: Custom Marker Icon</head>
 <p>Add a custom leaf icon, as an example you can use <link target="/assets/mapping-with-python-leaflet/exercises/exercise05/leaf.png">leaf.png</link>. Or use your own!</p>
 <p>In this exercise, we only need to edit the javascript file:</p>
 <pre><code class="language-javascript" xml:id="code_mapping-with-python-leaflet_31" type="block" corresp="code_mapping-with-python-leaflet_31.txt"></code></pre>
 <p>Marker icons are defined in leaflet using the <code type="inline">L.icon</code> object. We specify the image are using to replace our marker by using the property <code type="inline">iconUrl</code>. Make sure that you specify the proper path to your image.  We specified a few additional properties, such as iconSize (dimensions of the icon in pixels), iconAnchor (coordinates of the icon which will correspond to marker's location), popupAnchor (coordinates from which the popup should open relative to the iconAnchor). Check out the <link target="https://leafletjs.com/reference.html#icon">Icon Leaflet documentation</link> more information about <code type="inline">L.Icon</code> properties.</p>
 <p>The final map should look something like this:</p>
 <figure><desc>Exercise 05</desc><graphic url="webmap-09-exercise05.jpg"/></figure>
-</div></div><div n="2"><head>Next Steps</head>
+</div></div><div n="3"><head>Next Steps</head>
 <p>Congratulations! You now have some hands-on experience geocoding using common Python data analysis libraries and working with one of the most popular Javascript web mapping libraries out there.</p>
 <p>If you want to explore other web mapping features with Leaflet, there are a number of additional <link target="https://leafletjs.com/plugins.html">plugins</link> to try out. Of particular interest may be ability to create <link target="https://github.com/skeate/Leaflet.timeline">time based visualizations</link> and do <link target="https://github.com/pa7/heatmap.js">heat-mapping</link>.</p>
 <p>Also, check out the Programming Historian Lesson <link target="/lessons/using-javascript-to-create-maps">Using Javascript to Create Maps of Correspondence</link> that goes in depth on how to analyze correspondence using geospatial software, and using some of the same tools as this lesson.</p>

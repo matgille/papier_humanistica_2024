@@ -21,9 +21,9 @@ This lesson explains how to create simple twitterbots using Tracery and the Chea
     <body><div class="alert alert-warning">
 Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allows users to search and download Twitter data. Unfortunately, this means that elements of this lesson will only work for those who are paying for an upgraded plan. At the moment, there are no special access plans for researchers or academics. [2023]
 </div>
-<div n="1"><head>An Introduction to Twitter Bots with Tracery</head>
+<div n="2"><head>An Introduction to Twitter Bots with Tracery</head>
 <p>This lesson explains how to create simple twitterbots using the <link target="http://tracery.io">Tracery generative grammar</link> and the <link target="http://cheapbotsdonequick.com/">Cheap Bots Done Quick</link> service. Tracery exists in multiple languages and can be integrated into websites, games, bots. You may fork it <link target="https://github.com/galaxykate/tracery/tree/tracery2">on github here</link>.</p>
-<div n="2"><head>Why bots?</head>
+<div n="3"><head>Why bots?</head>
 <p>Strictly speaking, a twitter bot is a piece of software for automated controlling a Twitter account. When thousands of these are created and are tweeting more or less the same message, they have the ability to shape discourse on Twitter which then can influence other media discourses. Bots of this kind <link target="http://www.sciencedirect.com/science/article/pii/S0747563213003129">can even be seen as credible sources of information</link>. Projects such as <link target="http://www.docnow.io/">Documenting the Now</link> are creating tools to allow researchers to create and query archives of social media around current events - and which will naturally contain many bot-generated posts. In this tutorial, I want to demonstrate how one can build a simple twitterbot so that, knowing how they operate, historians may more easily spot the bots in our archives - and perhaps counter with bots of their own.</p>
 <p>But I believe also that there is space in digital history and the digital humanities more generally for creative, expressive, artistic work. I belive that there is space for programming historians to use the affordances of digital media to create <emph>things</emph> that could not otherwise exist to move us, to inspire us, to challenge us. There is room for satire; there is room for comment. With Mark Sample, I believe that there is a need for '<link target="https://medium.com/@samplereality/a-protest-bot-is-a-bot-so-specific-you-cant-mistake-it-for-bullshit-90fe10b7fbaa">bots of conviction</link>'.</p>
 <p>These are protest bots, bots so topical and on-point that they can&#8217;t be mistaken for anything else. Per Sample, such bots should be</p>
@@ -63,7 +63,7 @@ Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allo
 <p>Given that so much historical data is expressed on the web as <link target="http://json.org/">JSON</link>, a bit of digging should find you data that you can actually fold into your bot.</p>
 <p>My method is that of the bricoleur, the person who adapts and pastes together the bits and bobs of code that he finds; in truth, most programming functions this way. There are many packages available that will interface with Twitter's API, in various languages. There is little 'programming' in this lesson in the sense of writing bots in (for instance) Python. In this introductory lesson, I will show you how to build bots that tell stories, that write poetry, that do wonderful things using Tracery.io as our <emph>generative grammar</emph>, in conjunction with the Cheap Bots Done Quick service to host the bot. For more tutorials on building and hosting Twitter bots with other services, see <link target="https://botwiki.org/tutorials/twitterbots/">the Botwiki tutorial list</link>.</p>
 <p>My most successful bot has been <link target="http://twitter.com/tinyarchae">@tinyarchae</link>, a bot that tweets scenes from a horrible dsyfunctional archaeological excavation project. Every archaeological project deals with problems of sexism, abuse, and bad faith; @tinyarchae pushes the stuff of conference whispers to a ridiculous extreme. It is a caricature that contains a kernel of uncomfortable truth. Other bots I have built glitch <link target="https://twitter.com/archaeoglitch">archaeological photography</link>; one is actually useful, in that it is <link target="https://twitter.com/botarchaeo">tweeting out new journal articles in archaeology</link> and so serves as a research assistant. (For more thoughts on the role bots play in public archaeology, see this <link target="https://electricarchaeology.ca/2017/04/27/bots-of-archaeology-machines-writing-public-archaeology/">keynote</link> from the <link target="http://web.archive.org/web/20180131161516/https://publicarchaeologyconference.wordpress.com/">Public Archaeology Twitter Conference</link>).</p>
-</div></div><div n="1"><head>Planning: What will your bot do?</head>
+</div></div><div n="2"><head>Planning: What will your bot do?</head>
 <p>We begin with pad and paper. As a child in elementary school, one activity we often did to learn the basics of English grammar was called 'mad-libs' (as in, 'silly - mad - ad libs'). The teacher performing this activity would ask the class to, say, list a noun, then and adverb, then a verb, and then another adverb. Then on the other side of the sheet there would be a story with blank spaces like this:</p>
 <p>"Susie the _noun_ was _adverb_  _verb_ the _noun_."</p>
 <p>and students would fill in the blanks appropriately. It was silly; and it was fun. Twitterbots are to madlibs what sports cars are to horse and wagons. The blanks that we might fill in could be values in svg vector graphics. They could be numbers in numeric file names (and thus tweet random links to an open database, say). They could be, yes, even nouns and adverbs. Since Twitterbots live on the web, the building blocks that we put together can be more than text (although, for the time being, text will be easiest to work with).</p>
@@ -92,7 +92,7 @@ Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allo
 <li>I turned toward the sun fallen over</li>
 </ul>
 <p>With tweaking, and breaking the units of expression into smaller symbols, we can fix any expressive infelicities (or indeed, decide to leave them in to make the voice more 'authentic'.)</p>
-<div n="2"><head>Prototyping with a Tracery editor</head>
+<div n="3"><head>Prototyping with a Tracery editor</head>
 <p>In order to work out the kinks in <emph>plantpotbot</emph>, we used the Tracery editor at Brightspiral, which unfortunately no longer exists. Now, you might want to try the following alternative at <link target="https://tracery.io/editor/">https://tracery.io/editor/</link>. The editor visualizes the way the symbols and rules of the grammar interact (how they are nested, and the kinds of output your grammar will generate). Open the editor in a new window. You should see this:</p>
 <figure><desc>The Tracery Editor at Brightspiral.com</desc><graphic url="bot-lesson-editor.png"/></figure>
 <p>The dropdown menu at the top-left, marked 'tinygrammar', has some other example grammars that one can explore; they show just how complicated Tracery can become. For the time being, remain with 'tinygrammar'. One of the nice things about this editor is that you can press the 'show colors' button, which will color code each symbol and its rules, color-coding the generated text so that you can see which element belongs to what symbol.</p>
@@ -108,13 +108,13 @@ Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allo
 <pre><code class="language-JSON" xml:id="code_intro-to-twitterbots_4" type="block" corresp="code_intro-to-twitterbots_4.txt"></code></pre>
 <p>(of course, the number of symbols and rules is immaterial, but make sure the commas are right!)</p>
 <p>It is good practice to copy that JSON to a text editor and save another copy somewhere safe.</p>
-</div><div n="2"><head>But what would a proper 'historybot' look like?</head>
+</div><div n="3"><head>But what would a proper 'historybot' look like?</head>
 <p>Now, re-do the exercise above, but think hard about what a bot for history could look like given the constraints of Tracery. Build a simple grammar to express that idea, and make sure to save it. Here are some other things to think about as you design your grammar:</p>
 <p>Some of the fun of Twitterbots comes from their serendipitous placement with other tweets in your timeline (you should follow your own bot, just to keep tabs on it):</p>
 <figure><desc>Maniacallaughbot wins again</desc><graphic url="bot-lesson-maniacallaughbot.jpg"/></figure>
 <p>Remember that your bot will be appearing in other people's timelines. The potential for juxtaposition of your bot's message(s) against other peoples tweets will also influence the relative success of the bot.</p>
 <figure><desc>An interaction with Tinyarchae prompts wistful reflection</desc><graphic url="bot-lesson-interaction-with-tinyarchae.png"/></figure>
-</div></div><div n="1"><head>Get a twitter account for your bot and connect it to Cheap Bots Done Quick</head>
+</div></div><div n="2"><head>Get a twitter account for your bot and connect it to Cheap Bots Done Quick</head>
 <p>You can plumb a bot into your own, current, account, but you probably don't want a bot tweeting <emph>as</emph> you or <emph>for</emph> you. In which case, set up a new Twitter account. When you set up a new Twitter account, Twitter will want an email address. You can use a brand new email address, or, if you have a Gmail account, you can use the <code type="inline">+tag</code> trick, ie instead of 'johndoe' at gmail, you use <code type="inline">johndoe+twitterbot</code> at gmail. Twitter will accept that as a distinct email from your usual email.</p>
 <p>Normally, when one is building a Twitterbot, one has to create an app on twitter (at <link target="http://apps.twitter.com">apps.twitter.com</link>), obtain the consumer secret and key, and the access token and key. Then you have to program in authentication so that Twitter knows that the program trying to access the platform is permitted.</p>
 <p>Fortunately, we do not have to do that, since George Buckenham created the bot hosting site '<link target="http://cheapbotsdonequick.com/">Cheap Bots Done Quick</link>'. (That website also shows the JSON source grammar for a number of different bots, which can serve as inspiration). Once you've created your bot's Twitter account - and you are logged in to Twitter as the bot account-  go to Cheap Bots Done Quick and hit the 'sign in with Twitter' button. The site will redirect you to Twitter to approve authorization, and then bring you back to Cheap Bots Done Quick.</p>
@@ -124,30 +124,30 @@ Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allo
 <figure><desc>The settings for your bot</desc><graphic url="bot-lesson-settings.png"/></figure>
 <p>Decide how often you want your bot to tweet, and whether you want the source grammar visible. Then... the moment of truth. Hit the 'tweet' button, then go check your bot's twitter feed. Click 'save'.</p>
 <p>Congratulations, you have built a Twitterbot!</p>
-<div n="2"><head>Good bot citizenship</head>
+<div n="3"><head>Good bot citizenship</head>
 <p>As Cheap Bots Done Quick is a service provided by George Buckenham out of a spirit of goodwill, do not use the service to create bots that are offensive or abusive or that otherwise will spoil the service for everyone else. As he writes,</p>
 <blockquote>
 <p>If you create a bot I deem abusive or otherwise unpleasant (for example, @mentioning people who have not consented, posting insults or using slurs) I will take it down</p>
 </blockquote>
 <p>Other pointers for good bot citizenship are provided by Darius Kazemi, one of the great bot artists, are discussed <link target="http://tinysubversions.com/2013/03/basic-twitter-bot-etiquette/">here</link>.</p>
-</div></div><div n="1"><head>Going further with Tracery</head>
+</div></div><div n="2"><head>Going further with Tracery</head>
 <p>Many bots are a good deal more complicated than what we have described here, but it is enough to get you started. Some surprisingly effective bots can be created using Tracery.</p>
-<div n="2"><head>Modifying symbols</head>
+<div n="3"><head>Modifying symbols</head>
 <p>Tracery is smart enough to know when a word should take 'a' versus 'an', and how to pluralize words, or capitalize them. This means that you can provide the base word in a rule, and then add modifiers as appropriate. Consider:</p>
 <pre><code xml:id="code_intro-to-twitterbots_5" type="block" corresp="code_intro-to-twitterbots_5.txt"></code></pre>
 <p>would generate sentences like</p>
 <p><code type="inline">Big cows are nice</code></p>
 <p><code type="inline">Small pigs are nice</code></p>
 <p>The modifiers <code type="inline">.capitalize</code> and <code type="inline">.s</code> are added inside the <code type="inline">#</code> of the symbol they are meant to modify. Other modifiers are <code type="inline">.ed</code> for past tense, and <code type="inline">.a</code> for a/an. There may be more; Tracery is a work in progress.</p>
-</div><div n="2"><head>Use Emoji</head>
+</div><div n="3"><head>Use Emoji</head>
 <p>Emoji can be used to great effect in Twitterbots. You can copy and paste emoji directly into the Cheap Bots Done Quick editor; each emoji should be within quotation marks as any other rule would be. Use <link target="http://unicode.org/emoji/charts/full-emoji-list.html">this list</link> to find the emoji you wish to use, and make sure to copy and paste the emoji from the Twitter column to ensure that your emoji will display.</p>
-</div><div n="2"><head>Reusing Generated Symbols with Actions</head>
+</div><div n="3"><head>Reusing Generated Symbols with Actions</head>
 <p>This feature probably would not be used much in the case of a Twitterbot, but if one was using Tracery to generate a longer story or poem, it can be used so that Tracery remembers the first time it selected a particular rule for a symbol - eg we could get it to always used the same creature every time <code type="inline">creature</code> was called subsequently. This is called an 'action' by Tracery. The form is #[someAction]someSymbol#. This can be confusing, and this aspect of Tracery is still being developed. To see it in action, copy and past the json below into this Tracery editor by Beau Gunderson: <link target="https://beaugunderson.com/tracery-writer/">https://beaugunderson.com/tracery-writer/</link> (select and delete the default text. The Tracery editor we were using earlier does not handle saving data very well, so this alternative is a better tool for our present purposes).</p>
 <pre><code class="language-JSON" xml:id="code_intro-to-twitterbots_6" type="block" corresp="code_intro-to-twitterbots_6.txt"></code></pre>
 <p>Another, slightly more complex example is example number 5 at Kate Compton's own tutorial site at <link target="http://www.crystalcodepalace.com/traceryTut.html">http://www.crystalcodepalace.com/traceryTut.html</link>:</p>
 <pre><code class="language-JSON" xml:id="code_intro-to-twitterbots_7" type="block" corresp="code_intro-to-twitterbots_7.txt"></code></pre>
 <p>Tracery reads the origin, and before it gets to the <code type="inline">story</code> symbol it sees an action called <code type="inline">hero</code> that it sets from the symbol <code type="inline">name</code>. The it does the same for <code type="inline">heroPet</code> from <code type="inline">animal</code>. With these set it then reads <code type="inline">story</code>. Within <code type="inline">story</code> the symbol <code type="inline">hero</code> reads what was just set by the action, and returns that same value each time. So, if 'Yuuma' was selected by the action, then the story will read <code type="inline">Yuuma traveled with her pet... Yuuma was never...</code>. If we <emph>didn't</emph> set the hero's name via the action, then the story generated might change the hero's name in mid story!</p>
-</div><div n="2"><head>Responding to mentions in Cheap Bots Done Quick</head>
+</div><div n="3"><head>Responding to mentions in Cheap Bots Done Quick</head>
 <p><link target="http://cheapbotsdonequick.com/">Cheap Bots Done Quick</link> has a beta feature that allows your bot to respond to mentions. (Warning: if you create two bots, and one mentions the other, the ensuing 'conversation' can run for a very long time indeed; there is a 5% chance in any exchange that the bot won't respond, thus breaking the conversation).</p>
 <p>To set up a response pattern, click at the bottom of the page to set the button to 'reply to tweets'. In the JSON editing box that appears, you set up the pattern for phrases that your bot will respond to. For instance, some of what @tinyarchae watches for:</p>
 <pre><code class="language-JSON" xml:id="code_intro-to-twitterbots_8" type="block" corresp="code_intro-to-twitterbots_8.txt"></code></pre>
@@ -155,7 +155,7 @@ Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allo
 <pre><code class="language-JSON" xml:id="code_intro-to-twitterbots_9" type="block" corresp="code_intro-to-twitterbots_9.txt"></code></pre>
 <p>At the very bottom of the page, you can test your mentions by writing a sample tweet that your bot will parse. If you've set things up properly, you should see a response. If there is an error, the 'Response' box will turn red and will give you some indication of where the error lies.</p>
 <figure><desc>Testing your bot's response</desc><graphic url="bot-lesson-response.png"/></figure>
-</div><div n="2"><head>SVG graphics</head>
+</div><div n="3"><head>SVG graphics</head>
 <p>Since SVG is a text format that describes the geometry of a vector graphic, Tracery can be used to create rather artistic work - the <link target="https://twitter.com/TinyAdv">Tiny Space Adventure</link> bot draws a starfield, a spaceship, and a plot. Its grammar <link target="https://pastebin.com/YYtZnzZ0">may be viewed here</link>. The key issue with generating svg with Tracery is to get the components correct. The source code for the <link target="http://cheapbotsdonequick.com/source/softlandscapes">softlandscapes bot</link> can be a useful model. This bot begins by defining the critical text that marks out SVG:</p>
 <pre><code xml:id="code_intro-to-twitterbots_10" type="block" corresp="code_intro-to-twitterbots_10.txt"></code></pre>
 <p>and then :</p>
@@ -165,9 +165,9 @@ Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allo
 <p>The syntax looks like this: {svg &lt;svg ...&gt; ... }. SVGs will need to specify a width and height attribute. Note that "s within SVG files need to be escaped as \", as does \#s (\#). {s and }s can be escaped as \\{ and \\}. Note: this feature is still in development, so the tweet button on this page will not work. And the debugging info is better in FF than other browsers.</p>
 </blockquote>
 <p>Bots that generate SVG are beyond the scope of this lesson, but careful study of existing bots should help you on your way.</p>
-</div><div n="2"><head>Music</head>
+</div><div n="3"><head>Music</head>
 <p>Strictly speaking, this is no longer about bots, but since music can be notated in text, one can use Tracery to compose music and then use other libraries to convert this notation into Midi files - see <link target="http://www.codingblocks.net/videos/generating-music-in-javascript/">http://www.codingblocks.net/videos/generating-music-in-javascript/</link> and my <link target="https://electricarchaeology.ca/2017/04/07/tracery-continues-to-be-awesome/">own experiment</link>.</p>
-</div></div><div n="1"><head>Other Bot Tutorials</head>
+</div></div><div n="2"><head>Other Bot Tutorials</head>
 <ul>
 <li>Zach Whalen <link target="http://www.zachwhalen.net/posts/how-to-make-a-twitter-bot-with-google-spreadsheets-version-04/">How to make a Twitter Bot with Google Spreadsheets</link></li>
 <li>Casey Bergman, Keeping Up With the Scientific Literature using Twitterbots: The FlyPapers Experiment <link target="https://caseybergman.wordpress.com/2014/02/24/keeping-up-with-the-scientific-literature-using-twitterbots-the-flypapers-experiment/">https://caseybergman.wordpress.com/2014/02/24/keeping-up-with-the-scientific-literature-using-twitterbots-the-flypapers-experiment/</link> also <link target="https://github.com/roblanf/phypapers">https://github.com/roblanf/phypapers</link> ; in essence this method collects the RSS feed from journal articles, and then uses a service such as <link target="https://dlvrit.com/">Dlvr.it</link> to push the links to a Twitter account.</li>
@@ -176,7 +176,7 @@ Access to Twitter&#8217;s API has recently changed. The Free Tier no longer allo
 <li>The Botmakers' Wiki also has a list of <link target="https://botwiki.org/tutorials/twitterbots/">Twitterbot tutorials</link></li>
 </ul>
 <p>Finally, a list of Tracery-powered bots is maintained by Compton <link target="https://twitter.com/GalaxyKate/lists/tracery-bots">here</link>. Have fun! May your bots flummox, entertain, inspire, and confound.</p>
-</div><div n="1"><head>References</head>
+</div><div n="2"><head>References</head>
 <p>Compton, K., Kybartas, B., Mateas, M.: Tracery: An author-focused generative text tool. In: Proceedings of the 8th International Conference on Interactive Digital Storytelling. pp. 154&#8211;161 (2015)</p>
 </div></body>
   </text>
