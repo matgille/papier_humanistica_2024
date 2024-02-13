@@ -16,6 +16,11 @@ def pop_element(tree, element_name):
     for element in tree.xpath(f"//{element_name}"):
         element.getparent().remove(element)
 
+def write_to_log(message):
+    with open("logs/log.txt", "a") as log_file:
+        log_file.write("\n"+message)
+
+
 def change_element_name(tree, element, replacement, attr=None, attr_value=None, attr_change:tuple=None):
     for element in tree.xpath(f"//{element}"):
         element.tag = replacement
@@ -42,7 +47,7 @@ def xmlify(path):
     :return: None; creates a TEI file
     """
     # TODO: get back to endnotes
-
+    
     # Getting the path to output file
     with open(path, "r") as input_file:
         as_text = input_file.read()
@@ -101,13 +106,54 @@ def xmlify(path):
         all_headings.extend([element.tag.replace("h", "") for element in lesson_as_xml_tree.xpath(f"//h{section_level}")])
     different_headings = [int(val) for val in list(set(all_headings))]
     minimal_heading = min(different_headings)
-    if minimal_heading != 1:
-        difference = minimal_heading - 1
-        print(difference)
-        for section_level in range(minimal_heading, 7):
+    print(minimal_heading)
+
+    print("Structure check")
+    heading_check = True
+    minimal_heading_check = True
+    structural_jump_check = True
+    all_heads = [int(element.tag.replace("h", "")) for element in lesson_as_xml_tree.xpath(f"//node()[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]")]
+    if int(all_heads[0]) != 2:
+        heading_check = False
+    if int(all_heads[0]) != int(minimal_heading):
+        minimal_heading_check = False
+    if any([all_heads[n] - all_heads[n + 1] < - 1 for n in range(len(all_heads[:-1]))]):
+        structural_jump_check = False
+    # We modify just in case of 
+    
+    # Write log
+    if all(check is True for check in [minimal_heading_check, structural_jump_check, heading_check]):
+        pass
+    else:
+        write_to_log(f"Lesson {lesson_name}")
+        write_to_log(f"Lesson structure: [{','.join([str(head) for head in all_heads])}]")
+        if minimal_heading_check is False:
+            write_to_log(f"Structural issue. Check heading levels.")
+        if heading_check is False:
+            write_to_log(f"Lesson  starts with heading of level {str(all_heads[0])}. ")
+            if minimal_heading_check is True and structural_jump_check is True:
+                write_to_log(f"It can be corrected without supervision.")
+            else:
+                write_to_log(f"There is another issue that has to be corrected by hand before solving this one.")
+        if structural_jump_check is False:
+            write_to_log(f"Structural jump. Check heading levels.")
+        write_to_log("\n")
+        
+    # Correct structure    
+    if minimal_heading == 1 and all(check is True for check in [minimal_heading_check, structural_jump_check]):
+        for section_level in reversed(range(minimal_heading, 7)):
+            all_nodes = lesson_as_xml_tree.xpath(f"descendant::h{section_level}")
+            for heading in all_nodes:
+                heading.tag = f"h{str(section_level + 1)}"
+    elif minimal_heading != 2 and all(check is True for check in [minimal_heading_check, structural_jump_check]):
+        for section_level in range(minimal_heading, 6):
+            difference = minimal_heading - 2
             all_nodes = lesson_as_xml_tree.xpath(f"descendant::h{section_level}")
             for heading in all_nodes:
                 heading.tag = f"h{str(section_level - difference)}"
+        
+    
+    # TODO: structure coherence check
     ## First we need to correct the structure. The first level of division will be 1.
     
     ## After that, we can start restructuring the document, using the headers. 
@@ -115,7 +161,7 @@ def xmlify(path):
     #  in successive order.
     for section_level in range(0, 6):
         level = section_level + 1
-        if level == 1:
+        if level == 1 or level == 2:
             parent_nodes = [lesson_as_xml_tree]
         else:
             # We use the tree updated in a previous run (h1 > div @n=1, then h2 > div @n=2, etc)  
@@ -133,6 +179,7 @@ def xmlify(path):
                 else:
                     clustered_nodes[current_heading].append(node)
             for heading, nodes in clustered_nodes.items():
+                parent = heading.getparent()
                 # Let's replace h{X} with <head/>
                 heading_level = heading.tag.replace("h", "")
                 heading.tag = "head"
@@ -145,7 +192,6 @@ def xmlify(path):
                 for node in nodes:
                     division_and_descendants.append(node)
                 # Find and append the newly division to its parent
-                parent = heading.getparent()
                 # We work sequentially, so we can append the division at the end of its parent.
                 parent.append(division_and_descendants)
     
@@ -224,7 +270,12 @@ if __name__ == '__main__':
     # Let's select the lessons in all languages
     regexp = r"/home/mgl/Bureau/Travail/PH/jekyll/(es|fr|en|pt)/l[^/]*/[^/]*\.md"
     lessons = [f for f in glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/*.md") if re.search(regexp, f)]
-    # lessons = glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/generating-an-ordered-data-set-from-an-OCR-text-file.md")
+    # lessons = glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/generer-jeu-donnees-texte-ocr.md")
+    # Removing log file
+    try:
+        os.remove("logs/log.txt")
+    except FileNotFoundError:
+        pass
     for lesson in lessons:
         print(lesson)
         xmlify(lesson)
