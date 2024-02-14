@@ -1,2 +1,0 @@
-import matplotlib.font_manager
-matplotlib.font_manager.findSystemFonts(fontpaths=None, fontext='ttf')
