@@ -1,11 +1,8 @@
 import glob
 import os
-import traceback
-import uuid
 import lxml.etree as ET
 import re
 import yaml
-import marko
 from marko.ext.gfm import gfm
 
 tei_ns = "https://tei-c.org/ns/1-0/"
@@ -47,6 +44,8 @@ def xmlify(path):
     :return: None; creates a TEI file
     """
     # TODO: get back to endnotes
+    
+    language = re.search(r"/(es|fr|en|pt)/", path).groups()[0]
     
     # Getting the path to output file
     with open(path, "r") as input_file:
@@ -165,7 +164,7 @@ def xmlify(path):
             parent_nodes = [lesson_as_xml_tree]
         else:
             # We use the tree updated in a previous run (h1 > div @n=1, then h2 > div @n=2, etc)  
-            parent_nodes = lesson_as_xml_tree.xpath(f"//div[@n = '{level - 1}']")
+            parent_nodes = lesson_as_xml_tree.xpath(f"//div[@type = '{level - 1}']")
         for parent_node in parent_nodes:
             first_node = parent_node.xpath(f"descendant::h{level}[1]")
             all_same_level_nodes = parent_node.xpath(f"descendant::h{level}[1]/following-sibling::node()")
@@ -186,7 +185,7 @@ def xmlify(path):
                 # Add the division heading
                 division_and_descendants = ET.Element(f"div")
                 # Attribute n='X'
-                division_and_descendants.set("n", heading_level)
+                division_and_descendants.set("type", heading_level)
                 # Append the childs found with the dict method, starting with the new heading
                 division_and_descendants.append(heading)
                 for node in nodes:
@@ -225,6 +224,9 @@ def xmlify(path):
     body = root.xpath("//body")
     text_element.append(body[0])
     root.insert(1, text_element)
+    # Let's add the language
+    text_element.set("xml:lang", str(language))
+    
 
     original_file = lesson_as_xml_tree.xpath("//original")
     if len(original_file) == 1:
@@ -250,6 +252,9 @@ def xmlify(path):
     
     # Let's modify some tagnames, clean some other
     change_element_name(root, "strong", "hi", "rend", "bold")
+    change_element_name(root, "div[@class='alert alert-warning']", "p", "style", "alert alert-warning")
+    change_element_name(root, "div[@class='alert alert-info']", "p", "style", "alert alert-info")
+    change_element_name(root, "div[@class='alert alert-block alert-warning']", "p", "style", "alert alert-block alert-warning")
     change_element_name(root, "em", "emph")
     change_element_name(root, "code[not(@type)]", "code", "type", "inline")
     change_element_name(root, "a[@href]", "link", attr_change=('href', 'target'))
