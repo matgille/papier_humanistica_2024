@@ -1,0 +1,7 @@
+results_df_binary['bin'] = pd.qcut(results_df_binary['highest_prob'], q=7)
+idx = pd.IntervalIndex(results_df_binary['bin'])
+results_df_binary['low'] = idx.left
+results_df_binary['high'] = idx.right
+results_df_binary['prob range'] = results_df_binary['low'].round(2).astype(str) + "-" + results_df_binary['high'].round(2).astype(str)
+df_bins_grouped = results_df_binary.groupby('prob range').mean().reset_index()
+df_bins_grouped

@@ -1,0 +1,29 @@
+def local_file(blobs_list, filename, output_dir):
+
+    #If the output directory does not exist, create it.
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+
+    #Create an empty string to store the text.
+    output=''
+
+    #Iterate through the list created in the previous function and extract the 'full_text_response' (i.e. the OCRed text) for each page to append it to the output string.
+    for blob in blobs_list:
+        json_string = blob.download_as_string()
+        response=json.loads(json_string)
+        full_text_response = response['responses']
+
+        for text in full_text_response:
+            try:
+                annotation=text['fullTextAnnotation']
+                output+=annotation['text']
+            except:
+                pass
+
+    #Create the path and name of the output file.
+    output_file=os.path.join(output_dir, filename.split('.')[0]+'.txt')
+
+    #Create a file and write the output string.
+    f=open(output_file, 'x')
+    f.write(output)
+    f.close()

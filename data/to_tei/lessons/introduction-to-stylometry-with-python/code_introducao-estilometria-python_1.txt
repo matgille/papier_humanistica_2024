@@ -1,0 +1,16 @@
+# Função que compila todos os ficheiros de texto de cada grupo em uma única string
+
+import re
+
+def ler_ficheiros_para_string(ids_ficheiros):
+    global texto
+    strings = []
+    for id_ficheiro in ids_ficheiros:
+        with open(f'dados/pg{id_ficheiro}.txt', 'r',
+		encoding='utf-8') as f:
+            texto = f.read()
+            texto = re.search(r"(START.*?\*\*\*)(.*)(\*\*\* END)", 
+                              texto, 
+                              re.DOTALL).group(2)
+            strings.append(texto)
+    return '\n'.join(strings)

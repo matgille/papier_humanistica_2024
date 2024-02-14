@@ -1,0 +1,280 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>Transliterating non-ASCII characters with Python</title>
+  <layout>lesson</layout>
+  <date>2013-10-04</date>
+  <authors>Seth Bernstein</authors>
+  <reviewers>Michelle Moravec,Ezra Brooks,Russell Alleen-Willems</reviewers>
+  <editors>Adam Crymble</editors>
+  <difficulty>2</difficulty>
+  <exclude_from_check>review-ticket</exclude_from_check>
+  <activity>transforming</activity>
+  <topics>data-manipulation</topics>
+  <abstract>This lesson shows how to use Python to transliterate automatically a list of words from a language with a non-Latin alphabet to a standardized format using the American Standard Code for Information Interchange (ASCII) characters.</abstract>
+  <redirect_from>/lessons/transliterating</redirect_from>
+  <avatar_alt>A set of Cyrillic characters</avatar_alt>
+  <doi>10.46430/phen0032</doi>
+</metadata>
+  <text xml:lang="en">
+    <body>
+      <div type="2"><head>Lesson Goals</head>
+<p>This lesson shows how to use Python to transliterate automatically a
+list of words from a language with a non-Latin alphabet to a
+standardized format using the American Standard Code for Information
+Interchange (<link target="http://en.wikipedia.org/wiki/Ascii">ASCII</link>) characters. It builds on readers&#8217; understanding
+of Python from the lessons &#8220;<link target="/lessons/viewing-html-files">Viewing HTML Files</link>,&#8221; &#8220;<link target="/lessons/working-with-web-pages">Working with Web
+Pages</link>,&#8221; &#8220;<link target="/lessons/from-html-to-list-of-words-1">From HTML to List of Words (part 1)</link>&#8221; and &#8220;<link target="/lessons/intro-to-beautiful-soup">Intro to
+Beautiful Soup</link>.&#8221; At the end of the lesson, we will use the
+transliteration dictionary to convert the names from a database of the
+Russian organization <link target="http://lists.memo.ru">Memorial</link> from <link target="http://en.wikipedia.org/wiki/Cyrillic_script">Cyrillic</link> into <link target="http://en.wikipedia.org/wiki/Latin_script">Latin
+characters</link>. Although the example uses Cyrillic characters, the
+technique can be reproduced with other alphabets using <link target="http://en.wikipedia.org/wiki/Unicode">Unicode</link>.</p>
+</div>
+      <div type="2"><head>What Is Transliteration and for Whom Is It Useful?</head>
+<p>Transliteration is something that most people do every day, knowingly or
+not. Many English speakers would have trouble recognizing the name
+&#1042;&#1083;&#1072;&#1076;&#1080;&#1084;&#1080;&#1088; &#1055;&#1091;&#1090;&#1080;&#1085; but know that Vladimir Putin is Russia&#8217;s current
+president. Transliteration is especially useful with names, because a
+standardized transliterated name is often the same as a translated name.
+(Exceptions are when someone&#8217;s name is translated in a non-uniform way.
+Leon Trotsky&#8217;s Russian name would be transliterated in a standardized
+form as Lev Trotskii.)</p>
+<p>But transliteration has other uses too, especially for scholars. In many
+fields, the publishing convention is to transliterate any evidence used
+in the original. Moreover, citations from scholarly works need to be
+transliterated carefully so that readers can find and verify evidence
+used in texts. Finally, transliteration can be more practical for
+authors who can type more fluently with Latin letters than in the native
+alphabet of a language that does not use Latin characters.</p>
+<p>This lesson will be particularly useful for research in fields that use
+a standardized transliteration format, such as Russian history field,
+where the convention is to use a simplified version of the American
+Library Association-Library of Congress (<link target="http://en.wikipedia.org/wiki/ALA-LC_romanization_for_Russian">ALA-LC</link>) transliteration
+table. (All tables currently available can be accessed here.)
+Researchers dealing with large databases of names can benefit
+considerably. However, this lesson will also allow practice with
+Unicode, character translation and using the parser <link target="http://www.crummy.com/software/BeautifulSoup/">Beautiful Soup in
+Python.</link></p>
+</div>
+      <div type="2"><head>Converting a Webpage to Unicode</head>
+<p>The goal of this lesson is to take a list of names from a Russian
+database and convert them from Cyrillic into ASCII characters. The page
+we will use is from the site of the Russian human rights organization
+Memorial. During <link target="http://en.wikipedia.org/wiki/Glasnost">Glasnost</link> professional and amateur historians in the
+Soviet Union gained the ability to conduct research on previously taboo
+subjects, such as repression under Stalin. Banding together, they
+founded <link target="http://lists.memo.ru">Memorial</link> to collect and publicize their findings. Today, the
+NGO conducts research on a range of civil rights abuses in Russia, but
+collecting data about the victims of Stalinism remains one of its main
+functions. On the Memorial website researchers can find a database with
+some three million entries of people who were arrested or executed by
+Stalin&#8217;s regime. It is an important resource on a dark topic. However,
+because the database has many, many names, it lends itself nicely to
+automated transliteration. This lesson will use just the first page of
+the database, found <link target="http://lists.memo.ru/d1/f1.htm">here</link>, but using the lesson on &#8220;<link target="/lessons/automated-downloading-with-wget">Automated
+Downloading with Wget</link>,&#8221; it would be possible to go through the entire
+database as fast as your computer would allow.</p>
+<p>We need to start by modifying the process found in the lesson &#8220;<link target="/lessons/working-with-web-pages">Working
+with Web Pages</link>.&#8221; There we learned how to open and copy the HTML from
+a web page in Python. But what if we want to open a page in a language
+that does not use Latin characters? Python can do this but we need to
+tell it how to read these letters using a codec, a library of codes that
+allows Python to represent non-ASCII characters. Working with web pages
+makes this easy because almost all web pages specify what kind of
+encoding they use, in the page&#8217;s <emph>headers</emph>. In Python, opening a web page
+does not just give you the HTML, but it creates an object with several
+useful characteristics. One is that we can access the headers by calling
+the <code type="inline">header()</code> method. This method returns something a lot like a Python
+dictionary with information that is important to web programmers. For
+our purposes, what is important is that the encoding is stored under the
+&#8216;content-type&#8217; key.</p>
+<pre><code class="language-python" xml:id="code_transliterating_0" type="block" corresp="code_transliterating_0.txt"></code></pre>
+<p>Under the &#8216;content-type&#8217; key we find this information:</p>
+<pre><code xml:id="code_transliterating_1" type="block" corresp="code_transliterating_1.txt"></code></pre>
+<p>The &#8216;content-type&#8217; is telling us that the file stored at the url we
+accessed is in HTML and that its encoding (after &#8216;charset=&#8217;, meaning
+character set) is &#8216;windows-1251&#8242;, a common encoding for Cyrillic
+characters. You can visit the webpage and view the Page Source and see
+for yourself that the first line does in fact contain a &#8216;content-type&#8217;
+variable with the value <code type="inline">text/html; charset=windows-1251</code>. It would not be
+so hard to work with the &#8216;windows-1251&#8242; encoding. However,
+&#8216;windows-1251&#8242; is specifically for Cyrillic and will not handle all
+languages. For the sake of learning a standard method, what we want is
+Unicode, a coding set that handles not just Cyrillic but characters and
+symbols from virtually any language. (For more on Unicode, see the <link target="http://www.unicode.org/standard/WhatIsUnicode.html">What
+is Unicode</link> page.) Converting into Unicode gives us the potential to
+create a transliteration table that could cover multiple languages and
+special characters in a way that region-specific character sets do not
+allow.</p>
+<p>How do you convert the characters to Unicode? First, Python needs to
+know the original encoding of the source, &#8216;windows-1251.&#8217; We could just
+assign &#8216;windows-1251&#8217; to a variable by typing it manually but the
+encoding may not always be &#8216;windows-1251.&#8217; There are other character
+sets for Cyrillic, not to mention other languages. Let&#8217;s find a way to
+make the process more automatic for those cases. It helps that the
+encoding is the very last part of the string, so we can isolate it from
+everything that came before in the string. By using the <code type="inline">.split()</code> method,
+the string containing whatever encoding it is can be assigned to a
+variable. The <code type="inline">.split(separator)</code> method in Python returns a list of
+sections in the string that are split by some user-defined separator.
+Assigning no separator to <code type="inline">.split()</code> separates a string at the spaces.
+Another use of the <code type="inline">.split()</code> method is to separate by commas, which can
+help to work with <link target="http://en.wikipedia.org/wiki/Comma-separated_values">comma separated value</link> (csv) files. In this case,
+though, by splitting the &#8216;content-type&#8217; string at &#8216;charset=&#8217;, we get a
+<emph>list</emph> with two strings where the second will be the character set.</p>
+<pre><code class="language-python" xml:id="code_transliterating_2" type="block" corresp="code_transliterating_2.txt"></code></pre>
+<p>The encoding is assigned to the variable called &#8216;<emph>encoding</emph>&#8217;. You can
+check to see if this worked by printing the &#8216;<emph>encoding</emph>&#8217; variable. Now we
+can tell Python how to read the page as Unicode. Using the
+<code type="inline">str(object [, encoding])</code> method turns a text encoded in a specific encoding
+into a generic Unicode string. A Unicode string cannot only contain ASCII
+characters, but also
+special characters. If the original text is in a non-ASCII character set,
+like here with &#8216;windows-1251&#8217;, we have to use the optional encoding
+parameter.</p>
+<pre><code class="language-python" xml:id="code_transliterating_3" type="block" corresp="code_transliterating_3.txt"></code></pre>
+<pre><code class="language-python" xml:id="code_transliterating_4" type="block" corresp="code_transliterating_4.txt"></code></pre>
+<p>As you can see, the Cyrillic characters are mixed with the ASCII characters
+of the HTML code. But typing these can be cumbersome without a corresponding
+keyboard layout. Alternatively, the Unicode characters can be typed using
+special codes that represent the characters using their Unicode number.
+You can see the text as represented by Unicode numbers using the special &#8216;<emph>unicode-escape</emph>&#8217; encoding:</p>
+<pre><code class="language-python" xml:id="code_transliterating_5" type="block" corresp="code_transliterating_5.txt"></code></pre>
+<pre><code xml:id="code_transliterating_6" type="block" corresp="code_transliterating_6.txt"></code></pre>
+<p>All the
+&#8216;\u0420&#8217;-type marks are Unicode and Python knows that they code to
+Cyrillic characters. The backslash is called an &#8216;<emph>escape character</emph>&#8217;
+and allows Python to do things like use special characters in Unicode or
+signify a line break (&#8216;<code type="inline">\n</code>&#8217;) in a document. Each counts as just one
+character. Now we can create a Python <emph>dictionary</emph> that will act as the
+transliteration table.</p>
+</div>
+      <div type="2"><head>Unicode Transliteration Dictionary</head>
+<p>A dictionary is an unordered collection of <emph>key-object pairs</emph>. What this
+means is that under each key, the dictionary stores some number or
+string or other object &#8211; even another dictionary. (See also the lesson
+&#8220;<link target="/lessons/counting-frequencies">Counting Frequencies</link>.&#8221;) A dictionary has the following syntax:</p>
+<pre><code class="language-python" xml:id="code_transliterating_7" type="block" corresp="code_transliterating_7.txt"></code></pre>
+<p>How can we turn this into a transliteration table? Just make each
+Unicode character a key in the dictionary. Its value will be whatever
+character(s) it transliterates to. The table for Romanization of Russian
+is available from the <link target="http://web.archive.org/web/20170312041508/http://www.lcweb.loc.gov/catdir/cpso/romanization/russian.pdf">Library of Congress</link>. This table needs to be
+simplified slightly. The ALA-LC suggests using characters with umlauts
+or ligatures to represent Cyrillic letters but those characters are no
+more ASCII than Cyrillic characters. So instead no umlauts or ligatures
+will be used.</p>
+<p>Each Cyrillic letter has a different Unicode value. It would take time
+to find each one of them but fortunately <link target="http://en.wikipedia.org/wiki/Cyrillic_script_in_Unicode">Wikipedia has a table</link>. If
+the script were very rare, we could find it at the <link target="http://www.unicode.org/charts/">Unicode website</link>.</p>
+<p>We just need to combine the transliteration table with the Unicode
+table. The Unicode value for the Russian letter &#8220;&#1046;&#8221; is 0416 and it
+transliterates to the Latin characters &#8220;Zh.&#8221; Python needs more than just
+the Unicode identifier. It also needs to know to look out for a Unicode
+character. Therefore all the Unicode characters used in the dictionary
+should be in the format <code type="inline">'\uXXXX'</code>. In this case, the letter &#1046; is
+<code type="inline">'\u0416'</code>. We can create a transliteration dictionary and assign &#8216;Zh&#8217;
+as the value for the key <code type="inline">'\u0416'</code> in it.</p>
+<pre><code class="language-python" xml:id="code_transliterating_8" type="block" corresp="code_transliterating_8.txt"></code></pre>
+<p>As it turns out, lowercase Cyrillic letters in Unicode have the same
+value as their uppercase counterparts except the value of the second
+number is two greater. Thus, &#8216;&#1078;&#8217; codes to 0436. Now that we have a
+transliteration dictionary created, we just add a dictionary key-value
+pair.</p>
+<pre><code class="language-python" xml:id="code_transliterating_9" type="block" corresp="code_transliterating_9.txt"></code></pre>
+<p>Of course, rather than do each pair one by one, it would probably be
+easier to write the dictionary in a Python module or paste it in from a
+word processor. The full Cyrillic transliteration dictionary is here:</p>
+<pre><code class="language-python" xml:id="code_transliterating_10" type="block" corresp="code_transliterating_10.txt"></code></pre>
+<p>Now that we have the transliteration dictionary, we can simply loop
+through every character in the source page and convert those Unicode
+characters in the dictionary. If we turn it into a procedure, then we
+can reuse it for other webpages.</p>
+<pre><code class="language-python" xml:id="code_transliterating_11" type="block" corresp="code_transliterating_11.txt"></code></pre>
+<p>We can then call this function using the newly created dictionary and
+the webpage downloaded earlier.</p>
+<pre><code class="language-python" xml:id="code_transliterating_12" type="block" corresp="code_transliterating_12.txt"></code></pre>
+<p>Here is what we end up with:</p>
+<pre><code class="language-python" xml:id="code_transliterating_13" type="block" corresp="code_transliterating_13.txt"></code></pre>
+<p>Still not perfect. Python did not convert the special character &#8216;\xa0&#8242;
+that signifies a <emph>non-breaking space</emph>. But with the transliteration
+dictionary, any characters that pop up can just be added to the
+dictionary and they will be converted. First we need to find out what
+that character is. We could search for it on the Internet or we can just
+print it:</p>
+<pre><code class="language-python" xml:id="code_transliterating_14" type="block" corresp="code_transliterating_14.txt"></code></pre>
+<p>With this fix, all the Cyrillic and special characters are gone, making
+it much easier to read the file and deal with it. For the last part of
+the lesson, we will modify methods used in the lesson &#8220;<link target="/lessons/intro-to-beautiful-soup">Intro to
+Beautiful Soup</link>&#8221; to get a list of transliterated names from the
+webpage.</p>
+</div>
+      <div type="2"><head>Transliterated List of Names</head>
+<p>There may be cases where it is best to transliterate the entire file but
+if the goal is to transliterate and extract just a part of the data in
+the file, it would be best to extract first and transliterate later.
+That way Python will only transliterate a small part of the file rather
+than having to loop through the whole of the HTML. Speed is not a huge
+issue when dealing with a handful of web pages but Memorial&#8217;s site has
+thousands of pages. The difference between looping through thousands of
+whole pages and just looping through a small part of each of those pages
+can add up. But, of course, it would have been anti-climactic to have
+all the names before the transliteration dictionary and also more
+difficult for non-Cyrillic readers to understand the rest of the lesson.
+So now we need to find a way to get just the names from the page. Here
+is the first bit of HTML from the converted_content string, containing
+parts of two database entries:</p>
+<pre><code class="language-python" xml:id="code_transliterating_15" type="block" corresp="code_transliterating_15.txt"></code></pre>
+<p>This code prints out characters 200 to 1000 of the HTML, which happens
+to include the entire first entry and the beginning of the second:</p>
+<pre><code xml:id="code_transliterating_16" type="block" corresp="code_transliterating_16.txt"></code></pre>
+<p>Each entry includes lots of information: name (last, first and
+patronymic), date of birth, place of birth, profession, date of arrest,
+date of sentencing and so on. If we wanted the detailed information
+about each person, we would have to parse the page ourselves and extract
+that information using the string manipulation techniques from the
+lesson &#8220;<link target="/lessons/manipulating-strings-in-python">Manipulating Strings in Python</link>.&#8221; However, for just the names
+it will be quicker to use the HTML parsing module Beautiful Soup. If you
+have not installed Beautiful Soup, see &#8220;<link target="/lessons/installing-python-modules-pip">Installing Python Modules with pip</link>&#8221;
+and read &#8220;<link target="/lessons/intro-to-beautiful-soup">Intro to Beautiful Soup</link>&#8221; for an overview of how
+this tool works. In the transliterator module, we will load Beautiful
+Soup and then turn our converted page into a <emph>Beautiful Soup object</emph>.</p>
+<pre><code class="language-python" xml:id="code_transliterating_17" type="block" corresp="code_transliterating_17.txt"></code></pre>
+<p>The lesson &#8220;<link target="/lessons/intro-to-beautiful-soup">Intro to Beautiful Soup</link>&#8221; teaches how to grab sections of
+a web page by their tags. But we can also select sections of the page by
+<emph>attributes</emph>, HTML code that modifies elements. Looking at the HTML from
+this page, notice that the text of our names are enclosed in the tag
+<code type="inline">&lt;p class="name"&gt;</code>. The class attribute allows the page&#8217;s <link target="http://www.w3schools.com/css/">Cascading
+Style Sheets</link> (CSS) settings to change the look of all elements that
+share the &#8220;name&#8221; <emph>class</emph> at once. CSS itself is an important tool for web
+designers. For those interested in learning more on this aspect of CSS,
+I recommend <link target="https://www.codecademy.com/catalog/subject/web-development">Code Academy&#8217;s</link> interactive lessons in its web
+fundamentals track. In mining data from the web, though, attributes like
+class give us a pattern to separate out certain values.</p>
+<p>What we want is to get the elements where the class attribute&#8217;s value is
+&#8220;name&#8221;. When dealing with most types of attributes, Beautiful Soup can
+select parts of the page using the same syntax as HTML. The class
+attribute makes things a little tricky because Python uses &#8220;class&#8221; to
+define new types of objects. Beautiful Soup gets around this by making
+us search for class followed by an underscore: <code type="inline">class_="value"</code>.
+Beautiful Soup objects&#8217; <code type="inline">.find_all()</code> method will generate a Python list
+of Beautiful Soup objects that match the HTML tags or attributes set as
+<emph>parameters</emph>. The method <code type="inline">.get_text()</code> extracts just the text from
+Beautiful Soup objects, so
+<code type="inline">" &lt;p class="name"&gt;&lt;a name="n1"&gt;&lt;/a&gt;A-Aku Tulikovich&lt;/p&gt; ".get_text()</code>
+will become &#8220;<emph>A-Aku Tulikovich</emph>&#8221;. We need to use <code type="inline">.get_text()</code> on each
+item in the list, then append it to a new list containing just the
+names:</p>
+<pre><code class="language-python" xml:id="code_transliterating_18" type="block" corresp="code_transliterating_18.txt"></code></pre>
+<p>To make sure it worked, let&#8217;s check the number of names and then see if
+they look like we expect:</p>
+<pre><code class="language-python" xml:id="code_transliterating_19" type="block" corresp="code_transliterating_19.txt"></code></pre>
+<p>Transliteration can only do so much. Except for proper names, it can
+tell you little about the content of the source being transliterated.
+Yet the ability to transliterate automatically is of great use when
+dealing with lots of names or for people who prefer or need to use ASCII
+characters. It is a simple tool but one that can be an enormous time
+saver.</p>
+</div>
+    </body>
+  </text>
+</TEI>

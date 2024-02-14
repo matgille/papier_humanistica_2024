@@ -1,0 +1,87 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>Descargar páginas web con Python</title>
+  <authors>William J. Turkel,Adam Crymble</authors>
+  <date>2012-07-17</date>
+  <translation_date>2017-03-15</translation_date>
+  <editors>Miriam Posner</editors>
+  <reviewers>Miriam Posner,Jim Clifford,Frederik Elwert</reviewers>
+  <translator>Víctor Gayol</translator>
+  <translation-editor>Adam Crymble</translation-editor>
+  <translation-reviewer>Jairo A. Melo,Maria José Afanador-Llach,Antonio Rojas Castro</translation-reviewer>
+  <review-ticket>https://github.com/programminghistorian/ph-submissions/issues/42</review-ticket>
+  <layout>lesson</layout>
+  <categories>lessons,python,original-ph</categories>
+  <difficulty>2</difficulty>
+  <activity>acquiring</activity>
+  <topics>python</topics>
+  <abstract>Esta lección muestra qué es un Localizador de recursos uniforme (Uniform Resource Locator = URL) y explica cómo utilizar Python para descargar y guardar los contenidos de una página web en tu disco duro.</abstract>
+  <next>manipular-cadenas-de-caracteres-en-python</next>
+  <previous>reutilizacion-de-codigo-y-modularidad</previous>
+  <original>working-with-web-pages</original>
+  <python_warning>False</python_warning>
+  <avatar_alt>Grabado de una mujer y un hombre de pies.</avatar_alt>
+  <doi>10.46430/phes0029</doi>
+  <sequence>5</sequence>
+  <series_total>15</series_total>
+</metadata>
+  <text xml:lang="es">
+    <body>
+      <div type="2" n="1"><head>Objetivos de la lección</head>
+<p>Esta lección muestra qué es un Localizador de recursos uniforme (<emph>Uniform Resource Locator</emph> = URL) y explica cómo utilizar Python para descargar y guardar los contenidos de una página web en tu disco duro.</p>
+</div>
+      <div type="2" n="2"><head>Acerca de los URL</head>
+<p>Una <emph>página web</emph> es un archivo que está almacenado en otra computadora, una máquina conocida como <emph>servidor web</emph>. Cuando tú “vas” a una página web, lo que en realidad sucede es que tu computadora (el <emph>cliente</emph>) envía una solicitud al servidor (el <emph>alojamiento</emph> o <emph>host</emph>) a través de la red, y el servidor responde enviándote una copia de la página a tu máquina. Una manera de ir a una página web con tu navegador es seguir un enlace a alguna otra parte. También tienes la posibilidad de pegar o escribir un localizador de recursos uniforme (URL) directamente en tu navegador. El URL le indica a tu navegador dónde encontrar un recurso en línea especificando el servidor, directorio y nombre del archivo que tiene que ser recuperado, así como el tipo de <emph>protocolo</emph> que tu navegador y el servidor estarán de acuerdo en usar mientras intercambian información (como HTTP o <emph>protocolo de transferencia de hipertexto</emph>). La estructura básica de un URL es:</p>
+<pre><code xml:id="code_trabajar-con-paginas-web_0" type="block" corresp="code_trabajar-con-paginas-web_0.txt"/></pre>
+<p>Veamos algunos ejemplos.</p>
+<pre><code class="language-xml" xml:id="code_trabajar-con-paginas-web_1" type="block" corresp="code_trabajar-con-paginas-web_1.txt"/></pre>
+<p>El tipo más básico de URL simplemente especifica el protocolo y el alojamiento. Si introduces este URL en tu navegador, te mostrará la página principal del sitio <link target="http://oldbaileyonline.org">The Old Bailey Online</link>. Por defecto, la página principal en un directorio se denomina índice, por lo general <code type="inline">index.html</code>.</p>
+<p>El URL también pude incluir un <emph>número de puerto</emph> opcional. Sin entrar en detalles, el protocolo de red que subyace en el intercambio de información en la Internet permite a las computadoras conectarse de diferentes maneras. Los números de puerto se usan para distinguir estas diferentes formas de conexión. Dado que, por defecto, el puerto para HTTP es el número 80, el siguiente URL es equivalente al previo.</p>
+<pre><code class="language-xml" xml:id="code_trabajar-con-paginas-web_2" type="block" corresp="code_trabajar-con-paginas-web_2.txt"/></pre>
+<p>Como sabes, generalmente hay muchas páginas en un determinado sitio web. Éstas están almacenadas en directorios del servidor y tú puedes especificar la ruta (<emph>path</emph>) a una página en particular. La página “Acerca de” del <emph>The Old Bailey Online</emph> tiene el siguiente URL:</p>
+<pre><code class="language-xml" xml:id="code_trabajar-con-paginas-web_3" type="block" corresp="code_trabajar-con-paginas-web_3.txt"/></pre>
+<p>Por último, muchas páginas web te permiten introducir consultas. El sitio web <emph>The Old Bailey Online</emph>, por ejemplo, está diseñado de tal manera que puedes solicitar una página en particular utilizando una <link target="https://es.wikipedia.org/wiki/Query_string"><emph>cadena de consulta</emph></link>. EL siguiente URL te llevará a la página de resultados de búsqueda de registros de juicios criminales que contienen la palabra “arsenic” (arsénico)</p>
+<pre><code class="language-xml" xml:id="code_trabajar-con-paginas-web_4" type="block" corresp="code_trabajar-con-paginas-web_4.txt"/></pre>
+<p>El fragmento de texto después de “?” representa la consulta. Puedes aprender más acerca de la construcción de consultas en <link target="/lessons/downloading-multiple-records-using-query-strings">Descarga de registros múltiples usando cadenas de consulta</link> (en inglés).</p>
+</div>
+      <div type="2" n="3"><head>Abrir URLS con Python</head>
+<p>Como historiador digital a menudo querás utilizar los datos alojados en una base de datos académica en línea. Para obtener estos datos puedes abrir una URL a la vez y copiar y pegar su contenido a un archivo de texto, o puedes utilizar Python para hacer una cosecha por  procesamiento automático de las páginas web. Para hacer esto tienes que ser capaz de abrir cualquier URL con tus propios programas. El lenguaje Python incluye un número de formas estándar para hacer esto.</p>
+<p>Como ejemplo, vamos a trabajar con una tipo de archivo que podrás encontrar haciendo investigación histórica. Digamos que te interesan las relaciones étnicas en la Gran Bretaña del siglo XVIII. The Old Bailey Online (OBO) es una rica fuente que proporciona transcripciones de juicios de 1674 a 1913 y es un buen lugar para buscar documentación.</p>
+<figure><desc>Página principal del sitio The Old Bailey Online</desc><graphic url="old-bailey.png"/></figure>
+<p>Para este ejemplo vamos a utilizar la relatoría del juicio de Benjamin Bowsey, un “moro negro” que fue procesado por romper la paz durante las <link target="http://en.wikipedia.org/wiki/Gordon_Riots">revueltas de Gordon</link> en 1780. El URL para esa entrada es:</p>
+<pre><code class="language-xml" xml:id="code_trabajar-con-paginas-web_5" type="block" corresp="code_trabajar-con-paginas-web_5.txt"/></pre>
+<p>Si estudiamos el URL podemos aprender varias cosas. En primer lugar, OBO fue escrito en JSP (+JavaServer Pages*, un lenguaje de programación que genera HTML), y es posible obtener entradas de procesos judiciales individuales haciendo uso de cadenas de consulta. A cada proceso se le asignó, aparentemente un número de identificación (ID) (<emph>id=t</emph> en el URL), compuesto a partir de la fecha del juicio en formato (<emph>AAAA-MM-DD</emph>) y el número de proceso dentro de esa sesión de la corte, en este caso: <emph>33</emph>. Si cambias <code type="inline">33</code> por <code type="inline">34</code> en tu navegador y presionas Enter, eso te deberá llevar al siguiente proceso. Desafortunadamente no todos los sitios web tienen estos URL tan legibles y fiables.</p>
+<figure><desc>Página de la transcripción del juicio de Benjamin Bowsey, 1780</desc><graphic url="bowsey-trial-page.png"/></figure>
+<p>Tómate unos minutos para ver la página del proceso contra Benjamin Bowsey. No estamos muy interesados en lo que dice la relatoría sino en la información que proporciona la página. Al final de la misma notarás que hay un enlace <link target="http://www.oldbaileyonline.org/browse.jsp?foo=bar&amp;path=sessionsPapers/17800628.xml&amp;div=t17800628-33&amp;xml=yes">View as XML</link> que te lleva a una versión de la página del texto profusamente etiquetado con <link target="https://es.wikipedia.org/wiki/Extensible_Markup_Language">XML</link> que es muy útil para cierto tipo de investigaciones. También puedes ver un escaneo del <link target="http://www.oldbaileyonline.org/images.jsp?doc=178006280084">documento original</link> que fue transcrito para hacer construir esta fuente.</p>
+<p>Ahora vamos a tratar de abrir la página usando Python. Copia el siguiente programa en Komodo Edit y guárdalo como <code type="inline">abre-paginaweb.py</code> Cuando ejecutes el programa abrirá la página del proceso judicial, leerá (<code type="inline">read</code>) su contenido en una cadena de texto de Python llamada <code type="inline">contenidoWeb</code> y luego te mostrará mediante <code type="inline">print</code> los primeros trescientos caracteres de la cadena en el panel de salida de comando. Usa el comando de Firefox <code type="inline">Herramientas -&gt; Desarrollador web -&gt; Código fuente de esta página</code> (Ctrl-U) para verificar que la fuente de la página de ese URL es la misma fuente que tu programa recupera. Consulta la biblioteca de referencias de Python para saber más de <link target="https://docs.python.org/3/library/urllib.html">urllib</link>.</p>
+<pre><code class="language-python" xml:id="code_trabajar-con-paginas-web_6" type="block" corresp="code_trabajar-con-paginas-web_6.txt"/></pre>
+<p>Estas cinco líneas de código logran mucho rápidamente. Vamos a detenernos un momento para asegurarnos de que todo está claro y que puedes reconocer los bloques que permiten que este programa haga lo que queremos que haga.</p>
+<p><emph>url</emph>, <emph>respuesta</emph> y <emph>contenidoWeb</emph> son variables que nosotros mismos hemos llamado así.</p>
+<p><emph>url</emph> contiene el URL de la página web que queremos descargar. En este caso, el juicio contra Benjamien Bowsey.</p>
+<p>En la línea siguiente invocamos a la función <code type="inline">urlopen</code> que está almacenada en un módulo de Python llamado <code type="inline">urllib.py</code> y le hemos pedido a esa función que abra el sitio web en el URL que le especificamos. Entonces, guardamos el resultado de ese proceso en una variable denominada <emph>respuesta</emph>. Esta variable contiene una versión abierta del sitio web solicitado.</p>
+<p>Utilizamos entonces el método <code type="inline">read</code>, que ya usamos anteriormente, para copiar el contenido de esa página web abierta en una nueva variable llamada <emph>contenidoWeb</emph>.</p>
+<p>Asegúrate de que puedes reconocer las variables (hay 3), los módulos (1), los métodos (2) y los parámetros (1) antes de seguir adelante.</p>
+<p>Al ejecutar el programa, te darás cuenta que en el panel de salida se muestra algo etiquetado en HTML:</p>
+<pre><code class="language-xml" xml:id="code_trabajar-con-paginas-web_7" type="block" corresp="code_trabajar-con-paginas-web_7.txt"/></pre>
+<p>El contenido del proceso judicial está mucho más adelante en la página. Lo que vemos aquí es solamente en código HTML de la parte superior del documento. Esto no es lo que necesitamos para una investigación histórica, pero no te preocupes: en breve aprenderás cómo quitar el exceso de etiquetas y obtener el contenido que estás buscando.</p>
+</div>
+      <div type="2" n="4"><head>Guardar una copia local de una página web</head>
+<p>Dado que ya sabes lo suficiente acerca de escribir en archivos, resulta bastante sencillo modificar el programa anterior para que escriba el contenido de la cadena de texto <emph>contenidoWeb</emph> en un archivo local de nuestra computadora en vez de en el panel de salida. Copia el siguiente programa en Komodo Edit, guárdalo como <code type="inline">guardar-paginaweb.py</code> y ejecútalo. Abre en tu navegador el archivo creado en tu disco duro (<code type="inline">obo-t17800628-33.html</code>) para confirmar que la copia que guardaste es igual a la que está en línea.</p>
+<pre><code class="language-python" xml:id="code_trabajar-con-paginas-web_8" type="block" corresp="code_trabajar-con-paginas-web_8.txt"/></pre>
+<p>Ahora, si tu puedes guardar un solo archivo así de fácil, ¿es posible escribir un programa que te permita descargar un puñado de archivos? ¿Es posible incrementar la cantidad de IDs de los juicios y obtener copias de todos ellos en una sola descarga? Efectivamente. Puedes aprender cómo hacerlo en la lección <link target="/lessons/downloading-multiple-records-using-query-strings">Downloading Multiple Files using Query Strings</link>, que te recomendamos ver una vez completadas las lecciones introductorias de esta serie.</p>
+</div>
+      <div type="2" n="5"><head>Lecturas sugeridas</head>
+<ul>
+<li>Lutz, Mark. “Ch. 4: Introducing Python Object Types”, <emph>Learning
+Python</emph> (O’Reilly, 1999).</li>
+</ul>
+</div>
+      <div type="2" n="6"><head>Sicronización de código</head>
+<p>Para seguir a lo largo de las lecciones futuras es importante que tengas los archivos correctos y programas en el directorio "programming-historian" de tu disco duro. Al final de cada lección puedes descargar el archivo zip "python-es-lecciones" para asegurarte que tienes el código correcto.</p>
+<ul>
+<li>python-es-lecciones1.zip (<link target="/assets/python-es-lecciones1.zip">zip</link>)</li>
+</ul>
+</div>
+    </body>
+  </text>
+</TEI>

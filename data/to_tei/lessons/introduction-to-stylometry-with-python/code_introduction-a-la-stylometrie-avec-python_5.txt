@@ -1,0 +1,54 @@
+# Qui sont les auteurs auxquels comparer les articles contestés?
+auteurs = ["Hamilton","Madison"]
+
+# Convertir les occurrences en minuscules pour que toutes les occurrences
+# d'un même mot, avec ou sans majuscule, soient comptabilisées ensemble
+for auteur in auteurs:
+    federalist_par_auteur_occs[auteur] = (
+        [occ.lower() for occ in federalist_par_auteur_occs[auteur]])
+
+# Faire la même chose avec les occurrences des articles contestés
+federalist_par_auteur_occs["Contestes"] = (
+    [occ.lower() for occ in federalist_par_auteur_occs["Contestes"]])
+
+# Calculer un khi carré pour les deux candidats: Madison et Hamilton
+for auteur in auteurs:
+
+    # Construire un corpus combiné et trouver les 500 mots les plus
+    # fréquents dans celui-ci
+    corpus_combine = (federalist_par_auteur_occs[auteur] +
+                      federalist_par_auteur_occs["Contestes"])
+    corpus_combine_freq_dist = nltk.FreqDist(corpus_combine)
+    mots_communs = list(corpus_combine_freq_dist.most_common(500))
+
+    # Quelle proportion du corpus combiné est formé d'occurrences
+    # tirées du corpus de l'auteur candidat?
+    portion_candidat = (len(federalist_par_auteur_occs[auteur])
+                      / len(corpus_combine))
+
+    # Comparons maintenant le nombre d'occurrences observées pour chacun
+    # des 500 mots les plus communs dans le corpus de l'auteur candidat
+    # avec le nombre d'occurrences auquel on se serait attendu si les
+    # articles du candidat et les articles contestés étaient deux
+    # échantillons aléatoires tirés de la même distribution.
+    khicarre = 0
+    for mot,occs_corpus_combine in mots_communs:
+
+        # Nombre d'occurrences observées
+        auteur_occs = federalist_par_auteur_occs[auteur].count(mot)
+        contestes_occs = federalist_par_auteur_occs["Contestes"].count(mot)
+
+        # Nombre d'occurrences attendues
+        auteur_occs_attendues = occs_corpus_combine * portion_candidat
+        contestes_occs_attendues = occs_corpus_combine * (1-portion_candidat)
+
+        # Ajouter la contribution de ce mot au khi carré
+        khicarre += ((auteur_occs-auteur_occs_attendues) *
+                     (auteur_occs-auteur_occs_attendues) /
+                    auteur_occs_attendues)
+
+        khicarre += ((contestes_occs-contestes_occs_attendues) *
+                     (contestes_occs-contestes_occs_attendues)
+                       / contestes_occs_attendues)
+
+    print("Le khi carré mesuré pour le candidat", auteur, "est", khicarre)

@@ -1,0 +1,27 @@
+# html-a-kwic.py
+
+import obo
+
+# crea un diccionario de n-gramas
+n = 7
+url = 'http://www.oldbaileyonline.org/browse.jsp?id=t17800628-33&div=t17800628-33'
+
+texto = obo.paginaWebATexto(url)
+listaPalabrasCompleta = ('# ' * (n//2)).split()
+listaPalabrasCompleta = obo.quitaNoAlfaNum(texto)
+listaPalabrasCompleta += ('# ' * (n//2)).split()
+ngramas = obo.obtenNGramas(listaPalabrasCompleta, n)
+diccionarioPalabras = obo.nGramasAdicKWIC(ngramas)
+
+# genera salida de KWIC y envuelve con html
+objetivo = 'black'
+outstr = '<pre>'
+if objetivo in diccionarioPalabras:
+    for k in diccionarioPalabras[objetivo]:
+        outstr += obo.prettyPrintKWIC(k)
+        outstr += '<br />'
+else:
+    outstr += 'Keyword not found in source'
+
+outstr += '</pre>'
+obo.envuelveCadenaenHTML('html-a-kwic', url, outstr)

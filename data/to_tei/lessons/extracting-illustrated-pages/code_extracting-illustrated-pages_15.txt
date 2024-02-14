@@ -1,0 +1,16 @@
+# Use command-line client to see available metadata formats:
+# `ia metadata formats VOLUME_ID`
+
+# for this lesson, only the Abbyy file is needed
+returned_files = list(ia.get_files(item_id, formats=["Abbyy GZ"]))
+
+# make sure something got returned
+if len(returned_files) > 0:
+    abbyy_file = returned_files[0].name
+else:
+    print("[{}] Could not get Abbyy file".format(item_id))
+    return None
+
+# download the abbyy file to CWD
+ia.download(item_id, formats=["Abbyy GZ"], ignore_existing=True, \
+	destdir=os.getcwd(), no_directory=True)

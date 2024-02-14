@@ -1,0 +1,12 @@
+def l_blobs(gcs_destination_uri):
+
+    #Identify the 'prefix' of the response JSON files, i.e. their path and the beginning of their filename.
+    prefix='/'.join(gcs_destination_uri.split('//')[1].split('/')[1:])
+
+    #Use this prefix to extract the correct JSON response files from your bucket and store them as 'blobs' in a list.
+    blobs_list = list(bucket.list_blobs(prefix=prefix))
+
+    #Order the list by length before sorting it alphabetically so that the text appears in the correct order in the output file (i.e. so that the first two items of the list are 'output-1-to-2.json' and 'output-2-to-3.json' instead 'output-1-to-2.json' and 'output-10-to-11.json', as produced by the default alphabetical order).
+    blobs_list = sorted(blobs_list, key=lambda blob: len(blob.name))
+
+    return blobs_list

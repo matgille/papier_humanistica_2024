@@ -1,0 +1,248 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>An&#225;lisis de correspondencia para la investigaci&#243;n hist&#243;rica usando R
+</title>
+  <original>correspondence-analysis-in-R</original>
+  <collection>lessons</collection>
+  <authors>Ryan Deschamps</authors>
+  <date>2017-06-01</date>
+  <reviewers>Sandra van Ginhoven,Taylor Arnold</reviewers>
+  <editors>Matthew Lincoln</editors>
+  <difficulty>3</difficulty>
+  <review-ticket>https://github.com/programminghistorian/ph-submissions/issues/331</review-ticket>
+  <activity>analyzing</activity>
+  <topics>data-manipulation,network-analysis,r,data-visualization</topics>
+  <translation_date>2022-04-11</translation_date>
+  <translator>Riva Quiroga,Basthian Medina</translator>
+  <translation-editor>Jos&#233; Antonio Motilla</translation-editor>
+  <translation-reviewer>Silvia Guti&#233;rrez,Jos&#233; Antonio Motilla</translation-reviewer>
+  <layout>lesson</layout>
+  <mathjax>True</mathjax>
+  <abstract>Este tutorial explica c&#243;mo implementar e interpretar un an&#225;lisis de correspondencia, el que puede ser utilizado para identificar relaciones entre datos categ&#243;ricos.
+</abstract>
+  <avatar_alt>Diagrama de un cubo con aristas etiquetadas</avatar_alt>
+  <doi>10.46430/phes0058</doi>
+</metadata>
+  <text xml:lang="es">
+    <body><p>El An&#225;lisis de Correspondencia (AC) produce un gr&#225;fico de dos o tres dimensiones basado en las relaciones que existen entre dos o m&#225;s categor&#237;as de datos. Estas categor&#237;as pueden ser "miembros y clubes", "palabras y libros" o "pa&#237;ses y acuerdos comerciales". Por ejemplo, un miembro de un club se puede corresponder con otro miembro de un club sobre la base de los clubes comunes a los que ambos pertenecen. Los miembros que asisten a los mismos clubes probablemente tengan m&#225;s en com&#250;n que aquellos que participan en clubes diferentes. En la misma l&#237;nea, los clubes que comparten miembros tienen una mayor probabilidad de tener m&#225;s en com&#250;n que aquellos que tienen miembros diferentes.<ref type="footnotemark" target="#definitions"/></p>
+<p>Distinguir estas correspondencias significativas puede ser muy dif&#237;cil cuando hay muchos elementos en cada una de las categor&#237;as (por ejemplo, si tienes cientos de miembros distribuidos en docenas de clubes). El AC mide las correspondencias m&#225;s fuertes a lo largo de un conjunto de datos y las proyecta en un espacio multidimensional que puede ser visualizado e interpretado. Usualmente, se crean gr&#225;ficos con las dos primeras dimensiones, aunque es posible mostrar tres con visualizaciones en 3D.</p>
+<p>En el AC, las relaciones entre los elementos se visualizan como distancias en un gr&#225;fico. Gracias a esto, es posible descubrir patrones que se basan en qu&#233; elementos de una categor&#237;a aparecen cercanos a los elementos de otra. As&#237;, este tipo de an&#225;lisis puede ser un buen primer paso para filtrar los principales patrones de un conjunto de datos de gran tama&#241;o. Es una herramienta particularmente poderosa para entender informaci&#243;n hist&#243;rica contenida en colecciones digitales.</p>
+<p>Despu&#233;s de leer este tutorial sabr&#225;s:</p>
+<ul>
+<li>Qu&#233; es el an&#225;lisis de correspondencia y para qu&#233; se usa</li>
+<li>C&#243;mo ejecutar un an&#225;lisis de correspondencia usando el paquete de R FactoMineR</li>
+<li>Describir con precisi&#243;n los resultados de un an&#225;lisis de correspondencia</li>
+</ul>
+<div type="2"><head>Requisitos previos</head>
+<p>Este tutorial est&#225; pensado para personas con un nivel intermedio de programaci&#243;n. Asume un entendimiento b&#225;sico de R y cierto conocimiento de estad&#237;stica.</p>
+<p>Como preparaci&#243;n, se pueden revisar los siguientes tutoriales ya publicados en <emph>Programming Historian</emph>:</p>
+<ul>
+<li>El de Taryn Dewar sobre <link target="/es/lecciones/datos-tabulares-en-r">Datos tabulares en R</link>, que ofrece informaci&#243;n sobre c&#243;mo instalar y configurar R</li>
+<li>El de Taylor Arnold y Lauren Tilton <link target="/es/lecciones/procesamiento-basico-de-textos-en-r">Procesamiento b&#225;sico de textos en R</link>, que puede servir como preparaci&#243;n tambi&#233;n como preparaci&#243;n sobre el uso de este lenguaje de programaci&#243;n</li>
+<li><link target="/es/lecciones/creando-diagramas-de-redes-desde-fuentes-historicas">De la hermen&#233;utica a las redes de datos: Extracci&#243;n de datos y visualizaci&#243;n de redes en fuentes hist&#243;ricas</link>, de Marte D&#252;ring. Como el an&#225;lisis de correspondencia es un tipo de an&#225;lisis de redes sociales, vale la pena darle una mirada a este tutorial ya que contiene informaci&#243;n &#250;til sobre c&#243;mo estructurar datos para el an&#225;lisis de redes</li>
+</ul>
+</div><div type="2"><head>&#191;Qu&#233; es el an&#225;lisis de correspondencia?</head>
+<p>El an&#225;lisis de correspondencia, tambi&#233;n llamado "escalamiento multidimensional" o "an&#225;lisis de red bivariado", permite observar la interrelaci&#243;n de dos grupos en un gr&#225;fico bidimensional. Por ejemplo, fue reconocidamente utilizado por el soci&#243;logo franc&#233;s Pierre Bourdieu para mostrar c&#243;mo categor&#237;as sociales como ocupaci&#243;n influyen en la opini&#243;n pol&#237;tica .<ref type="footnotemark" target="#leroux"/> Este tipo de an&#225;lisis es especialmente poderoso como herramienta para encontrar patrones en conjuntos de datos de gran tama&#241;o.</p>
+<p>El an&#225;lisis de correspondencia funciona con cualquier tipo de datos categ&#243;ricos (es decir, datos que han sido agrupados en categor&#237;as). Partamos con un ejemplo simple. Si quisieras entender el rol que los tratados de comercio internacionales han tenido en la interconexi&#243;n entre las naciones del G8, <link target="/assets/correspondence-analysis-in-R/es-translation/NAFTA-es.csv">podr&#237;as crear una tabla para los pa&#237;ses y las relaciones de libre comercio</link> que han mantenido en un determinado per&#237;odo.</p>
+<p>En el siguiente ejemplo, se muestra una peque&#241;a selecci&#243;n de tratados de comercio (en azul), que incluye el Espacio Econ&#243;mico Europeo (EEE), el Acuerdo Econ&#243;mico y Comercial Global entre la Uni&#243;n Europea y Canad&#225; (AECG), el Tratado de Libre Comercio de Am&#233;rica del Norte (TLCAN), el Acuerdo Transpac&#237;fico de Cooperaci&#243;n Econ&#243;mica (TPP) y la  Asociaci&#243;n de Naciones del Sudeste Asi&#225;tico (ASEAN), y su correspondencia con los pa&#237;ses del G8. Los pa&#237;ses (en rojo) se agrupan geogr&#225;ficamente: los pa&#237;ses orientados hacia el Pac&#237;fico a la derecha, los pa&#237;ses europeos a la izquierda y los norteamericanos al centro. Canad&#225; y los EE.UU., de manera predecible, est&#225;n juntos. Alemania, Italia, Francia y el Reino Unido pertenecen a los mismos dos acuerdos (AECG &amp; EEE), por lo que se encuentran en el mismo punto.</p>
+<figure><desc>An&#225;lisis de correspondencia de una selecci&#243;n de pa&#237;ses del G8 y sus tratados de comercio</desc><graphic url="analisis-de-correspondencia-en-r1.png"/></figure>
+<p>Por otra parte, aunque Rusia y los EE.UU. est&#225;n relativamente cerca en el eje horizontal, en el eje vertical se ubican en polos opuestos. Rusia solo comparte un acuerdo comercial con otro pa&#237;s (Jap&#243;n), mientras que los EE.UU. con dos (Jap&#243;n y Canad&#225;). En un gr&#225;fico de an&#225;lisis de correspondencia, los elementos con pocas relaciones se ubican en la parte externa, mientras que los que tienen m&#225;s relaciones lo har&#225;n cerca del centro. En el an&#225;lisis de correspondencia, la conexi&#243;n relativa o la falta de conexi&#243;n de un dato se mide como <emph>inercia</emph>. La relativa falta de conexi&#243;n produce alta inercia.</p>
+<p>Un punto importante sobre Rusia y los EE.UU es que Rusia es un pa&#237;s del Pac&#237;fico que no pertenece al TPP. Al observar esa relaci&#243;n, historiadores e historiadoras podr&#237;an preguntarse si esto ocurre debido a una relaci&#243;n comercial tensa entre Rusia y EE.UU., comparada con otros pa&#237;ses del G8, o debido a actitudes generales hacia los tratados de comercio por parte de estos pa&#237;ses. <ref type="footnotemark" target="#tratado"/></p>
+<p>Con m&#225;s datos, el an&#225;lisis de correspondencia puede revelar distinciones m&#225;s sutiles entre grupos dentro de una categor&#237;a particular. En este tutorial, daremos una mirada a la vida pol&#237;tica de Canad&#225;, espec&#237;ficamente a c&#243;mo la representatividad pol&#237;tica se organiza en comit&#233;s en un gobierno respecto de otro. Al igual que con los tratados de comercio, esperar&#237;amos que los comit&#233;s que tiene m&#225;s miembros similares est&#233;n m&#225;s cerca. Adem&#225;s, los comit&#233;s que tienen menos representantes en com&#250;n se encontrar&#225;n en los alrededores del gr&#225;fico.</p>
+</div><div type="2"><head>Comit&#233;s parlamentarios de Canad&#225;</head>
+<p>En el sistema parlamentario canadiense la ciudadan&#237;a elige representantes llamados Miembros del Parlamento (MP) para la Casa de los Comunes. Los MP son responsables de votar y proponer cambios a la legislaci&#243;n canadiense. Los <link target="https://perma.cc/CGN6-SA4F">Comit&#233;s Parlamentarios (CP)</link> est&#225;n conformados por MP que informan a la Casa de los Comunes acerca de los detalles importantes de las pol&#237;ticas en un &#225;rea tem&#225;tica. Ejemplos de este tipo de comit&#233;s son el de Finanzas, Justicia y Salud.</p>
+<p>Usaremos abreviaciones para estos comit&#233;s porque los nombres a veces son muy largos, lo que hace dif&#237;cil leerlos en un gr&#225;fico. Puedes usar esta tabla como gu&#237;a de referencia de las abreviaciones.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Abreviaci&#243;n</th>
+<th align="center">Nombre del Comit&#233;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">INDN</td>
+<td align="center">Asuntos Ind&#237;genas y del Norte</td>
+</tr>
+<tr>
+<td align="left">RRHH</td>
+<td align="center">Recursos Humanos, Habilidades y Desarrollo Social y Situaci&#243;n de las Personas con Discapacidad</td>
+</tr>
+<tr>
+<td align="left">FINA</td>
+<td align="center">Finanzas</td>
+</tr>
+<tr>
+<td align="left">EXTR</td>
+<td align="center">Asuntos Exteriores y Comercio Internacional</td>
+</tr>
+<tr>
+<td align="left">INFO</td>
+<td align="center">Acceso a la Informaci&#243;n, Privacidad y &#201;tica</td>
+</tr>
+<tr>
+<td align="left">MAMB</td>
+<td align="center">Medio Ambiente y Desarrollo Sustentable</td>
+</tr>
+<tr>
+<td align="left">HECA</td>
+<td align="center">Herencia Canadiense</td>
+</tr>
+<tr>
+<td align="left">CINM</td>
+<td align="center">Ciudadan&#237;a e Inmigraci&#243;n</td>
+</tr>
+<tr>
+<td align="left">VETE</td>
+<td align="center">Asuntos de Veteranos</td>
+</tr>
+<tr>
+<td align="left">SLUD</td>
+<td align="center">Salud</td>
+</tr>
+<tr>
+<td align="left">TRAN</td>
+<td align="center">Transporte, Infraestructura y Comunidades</td>
+</tr>
+<tr>
+<td align="left">PESQ</td>
+<td align="center">Pesquer&#237;as y Oc&#233;anos</td>
+</tr>
+<tr>
+<td align="left">RRNN</td>
+<td align="center">Recursos Naturales</td>
+</tr>
+<tr>
+<td align="left">SMUJ</td>
+<td align="center">Situaci&#243;n de las Mujeres</td>
+</tr>
+<tr>
+<td align="left">EQUI</td>
+<td align="center">Equidad Salarial</td>
+</tr>
+<tr>
+<td align="left">VCMI</td>
+<td align="center">Violencia contra las Mujeres Ind&#237;genas</td>
+</tr>
+<tr>
+<td align="left">BIPA</td>
+<td align="center">Biblioteca del Parlamento</td>
+</tr>
+<tr>
+<td align="left">AGRI</td>
+<td align="center">Agricultura y Agroalimentos</td>
+</tr>
+<tr>
+<td align="left">JUST</td>
+<td align="center">Justicia y Derechos Humanos</td>
+</tr>
+</tbody></table><p>Como historiador, mi sospecha es que los MP se organizan seg&#250;n los temas de cada comit&#233; de manera distinta de gobierno en gobierno. Por ejemplo, los comit&#233;s formados durante el primer gabinete del gobierno conservador de Stephen Harper podr&#237;an estar organizados de manera distinta a como lo hizo el primer gabinete del liberal Justin Trudeau. Existen razones para esta sospecha. Primero, los CP se forman seg&#250;n liderazgo por partido y las decisiones del comit&#233; necesitan coordinaci&#243;n entre los miembros de la Casa de los Comunes. En otras palabras, los partidos pol&#237;ticos usar&#225;n a los CP como herramientas para anotar puntos pol&#237;ticos y los gobiernos deben asegurar que las personas correctas sean miembros de los partidos adecuados para proteger sus agendas pol&#237;ticas. Segundo, los dos gobiernos tienen focos pol&#237;ticos diferentes. El gobierno conservador de Harper se enfoc&#243; m&#225;s en asuntos de desarrollo econ&#243;mico, mientras que las primeras grandes decisiones del gobierno liberal de Trudeau enfatizaron la equidad social. En resumen, es posible que hayan algunas decisiones calculadas respecto de qui&#233;n va a qu&#233; comit&#233;, lo que provee evidencia sobre las actitudes de un gobierno a favor o en contra de ciertos temas.</p>
+</div><div type="2"><head>Preparando R para el an&#225;lisis de correspondencia</head>
+<p>Para realizar un an&#225;lisis de correspondencia necesitaremos un paquete que pueda realizar &#225;lgebra lineal. Para quienes tengan m&#225;s inclinaci&#243;n por las matem&#225;ticas, en esta lecci&#243;n se incluye un <link target="#Ap%C3%A9ndice">ap&#233;ndice</link> con algunos detalles sobre c&#243;mo se realiza esto. En R, existe una serie de opciones para el AC, pero nosotros utilizaremos el paquete <link target="https://perma.cc/YFT7-P5Y7">FactoMineR</link>,<ref type="footnotemark" target="#factominer"/> que est&#225; enfocado en el "an&#225;lisis exploratorio de datos multivariados". FactoMineR puede ser usado para realizar todo tipo de an&#225;lisis multivariados, incluyendo conglomerados jer&#225;rquicos, an&#225;lisis factorial, etc&#233;tera.</p>
+<p>Pero primero, as&#237; es como se instalan y llaman los paquetes de R, y c&#243;mo luego los datos se asignan a un objeto de R para trabajar sobre ellos.</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_0" type="block" corresp="code_analisis-de-correspondencia-en-r_0.txt"></code></pre>
+</div><div type="2"><head>Los datos</head>
+<p>Los datos originales de la versi&#243;n en ingl&#233;s de este tutorial se encuentran archivados en <link target="http://doi.org/10.5281/zenodo.889846">Zenodo</link>, en caso de que quieras ver los datos brutos. Se han incluido en formato tabular tambi&#233;n. En esta traducci&#243;n al espa&#241;ol trabajaremos sobre una versi&#243;n traducida de los datos (no es necesario que descargues estos archivos de forma manual; los descargaremos directamente usando R):</p>
+<ol>
+<li>[CPCs de Harper]({{ site.baseurl }}/assets/correspondence-analysis-in-R/es-translation/HarperCP-es.csv)</li>
+<li>[CPCs de Trudeau]({{ site.baseurl }}/assets/correspondence-analysis-in-R/es-translation/TrudeauCP-es.csv)</li>
+</ol>
+<p>Revisemos una muestra de los datos de la primera sesi&#243;n del gobierno de Stephen Harper. Las filas representan los comit&#233;s y las columnas son los miembros espec&#237;ficos. Si un miembro pertenece a un comit&#233;, la celda tendr&#225; un 1; si no pertenece, tendr&#225; un 0.</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_1" type="block" corresp="code_analisis-de-correspondencia-en-r_1.txt"></code></pre>
+<p>Estructurada de otra manera (a trav&#233;s de una tabla de R), podemos ver que los comit&#233;s tienen varios MP y que algunos MP son miembros de m&#250;ltiples comit&#233;s. Por ejemplo, la MP liberal Carolyn Bennett fue miembro de "INDN" (Asuntos Ind&#237;genas y del Norte) y de "VCMI" (Violencia en contra de las mujeres ind&#237;genas), y que  "SLUD" (el comit&#233; parlamentario de Salud) inclu&#237;a tanto a D. Wilks como a K. Block. En general, los comit&#233;s tienen entre nueve y doce miembros. Algunos MP son miembros de un solo comit&#233;, mientras otros pueden pertenecer a varios.</p>
+</div><div type="2"><head>An&#225;lisis de correspondencia de los comit&#233;s parlamentarios de Canad&#225; 2006 y 2016.</head>
+<p>Nuestro <emph>data frame</emph> <code type="inline">harper_df</code> est&#225; compuesto por el nombre completo de los comit&#233;s y los nombres de los MP. Como algunos nombres de comit&#233;s son muy largos para que se muestren bien en un gr&#225;fico (por ejemplo, "Recursos Humanos, Habilidades y Desarrollo Social y Situaci&#243;n de las Personas con Discapacidad"), usaremos las abreviaciones.</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_2" type="block" corresp="code_analisis-de-correspondencia-en-r_2.txt"></code></pre>
+<p>La funci&#243;n <code type="inline">table</code> (tabla) permite crear un conjunto de datos tabulares cruzados a partir de dos categor&#237;as de un <emph>data frame</emph>. Como las columnas corresponden a cada MP y las filas a cada comit&#233;, cada celda contiene un 0 o un 1 dependiendo de si la conexi&#243;n existe. Si miramos la asistencia real a cada reuni&#243;n, podr&#237;amos agregar valores ponderados (por ejemplo, 5 para un MP que asiste a un comit&#233; 5 veces). Como regla de oro, se usan valores ponderados cuando las cantidades importan (cuando la gente invierte dinero, por ejemplo), y se usan ceros y unos cuando no.</p>
+<p>Desafortunadamente, tenemos un problema m&#225;s. Un gran n&#250;mero de MP son miembros de un solo comit&#233;. Esto puede provocar que esos MP se superpongan cuando creemos el gr&#225;fico, haci&#233;ndolo menos legible. Pongamos como requerimiento, entonces, que los MP pertenezcan al menos a dos comit&#233;s antes de ejecutar la funci&#243;n de an&#225;lisis de correspondencia de FactoMineR.</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_3" type="block" corresp="code_analisis-de-correspondencia-en-r_3.txt"></code></pre>
+<p>La funci&#243;n <code type="inline">colSums</code> suma los valores de cada columna de la tabla. <code type="inline">rowSums</code> puede utilizarse para sumar las filas si fuese necesario.</p>
+<p>La funci&#243;n <code type="inline">CA</code> (an&#225;lisis de correspondencia, por las siglas en ingl&#233;s de Correspondence Analysis) grafica los resultados para las dos dimensiones principales y guarda el resumen de los datos en una variable a la que llamamos <code type="inline">AC_harper</code>. En gran medida, la funci&#243;n <code type="inline">CA</code> hace casi todo el trabajo por nosotros. Agregamos el argumento <code type="inline">title = "Mapa de factores AC - Harper"</code> para que el t&#237;tulo aparezca en espa&#241;ol. Si no incluyes esa l&#237;nea de c&#243;digo obtendr&#225;s el mismo gr&#225;fico, pero con el t&#237;tulo por defecto en ingl&#233;s ("CA factor map"). Como se se&#241;al&#243; antes, en el <link target="#Ap%C3%A9ndice">ap&#233;ndice</link> se ofrecen m&#225;s detalles sobre las matem&#225;ticas detr&#225;s del AC.</p>
+<p>Al ejecutar el c&#243;digo, deber&#237;as obtener un gr&#225;fico parecido a este:</p>
+<figure><desc>An&#225;lisis de Correspondencia de la primera sesi&#243;n de Comit&#233;s Parlamentarios del Gobierno de Harper</desc><graphic url="analisis-de-correspondencia-en-r2.png"/></figure>
+<p>Procesemos los datos del gobierno de Trudeau de la misma manera:</p>
+<pre><code class="language-R" xml:id="code_analisis-de-correspondencia-en-r_4" type="block" corresp="code_analisis-de-correspondencia-en-r_4.txt"></code></pre>
+<figure><desc>An&#225;lisis de Correspondencia de la primera sesi&#243;n de Comit&#233;s Parlamentarios del Gobierno de Justin Trudeau</desc><graphic url="analisis-de-correspondencia-en-r3.png"/></figure>
+<p>En el caso del gr&#225;fico de Harper, las etiquetas de los datos no son muy legibles tal como est&#225;n. Incluso utilizando las abreviaciones, estas se superponen. El paquete <link target="https://perma.cc/DLZ8-5JE9">factoextra</link><ref type="footnotemark" target="#factoextra"/> tiene un atributo de repulsi&#243;n que ayuda a ver las cosas con mayor claridad.</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_5" type="block" corresp="code_analisis-de-correspondencia-en-r_5.txt"></code></pre>
+<figure><desc>An&#225;lisis de Correspondencia de la primera sesi&#243;n de Comit&#233;s Parlamentarios del Gobierno de Harper</desc><graphic url="analisis-de-correspondencia-en-r4.png"/></figure>
+<p>En vez de superponerse, ahora las etiquetas utilizan flechas para mostrar su ubicaci&#243;n, cuando corresponde.</p>
+</div><div type="2"><head>Interpretaci&#243;n del an&#225;lisis de correspondencia</head>
+<p>Los gr&#225;ficos con los datos se ven mejor, pero &#191;qu&#233; tanto podemos confiar en la validez de los resultados? Nuestra primera pista es mirar las dimensiones (ver Dim 1 y Dim 2 en los ejes horizontal y vertical del gr&#225;fico). En el AC de los datos de Harper, solo un once y diez por ciento de valor explicativo aparece en los ejes horizontal y vertical,<ref type="footnotemark" target="#explanatory"/> lo que da un total &#161;de 21 por ciento! Eso no suena muy prometedor para nuestro an&#225;lisis. Si recordamos que el total del n&#250;mero de dimensiones es igual al n&#250;mero de filas o columnas (la que sea m&#225;s peque&#241;a), esto puede ser preocupante. Cuando ocurren valores tan bajos,  suele significar que que los puntos de datos est&#225;n distribuidos equitativamente. Que los MP est&#233;n distribuidos de manera equitativa en los CP es una convenci&#243;n bastante establecida en el parlamento canadiense.</p>
+<p>Otra manera de mirar los datos es a trav&#233;s de los valores de inercia.<ref type="footnotemark" target="#inertia"/> Se pueden encontrar m&#225;s detalles sobre ella en el <link target="#Ap%C3%A9ndice">ap&#233;ndice</link>, pero mirando este gr&#225;fico, se puede decir que los puntos distantes del origen tienen mayor inercia. Estos puntos sugieren valores fuera de rango, es decir, actores o eventos que tienen que tienen menos conexiones que los que se encuentran en el centro. Los valores bajos, por su parte, sugieren la existencia de puntos de datos que tienen m&#225;s en com&#250;n con el grupo como un todo. Como herramienta de an&#225;lisis, puede ser &#250;til para encontrar actores renegados o subgrupos dentro del conjunto de datos. Si todos los puntos tienen una inercia alta, puede ser indicador de una alta diversidad o fragmentaci&#243;n para las redes. Si es baja puede ser indicador de una mayor cohesi&#243;n o convergencia general. Lo que esto signifique depender&#225; del conjunto de datos. En el caso de nuestros gr&#225;ficos, ning&#250;n punto se aventura m&#225;s all&#225; de dos pasos desde la media. Nuevamente, esto es un indicador de que las relaciones est&#225;n distribuidas de una forma relativamente equitativa.</p>
+<p>Miremos los datos m&#225;s de cerca:</p>
+<pre><code class="language-R" xml:id="code_analisis-de-correspondencia-en-r_6" type="block" corresp="code_analisis-de-correspondencia-en-r_6.txt"></code></pre>
+<p>El c&#243;digo anterior nos entrega un resumen cuyas primeras filas se ven as&#237;:</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_7" type="block" corresp="code_analisis-de-correspondencia-en-r_7.txt"></code></pre>
+<p>Los <code type="inline">Eigenvalues</code> que encabezan el resumen muestran m&#233;tricas para las nuevas dimensiones calculadas. Desafortunadamente, el porcentaje de varianza encontrada en las dos primeras dimensiones es muy bajo. Incluso si pudi&#233;semos visualizar 7 u 8 dimensiones de los datos, solo podr&#237;amos capturar un porcentaje acumulado de alrededor de un 70 por ciento. La prueba de independencia chi cuadrada nos indica que no podemos rechazar la hip&#243;tesis de que nuestras dos categor&#237;as son independientes. El valor p es 0.74,<ref type="footnotemark" target="#pvalue"/> muy por encima del 0.05 que se utiliza habitualmente como punto de corte para rechazar la hip&#243;tesis nula. Un valor p m&#225;s bajo ocurrir&#237;a, por ejemplo, si todos o la mayor parte de los MP fueran miembros de uno o dos comit&#233;s. Si bien el valor p de la prueba de chi cuadrada para la muestra de Trudeau es menor (0.54), a&#250;n no es lo suficientemente bajo como para rechazar la hip&#243;tesis de que son categor&#237;as independientes.<ref type="footnotemark" target="#independientes"/></p>
+<p>Como ya se discuti&#243;, este resultado no es sorprendente. Se espera que los MP est&#233;n distribuidos equitativamente entre comit&#233;s. Si eligi&#233;ramos ponderar nuestras medidas bas&#225;ndonos en la asistencia de los MP a cada comit&#233; o su deseo de ser miembros de ese comit&#233; en una escala de 1 a 100, probablemente ver&#237;amos resultados distintos (por ejemplo, probablemente sea m&#225;s com&#250;n que los MP asistan regularmente a las reuniones de finanzas que a otras).</p>
+<p>&#191;Nos fall&#243; el an&#225;lisis de correspondencia? No realmente. Esto solo significa que no podemos simplemente lanzarle datos a un algoritmo y esperar que responda preguntas hist&#243;ricas reales. Pero no somos solo programadores, sino historiadores e historiadoras que programan. As&#237; que tenemos que ponernos nuestros "lentes hist&#243;ricos" y ver si podemos refinar nuestra investigaci&#243;n.</p>
+</div><div type="2"><head>&#191;Expandi&#243; Trudeau la agenda sobre equidad para las mujeres en el parlamento?</head>
+<p>Una de las primeras movidas pol&#237;ticas que realiz&#243; Justin Trudeau fue asegurarse que Canad&#225; tuviese un gabinete conformado en un 50% por mujeres. Puede decirse que el prop&#243;sito de este anuncio era declarar una agenda de igualdad de g&#233;nero. El gobierno de Trudeau tambi&#233;n cre&#243; en su primera sesi&#243;n un nuevo Comit&#233; Parlamentario por la igualdad de pago para las mujeres. Adem&#225;s, su gobierno introdujo una moci&#243;n para investigar la desaparici&#243;n y asesinato de mujeres ind&#237;genas, que reemplaz&#243; al comit&#233; parlamentario de Harper sobre violencia en contra de las mujeres ind&#237;genas.</p>
+<p>Si Trudeau pretend&#237;a tomarse en serio la igualdad para las mujeres, deber&#237;amos esperar que m&#225;s miembros del Comit&#233; sobre Estado de las Mujeres est&#233;n conectados con carteras como Justicia, Finanzas, Salud y Asuntos Exteriores, respecto del gobierno de Harper. Como el mandato de Harper no ten&#237;a un CP sobre equidad salarial, incluiremos el CP de Violencia contra las mujeres Ind&#237;genas.</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_8" type="block" corresp="code_analisis-de-correspondencia-en-r_8.txt"></code></pre>
+<p>Esto genera el siguiente gr&#225;fico:</p>
+<figure><desc>An&#225;lisis de correspondencia de las comisiones parlamentarias seleccionadas para la primera sesi&#243;n del gobierno de Stephen Harper</desc><graphic url="analisis-de-correspondencia-en-r5.png"/></figure>
+<p>El valor p de la prueba de chi cuadrada para este an&#225;lisis solo se mueve levemente hacia el cero, a 0,71. Todav&#237;a no podemos sacar ninguna conclusi&#243;n cuantitativa sobre una clara relaci&#243;n entre CP y MP. Para nuestros datos, esto no es tan importante como resultado. Quiz&#225;s si sonde&#225;ramos a los MP sobre qu&#233; CP fue el m&#225;s productivo o importante, encontrar&#237;amos valores p m&#225;s bajos. La inercia sobre el eje horizontal casi se duplic&#243;, lo que sugiere que FINA (Finanzas) es un valor fuera de rango en el gr&#225;fico en comparaci&#243;n con otras carteras.</p>
+<p>El significado de un an&#225;lisis de correspondencia depende de la interpretaci&#243;n cualitativa que se haga del gr&#225;fico. Al mirar los elementos del gr&#225;fico de Harper, por ejemplo, podr&#237;amos decir que las preocupaciones econ&#243;micas caen hacia la derecha del eje y que las preocupaciones sociales hacia la izquierda. Por lo que una de las "razones" para escoger a los MP que participan en los comit&#233;s durante el gobierno de Harper pareciera ser distinguir entre preocupaciones sociales y econ&#243;micas.</p>
+<p>Sin embargo, cuando ejecutamos el mismo an&#225;lisis para el gobierno de Trudeau...</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_9" type="block" corresp="code_analisis-de-correspondencia-en-r_9.txt"></code></pre>
+<p>obtenemos una advertencia junto con el gr&#225;fico.</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_10" type="block" corresp="code_analisis-de-correspondencia-en-r_10.txt"></code></pre>
+<p>Este mensaje nos est&#225; indicando que no existen relaciones cruzadas entre algunos de los comit&#233;s. Si miramos el objeto <code type="inline">trudeau_tabla2</code>, vemos lo siguiente:</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_11" type="block" corresp="code_analisis-de-correspondencia-en-r_11.txt"></code></pre>
+<p>&#161;No hay membres&#237;as cruzadas entre Asuntos Extranjeros, Asuntos Ind&#237;genas y del Norte o Justicia! Bueno, solo esto ya es un resultado en s&#237; mismo. Podemos concluir, de manera general, que las agendas de los dos gobiernos son bastante diferentes y que hubo aproximaciones distintas respecto de c&#243;mo organizar a los MP en comit&#233;s.
+Para la historia de Canad&#225;, este resultado hace sentido, considerando que Violencia contra las Mujeres Ind&#237;genas es mucho m&#225;s probable que est&#233; conectado con Asuntos Ind&#237;genas y del Norte y con el Departamento de Justicia (la historia del comit&#233; Violencia contra las Mujeres Ind&#237;genas est&#225; vinculada a un n&#250;mero de casos criminales de alta connotaci&#243;n en Canad&#225;), que con Equidad Salarial. Como se discuti&#243; anteriormente, el an&#225;lisis de correspondencia requiere de una cuota de interpretaci&#243;n para que sea significativo.</p>
+<p>Quiz&#225;s podr&#237;amos mirar algunos comit&#233;s diferentes. Si sacamos "JUST", "INDN" y "EXTR", y los reemplazamos por "CINM" (Ciudadan&#237;a e Inmigraci&#243;n), "ETIC" (&#201;tica y Acceso a la Informaci&#243;n) y "RRHH" (Recursos Humanos), podemos tener finalmente una visi&#243;n de la estructura de los comit&#233;s parlamentarios en este contexto.</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_12" type="block" corresp="code_analisis-de-correspondencia-en-r_12.txt"></code></pre>
+<figure><desc>An&#225;lisis de correspondencia de las comisiones parlamentarias seleccionadas para la primera sesi&#243;n del gobierno de Justin Trudeau</desc><graphic url="analisis-de-correspondencia-en-r6.png"/></figure>
+<p>En general, la inercia sobre el eje horizontal es menos que la del gobierno de Harper, pero la separaci&#243;n tiene a RRHH (Recursos Humanos) y ETIC (&#201;tica) en oposici&#243;n a las otras carteras en la derecha. La demarcaci&#243;n entre temas sociales y econ&#243;micos no es tan evidente como en el caso de Harper, lo que sugiere una filosof&#237;a distinta para la selecci&#243;n. Adem&#225;s, hay menos MP compartiendo las posiciones. Ese puede ser otro misterio para exploraciones futuras. Pese a eso, el proceso llevado a cabo con el an&#225;lisis de correspondencia nos dio una s&#243;lida panor&#225;mica sobre las relaciones que ocurren dentro de los comit&#233;s de un vistazo r&#225;pido, con muy pocos comandos.</p>
+</div><div type="2"><head>An&#225;lisis</head>
+<p>Como en la mayor&#237;a de la investigaci&#243;n interpretativa, no obtuvimos una respuesta un&#237;voca a nuestra pregunta sobre el poder para las mujeres en los gobiernos parlamentarios. En el caso de Harper, vemos una divisi&#243;n entre asuntos sociales, como Salud y Justicia, y asuntos econ&#243;micos, como Finanzas y Relaciones Exteriores, que da cuenta del 35% de la varianza. De la visualizaci&#243;n podemos suponer que Finanzas (FINA) y Asuntos Exteriores (EXTR) tienen un miembro en com&#250;n y que Asuntos Exteriores (EXTR) tiene un miembro en com&#250;n con Violencia Contra la Mujer Ind&#237;gena (VCMI). Este resultado es posiblemente de inter&#233;s, ya que las agendas m&#225;s publicitadas de Stephen Harper tendieron a enfocarse en preocupaciones econ&#243;micas como comercio y control fiscal. La separaci&#243;n de los comit&#233;s sugiere que la filosof&#237;a de gobierno de Harper separaba las preocupaciones econ&#243;micas de las sociales, y que los derechos de las mujeres eran principalmente una preocupaci&#243;n de tipo social. La cartera de Situaci&#243;n de las Mujeres (SMUJ) aparece separada del resto de las carteras y se encuentra conectada con otras solo a trav&#233;s de MP comunes con los comit&#233;s de Violencia contra las Mujeres Ind&#237;genas (VCMI) y Asuntos Ind&#237;genas y del Norte (INDN).</p>
+<p>Los gr&#225;ficos del gobierno de Trudeau no muestran conexiones cruzadas entre la cartera de Situaci&#243;n de las Mujeres y Justicia, Asuntos Exteriores y Personas Ind&#237;genas, pero s&#237; conexiones con Finanzas, Ciudadan&#237;a, Recursos Humanos y &#201;tica. Situaci&#243;n de las Mujeres est&#225; conectada con Finanzas e Inmigraci&#243;n a trav&#233;s de la cartera de Equidad Salarial.</p>
+<p>Puede decirse, entonces, que el gobierno de Harper aline&#243; los derechos de las mujeres con carteras sociales, tales como Justicia y Salud, mientras que Trudeau elev&#243; el perfil de Situaci&#243;n de las Mujeres hasta cierto punto al incluir el comit&#233; de Equidad Salarial. La conexi&#243;n entre comit&#233;s focalizados en los derechos de la Mujer y carteras fuertes como Salud, Finanzas y Ciudadan&#237;a e Inmigraci&#243;n en el gobierno de Trudeau merece un an&#225;lisis m&#225;s detallado. El comit&#233; de Situaci&#243;n de las Mujeres, en este contexto, parece poseer un posici&#243;n m&#225;s central (cercana al origen) en el gobierno de Trudeau que en el gobierno de Harper. Dicho esto, el n&#250;mero de puntos de datos en este caso sigue siendo bastante peque&#241;o para derivar una conclusi&#243;n definitiva. Tal vez otras fuentes podr&#237;an ser visualizadas en forma similar para confirmar o negar este punto.</p>
+<p>La agenda previamente sostenida entre mujeres y pueblos ind&#237;genas ha sido remplazada en el caso de Trudeau. Tal como se revis&#243; anteriormente, la <link target="https://perma.cc/5YZL-RWHX">Investigaci&#243;n Nacional sobre Mujeres y Ni&#241;as Ind&#237;genas Desaparecidas y Asesinadas</link> sustituy&#243; el mandato del comit&#233; sobre la Violencia Contra Mujeres Ind&#237;genas que existi&#243; durante el gobierno de Harper. La historia de este reemplazo es compleja, pero, en pocas palabras, el gobierno de Harper vivi&#243; presiones pol&#237;ticas para crear la Investigaci&#243;n Nacional sobre Mujeres y Ni&#241;as Ind&#237;genas Desaparecidas y Asesinadas a partir del juicio a Robert Pickton y los reportes de que las investigaciones policiales eran insuficientes en el caso de mujeres ind&#237;genas desaparecidas. Harper se rehus&#243; a realizar un Comit&#233; de Investigaci&#243;n diciendo que el CP era la mejor aproximaci&#243;n.<ref type="footnotemark" target="#pickton"/> Trudeau hizo la promesa de campa&#241;a de incluir esta investigaci&#243;n y, por tanto, desplazar as&#237; al CP. En cierto grado, pareciera que Harper le di&#243; un rol bastante central a la Violencia contra Mujeres Ind&#237;genas en la planificaci&#243;n de los comit&#233;s parlamentarios. Esta evidencia es un contrapunto a las cr&#237;ticas de que Harper no se tom&#243; con seriedad el problema de las mujeres ind&#237;genas desaparecidas y asesinadas.</p>
+<p>Las diferencias entre las dos relaciones levanta importantes preguntas sobre el rol de la situaci&#243;n de la mujer en el discurso pol&#237;tico y sus interconexiones entre la identidad racial, finanzas p&#250;blicas, salud y justicia social. Ser&#237;a interesante, tal vez, explorar estas en mayor detalle en trabajos cualitativos. Tambi&#233;n plantea importantes preguntas sobre un enfoque de g&#233;nero en general (seg&#250;n la cartera de Situaci&#243;n de la Mujer) o, m&#225;s espec&#237;ficamente, en lo que respecta a un grupo marginalizado (Mujeres Ind&#237;genas Desaparecidas y Asesinadas). Un art&#237;culo de pol&#237;tica relacionado con los beneficios de una investigaci&#243;n versus una discusi&#243;n del Comit&#233; Parlamentario parece razonable luego de haber examinado esta evidencia. Tal vez existe un argumento que exponga que el cambio de VCMI por EQUI es una especie de tejado de vidrio, en tanto coloca artificialmente una cuota sobre los problemas de las mujeres mientras carteras establecidas permanecen intactas. Como una herramientas exploratoria, el AC ayuda a identificar tales temas a trav&#233;s de observaciones emp&#237;ricas, m&#225;s que a trav&#233;s de la teor&#237;a o sesgos personales.</p>
+</div><div type="2"><head>Conclusi&#243;n</head>
+<p>Ahora que este tutorial est&#225; completo, deber&#237;as tener alguna idea sobre qu&#233; es el an&#225;lisis de correspondencia (AC) y c&#243;mo puede ser utilizado para responder preguntas exploratorias sobre los datos. Usamos la funci&#243;n <code type="inline">CA</code> del paquete FactoMineR para crear el an&#225;lisis y graficar los resultados en dos dimensiones. Cuando las etiquetas se superpusieron, aplicamos la funci&#243;n <code type="inline">viz_ca_biplot</code> del paquete factoextra para desplegar los datos en un formato m&#225;s legible.</p>
+<p>Tambi&#233;n aprendimos c&#243;mo interpretar un AC y c&#243;mo detectar posibles errores anal&#237;ticos, incluyendo casos en el que las relaciones entre categor&#237;as est&#225;n distribuidas uniformemente y tienen un bajo valor explicativo. En este caso, refinamos nuestra pregunta de investigaci&#243;n y nuestros datos para proveer de una imagen m&#225;s significativa sobre qu&#233; estaba pasando.</p>
+<p>En general, el beneficio de esta an&#225;lisis es entregar un resumen r&#225;pido de dos sets de datos categ&#243;ricos como un paso inicial para problem&#225;ticas hist&#243;ricas m&#225;s sustantivas. El uso de miembros y reuniones o eventos en todas las &#225;reas de la vida (negocios, organizaciones sin fines de lucro, reuniones municipales, hashtags de twitter, etc&#233;tera) es una aproximaci&#243;n com&#250;n para este an&#225;lisis. Los grupos sociales y sus preferencias es otro uso com&#250;n del AC. En cada caso, la visualizaci&#243;n ofrece un mapa con el cual observar una fotograf&#237;a de la vida social, cultural y pol&#237;tica.</p>
+<p>El siguiente paso deber&#237;a incluir la adici&#243;n de m&#225;s dimensiones categ&#243;ricas para nuestro an&#225;lisis, tal como la incorporaci&#243;n de partidos pol&#237;ticos, edad o g&#233;nero. Al AC con m&#225;s de dos categor&#237;as, se le conoce como un <link target="https://perma.cc/XEJ9-C4Q3">An&#225;lisis de Correspondencia M&#250;ltiple o MCA, por sus siglas en ingl&#233;s</link>. Si bien las matem&#225;ticas del MCA son m&#225;s complicadas, el resultado final es bastante similar al CA.</p>
+<p>Por suerte, ahora puedes aplicar estos m&#233;todos a tus propios datos, ayud&#225;ndote a dejar al descubierto preguntas e hip&#243;tesis que enriquezcan tu investigaci&#243;n hist&#243;rica. &#161;Buena suerte!</p>
+</div><div type="2"><head>Ap&#233;ndice: Las matem&#225;ticas detr&#225;s del An&#225;lisis de Correspondencia</head>
+<p>Dado que las matem&#225;ticas del CA ser&#225; de inter&#233;s para algunas personas pero no para otras, las he incluido en este ap&#233;ndice. Esta secci&#243;n tambi&#233;n contiene un poco m&#225;s de detalles sobre otros temas como <emph>inercia</emph>, <emph>dimensiones</emph> y <emph>descomposici&#243;n en valores singulares</emph> (SVD)</p>
+<p>Para que sea m&#225;s f&#225;cil de entender, comenzaremos solo con algunos comit&#233;s: SMUJ (Situaci&#243;n de las Mujeres), SLUD (Salud), INDN (Asuntos Ind&#237;genas y del Norte), VCMI (Violencia contra las Mujeres Ind&#237;genas) y JUST (Justicia y Derechos Humanos).</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_13" type="block" corresp="code_analisis-de-correspondencia-en-r_13.txt"></code></pre>
+<p>El An&#225;lisis de Correspondencia est&#225; hecho sobre un set de datos "normalizado" que es creado a trav&#233;s de la divisi&#243;n del valor de cada celda por la ra&#237;z cuadrada del producto de los totales de la columna y fila,<ref type="footnotemark" target="#faust"/> o celda \(\frac{1}{\sqrt{total columna \times total fila}}\). Por ejemplo, la celda para FEWO y S Ambler es \(\frac{1}{\sqrt{3 \times 3}}\) o 0.333.</p>
+<p>La tabla normalizada luce as&#237;:</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_14" type="block" corresp="code_analisis-de-correspondencia-en-r_14.txt"></code></pre>
+<p>El proceso de normalizaci&#243;n hace algo interesante. Quienes son miembros de m&#250;ltiples comit&#233;s y/o quienes pertenecen a comit&#233;s con muchos miembros tender&#225;n a tener puntajes normalizados m&#225;s bajos. Esto nos sugiere que estos miembros son m&#225;s centrales en la red. Es decir, estos miembros ser&#225;n puestos m&#225;s hacia el centro de la matriz. Por ejemplo, la celda que pertenece a S. Ambler y SMUJ tiene 0.192, el puntaje m&#225;s bajo, debido a que S. Ambler es un miembro de tres comit&#233;s y el comit&#233; VCMI tiene nueve miembros en el gr&#225;fico representado.</p>
+<p>El pr&#243;ximo paso es encontrar la descomposici&#243;n en valores singulares de estos datos normalizados. Esto implica un &#225;lgebra lineal bastante compleja que no ser&#225; revisada ac&#225;, pero sobre la que puedes aprender m&#225;s en <link target="https://perma.cc/9M7K-UHVL">este tutorial sobre descomposici&#243;n en valores singulares (en ingl&#233;s)</link> o ver m&#225;s detalles en <link target="https://perma.cc/7PN4-AEME">este documento pdf sobre SVD (en ingl&#233;s)</link>.<ref type="footnotemark" target="#svd"/> Intentar&#233; resumir qu&#233; ocurre en t&#233;rminos sencillos.</p>
+<ul>
+<li>Dos nuevas matrices que muestran puntajes de "dimensi&#243;n" para las filas (comit&#233;s) y las columnas (MP) son creadas a partir de <emph>eigenvectors</emph></li>
+<li>El n&#250;mero de dimensiones es igual al tama&#241;o de las columnas o filas menos 1; la que sea m&#225;s peque&#241;a. En este caso, hay cinco comit&#233;s comparados con los 11 MP, por lo que el n&#250;mero de dimensiones es cuatro</li>
+<li>Una matriz adicional muestra los <emph>eigenvalues</emph>, que pueden ser usados para mostrar la influencia de cada dimensi&#243;n en el an&#225;lisis</li>
+<li>Uno de varios "tratamientos" es aplicado a los datos para hacerlos m&#225;s f&#225;ciles de graficar. El m&#225;s com&#250;n es el enfoque de "coordenadas est&#225;ndar" (<emph>standard coordinates</emph>), que compara cada puntaje normalizado positiva o negativamente con el puntaje promedio</li>
+</ul>
+<p>Usando coordenadas est&#225;ndar, nuestra tabla de datos muestra lo siguiente:</p>
+<pre><code xml:id="code_analisis-de-correspondencia-en-r_15" type="block" corresp="code_analisis-de-correspondencia-en-r_15.txt"></code></pre>
+<p>Cada puntaje para una "dimensi&#243;n" puede ser usado como una coordenada en un gr&#225;fico. Dado que no podemos visualizar en cuatro dimensiones, los <emph>outputs</emph> de un CA, usualmente se enfocan en las primeras dos o tres dimensiones para producir el gr&#225;fico (por ejemplo, SLUD ser&#225; graficado sobre [1.245, 0.989] o [1.245, 0.989, 0.438] en un gr&#225;fico 3D).</p>
+<figure><desc>An&#225;lisis de correspondencia de las comisiones parlamentarias seleccionadas para la primera sesi&#243;n del gobierno de Stephen Harper, 2006</desc><graphic url="analisis-de-correspondencia-en-r7.png"/></figure>
+<p>Los puntajes de <emph>inercia</emph> son una forma de mostrar varianza en los datos. Salud y Justicia, teniendo la menor cantidad de miembros, tienen un alto puntaje de inercia, mientras que el comit&#233; m&#225;s popular (VCMI) tiene una inercia peque&#241;a. Por tanto, la inercia es una forma de cuantificar la distancia de los puntos desde el centro del gr&#225;fico.</p>
+<p>Otro puntaje importante es visible en el gr&#225;fico CA: el porcentaje de valor explicativo para cada dimensi&#243;n. Esto significa que el eje horizontal explica el 43.32 por ciento de la varianza en el gr&#225;fico, mientras que el eje vertical explica casi el 31 por ciento. El significado de estos ejes debe ser interpretado basado en el gr&#225;fico. Por ejemplo, podr&#237;amos decir que el lado izquierdo representa problemas concernientes a la identidad social y aquellos a la derecha son de tipo regulatorio. Un an&#225;lisis hist&#243;rico adicional de las actas de estos comit&#233;s podr&#237;a a su vez ofrecer una mayor comprensi&#243;n sobre lo que significaba la participaci&#243;n de estos miembros en ese momento.</p>
+</div><div type="2"><head>Notas finales</head>
+<p><note id="definitions"> El AC tiene una historia que se ramifica de varias disciplinas y, por lo tanto, la terminolog&#237;a puede ser confusa. Para simplificar, <emph>categor&#237;as</emph> se refiere a los tipos de datos que se comparan (por ejemplo, <emph>Miembros</emph> y <emph>clubs</emph>), mientras que cada elemento dentro de esas categor&#237;as (por ejemplo, "El club de tenis" o "John McEnroe") ser&#225; un <emph>elemento</emph> dentro de esa categor&#237;a. La ubicaci&#243;n cuantitativa de los elementos (coordenadas x e y) son <emph>puntos de datos</emph>.</note></p>
+<p><note id="leroux"> Brigitte Le Roux and Henry Rouanet, <emph>Multiple Correspondence Analysis</emph> (Los Angeles: SAGE Publications, 2010), pg. 3;</note></p>
+<p><note id="tratado"> No quisiera sugerir que este an&#225;lisis sea de alguna manera concluyente sobre las relaciones comerciales entre Estados Unidos y Rusia. El caso es que debido a que Rusia no es parte del TPP en este acuerdo, se separa de Estados Unidos. Por otro lado, si se pudiera demostrar que la membres&#237;a al TPP representa lazos tensos entre Estados Unidos y Rusia, aparecer&#237;a en el gr&#225;fico de AC.</note></p>
+<p><note id="factoextra"> Alboukadel Kassambara and Fabian Mundt (2017). factoextra: Extract and Visualize the Results of Multivariate Data Analyses. R package version 1.0.4. <link target="https://CRAN.R-project.org/package=factoextra">https://CRAN.R-project.org/package=factoextra</link>.</note></p>
+<p><note id="factominer"> Sebastien Le, Julie Josse, Francois Husson (2008). FactoMineR: An R Package for Multivariate Analysis. Journal of Statistical Software, 25(1), 1-18.<link target="https://doi.org/10.18637/jss.v025.i01">10.18637/jss.v025.i01</link>.</note></p>
+<p><note id="explanatory"> Un <emph>valor explicativo</emph> hace referencia a la distancia de los puntos de datos respecto del centro del gr&#225;fico. Cada dimensi&#243;n da cuenta de parte de la distancia en que los puntos de datos divergen del centro.</note></p>
+<p><note id="inertia"> En general, en estad&#237;stica el t&#233;rmino <emph>inercia</emph> hace referencia a la variaci&#243;n o "extensi&#243;n" de un conjunto de datos. Es an&#225;loga a la desviaci&#243;n est&#225;ndar en la distribuci&#243;n de datos.</note></p>
+<p><note id="pickton"> Ver Laura Kane (April 3, 2017), "Missing and murdered women's inquiry not reaching out to families, say advocates." <emph>CBC News Indigenous</emph>. <link target="https://perma.cc/MH3Y-9HW2">http://www.cbc.ca/news/indigenous/mmiw-inquiry-not-reaching-out-to-families-says-advocates-1.4053694</link></note></p>
+<p><note id="pvalue"> En estad&#237;stica, un valor p, una abreviaci&#243;n para <emph>valor de probabilidad</emph>, es un indicador de qu&#233; tan probable es que un determinado resultado haya ocurrido por azar. Un valor p bajo sugiere una baja probabilidad de que el resultado sea producto del azar y, por lo tanto, entrega evidencia de que la hip&#243;tesos nula, (en este caso, que los MP y los CP son categor&#237;as independientes) es poco probable.</note></p>
+<p><note id="independientes"> Dado que este valor p no es menor que 0.05, no puede rechazarse la hip&#243;tesis nula. Es decir, que no tenemos evidencia suficiente para decir que existe una asociaci&#243;n entre que dado un cierto MP, estar&#225; en un cierto Comit&#233;.</note></p>
+<p><note id="faust"> Katherine Faust (2005) "Using Correspondence Analysis for Joint Displays of Affiliation Network" in <emph>Models and Methods in Social Network Analysis</emph> eds. Peter J. Carrington, John Scott and Stanley Wasserman.</note></p>
+<p><note id="svd"> Otros recursos que podr&#237;an ser &#250;tiles para aprender sobre SVD son los siguientes: <link target="https://perma.cc/YA79-R5QR">este tutorial en ingl&#233;s que utiliza ejemplos en R</link>, <link target="https://perma.cc/UR8K-W92L">este tutorial en ingl&#233;s que explica las matem&#225;ticas detr&#225;s del AC usando R</link> y <link target="https://www.youtube.com/watch?v=gXbThCXjZFM&amp;list=PLMrJAkhIeNNRpsRhXTMt8uJdIGz9-X_1-&amp;index=2">esta serie de videos en ingl&#233;s de YouTube sobre SVD</link>.</note></p>
+</div></body>
+  </text>
+</TEI>

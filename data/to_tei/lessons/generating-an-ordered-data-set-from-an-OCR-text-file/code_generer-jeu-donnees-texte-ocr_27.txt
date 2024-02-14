@@ -1,0 +1,37 @@
+fin = open("your_current_source_file.txt", 'r')
+GScriba = fin.readlines()
+
+# dans la variable notemark, notez l’expression 'lookbehind' '?<!' pour s'assurer que
+# le marqueur '(1)' ne commence pas la chaîne
+notemark = re.compile(r"\(\d+\)(?<!^\(\d+\))")
+notetext = re.compile(r"^\(\d+\)")
+this_charter = 1
+pg = re.compile("~~~~~ PAGE \d+ ~~~~~")
+pgno = 1
+fndict = {}
+
+for line in GScriba:
+    nmarkers = notemark.findall(line)
+    ntexts = notetext.findall(line)
+    if pg.match(line):
+        # C’est notre 'sentinelle'. Nous sommes arrivés à la fin d’une page,
+        # Nous enregistrons donc nos données de note de bas de page accumulées dans le dictionnaire 'charters'.
+        for fn in fndict:
+            chid = fndict[fn]['chid']
+            fntext = fndict[fn]['fntext']
+            charters[int(chid)]['footnotes'].append((fn, fntext))
+        pgno += 1
+        fndict = {}  # puis réinitialisez notre conteneur temporaire
+    if slug.match(line): # c’est le début d’une charte, il faut donc actualiser la variable
+        this_charter = int(slug.match(line).group(3))
+    if nmarkers:
+        for marker in [eval(x) for x in nmarkers]:
+            # créer une entrée avec l’identifiant de la charte et un champ de texte vide
+            fndict[marker] = {'chid':this_charter, 'fntext': ''}
+    if ntexts:
+        for text in [eval(x) for x in ntexts]:
+            try:
+                # remplir le champ vide approprié.
+                fndict[text]['fntext'] = re.sub('\(\d+\)', '', line).strip()
+            except KeyError:
+                print("printer's error? ", "pgno:", pgno, line)

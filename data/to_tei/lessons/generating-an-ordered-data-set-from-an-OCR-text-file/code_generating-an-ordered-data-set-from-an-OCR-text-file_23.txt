@@ -1,0 +1,63 @@
+slug = re.compile("(\[~~~~\sGScriba_)(.*)\s::::\s(\d+)\s~~~~\]")
+fol = re.compile("\[fo\.\s?\d+\s?[rv]\.\s?\]")
+pgbrk = re.compile("~~~~~ PAGE (\d+) ~~~~~")
+
+fin = open("your_current_source_file.txt", 'r')
+GScriba = fin.readlines()
+
+# we'll also need these global variables with starting values as we mentioned at the top
+n = 0
+this_folio  = '[fo. 1 r.]'
+this_page = 1
+
+# 'charters' is also defined as a global variable. The 'for' loop below
+#  and in the following sections, will build on and modify this dictionary
+charters = dict()
+
+for line in GScriba:
+    if fol.match(line):
+        # use this global variable to keep track of the folio number.
+        # we'll create the 'folio' field using the value of this variable
+        this_folio = fol.match(line).group(0)
+        continue # update the variable but otherwise do nothing with this line.
+    if slug.match(line):
+        # if our 'slug' regex matches, we know we have a new charter
+        # so get the data from the match groups
+        m = slug.match(line)
+        chid = "GScriba_" + m.group(2)
+        chno = int(m.group(3))
+
+        # then create an empty nested dictionary
+        charters[chno] = {}
+
+        # and an empty container for all the lines we won't use on this pass
+        templist = [] # this works because we're proceeding in document order: templist continues to exist as we iterate through each line in the charter, then is reset to the empty list when we start a new charter(slug.match(line))
+        continue # we generate the entry, but do nothing with the text of this line.
+    if chno:
+        # if a charter dictionary has been created,
+        # then we can now populate it with data from our slug.match above.
+        d = charters[chno] # 'd' is just more convenient than 'charters[chno]'
+        d['footnotes'] = [] # We'll populate this empty list in a separate operation
+        d['chid'] = chid
+        d['chno'] = chno
+        d['folio'] = this_folio
+        d['pgno'] = this_page
+
+        if re.match('^\(\d+\)', line):
+            # this line is footnote text, because it has a footnote marker
+            # like "(1)" at the beginning. So we'll deal with it later
+            continue
+        if pgbrk.match(line):
+            # if line is a pagebreak, update the variable
+            this_page = int(pgbrk.match(line).group(1))
+        elif fol.search(line):
+            # if folio changes within the charter text, update the variable
+            this_folio = fol.search(line).group(0)
+            templist.append(line)
+        else:
+            # any line not otherwise accounted for, add to our temporary container
+            templist.append(line)
+        # add the temporary container to the dictionary after using
+        # a list comprehension to strip out any empty lines.
+        d['text'] = [x for x in templist if not x == '\n'] # strip empty lines
+

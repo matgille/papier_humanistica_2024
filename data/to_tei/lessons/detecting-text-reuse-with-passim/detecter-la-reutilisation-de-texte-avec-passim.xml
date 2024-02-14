@@ -1,0 +1,395 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>D&#233;tecter la r&#233;utilisation de texte avec Passim</title>
+  <collection>lessons</collection>
+  <layout>lesson</layout>
+  <slug>detecter-la-reutilisation-de-texte-avec-passim</slug>
+  <date>2021-05-16</date>
+  <modified>2023-01-06</modified>
+  <authors>Matteo Romanello,Simon Hengchen</authors>
+  <reviewers>Ryan Muther,Marco B&#252;chler</reviewers>
+  <editors>Anna-Maria Sichani</editors>
+  <translation_date>2021-09-10</translation_date>
+  <translator>Carla Amaya</translator>
+  <translation-editor>C&#233;lian Ringwald</translation-editor>
+  <translation-reviewer>Cyrille Suire</translation-reviewer>
+  <topics>data-manipulation</topics>
+  <review-ticket>https://github.com/programminghistorian/ph-submissions/issues/372</review-ticket>
+  <difficulty>3</difficulty>
+  <activity>transforming</activity>
+  <original>detecting-text-reuse-with-passim</original>
+  <avatar_alt>Pile de journaux entour&#233;e de plumes et de fils t&#233;l&#233;graphiques</avatar_alt>
+  <abstract>Dans cette le&#231;on, vous serez initi&#233; &#224; la d&#233;tection automatique de la r&#233;utilisation des textes avec la biblioth&#232;que Passim. Vous apprendrez comment installer et ex&#233;cuter Passim et ses d&#233;pendances, comment pr&#233;parer vos textes en tant que fichiers d'entr&#233;e adapt&#233;s &#224; l'utilisation de Passim et, enfin, comment traiter la sortie g&#233;n&#233;r&#233;e par Passim pour effectuer des analyses de base.</abstract>
+  <doi>10.46430/phfr0018</doi>
+</metadata>
+  <text xml:lang="fr">
+    <body><p>Dans cette le&#231;on, vous serez initi&#233;(e) &#224; la d&#233;tection automatique de la r&#233;utilisation des textes avec la biblioth&#232;que Passim. Vous apprendrez comment installer et ex&#233;cuter Passim et ses d&#233;pendances, comment pr&#233;parer vos textes en tant que fichiers d'entr&#233;e adapt&#233;s &#224; l'utilisation de Passim et, enfin, comment traiter la sortie g&#233;n&#233;r&#233;e par Passim pour effectuer des analyses de base.</p>
+<p>Cette le&#231;on s'adresse aux personnes dont le travail rel&#232;ve des humanit&#233;s num&#233;riques (HN). Aucune connaissance pr&#233;alable de la r&#233;utilisation de texte n'est requise, toutefois, il est n&#233;cessaire d'avoir une compr&#233;hension basique de <link target="https://fr.wikipedia.org/wiki/Bourne-Again_shell">l'usage de l'environnement bash</link> et du langage Python, ainsi que de certaines op&#233;rations de manipulation de donn&#233;es. Si vous souhaitez compl&#233;ter vos connaissances concernant l'utilisation du bash et de <link target="https://fr.wikipedia.org/wiki/Python_(langage)">Python</link>, r&#233;f&#233;rez-vous aux tutoriels du <emph>Programming Historian</emph> suivants qui offrent une <link target="/en/lessons/intro-to-bash">introduction au bash</link> et &#224; la <link target="/fr/lecons/?topic=python">collection de tutoriels sur Python</link>.</p>
+<p>Plus particuli&#232;rement, la le&#231;on donne un aper&#231;u de <link target="https://github.com/dasmiq/passim">Passim</link>, un outil open source con&#231;u pour la d&#233;tection automatique de la r&#233;utilisation de texte. Bien que cet outil ait &#233;t&#233; employ&#233; dans des projets HN, grands comme petits, une documentation destin&#233;e aux utilsateurs et utilisatrices pour une prise en main facile, avec des exemples et des instructions, fait d&#233;faut. Ainsi, nous visons &#224; combler cette lacune gr&#226;ce &#224; cetter le&#231;on du <emph>Programming Historian</emph>.</p>
+<div type="2"><head>Introduction &#224; la r&#233;utilisation de texte</head>
+<p>La r&#233;utilisation de texte peut &#234;tre d&#233;finie comme &#171;&#8239;une r&#233;it&#233;ration significative d'un texte, g&#233;n&#233;ralement au-del&#224; de la simple r&#233;p&#233;tition du langage courant&#8239;&#187; (Romanello et al. 2014). Il s'agit d'un concept si large, qu'il peut &#234;tre compris &#224; diff&#233;rents niveaux et &#234;tre &#233;tudi&#233; dans une grande vari&#233;t&#233; de contextes. Dans un contexte de publication ou d'enseignement, par exemple, les cas de r&#233;utilisation de texte peuvent &#234;tre consid&#233;r&#233;s comme du plagiat, si des parties de texte d'un(e) autre auteur(e) sont employ&#233;es sans une r&#233;f&#233;rence appropri&#233;e. Dans le cadre des &#233;tudes litt&#233;raires, la r&#233;utilisation de texte n'est bien souvent qu'un synonyme pour d&#233;signer des ph&#233;nom&#232;nes litt&#233;raires tels que les allusions, les paraphrases et les citations directes.</p>
+<p>La liste ci-dessous pr&#233;sente une partie des outils qui permettent de d&#233;tecter la r&#233;utilisation de texte : </p>
+<ul>
+<li><link target="https://docs.ropensci.org/textreuse/">Paquet <code type="inline">textreuse</code></link> (R) d&#233;velopp&#233; par Lincoln Mullen</li>
+<li><link target="https://www.etrap.eu/research/tracer/">TRACER</link> (Java) d&#233;velopp&#233; par Marco B&#252;chler et ses collaborateurs</li>
+<li><link target="https://blast.ncbi.nlm.nih.gov/Blast.cgi">Basic Local Alignment Search Tool (BLAST)</link></li>
+<li><link target="https://github.com/tesserae/tesserae">Tesserae</link> (PHP, Perl)</li>
+<li><link target="https://github.com/ARTFL-Project/text-pair">TextPAIR (Pairwise Alignment for Intertextual Relations)</link></li>
+<li><link target="https://github.com/dasmiq/passim">Passim</link> (Scala) d&#233;velopp&#233; par <link target="http://www.ccs.neu.edu/home/dasmith/">David Smith</link> (Universit&#233; Northeastern)</li>
+</ul>
+<p>Pour ce tutoriel, nous avons choisi de nous concentrer sur la biblioth&#232;que Passim et cela pour trois raisons principales. Premi&#232;rement, car celle-ci peut &#234;tre adapt&#233;e &#224; une grande vari&#233;t&#233; d'utilisation, puisqu'elle fonctionne autant sur une petite collection de texte que sur un corpus de grande &#233;chelle. Deuxi&#232;mement, parce que, bien que la documentation au sujet de Passim soit exhaustive, du fait que ses utilisateurs soient relativement avanc&#233;s, un guide &#171;&#8239;pas-&#224;-pas&#8239;&#187; de la d&#233;tection de la r&#233;utilisation de texte avec Passim plus ax&#233; sur l'utilisateur serait b&#233;n&#233;fique pour l'ensemble de la communaut&#233;. Enfin, les exemples suivants illustrent la vari&#233;t&#233; de sc&#233;narios dans lesquels la r&#233;utilisation de texte est une m&#233;thodologie utile :</p>
+<ul>
+<li>Pour d&#233;terminer si une biblioth&#232;que num&#233;rique contient plusieurs &#233;ditions de m&#234;mes &#339;uvres</li>
+<li>Pour trouver des citations dans un texte, &#224; condition que les &#339;uvres choisies soient connues (par exemple, pour trouver des citations de la Bible au sein de la litt&#233;rature anglaise du 17<sup>e</sup> si&#232;cle) </li>
+<li>Pour &#233;tudier la viralit&#233; et la diffusion des textes (par exemple <link target="https://viraltexts.org/">Viral Texts</link> par Cordell and Smith pour les journaux historiques)</li>
+<li>Pour identifier, et si possible filtrer, les documents en double dans une collection de texte avant d'effectuer d'autres &#233;tapes de traitement (par exemple, la mod&#233;lisation de sujet comme illustr&#233; par Schofield et al. (2017)).</li>
+</ul>
+<p>Pour ces raisons, Passim est un excellent choix. Passim vous aidera &#224; automatiser la recherche de passages textuels r&#233;p&#233;t&#233;s dans un corpus &#8211; qu&#8217;il s&#8217;agisse d&#8217;annonces publicitaires dans les journaux, de copies multiples du m&#234;me po&#232;me ou de citations directes (et l&#233;g&#232;rement indirectes) dans l&#8217;ouvrage d&#8217;un(e) autre auteur(e).<br/>
+La d&#233;tection de r&#233;utilisation de texte telle qu'elle est mise en place dans Passim vise &#224; identifier ces copies et r&#233;p&#233;titions automatiquement. Elle produit des clusters de passages qui ont &#233;t&#233; jug&#233;s comme &#233;tant li&#233;s les uns aux autres. En fin de compte, le contenu d'un cluster peut varier et d&#233;pendra beaucoup de votre question de recherche. Passim peut ainsi regrouper des copies d'un m&#234;me article qui ne diff&#232;rent que par des erreurs de reconnaissance optique de caract&#232;res (OCR), mais il peut aussi aider &#224; retrouver des textes qui partagent le m&#234;me mod&#232;le journalistique, comme des horoscopes ou des publicit&#233;s.</p>
+</div><div type="2"><head>Pr&#233;requis</head>
+<p>Ce tutoriel n&#233;cessite les connaissances suivantes :</p>
+<ul>
+<li>Une compr&#233;hension basique du terminal bash. Pour les lecteurs et les lectrices qui auraient besoin d&#8217;informations au sujet du script bash, vous pouvez lire la le&#231;on du <emph>Programming Historian</emph> qui offre une <link target="/en/lessons/intro-to-bash">introduction</link> au sujet.</li>
+<li>Des connaissances en JSON. Pour en apprendre davantage au sujet de JSON, vous pouvez consulter la le&#231;on du <emph>Programming Historian</emph> intitul&#233;e <link target="/en/lessons/json-and-jq">&#171;&#8239;Reshaping JSON with jq&#8239;&#187;</link>.</li>
+</ul>
+<p>De plus, bien qu'une compr&#233;hension de base de Python - et une installation de Python fonctionnelle - ne soient pas strictement n&#233;cessaires pour travailler avec Passim, elles sont requises pour ex&#233;cuter certaines parties de ce tutoriel (par exemple le carnet Jupyter avec l'exploration des donn&#233;es, ou le script de pr&#233;paration des donn&#233;es Early English Books Online (EEBO)). Si vous n'&#234;tes pas familier avec Python, veuillez lire la le&#231;on du <emph>Programming Historian</emph> <link target="/fr/lecons/introduction-et-installation">&#171;&#8239;Introduction &#224; Python et installation&#8239;&#187;</link>.   </p>
+<p>Notez que l&#8217;installation de Passim sur Windows est plus difficile que celle pour macOS ou pour Linux. Par cons&#233;quent, nous vous recommandons d'utiliser macOS ou Linux (ou une machine virtuelle) pour cette le&#231;on.</p>
+</div><div type="2"><head>Installation de Passim</head>
+<p>L'installation de Passim exige l&#8217;installation des logiciels ci-dessous :</p>
+<ul>
+<li><link target="https://www.java.com/fr/download/">Java JDK (version 8)</link></li>
+<li><link target="https://www.scala-sbt.org/">Scala Build Tool</link> (SBT)</li>
+<li><link target="https://spark.apache.org/">Apache Spark</link></li>
+</ul>
+<p>Mais pourquoi toutes ces d&#233;pendances sont-elles n&#233;cessaires ?</p>
+<p>Passim est &#233;crit dans un langage de programmation appel&#233; Scala. Pour ex&#233;cuter un logiciel &#233;crit en Scala, ses sources doivent &#234;tre compil&#233;es en un fichier JAR ex&#233;cutable, ce qui est r&#233;alis&#233; par <code type="inline">sbt</code>, l'outil de compilation interactif de Scala. Enfin, puisque Passim est con&#231;u pour travailler &#233;galement sur des grandes collections de textes (avec plusieurs milliers ou millions de documents), il utilise en coulisse Spark, un framework de calcul en cluster qui est &#233;crit en Java. L'utilisation de Spark permet &#224; Passim de g&#233;rer le traitement distribu&#233; de certaines parties du code, ce qui est utile lors de la manipulation de grandes quantit&#233;s de donn&#233;es. Le <link target="https://spark.apache.org/docs/latest/cluster-overview.html#glossary">Spark glossary</link> est une ressource utile pour apprendre la terminologie de base de Spark (des mots comme &#171;&#8239;driver&#8239;&#187;, &#171;&#8239;executor&#8239;&#187;, etc.), toutefois apprendre cette terminologie n&#8217;est pas indispensable si vous ex&#233;cutez Passim sur un petit ensemble de donn&#233;es.</p>
+<p>Avant d&#8217;installer cet ensemble de logiciels, vous aurez besoin de t&#233;l&#233;charger le code source de la version 1 de Passim depuis GitHub :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_0" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_0.txt"></code></pre>
+<p>ou t&#233;l&#233;chargez le code source <link target="https://github.com/dasmiq/passim/releases/tag/v1.0.0">depuis la page de la version v1.0</link>.</p>
+<p>Si vous n&#8217;&#234;tes pas familier avec Git et Github, nous vous recommandons de lire la le&#231;on du <emph>Programming Historian</emph> qui offre une introduction <link target="https://doi.org/10.46430/phen0051">&#224; la gestion de versions Git avec l'application GitHub Desktop</link>.</p>
+<div type="3"><head>Instructions pour macOS</head>
+<p>Ces instructions sont destin&#233;es aux utilisateurs de macOS d'Apple et ont &#233;t&#233; test&#233;es sous la version 10.13.4 (alias High Sierra).</p>
+<div type="4"><head>V&#233;rification de l'installation de Java</head>
+<p>Assurez-vous que vous disposez du kit de d&#233;veloppement Java 8 en tapant la commande suivante dans une nouvelle fen&#234;tre de l'invite de commande :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_1" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_1.txt"></code></pre>
+<p>Si le r&#233;sultat de cette commande ressemble &#224; l'exemple suivant, alors Java 8 est install&#233; sur votre ordinateur.</p>
+<pre><code xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_2" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_2.txt"></code></pre>
+</div><div type="4"><head>Installation de Java 8</head>
+<p>Si une autre version de Java est d&#233;j&#224; install&#233;e sur votre ordinateur, suivez les prochaines &#233;tapes afin d&#8217;installer Java 8, tout en conservant la version d&#233;j&#224; install&#233;e de Java.</p>
+<p>Ceci est important afin de ne pas casser les liens avec les logiciels d&#233;j&#224; install&#233;s qui ont besoin de versions plus r&#233;centes de Java.</p>
+<ol>
+<li>
+<p>Installez le gestionnaire de paquets <code type="inline">brew</code> en suivant les instructions d'installation sur le site <link target="https://brew.sh/">Brew.sh</link>. Une fois l'installation achev&#233;e, ex&#233;cutez <code type="inline">brew --help</code> pour qu'elle fonctionne.</p>
+</li>
+<li>
+<p>Utilisez <code type="inline">brew</code> pour installer Java 8.</p>
+</li>
+</ol>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_3" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_3.txt"></code></pre>
+<p>V&#233;rifiez que Java 8 est bien install&#233;.</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_4" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_4.txt"></code></pre>
+<p>Cette commande devrait produire quelque chose de semblable &#224; ce qui suit :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_5" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_5.txt"></code></pre>
+<ol start="3">
+<li>Installez <code type="inline">jenv</code>, un outil qui vous permet de g&#233;rer plusieurs versions de Java install&#233;es sur le m&#234;me ordinateur et qui vous permet de passer facilement de l&#8217;une &#224; l&#8217;autre.</li>
+</ol>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_6" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_6.txt"></code></pre>
+<p>Pour &#234;tre capable d'appeler <code type="inline">jenv</code> sans sp&#233;cifier le chemin complet du fichier, n&#8217;oubliez pas d&#8217;ajouter <code type="inline">jenv</code> &#224; votre variable d&#8217;environnement <code type="inline">$PATH</code> en ouvrant le fichier <code type="inline">~/.bashrc</code> avec votre &#233;diteur de texte pr&#233;f&#233;r&#233; et en ajoutant les lignes suivantes &#224; la fin du fichier :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_7" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_7.txt"></code></pre>
+<p>Apr&#232;s avoir ajout&#233; ces lignes, vous devez soit ouvrir une autre fen&#234;tre de l'invite de commande soit ex&#233;cuter la ligne suivante pour que la variable <code type="inline">$PATH</code> soit mise &#224; jour avec le changement que vous venez de faire (la commande <code type="inline">source</code> d&#233;clenche le rechargement de votre configuration <code type="inline">bash</code>).</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_8" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_8.txt"></code></pre>
+<p>Une fois install&#233;, ajoutez les versions existantes de Java &#224; <code type="inline">jenv</code> (c'est-&#224;-dire celles list&#233;es par la commande <code type="inline">/usr/libexec/java_home -V</code>) :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_9" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_9.txt"></code></pre>
+<p>Maintenant vous pouvez d&#233;finir la version par d&#233;faut de Java pour ce projet en ex&#233;cutant ce qui suit :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_10" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_10.txt"></code></pre>
+</div><div type="4"><head>Compilation de Passim &#224; partir des sources (macOS)</head>
+<p>Passim est &#233;crit dans un langage de programmation appel&#233; Scala. Avant de pouvoir ex&#233;cuter un logiciel &#233;crit en Scala, ses sources doivent &#234;tre compil&#233;es. Cette t&#226;che est effectu&#233;e par <code type="inline">sbt</code>, l'outil de compilation interactif.</p>
+<p>Pour d&#233;terminer si <code type="inline">sbt</code> est install&#233; sur votre ordinateur, ex&#233;cutez la commande suivante :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_11" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_11.txt"></code></pre>
+<p>Si votre commande affiche <code type="inline">bash: sbt: command not found</code> cela signifie que <code type="inline">sbt</code> n'est pas install&#233;.
+Cependant, Passim est livr&#233; avec un script utile (<code type="inline">build/sbt</code>) qui t&#233;l&#233;chargera et installera sbt automatiquement avant de compiler les sources de Passim.</p>
+<p><hi rend="bold">NB</hi> : L'utilisation d'un SBT externe (c'est-&#224;-dire d&#233;j&#224; install&#233;) peut conduire &#224; des probl&#232;mes, nous vous recommandons la m&#233;thode suivante pour compiler Passim.</p>
+<p>Pour compiler le programme, ex&#233;cutez la commande suivante depuis le r&#233;pertoire o&#249; vous avez pr&#233;c&#233;demment clon&#233; le d&#233;p&#244;t Github de Passim :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_12" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_12.txt"></code></pre>
+<p>Cette commande prendra un certain temps (environ 3 minutes sur une connexion moderne), mais elle vous tiendra inform&#233;(e) de la progression du t&#233;l&#233;chargement. Au fur et &#224; mesure que votre ordinateur commence &#224; t&#233;l&#233;charger les fichiers requis, un journal sera affich&#233; &#224; l'&#233;cran. &#192; la fin de ce processus, <code type="inline">sbt</code> aura cr&#233;&#233; une archive <code type="inline">.jar</code> contenant les sources compil&#233;es pour Passim. Ce fichier se trouve dans le r&#233;pertoire <code type="inline">target</code>: <code type="inline">target/scala-2.11/Passim_2.11-0.2.0.jar</code>. Selon la version de Scala et de Passim que vous poss&#232;dez, le chemin r&#233;el peut &#234;tre l&#233;g&#232;rement diff&#233;rent sur votre ordinateur.</p>
+<p>Le r&#233;pertoire <code type="inline">bin</code> contient un fichier Passim : il s'agit de l'ex&#233;cutable qui va lancer Passim. Pour que votre ordinateur connaisse l'emplacement de ce fichier, et donc pour qu'il reconnaisse la commande Passim, il est n&#233;cessaire d'ajouter le chemin &#224; la variable d'environnement <code type="inline">PATH</code>.</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_13" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_13.txt"></code></pre>
+<p>Pour ajouter le chemin de fa&#231;on permanente &#224; la variable d'environnement <code type="inline">PATH</code> ouvrez le <code type="inline">~/.bashrc</code> avec votre &#233;diteur de texte pr&#233;f&#233;r&#233; et ajoutez la ligne suivante n'importe o&#249; dans le fichier (puis ex&#233;cutez <code type="inline">source ~/.bashrc</code> pour appliquer ce changement) :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_14" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_14.txt"></code></pre>
+</div><div type="4"><head>Installation de Spark</head>
+<ol>
+<li>
+<p>Acc&#233;dez &#224; la <link target="http://spark.apache.org/downloads">section de t&#233;l&#233;chargement</link> du site Web de Spark et s&#233;lectionnez la version publi&#233;e de Spark 3.x.x (o&#249; <emph>x.x</emph> indique les &#233;ditions de la version 3.) ainsi que le type de paquetage &#171;&#8239;Pre-built for Apache Hadoop 2.7&#8239;&#187; dans les menus d&#233;roulants.</p>
+</li>
+<li>
+<p>Extrayez les donn&#233;es binaires compress&#233;es dans le r&#233;pertoire de votre choix (par exemple <code type="inline">/Applications</code>) :</p>
+</li>
+</ol>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_15" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_15.txt"></code></pre>
+<ol start="3">
+<li>Ajoutez le r&#233;pertoire o&#249; vous avez install&#233; Spark &#224; votre variable d'environnement <code type="inline">PATH</code>. Pour ce faire, ex&#233;cutez temporairement la commande suivante :</li>
+</ol>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_16" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_16.txt"></code></pre>
+<p>Pour ajouter le r&#233;pertoire d'installation du chemin de fa&#231;on permanente &#224; votre variable d'environnement <code type="inline">PATH</code>, ouvrez le fichier <code type="inline">~/.bashrc</code> avec votre &#233;diteur de texte pr&#233;f&#233;r&#233; et ajoutez la ligne suivante n'importe o&#249; dans le fichier :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_17" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_17.txt"></code></pre>
+<p>Apr&#232;s avoir &#233;dit&#233; <code type="inline">~/.bashrc</code>, ouvrez une autre fen&#234;tre de l'invite de commande ou bien ex&#233;cutez la commande suivante :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_18" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_18.txt"></code></pre>
+</div></div><div type="3"><head>Instructions pour Linux</head>
+<p>Ces instructions sont destin&#233;es aux distributions bas&#233;es sur Debian (Debian, Ubuntu, Linux Mint, etc.). Si vous utilisez un autre type de distribution (Fedora, Gentoo, etc.), remplacez les commandes sp&#233;cifiques &#224; la distribution(par exemple <code type="inline">apt</code>) par celles que votre distribution impose.</p>
+<div type="4"><head>V&#233;rifiez l'installation de Java</head>
+<p>Pour vous assurer que le kit de d&#233;veloppement Java 8 est bien install&#233;, ex&#233;cutez la commande suivante :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_19" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_19.txt"></code></pre>
+<p>Si la commande ci-dessus renvoie &#224; <code type="inline">1.8.0_252</code> ou &#224; quelque chose de semblable, alors vous avez install&#233; le kit de d&#233;veloppement Java 8 (le <code type="inline">8</code> vous indique qu'il s'agit du bon kit qui a &#233;t&#233; install&#233; et qui a &#233;t&#233; s&#233;lectionn&#233; par d&#233;faut). Si votre r&#233;sultat est diff&#233;rent, choisissez en cons&#233;quence l'une des commandes suivantes :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_20" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_20.txt"></code></pre>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_21" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_21.txt"></code></pre>
+</div><div type="4"><head>Compilation de Passim &#224; partir des sources</head>
+<p>Reportez-vous aux <link target="#compilation-de-passim-%C3%A0-partir-des-sources-macos">instructions de compilation pour macOS</link>, car elles sont les m&#234;mes que pour l'environnement Linux.</p>
+</div><div type="4"><head>Installation de Spark</head>
+<ol>
+<li>T&#233;l&#233;chargez les donn&#233;es binaires Spark en utilisant la commande <code type="inline">wget</code>:</li>
+</ol>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_22" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_22.txt"></code></pre>
+<ol start="2">
+<li>Extrayez les donn&#233;es binaires compress&#233;es dans un r&#233;pertoire de votre choix :</li>
+</ol>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_23" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_23.txt"></code></pre>
+<ol start="3">
+<li>Ajoutez le r&#233;pertoire dans lequel vous avez install&#233; Spark &#224; votre variable d'environnement <code type="inline">PATH</code>. Pour ajouter temporairement le r&#233;pertoire &#224; votre variable d'environnement&#160;<code type="inline">PATH</code>, ex&#233;cutez la commande suivante :</li>
+</ol>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_24" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_24.txt"></code></pre>
+<p>Pour ajouter le r&#233;pertoire &#224; votre variable d'environnement&#160;<code type="inline">PATH</code> de fa&#231;on permanente, ouvrez le fichier <code type="inline">~/.bashrc</code> avec votre &#233;diteur de texte pr&#233;f&#233;r&#233; et ajoutez la ligne suivante n'importe o&#249; dans le fichier :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_25" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_25.txt"></code></pre>
+<p>Apr&#232;s avoir modifi&#233; <code type="inline">~/.bashrc</code>, vous devez ouvrir une nouvelle fen&#234;tre de l'invite de commande ou bien ex&#233;cuter la ligne suivante pour que votre variable <code type="inline">PATH</code> soit mise &#224; jour avec le changement que vous venez de faire.</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_26" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_26.txt"></code></pre>
+</div></div><div type="3"><head>V&#233;rifiez l'installation</head>
+<p>&#192; ce stade, vous avez install&#233; Passim et tous les paquets n&#233;cessaires sur votre ordinateur. Si vous tapez  <code type="inline">Passim --help</code> dans la ligne de commande, vous devriez voir une sortie similaire &#224; ce qui suit :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_27" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_27.txt"></code></pre>
+<!--
+Doit-on traduire la doccumentation de Passim ?
+-->
+</div></div><div type="2"><head>Pr&#233;paration des donn&#233;es pour Passim</head>
+<p>Le but de l'utilisation de Passim est d'automatiser la recherche de passages de texte r&#233;p&#233;t&#233;s dans un corpus. Par exemple, un corpus de journaux contient de multiples copies d'un m&#234;me article, identiques ou l&#233;g&#232;rement diff&#233;rentes les unes des autres, ainsi que des r&#233;p&#233;titions de plus petites portions d'une page de journal (par exemple, publicit&#233;, liste d'&#233;v&#233;nements, etc.).</p>
+<p>Comme le pr&#233;cise la documentation de Passim, &#171;&#8239;l'entr&#233;e de Passim est un ensemble de documents. En fonction du type de donn&#233;es que vous avez, vous pouvez choisir des documents comme des livres entiers, des pages de livres, des num&#233;ros entiers de journaux, des articles de journaux individuels, etc. Au minimum, un document est constitu&#233; d'une cha&#238;ne d'identification et d'une seule cha&#238;ne de contenu textuel&#8239;&#187;. Vous pouvez vous r&#233;f&#233;rer &#224; l'exemple de saisie JSON minimale dans la section suivante pour davantage d'informations sur la structure de la saisie pour Passim.</p>
+<p>La figure 1 repr&#233;sente sch&#233;matiquement les donn&#233;es d&#8217;entr&#233;e et de sortie fournies &#224; Passim. &#201;tant donn&#233; qu'il s'agit d'un ensemble de documents en entr&#233;e et qu'il est divis&#233; en s&#233;ries de documents, Passim tentera d'identifier la r&#233;utilisation de texte &#224; partir de documents de diff&#233;rentes s&#233;ries, et non au sein de ces s&#233;ries. Dans le cas d'un corpus de journaux, les articles d'un m&#234;me journal appartiendront &#224; la m&#234;me s&#233;rie de documents, car nous ne sommes pas int&#233;ress&#233;s par la d&#233;tection de la r&#233;utilisation au sein d'un m&#234;me journal, mais entre diff&#233;rents journaux.</p>
+<p>En fin de compte, ce qui compose un document et comment ces documents devraient &#234;tre divis&#233;s en s&#233;ries sont les choix que vous devrez faire lorsque vous pr&#233;parerez vos donn&#233;es pour Passim.  Naturellement, la d&#233;cision sur ce qui constitue des <emph>s&#233;ries</emph> de documents d&#233;pend directement de vos objectifs ou de vos questions de recherche. Trouver des citations de la Bible dans un corpus de livres est un cas de <link target="https://fr.wikipedia.org/wiki/Mod%C3%A8le_relationnel#Relation_1:N">relation &#171;&#8239;un &#224; plusieurs&#8239;&#187; (1,N)</link> de d&#233;tection de r&#233;utilisation de texte, qui exige que les documents soient group&#233;s en deux s&#233;ries (<code type="inline">bible</code> et <code type="inline">non_bible</code>). Au contraire, la comparaison entre plusieurs &#233;ditions de la Bible (&#233;galement nomm&#233;e par collection) peut &#234;tre consid&#233;r&#233;e comme un cas de <link target="https://fr.wikipedia.org/wiki/Mod%C3%A8le_relationnel#Relation_N:N">relation &#171;&#8239;plusieurs &#224; plusieurs&#8239;&#187; (N,N)</link>, o&#249; chaque &#233;dition correspondra et constituera une s&#233;rie de documents (par exemple des pages). Si vos questions de recherche changent &#224; un moment donn&#233;, ce qui requiert ainsi une red&#233;finition des s&#233;ries de documents, vous devrez &#233;galement produire de nouvelles donn&#233;es d'entr&#233;e pour Passim, afin de refl&#233;ter ce changement.</p>
+<figure><desc>Figure 1. Repr&#233;sentation sch&#233;matique des clusters de r&#233;utilisation de texte ; chaque cluster est form&#233; de passages similaires trouv&#233;s dans plusieurs s&#233;ries de documents.</desc><graphic url="textreuse-generic.png"/></figure>
+<div type="3"><head>Format JSON de base</head>
+<p>Le format d'entr&#233;e de Passim consiste en des documents JSON qui sont au format <link target="http://jsonlines.org/">JSON lines</link> (c'est-&#224;-dire que chaque ligne de texte contient un seul document JSON).</p>
+<p>Le contenu suivant d'un fichier nomm&#233; <code type="inline">test.json</code> illustre le format minimal d'entr&#233;e requis pour Passim :</p>
+<pre><code class="language-json" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_28" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_28.txt"></code></pre>
+<p>Les champs <code type="inline">id</code>, <code type="inline">series</code> et <code type="inline">text</code> sont les seuls champs obligatoirement requis pour Passim. Avec ce fichier en entr&#233;e, le logiciel va tenter de d&#233;tecter la r&#233;utilisation de texte entre les documents de la s&#233;rie <code type="inline">abc</code> et ceux de la s&#233;rie <code type="inline">def</code>, sur la base du contenu de <code type="inline">text</code>.</p>
+<p>Tout au long de ce tutoriel, nous utiliserons l'outil en ligne de commande <link target="https://stedolan.github.io/jq/"><code type="inline">jq</code></link> pour inspecter et effectuer quelques traitements de base sur les donn&#233;es JSON en entr&#233;e et en sortie. Notez que, si vous n'avez pas install&#233; <code type="inline">jq</code>, vous devrez ex&#233;cuter <code type="inline">sudo apt-get install jq</code> sous Ubuntu ou <code type="inline">brew install jq</code> sous macOS (pour les autres syst&#232;mes d'exploitation <link target="https://stedolan.github.io/jq/download/">r&#233;f&#233;rez-vous &#224; la page officielle d'installation de JQ</link>).</p>
+<p>Par exemple, pour s&#233;lectionner et afficher le champ <code type="inline">series</code> de votre entr&#233;e <code type="inline">test.json</code>, ex&#233;cutez la commande suivante :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_29" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_29.txt"></code></pre>
+<p>Note : Si vous employez <code type="inline">jq</code> pour consulter vos donn&#233;es JSON, vous devez utiliser le param&#232;tre <code type="inline">--slurp</code> chaque fois que vous voulez traiter le contenu d'un ou plusieurs fichiers de lignes JSON comme un seul tableau de documents JSON et y appliquer des filtres (par exemple, pour s&#233;lectionner et afficher un seul document, utilisez la commande suivante <code type="inline">jq --slurp '.[-1]' test.json</code>). Sinon <code type="inline">jq</code> traitera chaque document s&#233;par&#233;ment, ce qui provoquera alors l'erreur suivante :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_30" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_30.txt"></code></pre>
+</div><div type="3"><head>Note au sujet du stockage des donn&#233;es</head>
+<p>En fonction de la taille totale de vos donn&#233;es, il peut &#234;tre judicieux de stocker les fichiers d'entr&#233;e de Passim sous forme de fichiers compress&#233;s. Passim supporte plusieurs sch&#233;mas de compression comme .gzip et .bzip2. Notez qu'un flux de donn&#233;es compress&#233; sera plus lent &#224; traiter qu'un flux non compress&#233;, donc l'utilisation de cette option ne sera b&#233;n&#233;fique que si vos donn&#233;es sont volumineuses (par exemple des gigaoctets de texte), si vous avez acc&#232;s &#224; une grande puissance de calcul, ou si vous disposez d'une quantit&#233; limit&#233;e d'espace disque.</p>
+<p>Cette commande ou, mieux, cette cha&#238;ne de commandes produira le premier document dans un fichier de lignes JSON compress&#233; par bzip2 (certains champs ont &#233;t&#233; tronqu&#233;s pour des raisons de lisibilit&#233;) :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_31" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_31.txt"></code></pre>
+<p>Et produira le r&#233;sultat suivant :</p>
+<pre><code class="language-json" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_32" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_32.txt"></code></pre>
+</div><div type="3"><head>Personnalisation du format JSON</head>
+<p>Merci de noter d'embl&#233;e que cette sous-section n'est pas strictement n&#233;cessaire pour ex&#233;cuter Passim, comme le montrera la deuxi&#232;me &#233;tude de cas. N&#233;anmoins, ces &#233;tapes peuvent &#234;tre utiles aux lecteurs ayant besoin de connaissances plus avanc&#233;es en ce qui concerne le format et la structure des donn&#233;es d'entr&#233;e.</p>
+<p>Dans certains cas, il se peut que vous d&#233;siriez inclure des informations suppl&#233;mentaires (c'est-&#224;-dire des champs JSON) dans chaque document d'entr&#233;e, en plus des champs obligatoires (<code type="inline">id</code>, <code type="inline">series</code>, <code type="inline">text</code>). Par exemple, lorsque vous travaillez avec des donn&#233;es OCR, il est possible que vous souhaitiez passer les informations de coordonn&#233;es de l'image avec le texte de l'article. Passim supporte l'utilisation de donn&#233;es d'entr&#233;e qui suivent un format JSON personnalis&#233;, car, en coulisses, il s'appuie sur Spark pour d&#233;duire la structure des donn&#233;es d'entr&#233;e (c'est-&#224;-dire le sch&#233;ma JSON). Passim n'utilisera pas directement ces champs, mais il les conservera dans la sortie produite.</p>
+<p>Cependant, il arrive quelques fois que Spark ne parvienne pas &#224; d&#233;duire la structure correcte des donn&#233;es d'entr&#233;e (par exemple, en d&#233;duisant un type de donn&#233;es erron&#233; pour un champ donn&#233;). Dans cette situation, vous devez informer Passim du sch&#233;ma correct des donn&#233;es d'entr&#233;e. </p>
+<p>L'exemple suivant explique une approche pas &#224; pas pour r&#233;soudre cette situation relativement rare dans laquelle il faut corriger le sch&#233;ma JSON qui a &#233;t&#233; d&#233;duit. Passim poss&#232;de de base la commande <code type="inline">json-df-schema</code>, qui ex&#233;cute un script (Python) pour d&#233;duire le sch&#233;ma &#224; partir de n'importe quelle entr&#233;e JSON. Les &#233;tapes suivantes sont n&#233;cessaires pour d&#233;duire la structure &#224; partir de n'importe quelle donn&#233;e JSON :</p>
+<ol>
+<li>Installez les biblioth&#232;ques Python n&#233;cessaires.</li>
+</ol>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_33" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_33.txt"></code></pre>
+<ol start="2">
+<li>Extrayez un exemple d'entr&#233;e &#224; partir de l'un des fichiers d'entr&#233;e compress&#233;s.</li>
+</ol>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_34" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_34.txt"></code></pre>
+<ol start="3">
+<li>Demandez &#224; <code type="inline">json-df-schema</code> de d&#233;duire le sch&#233;ma de nos donn&#233;es &#224; partir de notre fichier d'exemple.</li>
+</ol>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_35" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_35.txt"></code></pre>
+<p><code type="inline">json-df-schema</code> tentera de d&#233;duire le sch&#233;ma JSON des donn&#233;es d'entr&#233;e et de le sortir dans un fichier. L'exemple suivant nous montre &#224; quoi ressemble le sch&#233;ma g&#233;n&#233;r&#233; par Passim (<code type="inline">Passim.schema.orig</code>) :</p>
+<pre><code class="language-json" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_36" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_36.txt"></code></pre>
+<p>Passim n'a pas reconnu que le champ de coordonn&#233;es contient des valeurs enti&#232;res et il l'a interpr&#233;t&#233; comme un type de donn&#233;es <emph>long</emph>.  A ce stade, nous devons changer le type des sous-champs de <code type="inline">coords</code> (c'est-&#224;-dire <code type="inline">h</code>, <code type="inline">w</code>, <code type="inline">x</code>, et <code type="inline">y</code>) de <code type="inline">"type": "long"</code> &#224; <code type="inline">"type": "integer"</code>. Ce d&#233;calage de type doit &#234;tre corrig&#233;, sinon Passim traitera les valeurs <code type="inline">int</code> comme si elles &#233;taient  <code type="inline">long</code>, menant potentiellement &#224; des probl&#232;mes ou des incoh&#233;rences dans la sortie g&#233;n&#233;r&#233;e.</p>
+<p>Nous pouvons maintenant enregistrer le sch&#233;ma dans un nouveau fichier  (<code type="inline">passim.schema</code>) pour une utilisation ult&#233;rieure. Ce sch&#233;ma est n&#233;cessaire pour traiter les donn&#233;es d'entr&#233;e fournies par <link target="#etude-de-cas-2--r%C3%A9utilisation-de-textes-dans-un-grand-corpus-de-journaux-historiques">la deuxi&#232;me &#233;tude de cas</link> pr&#233;sent&#233;e dans ce cours.</p>
+</div></div><div type="2"><head>Ex&#233;cution de Passim</head>
+<p>Dans cette section, nous illustrerons l'utilisation de Passim avec deux &#233;tudes de cas distinctes : 1) la d&#233;tection de citations bibliques dans des textes du XVIIe si&#232;cle et 2) la d&#233;tection de r&#233;utilisation de textes dans un large corpus de journaux historiques. La premi&#232;re &#233;tude de cas met en &#233;vidence certaines bases de l'utilisation de Passim, tandis que la deuxi&#232;me &#233;tude de cas contient de nombreux d&#233;tails et des pratiques qui pouraient &#234;tre utiles pour un projet de r&#233;utilisation de texte de grande &#233;chelle.</p>
+<p>Dans le tableau suivant, nous nous basons sur la documentation originale de Passim et expliquons les param&#232;tres les plus utiles que cette biblioth&#232;que offre. Les &#233;tudes de cas ne vous obligent pas &#224; ma&#238;triser ces param&#232;tres, alors n'h&#233;sitez pas &#224; passer directement &#224; la section <link target="#t%C3%A9l%C3%A9chargement-des-donn%C3%A9es">T&#233;l&#233;chargement de donn&#233;es</link> et &#224; revenir &#224; cette section lorsque vous serez suffisamment &#224; l'aise pour utiliser Passim sur vos propres donn&#233;es.</p>
+<table>
+<thead>
+<tr>
+<th>Param&#232;tre</th>
+<th>Valeur par d&#233;faut</th>
+<th>Description</th>
+<th>Explication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code type="inline">--n</code></td>
+<td>5</td>
+<td>Ordre des n-grammes pour la d&#233;tection de r&#233;utilisation de textes</td>
+<td>Les n-grammes sont des cha&#238;nes de mots de longueur N. Ce param&#232;tre vous permet de d&#233;cider de quel type de n-gramme (unigramme, bigramme, trigramme...) devra &#234;tre utilis&#233; par Passim lors de la cr&#233;ation d'une liste de candidats possibles &#224; la r&#233;utilisation de textes.<br/><br/>Le r&#233;glage de ce param&#232;tre &#224; une valeur plus faible peut aider dans le cas de textes bruit&#233;s (c'est-&#224;-dire lorsque de nombreux mots d'un texte sont affect&#233;s par une ou plusieurs erreurs d'OCR). En effet, plus le n-gramme est long, plus il est susceptible de contenir des erreurs d'OCR.</td>
+</tr>
+<tr>
+<td><code type="inline">--minDF</code> (<code type="inline">-l</code>)</td>
+<td>2</td>
+<td>Limite inf&#233;rieure de la fr&#233;quence de document des n-grammes utilis&#233;s</td>
+<td>Puisque les n-grammes sont utilis&#233;s dans Passim pour retrouver des paires de documents candidats, un n-gramme n'apparaissant qu'une seule fois n'est pas utile, car il ne retrouvera qu'un seul document (et non une paire). Pour cette raison, la valeur par d&#233;faut de <code type="inline">--minDF</code> est de <code type="inline">2</code>.</td>
+</tr>
+<tr>
+<td><code type="inline">--maxDF</code> (<code type="inline">-u</code>)</td>
+<td>100</td>
+<td>Limite sup&#233;rieure de la fr&#233;quence du document pour les n-grammes utilis&#233;s.</td>
+<td>Ce param&#232;tre permettra de filtrer les n-grammes trop fr&#233;quents, donc apparaissant de nombreuses fois dans un document donn&#233;. <br/><br/>Cette valeur a un impact sur les performances, car elle va r&#233;duire le nombre de paires de documents r&#233;cup&#233;r&#233;s par Passim qui devront &#234;tre compar&#233;s.</td>
+</tr>
+<tr>
+<td><code type="inline">--min-match</code> (<code type="inline">-m</code>)</td>
+<td>5</td>
+<td>Nombre minimum de n-grammes correspondants entre deux documents</td>
+<td>Ce param&#232;tre vous permet de d&#233;cider combien de n-grammes doivent &#234;tre trouv&#233;s entre deux documents.</td>
+</tr>
+<tr>
+<td><code type="inline">--relative-overlap</code> (<code type="inline">-o</code>)</td>
+<td>0.8</td>
+<td>Proportion, mesur&#233;e sur le passage le plus long, que deux passages align&#233;s diff&#233;rents du m&#234;me document doivent se chevaucher pour &#234;tre regroup&#233;s. <!-- TODO SH: Current mismatch between official doc and code, see what is going to be changed after David answers to this issue https://github.com/dasmiq/passim/issues/10 --></td>
+<td>Ce param&#232;tre d&#233;termine le degr&#233; de similarit&#233; des cha&#238;nes de caract&#232;res que deux passages doivent avoir pour &#234;tre regroup&#233;s.<br/><br/>Dans le cas de textes bruit&#233;s, il peut &#234;tre pr&#233;f&#233;rable de fixer ce param&#232;tre &#224; une valeur plus petite.</td>
+</tr>
+<tr>
+<td><code type="inline">--max-repeat</code> (<code type="inline">-r</code>)</td>
+<td>10</td>
+<td>R&#233;p&#233;tition maximale d'une s&#233;rie dans un cluster</td>
+<td>Ce param&#232;tre vous permet de pr&#233;ciser la quantit&#233; potentiellement pr&#233;sente d'une s&#233;rie donn&#233;e dans un cluster.</td>
+</tr>
+</tbody></table><div type="3"><head>T&#233;l&#233;chargement des donn&#233;es</head>
+<p>Les &#233;chantillons de donn&#233;es n&#233;cessaires pour ex&#233;cuter les exemples de commande dans les deux &#233;tudes de cas peuvent &#234;tre t&#233;l&#233;charg&#233;s &#224; partir du <link target="https://github.com/impresso/PH-Passim-tutorial">d&#233;p&#244;t Github d&#233;di&#233;</link>. Avant de poursuivre les &#233;tudes de cas, t&#233;l&#233;chargez une copie locale des donn&#233;es en clonant le d&#233;p&#244;t.</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_37" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_37.txt"></code></pre>
+<p>Il est &#233;galement possible de t&#233;l&#233;charger les donn&#233;es de cette le&#231;on via <link target="https://zenodo.org/badge/latestdoi/250229057">Zenodo</link>.</p>
+</div><div type="3"><head>Etude de cas 1 : Citations bibliques dans des textes du XVIIe si&#232;cle</head>
+<p>Dans cette premi&#232;re &#233;tude de cas, nous nous pencherons sur la r&#233;utilisation des textes en utilisant des textes tir&#233;s du corpus <link target="https://textcreationpartnership.org/tcp-texts/eebo-tcp-early-english-books-online/">EEBO-TCP</link> phase I, la version accessible au public de Early English Books Online qui est fournie par l'initiative Text Creation Partnership. Cette &#233;tude de cas est un exemple particulier de la r&#233;utilisation de texte. Car nous ne nous concentrons pas sur la r&#233;utilisation de texte entre auteurs, mais plut&#244;t sur l'influence qu'un seul livre - dans ce cas, la version King James de la Bible publi&#233;e en 1611 - a eu sur divers auteurs. Est-il possible de d&#233;tecter quels documents contiennent des extraits de la Bible ?</p>
+<p>Comme il s'agit d'un exemple &#224; petite &#233;chelle, qui peut ressembler &#224; une question de recherche r&#233;elle qui fait appel aux m&#233;thodes de r&#233;utilisation des textes, nous n'utiliserons qu'une partie des 25 368 &#339;uvres disponibles dans EEBO-TCP, celles-ci prises al&#233;atoirement. Cette s&#233;lection de taille r&#233;duite devrait &#233;galement permettre &#224; toute personne qui lit ce tutoriel d'ex&#233;cuter cet exemple sur son ordinateur portable personnel. Id&#233;alement, nous recommandons &#224; quelqu'un qui souhaite &#233;tudier correctement l'utilisation des citations bibliques dans les textes du XVIIe si&#232;cle d'opter pour un corpus tel que <link target="https://www.uantwerpen.be/en/projects/mind-bending-grammars/emma-corpus/">Early Modern Multiloquent Authors (EMMA)</link>, rassembl&#233; par le projet <link target="https://www.uantwerpen.be/en/projects/mind-bending-grammars/">Mind Bending Grammars</link> de l'Universit&#233; d'Anvers. Ce corpus a l'avantage de fournir des m&#233;tadonn&#233;es recueillies manuellement dans un format facilement analysable, permettant aux chercheur(e)s de se focaliser sur des auteurs sp&#233;cifiques, des p&#233;riodes, etc.</p>
+<div type="4"><head>Extraction des donn&#233;es</head>
+<p>&#192; la racine du r&#233;pertoire nouvellement cr&#233;&#233; se trouve un fichier JSON : <code type="inline">passim_in.json</code>. Ce fichier contient toutes nos donn&#233;es, dans le format d&#233;crit ci-dessus : un document par ligne (<code type="inline">text</code>), structur&#233; avec le strict minimum de m&#233;tadonn&#233;es requises (<code type="inline">id</code>, <code type="inline">series</code>). Comme il s'agit d'un fichier de petite taille, nous vous encourageons &#224; l'ouvrir &#224; l'aide d'un &#233;diteur de texte tel que Notepad++ sur Windows ou Sublime Text sur Linux/macOS, afin de vous familiariser avec le format des donn&#233;es. Puisque notre &#233;tude de cas se concentre sur la d&#233;tection de passages de la Bible dans plusieurs documents et non pas sur la r&#233;utilisation de texte dans tous les documents, nous avons format&#233; les donn&#233;es de sorte que le champ <code type="inline">series</code> contienne <code type="inline">bible</code> pour la Bible (derni&#232;re ligne de notre fichier JSON), et <code type="inline">not_bible</code> pour tous les autres documents. Passim n'analyse pas les documents qui appartiennent &#224; la m&#234;me s&#233;rie, donc ceci indique effectivement au logiciel qu'il doit comparer l'ensemble des documents avec uniquement la Bible - et non entre eux.</p>
+<p>Le <link target="https://github.com/impresso/PH-Passim-tutorial/">d&#233;p&#244;t Github d'accompagnement</link> contient un <link target="https://github.com/impresso/PH-Passim-tutorial/blob/master/eebo/code/main.py">script Python</link> pour transformer EEBO-TCP dans le format JSON requis par Passim et qui est utilis&#233; pour cette le&#231;on. Nous encourageons les lecteurs et les lectrices &#224; le r&#233;utiliser et &#224; l'adapter &#224; leurs besoins.</p>
+</div><div type="4"><head>Ex&#233;cution de Passim</head>
+<p>Cr&#233;ez un r&#233;pertoire dans lequel vous allez stocker la sortie de Passim (nous utiliserons <code type="inline">Passim_output_bible</code> mais n'importe quel nom conviendra). Si vous d&#233;cidez de garder le r&#233;pertoire par d&#233;faut <code type="inline">Passim_output_bible</code>, assurez-vous de supprimer tout son contenu (c'est-&#224;-dire les r&#233;sultats pr&#233;-calcul&#233;s par Passim) soit manuellement, soit en ex&#233;cutant <code type="inline">rm -r ./eebo/Passim_output_bible/*</code>.</p>
+<p>Comme nous le verrons plus en d&#233;tail dans le deuxi&#232;me cas d'utilisation, Passim, &#224; travers Spark, offre de nombreuses possibilit&#233;s. Par d&#233;faut, Java n'alloue pas beaucoup de m&#233;moire &#224; ses processus, et faire tourner Passim, m&#234;me sur de tr&#232;s petits jeux de donn&#233;es, fera planter Passim &#224; cause d'une erreur <code type="inline">OutOfMemory</code> &#8212; m&#234;me si vous avez un ordinateur qui poss&#232;de beaucoup de RAM. Pour &#233;viter cela, quand vous appelez Passim, il faut ajouter des param&#232;tres suppl&#233;mentaires qui diront &#224; Spark d'utiliser davantage de RAM pour ses processus.</p>
+<p>Vous &#234;tes maintenant pr&#234;t(e)s &#224; vous lancer dans votre premier projet de r&#233;utilisation de texte.</p>
+<ol>
+<li>
+<p>D&#233;placez-vous dans le sous-r&#233;pertoire <code type="inline">eebo</code> en ex&#233;cutant la commande <code type="inline">cd eebo/</code>, en partant du r&#233;pertoire o&#249; vous avez auparavant clon&#233; le d&#233;p&#244;t  <link target="https://github.com/impresso/PH-Passim-tutorial/"><code type="inline">PH-Passim-tutorial</code></link>.</p>
+</li>
+<li>
+<p>Ex&#233;cutez la commande suivante et allez boire une tasse de votre boisson chaude pr&#233;f&#233;r&#233;e :</p>
+</li>
+</ol>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_38" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_38.txt"></code></pre>
+<p>Pour l'instant, ne vous souciez pas des arguments suppl&#233;mentaires <code type="inline">SPARK_SUBMIT_ARGS='--master local[12] --driver-memory 8G --executor-memory 4G'</code>; dans la section <link target="#etude-de-cas-2--r%C3%A9utilisation-de-textes-dans-un-grand-corpus-de-journaux-historiques">Etude de Cas 2</link> nous les expliquerons en d&#233;tail.</p>
+<p>Ce cas de test prend approximativement huit minutes sur un ordinateur portable r&#233;cent avec huit threads. Vous pouvez &#233;galement suivre la progression de la d&#233;tection sur http://localhost:4040 &#8212; un tableau de bord interactif cr&#233;&#233; par Spark. Notez que le tableau de bord se fermera d&#232;s que Passim aura termin&#233; son ex&#233;cution.</p>
+</div></div><div type="3"><head>Etude de cas 2 : R&#233;utilisation de textes dans un grand corpus de journaux historiques</head>
+<p>La deuxi&#232;me &#233;tude de cas est tir&#233;e d'<link target="https://impresso-project.ch/">impresso</link>, un projet de recherche visant &#224; permettre l'exploration textuelle critique des archives de journaux par la mise en &#339;uvre d'un cadre technologique permettant d'extraire, de traiter, de relier et d'explorer les donn&#233;es des archives de la presse &#233;crite.</p>
+<p>Dans ce projet, nous utiliserons Passim pour d&#233;tecter la r&#233;utilisation de texte &#224; grande &#233;chelle. Les clusters de r&#233;utilisation de texte extraits sont ensuite int&#233;gr&#233;s dans l'application du projet <link target="https://impresso-project.ch/app">impresso</link> de deux mani&#232;res. Premi&#232;rement, dans la vue principale de lecture de l'article, les utilisateurs et utilisatrices peuvent facilement voir quelles parties d'un article ont &#233;t&#233; r&#233;utilis&#233;es par d'autres articles du corpus. Deuxi&#232;mement, il est possible de parcourir tous les clusters dans une page d&#233;di&#233;e (actuellement plus de 6 millions), effectuer des recherches de texte int&#233;gral sur leur contenu et filtrer les r&#233;sultats selon un certain nombre de crit&#232;res (taille du cluster, p&#233;riode couverte, chevauchement lexical, etc.)</p>
+<p>De fa&#231;on plus g&#233;n&#233;rale, la d&#233;tection de la r&#233;utilisation de textes dans un corpus de journaux &#224; grande &#233;chelle peut s'av&#233;rer utile dans les cas suivants :</p>
+<ul>
+<li>Identifier (et &#233;ventuellement filtrer) les documents dupliqu&#233;s avant d'effectuer d'autres &#233;tapes de traitement (par exemple, la mod&#233;lisation des th&#232;mes)</li>
+<li>&#201;tudier la viralit&#233; et la propagation des nouvelles</li>
+<li>&#201;tudier les flux d'information, tant &#224; l'int&#233;rieur qu'&#224; l'ext&#233;rieur des fronti&#232;res nationales</li>
+<li>Permettre aux utilisateurs de d&#233;couvrir quels contenus, au sein de leurs propres collections, ont g&#233;n&#233;r&#233; une r&#233;utilisation de texte (par exemple, des discours politiques c&#233;l&#232;bres, des parties de constitutions nationales, etc.)</li>
+</ul>
+<p>Pour cette &#233;tude de cas, nous traiterons d'une petite partie du corpus <emph>impresso</emph>, constitu&#233;e d'une ann&#233;e de donn&#233;es de journaux (c'est-&#224;-dire 1900) pr&#233;lev&#233;es sur un &#233;chantillon de quatre journaux. Le corpus contient 76 journaux provenant de Suisse et du Luxembourg, couvrant une p&#233;riode de 200 ans. Les &#233;chantillons de donn&#233;es n&#233;cessaires &#224; l'ex&#233;cution pas &#224; pas de cette &#233;tude de cas sont contenus dans le dossier <link target="https://github.com/impresso/PH-Passim-tutorial/tree/master/impresso"><code type="inline">impresso/</code></link>.</p>
+<div type="4"><head>Pr&#233;paration des donn&#233;es</head>
+<p>Le format utilis&#233; dans impresso pour stocker les donn&#233;es des journaux diff&#232;re l&#233;g&#232;rement du format d'entr&#233;e de Passim. Nous avons donc besoin d'un script qui se charge de transformer le premier dans le second. Bien que la discussion sur le fonctionnement de ce script d&#233;passe largement le cadre de ce cours, vous pouvez trouver le script de conversion sur le  <link target="https://github.com/impresso/impresso-pycommons/blob/master/impresso_commons/text/rebuilder.py">d&#233;p&#244;t GitHub d'impresso</link>, si cela vous int&#233;resse. Le r&#233;sultat de ce script est un fichier JSON par journal et par an, compress&#233; dans une archive <code type="inline">.bz2</code> pour un stockage efficace. Des exemples de ce format peuvent &#234;tre trouv&#233;s dans le r&#233;pertoire <code type="inline">impresso/data</code> et sont montr&#233;s dans l'exemple suivant :</p>
+<pre><code xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_39" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_39.txt"></code></pre>
+<p>Chaque archive de journal est nomm&#233;e d'apr&#232;s l'identifiant du journal : par exemple, <code type="inline">GDL</code> &#233;quivaut &#224; la <emph>Gazette de Lausanne</emph>. Au total, ces quatre fichiers <code type="inline">.bz2</code> contiennent 92 000 articles dans Passim, ce qui correspond &#224; tous les articles publi&#233;s en 1900 dans les quatre journaux de l'&#233;chantillon.</p>
+<p>Parfois, il n'est pas ais&#233; d'inspecter des donn&#233;es conditionn&#233;es de cette mani&#232;re. Mais certaines commandes bash comme <code type="inline">bzcat</code> ainsi que <code type="inline">jq</code> peuvent nous aider. La cha&#238;ne de commandes suivante nous permet par exemple de savoir combien de documents (articles de journaux) sont contenus dans chacun des fichiers d'entr&#233;e en comptant leurs ID :</p>
+<pre><code xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_40" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_40.txt"></code></pre>
+<p>Et de la m&#234;me mani&#232;re, dans tous les fichiers d'entr&#233;e :</p>
+<pre><code xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_41" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_41.txt"></code></pre>
+<p>Le r&#244;le de ces commandes est de lire le contenu du fichier <code type="inline">.bz2</code> au moyen de <code type="inline">bzcat</code> et ensuite <emph>d'acheminer</emph> &#224; l'aide d'un pipe (<code type="inline">|</code>), ce contenu dans <code type="inline">jq</code> qui</p>
+<ul>
+<li>se r&#233;p&#232;te &#224; travers tous les documents dans le fichier en ligne JSON</li>
+<li>supprime pour chaque document le champ <code type="inline">pages</code>, car il n'est pas n&#233;cessaire et il s&#233;lectionne seulement le champ <code type="inline">id</code></li>
+<li>finalement, calcule la taille de la liste d'identifiants cr&#233;&#233;e par l'expression pr&#233;c&#233;dente avec <code type="inline">length</code> <code type="inline">jq</code>.</li>
+</ul>
+</div><div type="4"><head>Ex&#233;cution de Passim</head>
+<p>Pour traiter les donn&#233;es impresso &#224; travers Passim, effectuez la commande suivante dans une fen&#234;tre  <code type="inline">Terminal</code> :</p>
+<pre><code xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_42" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_42.txt"></code></pre>
+<p>Cette commande est compos&#233;e des param&#232;tres suivants :</p>
+<ul>
+<li>
+<hi rend="bold"><code type="inline">SPARK_SUBMIT_ARGS</code></hi> envoie quelques param&#232;tres de configuration &#224; Spark, la biblioth&#232;que qui s'occupe de l'ex&#233;cution parall&#232;le des processus<ul>
+<li><code type="inline">--master local[10]</code>: <code type="inline">local</code> signifie que nous ex&#233;cutons Spark en mode machine unique ; <code type="inline">[10]</code> sp&#233;cifie le nombre de workers (ou threads, dans ce cas pr&#233;cis) sur lesquels les processus doivent &#234;tre distribu&#233;s&#8239;; (<code type="inline">local [*]</code> utilisera le nombre maximum de threads)    </li>
+<li><code type="inline">--executor-memory 4G</code>: L'&#233;quivalent de la taille maximale du tas lors de l'ex&#233;cution d'une application JAVA normale. C'est la quantit&#233; de m&#233;moire que Spark alloue &#224; chaque ex&#233;cuteur</li>
+<li><code type="inline">--conf spark.local.dir=/scratch/matteo/spark-tmp/</code>: Un r&#233;pertoire o&#249; Spark stocke des donn&#233;es temporaires. Lorsque vous travaillez avec de grands ensembles de donn&#233;es, il est important de sp&#233;cifier un emplacement qui poss&#232;de suffisamment d'espace libre sur le disque</li>
+</ul>
+</li>
+<li><hi rend="bold"><code type="inline">--schema-path</code></hi> sp&#233;cifie le chemin vers le sch&#233;ma JSON, en d&#233;crivant les donn&#233;es d'entr&#233;e &#224; ex&#233;cuter par Passim (voir la section sur la <link target="#personnalisation-du-format-json">personnalisation du format JSON</link> de la partie qui porte sur la pr&#233;paration des donn&#233;es pour Passim pour plus d'informations sur la fa&#231;on de g&#233;n&#233;rer un tel sch&#233;ma)</li>
+<li><hi rend="bold"><code type="inline">impresso/data/*.jsonl.bz2</code></hi> sp&#233;cifie les fichiers d'entr&#233;e (c'est-&#224;-dire tous les fichiers contenus dans <code type="inline">impresso/data/</code> avec <code type="inline">.jsonl.bz2</code> dans le nom du fichier)</li>
+<li><hi rend="bold"><code type="inline">impresso/Passim-output/</code></hi> sp&#233;cifie o&#249; Passim doit &#233;crire sa sortie</li>
+</ul>
+<p>Si vous voulez limiter le traitement &#224; quelques fichiers d'entr&#233;e - par exemple pour limiter l'utilisation de la m&#233;moire - vous pouvez sp&#233;cifier l'entr&#233;e en utilisant la commande suivante :</p>
+<pre><code xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_43" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_43.txt"></code></pre>
+<p>Vous pouvez suivre la progression de Passim en cours d'ex&#233;cution en vous rendant depuis votre navigateur &#224; l'adresse <code type="inline">localhost:4040</code>, c'est l&#224; que se trouve le tableau de bord accessible de Spark (figure 2).</p>
+<figure><desc>Figure 2. Capture d'&#233;cran du tableau de bord de Spark en train d'ex&#233;cuter Passim.</desc><graphic url="spark-dashboard.png"/></figure>
+<p>L'ex&#233;cution de Passim avec huit workers (et 4 Go de m&#233;moire d'ex&#233;cution) pour traiter les 92 514 articles publi&#233;s en 1900 dans les journaux GDL, JDG, EXP et IMP prend environ 5 minutes, sachant n&#233;anmoins que ce temps peut varier.</p>
+<p>Si vous fournissez un dossier avec des fichiers <code type="inline">*.bz2</code> en tant qu'entr&#233;e, assurez-vous que ces fichiers ne se trouvent pas dans des sous-r&#233;pertoires, sinon Passim ne sera pas capable de les trouver automatiquement.</p>
+<p>Il est important que le dossier de sortie dans lequel Passim &#233;crira ses r&#233;sultats soit vide. En particulier, lors des premi&#232;res utilisations, car vous vous familiarisez avec le logiciel. Il est facile de sp&#233;cifier un dossier de sortie non vide. Si vous avez sp&#233;cifi&#233; un dossier de sortie non vide, cela conduit g&#233;n&#233;ralement &#224; une erreur, car Passim traite le contenu du dossier et ne l'&#233;crase pas.</p>
+</div><div type="4"><head>Contr&#244;le de la sortie de Passim</head>
+<p>Une fois que le processus de Passim est termin&#233;, le dossier de sortie <code type="inline">impresso/Passim-output/</code> contiendra un sous-dossier <code type="inline">out.json/</code> avec les clusters de r&#233;utilisation de texte extraits. Si vous avez sp&#233;cifi&#233; <code type="inline">--output=parquet</code> &#224; la place de <code type="inline">--output=json</code>, ce sous-dossier sera nomm&#233; <code type="inline">out.parquet</code>.</p>
+<p>Dans la sortie JSON, chaque dictionnaire correspond &#224; un passage de r&#233;utilisation de texte. Comme les passages sont agr&#233;g&#233;s en clusters, chaque passage contient un champ <code type="inline">cluster</code> avec l'ID du cluster auquel il appartient.</p>
+<p>Pour obtenir le nombre total de cluster, il faut compter le nombre d'ID de clusters qui sont uniques avec la commande suivante :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_44" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_44.txt"></code></pre>
+<p>De m&#234;me, nous pouvons afficher le centi&#232;me ID du cluster :</p>
+<pre><code class="language-bash" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_45" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_45.txt"></code></pre>
+<p>Et avec une simple requ&#234;te <code type="inline">jq</code>, nous pouvons afficher tous les passages qui appartienent &#224; ce cluster de r&#233;utilisation de texte :</p>
+<pre><code xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_46" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_46.txt"></code></pre>
+<pre><code class="language-json" xml:id="code_detecter-la-reutilisation-de-texte-avec-passim_47" type="block" corresp="code_detecter-la-reutilisation-de-texte-avec-passim_47.txt"></code></pre>
+<p>Comme vous pouvez le voir dans les sorties ci-dessus, ce cluster contient le m&#234;me article - un accident de montagne qui est survenu &#224; Interlaken le 30 juillet 1900 - rapport&#233; le m&#234;me jour par deux journaux diff&#233;rents  avec des mots qui diff&#232;rent l&#233;g&#232;rement. </p>
+</div></div></div><div type="2"><head>Utilisation de la sortie de Passim</head>
+<p>Puisque l'utilisation des donn&#233;es de r&#233;utilisation de texte d&#233;pend en fin de compte des questions de recherche - et il y a plusieurs applications possibles de la r&#233;utilisation de texte, comme nous l'avons vu ci-dessus -, s'int&#233;resser &#224; l'utilisation des sorties de Passim va plus loin que les objectifs de ce cours.</p>
+<p>Les donn&#233;es issues de Passim peuvent &#234;tre ensuite r&#233;investies &#224; travers d'autres langages de programmation, comme par exemple Python. Les clusters extraits peuvent &#234;tre utilis&#233;s pour d&#233;doublonner des documents dans un corpus, ou m&#234;me rassembler de multiples t&#233;moins du m&#234;me texte, mais cela d&#233;pendra enti&#232;rement du contexte de recherche et du cas d'utilisation sp&#233;cifique.</p>
+<p>Afin de donner un exemple sur l'&#233;tape suivante, pour celles et ceux qui souhaitent manipuler et approfondir leurs connaissances sur les donn&#233;es de la r&#233;utilisation de texte en Python, nous leur fournissons un carnet Jupyter (<link target="https://github.com/impresso/PH-passim-tutorial/blob/master/explore-passim-output.ipynb"><code type="inline">explore-Passim-output.ipynb</code></link>) qui explique comment importer des sorties JSON de Passim dans un <code type="inline">pandas.DataFrame</code> et comment analyser la distribution des clusters de r&#233;utilisation de texte dans les deux cas pr&#233;sent&#233;s pr&#233;c&#233;demment. Pour les lecteurs et les lectrices novices qui utilisent la biblioth&#232;que <code type="inline">pandas</code> de Python, la le&#231;on du <emph>Programming Historian</emph> r&#233;dig&#233;e par Charlie Harper sur <link target="/en/lessons/visualizing-with-bokeh">la visualisation des donn&#233;es avec Bokeh et Pandas</link> est une bonne lecture d'introduction (et tr&#232;s fortement recommand&#233;e).</p>
+<p>Le code contenu et expliqu&#233; dans le journal produira les graphiques des figures 3 et 4, qui montrent respectivement comment les tailles des clusters de r&#233;utilisation de texte sont distribu&#233;es dans les donn&#233;es de impresso et dans les donn&#233;es de la Bible.</p>
+<figure><desc>Figure 3. Distribution des tailles des clusters de r&#233;utilisation de texte dans l'&#233;chantillon de donn&#233;es de impresso.</desc><graphic url="plot-impresso.png"/></figure>
+<figure><desc>Figure 4. Distribution des tailles des clusters de r&#233;utilisation de texte dans les donn&#233;es de l'&#233;chantillon biblique.</desc><graphic url="plot-bible.png"/></figure>
+<p>Comme vous pouvez le voir dans ces graphiques, la majorit&#233; des clusters de r&#233;utilisation de texte contient au maximum deux passages dans les deux cas. Cependant, dans l'&#233;chantillon de donn&#233;es d'impresso, il y a beaucoup plus de variations quant &#224; la taille des clusters, avec 10% des &#233;chantillons qui ont une taille comprise entre 6 et 296 passages, contrairement aux donn&#233;es de la Bible, dont la taille maximum d'un cluster n'est que de 3.</p>
+</div><div type="2"><head>Pour aller plus loin</head>
+<p><hi rend="bold">Passim</hi></p>
+<ul>
+<li>Smith et al. (2015) pr&#233;sentent en d&#233;tail l'algorithme de d&#233;tection de r&#233;utilisation de texte impl&#233;ment&#233; dans Passim</li>
+<li>Cordell (2015) a employ&#233; Passim pour &#233;tudier la r&#233;utilisation de textes dans un large corpus de journaux am&#233;ricains</li>
+</ul>
+<p><hi rend="bold">textreuse</hi></p>
+<ul>
+<li>Vogler et al. (2020) utilisent le paquetage R <code type="inline">textreuse</code> (Mullen 2016) pour &#233;tudier le ph&#233;nom&#232;ne de <emph>concentration des m&#233;dias</emph> dans le journalisme contemporain</li>
+</ul>
+<p><hi rend="bold">TRACER</hi></p>
+<ul>
+<li>B&#252;chler et al. (2014) expliquent les algorithmes de d&#233;tection de la r&#233;utilisation de textes qui sont mis en &#339;uvre dans TRACER</li>
+<li>Franzini et al. (2018) utilisent et &#233;valuent TRACER pour l'extraction de citations d'un texte latin (le <emph>Summa contra Gentiles</emph> de Thomas d'Aquin)</li>
+</ul>
+<p><hi rend="bold">BLAST</hi></p>
+<ul>
+<li>Vierthaler et al. (2019) utilisent l'algorithme d'alignement BLAST pour d&#233;tecter la r&#233;utilisation dans des textes chinois</li>
+<li>Vesanto et al. (2017) and Salmi et al. (2019) appliquent BLAST &#224; un corpus complet de journaux publi&#233;s en Finlande</li>
+</ul>
+</div><div type="2"><head>Remerciements</head>
+<p>Nous remercions sinc&#232;rement Marco B&#252;chler et Ryan Muther pour la r&#233;vision de cette le&#231;on, ainsi que nos coll&#232;gues Marten D&#252;ring et David Smith pour leurs commentaires constructifs sur une premi&#232;re version de ce tutoriel. Nous remercions &#233;galement Anna-Maria Sichani pour son r&#244;le d'&#233;ditrice. <emph>(N.D.L.R.) Les remerciements portent sur la version originale en anglais de cette le&#231;on.</emph></p>
+<p>Les auteurs remercient chaleureusement le journal <link target="https://letemps.ch/">Le Temps</link> &#8212; propri&#233;taire de <emph>La Gazette de Lausanne</emph> (GDL) et du <emph>Journal de Gen&#232;ve</emph> (JDG) &#8212; ainsi que le groupe <link target="https://www.arcinfo.ch/">ArcInfo</link> &#8212; propri&#233;taire de <emph>L&#8217;Impartial</emph> (IMP) et de <emph>L&#8217;Express</emph> (EXP) &#8212;  pour avoir accept&#233; de partager leurs donn&#233;es &#224; des fins acad&#233;miques.</p>
+<p>Matteo Romanello remercie le Fonds national suisse de la recherche scientifique (FNS) pour son soutien financier au projet <link target="https://impresso-project.ch/"><emph>impresso &#8211; Media Monitoring of the Past</emph></link> sous le num&#233;ro de subvention CR-SII5_173719. Le travail de Simon Hengchen a &#233;t&#233; soutenu par le programme de recherche et d'innovation Horizon 2020 de l'Union europ&#233;enne sous la subvention 770299 (<link target="https://www.newseye.eu/">NewsEye</link>). Simon Hengchen &#233;tait affili&#233; &#224; l'Universit&#233; d'Helsinki et &#224; l'Universit&#233; de Gen&#232;ve pour la plupart de ces travaux, et est actuellement financ&#233; par le projet <emph>Towards Computational Lexical Semantic Change Detection</emph> soutenu par le Conseil su&#233;dois de la recherche (20192022; dnr 2018-01184).</p>
+</div><div type="2"><head>Bibliographie</head>
+<ol>
+<li>Franzini, Greta, Maria Moritz, Marco B&#252;chler et Marco Passarotti. &#171;&#8239;Using and evaluating TRACER for an Index fontium computatus of the Summa contra Gentiles of Thomas Aquinas&#8239;&#187;. <emph>Proceedings of the Fifth Italian Conference on Computational Linguistics (CLiC-it 2018)</emph> (2018). <link target="http://ceur-ws.org/Vol-2253/paper22.pdf">Lien</link></li>
+<li>Smith, David A., Ryan Cordell et Abby Mullen. &#171;&#8239;Computational Methods for Uncovering Reprinted Texts in Antebellum Newspapers&#8239;&#187;. <emph>American Literary History</emph> <hi rend="bold">27</hi> (2015). <link target="http://dx.doi.org/10.1093/alh/ajv029">Lien</link></li>
+<li>Cordell, Ryan. &#171;&#8239;Reprinting Circulation, and the Network Author in Antebellum Newspapers&#8239;&#187;. <emph>American Literary History</emph> <hi rend="bold">27</hi> (2015): 417&#8211;445. <link target="http://dx.doi.org/10.1093/alh/ajv028">Lien</link></li>
+<li>Vogler, Daniel, Linards Udris et Mark Eisenegger. &#171;&#8239;Measuring Media Content Concentration at a Large Scale Using Automated Text Comparisons&#8239;&#187;. <emph>Journalism Studies</emph> 21, no.11 (2020). <link target="http://dx.doi.org/10.1080/1461670x.2020.1761865">Lien</link></li>
+<li>Mullen, Lincoln. <emph>textreuse: Detect Text Reuse and Document Similarity</emph>. Github. (2016). <link target="https://github.com/ropensci/textreuse">Lien</link></li>
+<li>B&#252;chler, Marco, Philip R. Burns, Martin M&#252;ller, Emily Franzini et Greta Franzini. &#171;&#8239;Towards a Historical Text Re-use Detection&#8239;&#187;. In <emph>Text Mining: From Ontology Learning to Automated Text Processing Applications</emph> dir. Chris Biemann et Alexander Mehler, 221&#8211;238. Springer International Publishing, 2014. <link target="http://dx.doi.org/10.1007/978-3-319-12655-5_11">Lien</link></li>
+<li>Vierthaler, Paul et Meet Gelein. &#171;&#8239;A BLAST-based, Language-agnostic Text Reuse Algorithm with a MARKUS Implementation and Sequence Alignment Optimized for Large Chinese Corpora&#8239;&#187;. <emph>Journal of Cultural Analytics</emph> 4, vol.2 (2019). <link target="http://dx.doi.org/10.22148/16.034">Lien</link></li>
+<li>Vesanto, Aleksi, Asko Nivala, Heli Rantala, Tapio Salakoski, Hannu Salmi et Filip Ginter. &#171;&#8239;Applying BLAST to Text Reuse Detection in Finnish Newspapers and Journals, 1771-1910&#8239;&#187;. <emph>Proceedings of the NoDaLiDa 2017 Workshop on Processing Historical Language</emph> (2017): 54&#8211;58. <link target="https://www.aclweb.org/anthology/W17-0510">Lien</link></li>
+<li>Salmi, Hannu, Heli Rantala, Aleksi Vesanto et Filip Ginter. &#171;&#8239;The long-term reuse of text in the Finnish press, 1771&#8211;1920&#8239;&#187;. <emph>CEUR Workshop Proceedings</emph> 2364 (2019): 394&#8211;544.</li>
+<li>Soto, Axel J, Abidalrahman Mohammad, Andrew Albert, Aminul Islam, Evangelos Milios, Michael Doyle, Rosane Minghim et Maria Cristina de Oliveira. &#171;&#8239;Similarity-Based Support for Text Reuse in Technical Writing&#8239;&#187;. <emph>Proceedings of the 2015 ACM Symposium on Document Engineering</emph> (2015): 97&#8211;106. <link target="http://dx.doi.org/10.1145/2682571.2797068">Lien</link></li>
+<li>Schofield, Alexandra, Laure Thompson et David Mimno. &#171;&#8239;Quantifying the Effects of Text Duplication on Semantic Models&#8239;&#187;. <emph>Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing</emph> (2017): 2737&#8211;2747. <link target="http://dx.doi.org/10.18653/v1/D17-1290">Lien</link></li>
+<li>Romanello, Matteo, Aur&#233;lien Berra et Alexandra Trachsel. &#171;&#8239;Rethinking Text Reuse as Digital Classicists&#8239;&#187;. <emph>Digital Humanities conference</emph> (2014). <link target="https://wiki.digitalclassicist.org/Text_Reuse">Lien</link></li>
+</ol>
+</div></body>
+  </text>
+</TEI>

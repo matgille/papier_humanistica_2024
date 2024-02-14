@@ -1,0 +1,24 @@
+num_firstlines = 0
+fin = open("your_current_source_file.txt", 'r')
+# NB: GScriba is not a list of lines this time, but a single big string.
+GScriba = fin.read()
+
+# finditer() creates an iterator 'i' that we can do a 'for' loop over.
+i = slug_and_firstline.finditer(GScriba)
+
+# each element 'x' in that iterator is a regex match object.
+for x in i:
+    # count the summary lines we find. Remember, we know how many
+    # there should be, because we know how many charters there are.
+    num_firstlines += 1
+
+    chno = int(x.group(3)) # our charter number is a string, we need an integer
+
+    # chno should equal n + 1, if it doesn't, report to us
+    if chno != n + 1:
+        print(f"problem in charter: {(n + 1)}") #NB: this will miss consecutive problems.
+    # then set n to the right charter number
+    n = chno
+
+# print out the number of summary lines we found
+print(f"number of italian summaries: {num_firstlines}")

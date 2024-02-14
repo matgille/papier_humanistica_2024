@@ -1,0 +1,12 @@
+sesamestreet_data%>%
+  mutate(has_sesame_ht = str_detect(text, regex("#sesamestreet", ignore_case = TRUE))) %>%
+  mutate(date = date(created_at)) %>%
+  count(date, has_sesame_ht) %>%
+  ggplot(aes(date, n)) +
+  geom_line(aes(linetype=has_sesame_ht)) +
+  scale_linetype(labels = c("No #sesamestreet", "#sesamestreet")) +
+  scale_x_date(date_breaks = "1 day", date_labels = "%b %d") +
+  scale_y_continuous(breaks = seq(0, 400, by = 50)) +
+  theme(axis.text.x=element_text(angle=40, hjust=1)) +
+  labs(y="Number of Tweets", x="Date", caption = "Total number of tweets: 2432") +
+  guides(linetype = guide_legend(title = "Whether or not the\ntweet contains \n#sesamestreet"))

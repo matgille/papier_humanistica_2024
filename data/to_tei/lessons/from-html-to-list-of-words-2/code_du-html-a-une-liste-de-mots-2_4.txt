@@ -1,0 +1,28 @@
+# obo.py
+def stripTags(pageContents):
+    # Type le contenu du code source de la page comme une chaine de caractère
+    pageContents = str(pageContents)
+    # Renvoie l'indice du premier paragraphe
+    startLoc = pageContents.find("<p>")
+    # Renvoie indice du dernier passage à la ligne
+    endLoc = pageContents.rfind("<br/>")
+    # Ne garde que le contenu entre le premier paragraphe et le dernier passage à la ligne
+    pageContents = pageContents[startLoc:endLoc]
+    
+    # Initialisation 
+    inside = 0 # variable repérant l'intérieur d'une balise
+    text = '' # variable agrégeant les contenus
+
+    # Pour chaque caractère
+    for char in pageContents:
+        # Teste chaque cas :
+        if char == '<':
+            inside = 1
+        elif (inside == 1 and char == '>'):
+            inside = 0
+        elif inside == 1:
+            continue
+        else:
+            text += char
+
+    return text

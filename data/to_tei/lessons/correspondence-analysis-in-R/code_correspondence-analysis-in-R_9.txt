@@ -1,0 +1,14 @@
+#include only the desired committees
+# HESA: Health, JUST: Justice, FEWO: Status of Women,
+# INAN: Indigenous and Northern Affairs, FINA: Finance
+# FAAE: Foreign Affairs and International Trade
+# IWFA: Violence against Indigenous Women
+
+harper_df2 <- harper_df[which(harper_df$abbr %in%
+    c("HESA", "JUST", "FEWO", "INAN", "FINA", "FAAE", "IWFA")),]
+harper_table2 <- table(harper_df2$abbr, harper_df2$membership)
+
+# remove the singles again
+harper_table2 <- harper_table2[, colSums(harper_table2) > 1]
+CA_Harper2 <- CA(harper_table2)
+plot(CA_Harper2)

@@ -1,0 +1,145 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>Descarga automatizada con Wget</title>
+  <layout>lesson</layout>
+  <date>2012-06-27</date>
+  <translation_date>2018-11-29</translation_date>
+  <authors>Ian Milligan</authors>
+  <reviewers>Aur&#233;lien Berra</reviewers>
+  <editors>Adam Crymble</editors>
+  <translator>V&#237;ctor Gayol</translator>
+  <translation-editor>Jennifer Isasi</translation-editor>
+  <translation-reviewer>Jennifer Isasi,Joshua Ortiz-Baco</translation-reviewer>
+  <original>automated-downloading-with-wget</original>
+  <exclude_from_check>review-ticket</exclude_from_check>
+  <difficulty>1</difficulty>
+  <activity>acquiring</activity>
+  <topics>web-scraping</topics>
+  <abstract>Wget es un programa &#250;til que se ejecuta a trav&#233;s de la l&#237;nea de comandos de tu computadora. Sirve para recuperar material en l&#237;nea.</abstract>
+  <avatar_alt>Grabado de dos mineros dentro de una mina empujando carretillas hasta un ascensor.</avatar_alt>
+  <doi>10.46430/phes0035</doi>
+</metadata>
+  <text xml:lang="es">
+    <body>
+      <div type="2"><head>Nota del editor</head>
+<p>Esta lecci&#243;n requiere que uses la l&#237;nea de comandos. Si no tienes experiencia previa en el uso de la l&#237;nea de comandos, ser&#225; &#250;til estudiar la lecci&#243;n  <link target="/es/lecciones/introduccion-a-bash">Introducci&#243;n a la l&#237;nea de comandos en Bash</link>, en <emph>The Programming Historian</emph> en espa&#241;ol.</p>
+</div>
+      <div type="2"><head>Objetivos de la lecci&#243;n</head>
+<p>Esta lecci&#243;n est&#225; dise&#241;ada para usuarias/os intermedias/os, aunque pueden seguirla principiantes.</p>
+<p>Wget es un programa &#250;til, que se ejecuta a trav&#233;s de la l&#237;nea de comandos de tu computadora y  sirve para recuperar material en l&#237;nea.</p>
+<figure><desc>Int&#233;rprete de l&#237;nea de comandos, Terminal, en Mac</desc><graphic url="Terminal-on-mac2.png"/></figure>
+<p>Puede ser de utilidad en las siguientes situaciones:</p>
+<ul>
+<li>Recuperar o duplicar (crear una copia exacta) de un sitio web completo. Este sitio web puede contener documentos hist&#243;ricos, o simplemente puede ser tu propio sitio web personal del que deseas hacer una copia de seguridad. Un comando u orden puede descargar todo el sitio en tu computadora.</li>
+<li>Descargar archivos espec&#237;ficos de la jerarqu&#237;a de un sitio web (cierta parte del sitio web como, por ejemplo, cada p&#225;gina que se encuentre dentro del directorio <code type="inline">/papeles/</code> del sitio).</li>
+</ul>
+<p>En esta lecci&#243;n trabajaremos con tres ejemplos r&#225;pidos de c&#243;mo puedes usar wget en tu trabajo. Al final de la lecci&#243;n podr&#225;s descargar r&#225;pidamente grandes cantidades de informaci&#243;n de Internet de manera automatizada. Si encuentras un repositorio de informaci&#243;n hist&#243;rica en l&#237;nea, en lugar de hacer clic con el bot&#243;n derecho en cada archivo y guardarlo para construir tu conjunto de datos, tendr&#225;s las habilidades para elaborar un solo comando que descargue todo.</p>
+<p>Primero, algunas precauciones. Debes tener cuidado de c&#243;mo usas wget. Si consultas el manual en caso de duda y repasas la lecci&#243;n aqu&#237;, est&#225; bien. Siempre debes generar un retraso en tus comandos para no sobrecargar los servidores y tambi&#233;n debes poner un l&#237;mite a la velocidad de descarga. Todo esto es parte del ser un buen ciudadano de Internet. Podemos pensar en la analog&#237;a de utilizar una toma de agua con prudencia en vez de abrir todas las llaves al mismo tiempo (no es bueno para ti ni para la compa&#241;&#237;a de agua).</p>
+<p>Trata de espec&#237;ficar de la mejor manera posible la formulaci&#243;n de tu descarga. Hay por ah&#237; un chiste que sugiere que puedes descargar accidentalmente &#161;todo Internet con wget! Es un poco exagerado, &#161;pero no est&#225; demasiado lejos!</p>
+<p>Comencemos.</p>
+</div>
+      <div type="2"><head>Primer paso: la instalaci&#243;n</head>
+<div type="3"><head>Instrucciones para Linux</head>
+<p>Si usas Linux ya debes tener instalado wget. Compru&#233;balo abriendo tu l&#237;nea de comandos. Escribe <code type="inline">wget</code> y presiona enter. Si tienes instalado wget el sistema responder&#225;:</p>
+<pre><code xml:id="code_descarga-automatizada-con-wget_0" type="block" corresp="code_descarga-automatizada-con-wget_0.txt"></code></pre>
+<p>si no est&#225; instalado ver&#225;s:</p>
+<pre><code xml:id="code_descarga-automatizada-con-wget_1" type="block" corresp="code_descarga-automatizada-con-wget_1.txt"></code></pre>
+<p>Si usas OS X o Windows tienes que descargar el programa. Usuarias/os de Linux sin wget deben seguir las instrucciones para OS X a continuaci&#243;n.</p>
+</div><div type="3"><head>Instrucciones para OS X</head>
+<div type="4"><head>Opci&#243;n uno en OS X: el m&#233;todo preferido</head>
+<p>En OS X hay dos formas de obtener wget e instalarlo. Lo m&#225;s f&#225;cil es instalar un administrador de paquetes y usarlo para instalar wget autom&#225;ticamente. Hay un segundo m&#233;todo, que se discute m&#225;s adelante, que involucra compilarlo.</p>
+<p>Sin embargo, para un correcto funcionamiento de ambos m&#233;todos se requiere que instales las 'Herramientas para l&#237;nea de comandos' de Apple. Esto implica descargar XCode. Si tienes el 'App Store', puedes <link target="https://itunes.apple.com/us/app/xcode/id497799835?mt=12">descargar XCode a trav&#233;s de este enlace</link>. Si no, las siguientes instrucciones funcionar&#225;n.</p>
+<p>Para descargar XCode, ve al <link target="https://developer.apple.com/xcode/">sitio web de desarrolladores de Apple</link>, reg&#237;strate como desarrollador y luego en la secci&#243;n <link target="https://developer.apple.com/xcode/">descargas para desarrolladores de Apple</link> necesitar&#225;s encontrar la versi&#243;n correcta. Si est&#225;s en la versi&#243;n m&#225;s reciente, Lion a partir de julio de 2012,<ref type="footnotemark" target="#1"/> puedes utilizar el enlace principal. De lo contrario, deber&#225;s hacer clic en el enlace: "&#191;Est&#225; buscando herramientas de desarrollador adicionales? <link target="https://developer.apple.com/downloads/">Ver descargas</link>".</p>
+<p>Despu&#233;s de iniciar sesi&#243;n con tus credenciales de desarrollador gratuitas ver&#225;s una larga lista. Escribe "xcode" en la barra de b&#250;squeda y encuentra la versi&#243;n que sea compatible con la versi&#243;n de tu sistema operativo. Encontrar la versi&#243;n correcta para ti puede tomar algunos clics. Por ejemplo, Xcode 3.2 es la versi&#243;n para OS X 10.6 Snow Leopard, 3.0 es la versi&#243;n para OS X 10.5 Leopard, etc.</p>
+<p>Es una descarga muy grande y tomar&#225; alg&#250;n tiempo en completarse. Una vez que tengas el archivo, inst&#225;lalo.</p>
+<p>Deber&#225;s instalar el kit '<hi rend="bold">Command Line Tools</hi>' de XCode. Abre la pesta&#241;a 'Preferencias', haz clic en 'Descargas' y luego en 'Instalar' junto a 'Herramientas de l&#237;nea de comandos'. Ahora estamos listos para instalar un gestor de paquetes.</p>
+<p>El gestor de paquetes m&#225;s f&#225;cil de instalar es <emph>Homebrew</emph>. Ve a <link target="https://brew.sh/es/">https://brew.sh/es/</link> y revisa las instrucciones. Hay muchos comandos importantes, como wget, que no est&#225;n incluidos de forma predeterminada en OS X. Este programa facilita la descarga y la instalaci&#243;n de todos los archivos necesarios.</p>
+<p>Para instalar <emph>Homebrew</emph>, abre la ventana de Terminal y escribe:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_2" type="block" corresp="code_descarga-automatizada-con-wget_2.txt"></code></pre>
+<p>Esta instalaci&#243;n de <emph>Hombrew</emph> utiliza el lenguaje de programaci&#243;n Ruby, integrado en OS X. Para ver si la instalaci&#243;n fue correcta, escribe la siguiente orden en la ventana de tu Terminal:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_3" type="block" corresp="code_descarga-automatizada-con-wget_3.txt"></code></pre>
+<p>Si se ha instalado bien, debe aparecer una lista de opciones de documentaci&#243;n. Pero a&#250;n tenemos que ejecutar otro comando para asegurarnos de que todo funcione:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_4" type="block" corresp="code_descarga-automatizada-con-wget_4.txt"></code></pre>
+<p>Con <emph>Homebrew</emph> listo podemos instalar wget, que ahora ser&#225; un paso f&#225;cil.</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_5" type="block" corresp="code_descarga-automatizada-con-wget_5.txt"></code></pre>
+<p>Se proceder&#225; a descargar la versi&#243;n m&#225;s reciente de wget, que es wget 1.14.<ref type="footnotemark" target="#2"/> Despu&#233;s de que la secuencia de comandos deje de ejecutarse y vuelva a la ventana principal, escribe el siguiente comando en la terminal:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_6" type="block" corresp="code_descarga-automatizada-con-wget_6.txt"></code></pre>
+<p>Si se instal&#243; ver&#225;s:</p>
+<pre><code xml:id="code_descarga-automatizada-con-wget_7" type="block" corresp="code_descarga-automatizada-con-wget_7.txt"></code></pre>
+<p>Si no, ver&#225;s:</p>
+<pre><code xml:id="code_descarga-automatizada-con-wget_8" type="block" corresp="code_descarga-automatizada-con-wget_8.txt"></code></pre>
+<p>En este punto, deber&#237;as haber instalado wget correctamente. &#161;Ahora todo est&#225; listo para seguir!</p>
+</div><div type="4"><head>Opci&#243;n dos para OS X</head>
+<p>Si por alguna raz&#243;n no deseas instalar un administrador de paquetes, puedes descargar solo wget. Esto ser&#225; apropiado si est&#225;s utilizando un administrador de paquetes diferente (como Mac Ports) o si deseas mantener tu infraestructura al m&#237;nimo. Sigue las mismas instrucciones para instalar Xcode y el conjunto de herramientas de l&#237;nea de comandos.</p>
+<p>Luego puedes descargar una versi&#243;n no compilada de wget desde el <link target="http://www.gnu.org/software/wget/">sitio web de GNU</link>. Yo eleg&#237; descargar el archivo <code type="inline">wget-1.13.tar.gz</code>, que puedes encontrar siguiendo el enlace a cualquier p&#225;gina de descarga, ya sea <link target="http://ftp.gnu.org/gnu/wget/">HTTP</link> o <link target="ftp://ftp.gnu.org/gnu/wget/">FTP</link>). Descomprime haciendo doble clic en el archivo en tu directorio de inicio. En una Mac, este ser&#225; su directorio: <code type="inline">/user/</code>; por ejemplo, mi nombre de usuario es ianmilligan y aparece junto a un icono de casa en mi Finder. Luego abre Terminal. Para este tutorial, hemos descargado <code type="inline">wget-1.13</code>.</p>
+<p>Tenemos que navegar primero al directorio en el que se encuentran los archivos wget. En la terminal, escribe:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_9" type="block" corresp="code_descarga-automatizada-con-wget_9.txt"></code></pre>
+<p>Ten en cuenta que si has descargado una versi&#243;n diferente de wget, los siguientes pasos funcionar&#225;n pero tendr&#225;s que reemplazar el n&#250;mero de la versi&#243;n (aqu&#237; <code type="inline">1.13</code>) por el tuyo.</p>
+<p>Ahora necesitamos generar las instrucciones, o <code type="inline">makefile</code>, para el archivo. Esto es una especie de boceto del aspecto que tendr&#225; el archivo final. Escribe:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_10" type="block" corresp="code_descarga-automatizada-con-wget_10.txt"></code></pre>
+<p>Ahora que tenemos el proyecto abocetado, ordenemos a la computadora que lo siga. Escribe:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_11" type="block" corresp="code_descarga-automatizada-con-wget_11.txt"></code></pre>
+<p>Ahora necesitas crear el archivo final. Al escribir antes el comando sudo, est&#225;s ejecutando los comandos siguientes con los privilegios de seguridad m&#225;s altos. Esto le permite a la computadora instalar el archivo en tu sistema.</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_12" type="block" corresp="code_descarga-automatizada-con-wget_12.txt"></code></pre>
+<p>En este punto del proceso tendr&#225;s que introducir la contrase&#241;a de tu computadora en el prompt que aparezca. Escr&#237;bela.</p>
+<p>Deber&#225;s haber instalado wget.</p>
+</div></div><div type="3"><head>Instrucciones para Windows</head>
+<p>La forma m&#225;s f&#225;cil es descargar una versi&#243;n funcional. Para hacerlo, visita <link target="https://eternallybored.org/misc/wget/">este sitio web</link> y descarga la &#250;ltima versi&#243;n de <code type="inline">wget.exe</code> utilizando los archivos de instalaci&#243;n adecuados para tu computadora. Puedes averiguar si necesitas el binario de 32 o 64 bits comprobando las especificaciones de tu dispositivo o realizando una b&#250;squeda en Internet.</p>
+<p>Si colocas <code type="inline">wget.exe</code> en tu directorio <code type="inline">C:\Windows</code>, puedes usar wget desde cualquier lugar de tu computadora. Esto har&#225; tu vida m&#225;s f&#225;cil ya que no tendr&#225;s que preocuparte por ejecutar siempre wget desde un solo lugar en tu sistema. Si est&#225; en este directorio, Windows sabr&#225; que el comando se puede usar en cualquier parte en el que se encuentra la ventana de tu terminal.</p>
+</div></div>
+      <div type="2"><head>Segundo paso: Aprender acerca de la estructura de Wget - Descargar un conjunto espec&#237;fico de archivos</head>
+<p>En este punto, las personas usuarias de las tres plataformas deben estar en la misma p&#225;gina. Usamos wget a trav&#233;s de la interfaz de l&#237;nea de comandos de nuestro sistema operativo (introducido anteriormente como <code type="inline">Terminal</code> para usuarios de Mac y Linux, donde ha estado jugando con algunos comandos de Python). Debes usar su l&#237;nea de comandos en lugar de Komodo Edit que puedes haber usado en otras lecciones.</p>
+<p>La documentaci&#243;n completa para wget se puede encontrar en la p&#225;gina del <link target="http://www.gnu.org/software/wget/manual/wget.html">Manual de wget de GNU</link>.</p>
+<p>Tomemos un ejemplo de conjunto de datos. Digamos que deseas descargar todos los documentos alojados en el sitio web ActiveHistory.ca. Todos est&#225;n ubicados en: <link target="http://activehistory.ca/papers/">http://activehistory.ca/papers/</link>; en el sentido de que est&#225;n todos contenidos en el directorio <code type="inline">/papers/</code>. Por ejemplo, el noveno documento publicado en el sitio web es <link target="http://activehistory.ca/papers/historypaper-9/">http://activehistory.ca/papers/historypaper-9/</link>. Piensa en esta estructura de la misma forma que los directorios en tu propia computadora. Si tienes una carpeta con la etiqueta <code type="inline">/Historia/</code>, es probable que contenga varios archivos dentro de ella. La misma estructura es v&#225;lida para los sitios web y estamos usando esta l&#243;gica para decirle a nuestra computadora qu&#233; archivos queremos descargar.</p>
+<p>Si deseas descargarlos todos manualmente deber&#225;s escribir un programa personalizado o hacer clic derecho en cada papel para hacerlo. Si los archivos est&#225;n organizados de una manera que se ajuste a tus necesidades de investigaci&#243;n, wget es el abordaje m&#225;s r&#225;pido.</p>
+<p>Para asegurarte que wget est&#225; trabajando, prueba lo siguiente.</p>
+<p>En tu directorio de trabajo, crea un nuevo directorio. Llam&#233;moslo <code type="inline">wget-activehistory</code>. Puedes hacer esto utilizando tu Finder / Windows, o si est&#225;s en una ventana de Terminal en esa ruta, puedes escribir:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_13" type="block" corresp="code_descarga-automatizada-con-wget_13.txt"></code></pre>
+<p>Ahora tienes un directorio en el que trabajaremos. Abre la interfaz de la l&#237;nea de comandos y navega al directorio <code type="inline">wget-activehistory</code>. Como recordatorio, recuerda que puedes escribir:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_14" type="block" corresp="code_descarga-automatizada-con-wget_14.txt"></code></pre>
+<p>... para navegar a un directorio determinado. Si has creado este directorio en tu directorio de inicio, al escribir <code type="inline">cd wget-activehistory</code> podr&#225;s moverte a tu nuevo directorio.</p>
+<p>Escribe la orden siguiente:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_15" type="block" corresp="code_descarga-automatizada-con-wget_15.txt"></code></pre>
+<p>Despu&#233;s de algunos mensajes iniciales, ver&#225;s algo parecido a lo siguiente (por supuesto que las cifras, las fechas y algunos detalles ser&#225;n diferentes):</p>
+<pre><code xml:id="code_descarga-automatizada-con-wget_16" type="block" corresp="code_descarga-automatizada-con-wget_16.txt"></code></pre>
+<p>Wget descarg&#243; la primera p&#225;gina de <link target="http://activehistory.ca/papers/">http://activehistory.ca/papers/</link>, que contiene el &#237;ndice de los documentos, a tu nuevo directorio. Si lo abres, ver&#225;s el texto principal en la p&#225;gina de inicio de ActiveHistory.ca. As&#237; que de un golpe ya hemos descargado algo r&#225;pidamente.</p>
+<p>Pero lo que queremos hacer ahora es descargar cada uno de los papeles. As&#237; que necesitamos agregar algunos comandos a wget.</p>
+<p>Wget opera sobre las siguientes bases generales:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_17" type="block" corresp="code_descarga-automatizada-con-wget_17.txt"></code></pre>
+<p>Acabamos de aprender cosas sobre el componente [URL] en el ejemplo anterior, ya que le indica al programa a d&#243;nde ir. Sin embargo, las opciones le dan al programa un poco m&#225;s de informaci&#243;n sobre lo que queremos hacer. El programa sabe que una opci&#243;n es una opci&#243;n por la presencia de un gui&#243;n antes de la variable. Esto le permite saber la diferencia entre la URL y las opciones. As&#237; que vamos a aprender algunos comandos ahora:</p>
+<pre><code xml:id="code_descarga-automatizada-con-wget_18" type="block" corresp="code_descarga-automatizada-con-wget_18.txt"></code></pre>
+<p>La recuperaci&#243;n recursiva es la parte m&#225;s importante de wget. Lo que esto significa es que el programa comienza siguiendo los enlaces del sitio web y tambi&#233;n los descarga. Entonces, por ejemplo, <link target="http://activehistory.ca/papers/">http://activehistory.ca/papers/</link> tiene un enlace a <link target="http://activehistory.ca/papers/historypaper-9/">http://activehistory.ca/papers/historypaper-9/</link>, por lo que tambi&#233;n se descargar&#225; si utilizamos la recuperaci&#243;n recursiva. Sin embargo, tambi&#233;n seguir&#225; a cualquier otro enlace: si hubiera un enlace a <link target="http://uwo.ca">http://uwo.ca</link> en alg&#250;n lugar de esa p&#225;gina, seguir&#237;a eso y lo descargar&#237;a tambi&#233;n. De forma predeterminada, <code type="inline">-r</code> env&#237;a wget a una profundidad de cinco sitios despu&#233;s del primero. Esto es siguiendo los enlaces, hasta un l&#237;mite de cinco clics despu&#233;s del primer sitio web. En este punto, ser&#225; bastante indiscriminado. As&#237; que necesitamos m&#225;s comandos:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_19" type="block" corresp="code_descarga-automatizada-con-wget_19.txt"></code></pre>
+<p>(El doble gui&#243;n indica el texto completo de un comando. Todos los comandos tambi&#233;n tienen una versi&#243;n corta, &#233;ste podr&#237;a iniciarse usando -np).</p>
+<p>Esto es muy importante. Quiere decir que wget debe seguir los enlaces pero no m&#225;s all&#225; del &#250;ltimo directorio principal. En nuestro caso, eso significa que no ir&#225; a ninguna sitio que no sea parte de la jerarqu&#237;a de <link target="http://activehistory.ca/papers/">http://activehistory.ca/papers/</link>. Si se tratara de una ruta larga como <link target="http://niche-canada.org/projects/events/new-events/not-yet-happened-events/">http://niche-canada.org/projects/events/new-events/not-yet-happened-events/</link>, solo encontrar&#237;a archivos en la carpeta <code type="inline">/not-yet-happened-events/</code>. Es un comando cr&#237;tico para delimitar tu b&#250;squeda.</p>
+<p>Aqu&#237; una representaci&#243;n gr&#225;fica:</p>
+<figure><desc>Representaci&#243;n gr&#225;fica de c&#243;mo trabaja el comando 'no-parent' en wget</desc><graphic url="active-history-chart_edited-1.jpg"/></figure>
+<p>Finalmente, si deseas navegar fuera de una jerarqu&#237;a, es mejor delimitar qu&#233; tan lejos quieres ir. El valor predeterminado es seguir cada enlace y mantener un l&#237;mite de cinco p&#225;ginas desde la primera p&#225;gina. Sin embargo, tal vez solo quieras seguir un enlace y detenerte all&#237;. En ese caso, podr&#237;a escribir <code type="inline">-l 2</code>, lo cual nos lleva a una profundidad de dos p&#225;ginas web. Ten en cuenta que esto es una 'L' min&#250;scula, no un n&#250;mero 1.</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_20" type="block" corresp="code_descarga-automatizada-con-wget_20.txt"></code></pre>
+<p>Si estos comandos ayudan a dirigir wget, tambi&#233;n debemos agregar algunos m&#225;s para ser amables con los servidores y para evitar que las contramedidas autom&#225;ticas del sitio detecten que el servidor est&#225; siendo atacado. Para ello, hay dos comandos esenciales adicionales:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_21" type="block" corresp="code_descarga-automatizada-con-wget_21.txt"></code></pre>
+<p>No es correcto solicitar demasiadas peticiones a la vez a un servidor web. Tambi&#233;n hay otras personas que esperan informaci&#243;n, por lo que es importante compartir la carga. El comando <code type="inline">-w 10</code> marca una espera de diez segundos entre las solicitudes que hacemos al servidor. Puedes acortar esto, ya que diez segundos es bastante largo. En mis propias b&#250;squedas, a menudo uso una espera de 2 segundos. En raras ocasiones, puede encontrarse con un sitio que bloquee la descarga autom&#225;tica por completo. Los t&#233;rminos de servicio del sitio web, que debes consultar, pueden no mencionar una pol&#237;tica de descarga automatizada. Pero los pasos para prohibirlo pueden incorporarse en la arquitectura de su sitio web. En casos tan raros, puede usar el comando <code type="inline">&#8211;&#8211;random-wait</code> que variar&#225; la espera entre 0,5 y 1,5 veces el valor que proporciones aqu&#237;.</p>
+<p>Otro aspecto cr&#237;tico es limitar el ancho de banda que utilizar&#225;s en la descarga:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_22" type="block" corresp="code_descarga-automatizada-con-wget_22.txt"></code></pre>
+<p>Este es otro comando importante y "educado". No deseas utilizar demasiado ancho de banda de los servidores. Por lo tanto, este comando limitar&#225; la velocidad m&#225;xima de descarga a 20kb por segundo. La opini&#243;n var&#237;a acerca de cu&#225;l es una tasa l&#237;mite adecuada. Probablemente podr&#237;amos llegar hasta unos 200 kb por segundo para archivos peque&#241;os. Sin embargo, para no cargar demasiado al servidor, vamos a mantentenerlo en 20k. &#161;Esto tambi&#233;n nos mantendr&#225; felices en <code type="inline">ActiveHistory.ca</code>!</p>
+<div type="3"><head>Tercer paso: copia (mirror) de un sitio completo</head>
+<p>Considerando todo esto descarguemos todos los documentos de ActiveHistory.ca. Ten en cuenta que la barra diagonal final en la URL es cr&#237;tica. Si la omites, wget pensar&#225; que los documentos son un archivo en lugar de un directorio. Los directorios terminan en barras. Los archivos no lo hacen. El comando descargar&#225; la p&#225;gina completa de ActiveHistory.ca. El orden de las opciones no importa.</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_23" type="block" corresp="code_descarga-automatizada-con-wget_23.txt"></code></pre>
+<p>Va a ser m&#225;s lento que antes, pero tu terminal comenzar&#225; a descargar todos los documentos de ActiveHistory.ca. Cuando haya terminado, debes tener un directorio etiquetado como <code type="inline">ActiveHistory.ca</code> que contendr&#225; el subdirectorio <code type="inline">/papers/</code> perfectamente reflejado en tu sistema. Este directorio aparecer&#225; en la ubicaci&#243;n desde la que ejecutaste el comando en tu l&#237;nea de comandos, por lo que es probable que est&#233; en tu directorio <code type="inline">USER</code>. Los enlaces ser&#225;n reemplazados por enlaces internos a las otras p&#225;ginas que ha descargado, por lo que realmente puedes tener un sitio ActiveHistory.ca completamente operativo en tu computadora. Esto te permite comenzar a jugar con &#233;l sin preocuparte por tu velocidad de internet.</p>
+<p>Para saber si la descarga fue un &#233;xito, tambi&#233;n tendr&#225;s un registro en la pantalla de comandos. Echa un vistazo para asegurarte de que todos los archivos se descargaron correctamente. Si no se han descargado, te avisar&#225; que has fallado.</p>
+<p>Si quieres descargar un sitio web completo, hay un comando incorporado para wget que te lo permite.</p>
+<pre><code xml:id="code_descarga-automatizada-con-wget_24" type="block" corresp="code_descarga-automatizada-con-wget_24.txt"></code></pre>
+<p>Este comando significa "espejo" (<emph>mirror</emph>) y es muy &#250;til para hacer copias de seguridad de un sitio web completo. Introduce el siguiente conjunto de comandos: <code type="inline">marcado de tiempo</code>(<emph>time stamping</emph>), que analiza la fecha del sitio y no lo reemplaza si ya tienes esa versi&#243;n en tu sistema (que es muy &#250;til para descargas repetidas), as&#237; como una recursi&#243;n infinita (ir&#225; por tantas capas en el sitio como sea necesario). El comando para copiar completo el sitio ActiveHistory.ca ser&#237;a:</p>
+<pre><code class="language-bash" xml:id="code_descarga-automatizada-con-wget_25" type="block" corresp="code_descarga-automatizada-con-wget_25.txt"></code></pre>
+</div></div>
+      <div type="2"><head>Una herramienta flexible para descargar fuentes de Internet</head>
+<p>A medida que tengas m&#225;s comodidad usando la l&#237;nea de comandos, ver&#225;s que wget es un agregado &#250;til a tu conjunto de herramientas digitales. Si hay un corpus completo de documentos de archivo que deseas descargar para miner&#237;a de texto, si est&#225;n organizados en un directorio y est&#225;n todos juntos (lo que no es tan com&#250;n como podr&#237;a pensarse), con un comando wget r&#225;pido esto ser&#225; m&#225;s eficaz que hacer <emph>scraping</emph> en los enlaces con Python. Asimismo, puedes comenzar a descargar cosas directamente desde tu l&#237;nea de comandos: programas, archivos, copias de seguridad, etc.</p>
+<div type="3"><head>Otras lecturas</head>
+<p>Aqu&#237; solo he dado una instant&#225;nea de algunas de las funcionalidades de wget. Para m&#225;s informaci&#243;n, consulta el <link target="http://www.gnu.org/software/wget/manual/wget.html">manual de wget</link>.</p>
+<div type="4"><head>Notas</head>
+<p><note id="1"> Al momento de la traducci&#243;n el m&#225;s reciente es Mojave (OS-X 10.14), desde el 25 de septiembre de 2018.</note>
+<note id="2"> La versi&#243;n m&#225;s reciente es wget 1.19, desde el 3 de febrero de 2017.</note></p>
+</div></div></div>
+    </body>
+  </text>
+</TEI>

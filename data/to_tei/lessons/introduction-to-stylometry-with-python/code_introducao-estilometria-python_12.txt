@@ -1,0 +1,26 @@
+import math
+
+# A estrutura de dados na qual iremos armazenar 
+# as "estatísticas padrão do corpus"
+corpus_features = {}
+
+# Para cada elemento...
+for feature in features:
+    # Criar um subdicionário que conterá a média e o desvio padrão do elemento
+    corpus_features[feature] = {}
+
+    # Calcular a média das frequências expressas no subcorpora
+    feature_average = 0
+    for autor in autores:
+        feature_average += feature_freqs[autor][feature]
+    feature_average /= len(autores)
+    corpus_features[feature]["Mean"] = feature_average
+
+    # Calcular o desvio padrão usando a fórmula básica para uma amostra
+    feature_stdev = 0
+    for autor in autores:
+        diff = feature_freqs[autor][feature] - corpus_features[feature]["Mean"]
+        feature_stdev += diff * diff
+    feature_stdev /= (len(autores) - 1)
+    feature_stdev = math.sqrt(feature_stdev)
+    corpus_features[feature]["StdDev"] = feature_stdev

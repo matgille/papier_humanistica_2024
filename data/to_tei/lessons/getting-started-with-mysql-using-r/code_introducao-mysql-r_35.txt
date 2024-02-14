@@ -1,0 +1,56 @@
+library(RMariaDB)
+rmariadb.settingsfile<-"/Program Files/MySQL/MySQL Server 8.0/periodicos_resultados_pesquisa.cnf"
+
+rmariadb.db<-"periodicos_resultados_pesquisa"
+artigosDb<-dbConnect(RMariaDB::MariaDB(),default.file=rmariadb.settingsfile,group=rmariadb.db)
+
+termoBuscaUsado = "German+Submarine"
+# Solicita uma contagem do número de artigos que correspondem ao termoBuscaUsado que foram publicados a cada mês.
+query<-paste("SELECT ( COUNT(CONCAT(MONTH(data_publicacao_artigo), ' ',YEAR(data_publicacao_artigo)))) as 'count'
+    FROM tbl_periodicos_resultados_pesquisa
+    WHERE termo_busca_usado ='", termoBuscaUsado,"'
+    GROUP BY YEAR(data_publicacao_artigo),MONTH(data_publicacao_artigo)
+    ORDER BY YEAR(data_publicacao_artigo),MONTH(data_publicacao_artigo);",sep="")
+
+print(query)
+rs = dbSendQuery(artigosDb,query)
+dbRows<-dbFetch(rs)
+
+contagemArtigos<-c(as.integer(dbRows$count))
+
+# Coloca os resultados da consulta numa série temporal.
+qts1 = ts(contagemArtigos, frequency = 12, start = c(1914, 8))
+print(qts1)
+
+# Plota a série temporal qts1 dos dados com uma linha de espessura 3 na cor vermelha.
+plot(qts1,
+     lwd=3,
+     col = "red",
+     xlab="Mês da Guerra",
+     ylab="Números de artigos de periódicos",
+     xlim=c(1914,1919),
+     ylim=c(0,150),
+     main=paste("Número de artigos nos jornais galeses (Welsh newspapers) que correspondem aos termos de busca listados.",sep=""),
+     sub="Legenda do termo de busca: Vermelho = German+Submarine. Verde = Allotment And Garden.")
+
+termoBuscaUsado="AllotmentAndGarden"
+
+# Solicita uma contagem do número de artigos que correspondem ao termoBuscaUsado que foram publicados a cada mês.
+query<-paste("SELECT (  COUNT(CONCAT(MONTH(data_publicacao_artigo),' ',YEAR(data_publicacao_artigo)))) as 'count'   FROM tbl_periodicos_resultados_pesquisa   WHERE termo_busca_usado='",termoBuscaUsado,"'   GROUP BY YEAR(data_publicacao_artigo),MONTH(data_publicacao_artigo)   ORDER BY YEAR(data_publicacao_artigo),MONTH(data_publicacao_artigo);",sep="")
+print(query)
+rs = dbSendQuery(artigosDb,query)
+dbRows<-dbFetch(rs)
+
+contagemArtigos<-c(as.integer(dbRows$count))
+
+# Coloca os resultados da consulta numa série temporal.
+qts2 = ts(contagemArtigos, frequency = 12, start = c(1914, 8))
+
+# Adiciona esta linha com a série temporal qts2 à plotagem existente.
+lines(qts2, lwd=3,col="darkgreen")
+
+# Limpa o resultado.
+dbClearResult(rs)
+
+# Desconecta para limpar a conexão com o banco de dados. 
+dbDisconnect(artigosDb)

@@ -1,0 +1,22 @@
+# At the top, do the importing you need, then define rom2ar() as described above, and then:
+n = 0
+romstr = re.compile("\s*[IVXLCDM]{2,}")
+fin = open("out1.txt", 'r')
+fout = open("out2.txt", 'w')
+GScriba = fin.readlines()
+
+for line in GScriba:
+    if romstr.match(line):
+        rnum = line.strip().strip('.')
+        # each time we find a roman numeral by itself on a line we increment n:
+        # that's our charter number.
+        n += 1
+        try:
+            # translate the roman to the arabic and it should be equal to n.
+            if n != rom2ar(rnum):
+                # if it's not, then alert us
+                print(f"{n}, there's a charter roman numeral missing?, because line number {GScriba.index(line)} reads: {line}")
+                # then set 'n' to the right number
+                n = rom2ar(rnum)
+        except KeyError:
+            print(f"{n}, KeyError, line number {GScriba.index(line)} reads: {line}")

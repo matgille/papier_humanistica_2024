@@ -1,0 +1,944 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>Clustering with Scikit-Learn in Python</title>
+  <collection>lessons</collection>
+  <layout>lesson</layout>
+  <slug>clustering-with-scikit-learn-in-python</slug>
+  <date>2021-09-29</date>
+  <mathjax>True</mathjax>
+  <authors>Thomas Jurczyk</authors>
+  <reviewers>Melanie Walsh,Luling Huang</reviewers>
+  <editors>Alex Wermer-Colan</editors>
+  <review-ticket>https://github.com/programminghistorian/ph-submissions/issues/325</review-ticket>
+  <difficulty>3</difficulty>
+  <activity>analyzing</activity>
+  <topics>python,data-manipulation</topics>
+  <avatar_alt>Microscope images of bacteria</avatar_alt>
+  <doi>10.46430/phen0094</doi>
+  <abstract>This tutorial demonstrates how to apply clustering algorithms with Python to a dataset with two concrete use cases. The first example uses clustering to identify meaningful groups of Greco-Roman authors based on their publications and their reception. The second use case applies clustering algorithms to textual data in order to discover thematic groups. After finishing this tutorial, you will be able to use clustering in Python with Scikit-learn applied to your own data, adding an invaluable method to your toolbox for exploratory data analysis.</abstract>
+</metadata>
+  <text xml:lang="en">
+    <body>
+      <div type="2"><head>Introduction</head>
+<p>This tutorial demonstrates how to implement and apply <link target="https://perma.cc/GL9D-9GRG"><emph>k</emph>-means clustering</link> and <link target="https://perma.cc/6JNW-DCNT">DBSCAN</link> in Python. <emph>K</emph>-means and DBSCAN are two popular clustering algorithms that can be used, in combination with others, during the exploratory data analysis to discover (hidden) structures in your data by identifying groups with similar <link target="https://perma.cc/TG79-SQP3">features</link> (see Patel 2019 in the bibliography). We will implement the clustering algorithms using <link target="https://perma.cc/Z9AT-N6SB">scikit-learn</link>, a widely applied and well-documented machine learning framework in Python. Also, scikit-learn has a huge community and offers smooth implementations of various machine learning algorithms. Once you have understood how to implement <emph>k</emph>-means and DBSCAN with scikit-learn, you can easily use this knowledge to implement other machine learning algorithms with scikit-learn, too.</p>
+<p>This tutorial consists of two different case studies. The first case study clusters and analyzes an ancient authors dataset from <emph>Brill's New Pauly</emph>. The second case study focuses on clustering textual data, namely abstracts of all published articles in the journal <link target="https://perma.cc/P4VN-6K9K"><emph>Religion</emph></link> (Taylor &amp; Francis). These two datasets have been selected to illustrate how clustering algorithms can handle different data types (including numerical and textual features) and potentially be applied to a broad range of potential research topics.</p>
+<p>The following section will introduce both datasets.</p>
+<div type="3"><head>First Case Study: Ancient Authors in <emph>Brill's New Pauly</emph></head>
+<p>In this example, we will use <emph>k</emph>-means to analyze a dataset including information about 238 ancient authors from Greco-Roman antiquity. The data was taken from the official <link target="https://perma.cc/4377-UUE8"><emph>Brill's New Pauly</emph></link> website, and originates from <link target="https://perma.cc/GJZ9-9779">Supplement I Volume 2: Dictionary of Greek and Latin Authors and Texts</link>. <emph>Der Neue Pauly: Realenzyklop&#228;die der Antike</emph> (in English <emph>Brill's New Pauly</emph>) (1996&#8211;2002) is a well-known encyclopedia of the ancient world with contributions from established international scholars. It should be noted that access to the texts (and thus the data) in the <emph>New Pauly</emph> is not free of charge. I used my university's access to obtain the data from the author entries. For the following analyses, I have not copied any texts from the <emph>New Pauly</emph> to the dataset. However, the numerical data in the dataset was extracted and partially accumulated from the author entries in the <emph>New Pauly</emph>. The original German version has been translated into English since 2002. I will refer to the text using its German abbreviation (DNP) from here onwards.</p>
+<p>This tutorial demonstrates how <emph>k</emph>-means can help to cluster ancient authors into separate groups. The overall idea is that clustering algorithms either provide us with new insights into our data structure, or falsify/verify existing hypotheses. For instance, there might be groups of authors who are discussed at length but to whom few manuscripts are attributed. Meanwhile, other groups may include authors to whom many surviving manuscripts are ascribed but who only have short entries in the DNP. Another scenario could be that we find groups of authors associated with many early editions but only a few modern ones. This would point to the fact that modern scholars continue to rely on older editions when reading these authors. In the context of this tutorial, we will leave it to the algorithms to highlight such promising clusters for us.</p>
+<p>The author data was collected from the official website using Python modules and libraries such as <link target="https://perma.cc/XK5T-JH2Z">requests</link>, <link target="https://perma.cc/5RP2-869V">BeautifulSoup</link>, and <link target="https://perma.cc/VJ62-2AM2">pandas</link>.<ref type="footnotemark" target="#1"/> The data was then stored in a csv file named <code type="inline">DNP_ancient_authors.csv</code> (see also the <link target="https://github.com/programminghistorian/jekyll/tree/gh-pages/assets/clustering-with-scikit-learn-in-python">GitHub repository</link>).</p>
+<p>A single observation (row) in the <code type="inline">DNP_ancient_authors.csv</code> dataset contains an author name as an index and observations of the following seven features (variables):</p>
+<ul>
+<li>Word count of the entry in the DNP, used as a measure to evaluate the importance of the author (<code type="inline">word_count</code>)</li>
+<li>Number of modern translations (<code type="inline">modern_translations</code>)</li>
+<li>Number of known works (<code type="inline">known_works</code>)</li>
+<li>Number of existing manuscripts (<code type="inline">manuscripts</code>)</li>
+<li>Number of early editions (<code type="inline">early_editions</code>)</li>
+<li>Number of early translations (<code type="inline">early_translations</code>)</li>
+<li>Number of modern editions (<code type="inline">modern_editions</code>)</li>
+<li>Number of commentaries (<code type="inline">commentaries</code>) </li>
+</ul>
+<p>So, a single row in the dataset looks like this:</p>
+<table>
+<thead>
+<tr>
+<th align="left">authors</th>
+<th align="center">word_count</th>
+<th align="center">modern_translations</th>
+<th align="center">known_works</th>
+<th align="center">manuscripts</th>
+<th align="center">early_editions</th>
+<th align="center">early_translations</th>
+<th align="center">modern_editions</th>
+<th align="center">commentaries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Aelianus Tacticus</td>
+<td align="center">350</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">3</td>
+<td align="center">6</td>
+<td align="center">1</td>
+</tr>
+</tbody></table></div><div type="3"><head>Second Case Study: Article Abstracts in <emph>Religion</emph> (Journal)</head>
+<p>The second dataset contains abstracts of all published articles in the journal <emph>Religion</emph> (Taylor &amp; Francis). The abstracts were collected from the official website using Python modules and libraries such as requests, BeautifulSoup, and pandas. The data was stored in a csv file named <code type="inline">RELIGION_abstracts.csv</code> (see the GitHub repository). The current dataset includes abstracts from 701 articles published in 51 volumes between 1971&#8211;2021. However, some articles, particularly in older volumes, did not posses scrapable abstracts on the website and were thus left out. Other contribution types, including reviews and miscellanea, have also been excluded from this dataset.</p>
+<p>A single row in the <code type="inline">RELIGION_abstracts.csv</code> dataset contains an numerical index and observations of the following four features (variables):</p>
+<ul>
+<li>The title of the article (<code type="inline">title</code>)</li>
+<li>The full abstract (<code type="inline">abstract</code>)</li>
+<li>A link to the article (<code type="inline">link</code>)</li>
+<li>A link to the volume in which the article (abstract) was published (<code type="inline">volume</code>)</li>
+</ul>
+<p>So, a single row in this dataset looks like this:</p>
+<table>
+<thead>
+<tr>
+<th align="left">title</th>
+<th align="center">abstract</th>
+<th align="center">link</th>
+<th align="center">volume</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Norwegian Muslims denouncing terrorism: beyond &#8216;moderate&#8217; versus &#8216;radical&#8217;?</td>
+<td align="center">In contemporary (...)</td>
+<td align="center"><link target="https://www.tandfonline.com/doi/full/10.1080/0048721X.2021.1865600">https://www.tandfonline.com/doi/full/10.1080/0048721X.2021.1865600</link></td>
+<td align="center"><link target="https://www.tandfonline.com/loi/rrel20?treeId=vrrel20-51">https://www.tandfonline.com/loi/rrel20?treeId=vrrel20-51</link></td>
+</tr>
+</tbody></table><p>The analysis in this tutorial focuses on clustering the textual data in the <code type="inline">abstract</code> column of the dataset. We will apply <emph>k</emph>-means and DBSCAN to find thematic clusters within the diversity of topics discussed in <emph>Religion</emph>. To do so, we will first create document vectors of each abstract (via <hi rend="bold">T</hi>ext <hi rend="bold">F</hi>requency - <hi rend="bold">I</hi>nverted <hi rend="bold">D</hi>ocument <hi rend="bold">F</hi>requency, or <link target="https://perma.cc/UL2M-GY4A"><hi rend="bold">TF-IDF</hi></link> for short), reduce the feature space (which initially consists of the entire vocabulary of the abstracts), and then look for thematic clusters. </p>
+<p>You can download both datasets as well as a Jupyter notebook containing the code we are writing in this tutorial from the <link target="https://github.com/programminghistorian/jekyll/tree/gh-pages/assets/clustering-with-scikit-learn-in-python">GitHub repository</link>. This lesson will work on any operating system, as long as you follow these instructions to set up an environment with Anaconda or Google Colab to run the Jupyter notebook locally or in the cloud. If you do not know how to set up a Jupyter notebook locally, this <link target="https://perma.cc/DG7B-ASKL">excellent PH tutorial might help you get started</link>.</p>
+</div></div>
+      <div type="2"><head>Prerequisites</head>
+<p>To follow this tutorial, you should have basic programming knowledge (preferably Python) and be familiar with central Python libraries, such as pandas and <link target="https://perma.cc/GY76-324B">matplotlib</link> (or their equivalents in other programming languages). I also assume that you have basic knowledge of descriptive statistics. For instance, you should know what <link target="https://perma.cc/3Z34-DXCW">mean</link>, <link target="https://perma.cc/DH2Q-NP35">standard deviation</link>, and <link target="https://perma.cc/AKA7-HVQC">categorical</link>/<link target="https://perma.cc/WVE4-4WAQ">continuous</link> variables are.</p>
+</div>
+      <div type="2"><head>Why <emph>K</emph>-Means clustering and DBSCAN?</head>
+<p>Generally, you can choose between several clustering algorithms to analyze your data, such as <emph>k</emph>-means clustering, <link target="https://perma.cc/C3UV-SWMN">hierarchical clustering</link>, and <link target="https://perma.cc/VH9X-DTSB">DBSCAN</link>. We focus on <emph>k</emph>-means clustering in this tutorial since it is a relatively easy-to-understand clustering algorithm with a fast runtime speed that still delivers decent results,<ref type="footnotemark" target="#2"/> which makes it an excellent model to start with. I have selected DBSCAN as the second clustering algorithm for this tutorial since DBSCAN is an excellent addition to <emph>k</emph>-means. Among other capabilities, DBSCAN allows you to focus on dense and non-linear clusters in your data while leaving noise points or outliers outside the dense clusters, which is something that <emph>k</emph>-means cannot do independently (<emph>k</emph>-means adds the noise points or outliers to the <emph>k</emph>-clusters).</p>
+<p>However, implementing other clustering algorithms in combination with scikit-learn should be fairly straight-forward once you are familiar with the overall workflow. Thus, if you decide to analyze your data with additional clustering algorithms (such as hierarchical clustering), you can easily do so after finishing this tutorial. In general, it is advisable to apply more than one clustering algorithm to get different perspectives on your data and evaluate each model's results.</p>
+</div>
+      <div type="2"><head>What is Clustering?</head>
+<p>Clustering is part of the larger field of <link target="https://perma.cc/RCF8-AVH6">machine learning</link>. Machine learning is an artificial intelligence process by which computers can learn from data without being explicitly programmed (see G&#233;ron 2019, 2 in the bibliography), meaning that a machine learning model, once it is set up, can independently discover structures in the data or predict new (unknown) data. The field of machine learning can be separated into <link target="https://perma.cc/RS62-NQE3">supervised</link>, <link target="https://perma.cc/6FSL-9N2J">unsupervised</link>, and <link target="https://perma.cc/2LPR-9DJU">reinforcement</link> learning (see G&#233;ron 2019, 7-17 in the bibliography).</p>
+<p><hi rend="bold">Supervised machine learning</hi> uses <link target="https://perma.cc/AC8U-DCYD">labeled data</link> to train machine learning algorithms to make accurate predictions for new data. A good example is a spam filter (with emails either labeled as "spam" or "not-spam"). One way to assess a supervised machine learning model's accuracy is to test it on some pre-labeled data, then compare the machine learning model's labeling predictions with the original output. Among other things, the model's accuracy depends on the quantity and quality of the labeled data it has been trained on and its parameters (<link target="https://perma.cc/AX34-ZKA7">hyperparameter tuning</link>). Thus, building a decent supervised machine learning model involves a continuous loop of training, testing, and fine-tuning of the model's parameters. Common examples of supervised machine learning classifiers are <link target="https://perma.cc/U6CU-5R55"><emph>k</emph>-nearest neighbors (KNN)</link> and <link target="https://perma.cc/AG5A-AB7M">logistic regression</link>.</p>
+<p><hi rend="bold">Unsupervised learning</hi> is applied to unlabeled data. Among other things, unsupervised learning is used for anomaly detection, dimensionality reduction, and clustering. When applying unsupervised machine learning algorithms, we do not feed our model with prelabeled data to make predictions for new data. Instead, we want the model to discern potential structures in our data. The datasets in this tutorial are a good example: we are only feeding our model either the author or abstract data, and we expect the model to indicate where (potential) clusters exist (for instance, articles in <emph>Religion</emph> with similar topics). Hyperparameter tuning can also be a part of unsupervised learning; however, in these cases, the results of the clustering cannot be compared to any prelabeled data. Yet, we can apply measures such as the so-called <link target="https://perma.cc/W69A-EUQB">elbow method</link> or the <link target="https://perma.cc/M4TD-VSNU">silhouette score</link> to evaluate the model's output based on different parameter choices (such as the n number of clusters in <emph>k</emph>-means).   </p>
+<p><hi rend="bold">Reinforcement learning</hi> is less relevant for scholars in the humanities. Reinforcement learning consists of setting up an agent (for instance, a robot) that performs actions and is either rewarded or punished for their execution. The agent learns how to react to its environment based on the feedback it received from its former actions.</p>
+</div>
+      <div type="2"><head>How Does <emph>K</emph>-Means Work?</head>
+<p>The following overview of the <emph>k</emph>-means algorithm focuses on the so-called <link target="https://perma.cc/8WB3-K8NT">naive <emph>k</emph>-means</link> clustering, in which the cluster centers (so-called <link target="https://perma.cc/T76C-GWQY">centroids</link>) are randomly initialized. However, the <link target="https://perma.cc/K7KK-XUEG">scikit-learn implementation of <emph>k</emph>-means</link> applied in this tutorial already integrates many improvements to the original algorithm. For instance, instead of randomly distributing the initial cluster centers (centroids), the scikit-learn model uses a different approach called <link target="https://perma.cc/L98W-GWD5"><emph>k</emph>-means++</link>, which is a smarter way to distribute the initial centroids. Yet, the way <emph>k</emph>-means++ works is beyond the scope of this tutorial, and I recommend reading this <link target="https://perma.cc/8KPJ-JRZW">article</link> by David Arthur and Sergei Vassilvitskii if you want to learn more.</p>
+<div type="3"><head>The <emph>K</emph>-Means Algorithm</head>
+<p>To explain how <emph>k</emph>-means works, let us review a snippet from our <code type="inline">DNP_ancien_authors.csv</code> dataset. Even though we will later include more features, it is helpful to focus on a few key features in this introductory section to explain how the clustering techniques work.</p>
+<table>
+<thead>
+<tr>
+<th align="left">authors</th>
+<th align="center">word_count</th>
+<th align="center">known_works</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Aelianus Tacticus</td>
+<td align="center">350</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="left">Ambrosius</td>
+<td align="center">1221</td>
+<td align="center">14</td>
+</tr>
+<tr>
+<td align="left">Anacreontea</td>
+<td align="center">544</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="left">Aristophanes</td>
+<td align="center">1108</td>
+<td align="center">11</td>
+</tr>
+</tbody></table><p>To start with the <emph>k</emph>-means clustering, you first need to define the number of clusters you want to find in your data. In most cases, you will not know how many clusters exist in your data, so choosing the appropriate initial number of clusters is already a tricky question. We will address this issue below, but let us first review how <emph>k</emph>-means generally functions. </p>
+<p>In our example, we will assume that we are trying to identify two clusters. The naive <emph>k</emph>-means algorithm will now initialize the model with two randomly distributed cluster centers in the two-dimensional space. </p>
+<p>The main algorithm consists of two steps. The first step is to measure the distances between every data point and the current cluster centers (in our case, via <link target="https://perma.cc/X3P6-JESJ">Euclidean distance</link> \( \sqrt[]{(x_1-x_2)^{2}+(y_1-y_2)^{2}} \), where \( (x_1,y_1) \) and \( (x_2,y_2) \) are two data points in our two-dimensional space). After measuring the distances between each data point and the cluster centers, every data point is assigned to its nearest cluster center.</p>
+<p>The second step consists of creating new cluster centers by calculating the mean of all the data points assigned to each cluster.</p>
+<p>After creating the new cluster centers, the algorithm starts again with the data points' reassignment to the newly created cluster centers. The algorithm stops once the cluster centers are more or less stable. The <link target="https://perma.cc/GL9D-9GRG">Wikipedia entry on <emph>k</emph>-means clustering</link> provides helpful visualizations of this two-step process.</p>
+<p>The plotted results when clustering our snippet from the <code type="inline">DNP_ancient_authors.csv</code> dataset look like this, including the position of the final centroids:</p>
+<figure><desc>Figure 1: The clustered ancient authors data and the centroids using *k*-means in a two-dimensional space.</desc><graphic url="clustering-with-sklearn-in-python-fig1.png"/></figure>
+<p>This appears satisfactory, and we can quickly see how the centroids are positioned between the data points that we intuitively assume to represent one cluster. However, we can already notice that the scales of both axes differ significantly. The y-axis ranges from 1&#8211;14, whereas the x-axis scale ranges from 300&#8211;1300. Thus, a change on the x-axis is likely to influence the distance between data points more significantly than a change on the y-axis. This, in turn, also impacts the placement of the centroids and thus the cluster building process. To showcase this problem, let us change the word count of Aristophanes from 1108 to 700.</p>
+<table>
+<thead>
+<tr>
+<th align="left">authors</th>
+<th align="center">word_count</th>
+<th align="center">known_works</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Aelianus Tacticus</td>
+<td align="center">350</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="left">Ambrosius</td>
+<td align="center">1221</td>
+<td align="center">14</td>
+</tr>
+<tr>
+<td align="left">Anacreontea</td>
+<td align="center">544</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="left">Aristophanes</td>
+<td align="center">700</td>
+<td align="center">11</td>
+</tr>
+</tbody></table><p>If we apply <emph>k</emph>-means clustering on the changed dataset, we get the following result:</p>
+<figure><desc>Figure 2: A new version of the clustered data and the centroids using *k*-means on the changed ancient authors data.</desc><graphic url="clustering-with-sklearn-in-python-fig2.png"/></figure>
+<p>As you can see, a change of word count resulted in a new cluster of three authors who each have entries of approximately the same word count in the DNP, but who have a significantly different number of known published works. But does this really make sense? Wouldn't it be more reasonable to leave Ambrosius and Aristophanes in the same cluster since they have both written approximately the same number of documented works? To account for such problems based on different scales, it is advisable to normalize the data before clustering it. There are different ways to do this, among them <link target="https://perma.cc/M73K-8XST">min-max normalization</link> and <link target="https://perma.cc/ZTB8-3K74">z-score normalization</link>, which is also called standardization. In this tutorial, we will focus on the latter. This means that we first subtract the mean from each data point and then divide it by the standard deviation of the data in the respective column. Fortunately, scikit-learn already provides us with implementations of these normalizations, so we do not have to calculate them manually.</p>
+<p>The standardized (z-score) snippet of the ancient authors dataset looks like this:</p>
+<table>
+<thead>
+<tr>
+<th align="left">authors</th>
+<th align="center">word_count</th>
+<th align="center">known_works</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Aelianus Tacticus</td>
+<td align="center">-1.094016</td>
+<td align="center">-0.983409</td>
+</tr>
+<tr>
+<td align="left">Ambrosius</td>
+<td align="center">1.599660</td>
+<td align="center">1.239950</td>
+</tr>
+<tr>
+<td align="left">Anacreontea</td>
+<td align="center">-0.494047</td>
+<td align="center">-0.983409</td>
+</tr>
+<tr>
+<td align="left">Aristophanes</td>
+<td align="center">-0.011597</td>
+<td align="center">0.726868</td>
+</tr>
+</tbody></table><p>If we now apply a <emph>k</emph>-means clustering on the standardized dataset, we get the following result:</p>
+<figure><desc>Figure 3: Using *k*-means clustering on the standardized dataset.</desc><graphic url="clustering-with-sklearn-in-python-fig3.png"/></figure>
+<p>As you can see, changing the word count now has a less significant influence on the clustering. In our example, working with the standardized dataset results in a more appropriate clustering of the data since the <code type="inline">known_works</code> feature would otherwise lose much of its value for the overall analysis.</p>
+</div></div>
+      <div type="2"><head>How Many Clusters Should I Choose?</head>
+<div type="3"><head>Elbow Method</head>
+<p>The question of how many cluster centers to choose is a difficult one. There is no one-size-fits-all solution to this problem. Yet, specific performance measures might help to select the right number of clusters for your data. A helpful example that we will be using in this tutorial is the elbow method. The elbow method is based on measuring the inertia of the clusters for different numbers of clusters. In this context, inertia is defined as:</p>
+<blockquote>
+<p>Sum of squared distances of samples to their closest cluster center.<ref type="footnotemark" target="#3"/></p>
+</blockquote>
+<p>The inertia decreases with the number of clusters. The extreme is that inertia will be zero when n is equal to the number of data points. But how could this help us find the right amount of clusters? Ideally, you would expect the inertia to decrease more slowly from a certain n onwards, so that a (fictional) plot of the inertia/cluster relation would look like this:</p>
+<figure><desc>Figure 4: Fictional example of inertia for k clusters.</desc><graphic url="clustering-with-sklearn-in-python-fig4.png"/></figure>
+<p>In this plot, the "elbow" is found at four clusters. This indicates that four clusters might be a reasonable trade-off between relatively low inertia (meaning the data points assigned to the clusters are not too far away from the centroids) and as few clusters as possible. Again, this method only provides you with an idea of where to start investigating. The final decision is up to you and highly depends on your data and your research question. Figuring out the right amount of clusters should also be accompanied by other steps, such as plotting your data or assessing other statistics. We will see how inertia helps us to discover the right amount of clusters for our <code type="inline">DNP_ancient_authors.csv</code> dataset in the following application of <emph>k</emph>-means.</p>
+</div><div type="3"><head>Silhouette Score</head>
+<p>Another possible way to evaluate the clustering of your data is to use the silhouette score, a method that allows you to assess how well each data point is associated with its current cluster. The way the silhouette score works is very well described in the Wikipedia article <link target="https://perma.cc/M4TD-VSNU">"Silhouette (clustering)"</link>:</p>
+<blockquote>
+<p>The silhouette value is a measure of how similar an object is to its own cluster (cohesion) compared to other clusters (separation). The silhouette ranges from &#8722;1 to +1, where a high value indicates that the object is well matched to its own cluster and poorly matched to neighboring clusters. If most objects have a high value, then the clustering configuration is appropriate. If many points have a low or negative value, then the clustering configuration may have too many or too few clusters.</p>
+</blockquote>
+<p>In this tutorial, we will be using the silhouette scores with the machine learning visualization library <link target="https://perma.cc/5P5D-WPW9">yellowbrick</link> in Python. Plotting the average silhouette score of all data points against the silhouette score of each data point in a cluster can help you to evaluate the quality of your model and the suitability of your current choice of parameter values.</p>
+<p>To illustrate how a silhouette plot can help you find the correct number of clusters for your data, we can take a dummy example from our ancient author dataset. The data is based on a fictive sample of the number of known works and the word count of selected authors. The data has already been standardized using the z-score.</p>
+<table>
+<thead>
+<tr>
+<th align="left">authors</th>
+<th align="center">known_works</th>
+<th align="center">word_count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Author A</td>
+<td align="center">0.24893051</td>
+<td align="center">0.83656758</td>
+</tr>
+<tr>
+<td align="left">Author B</td>
+<td align="center">0.38169345</td>
+<td align="center">0.04955707</td>
+</tr>
+<tr>
+<td align="left">Author C</td>
+<td align="center">0.11616757</td>
+<td align="center">0.34468601</td>
+</tr>
+<tr>
+<td align="left">Author D</td>
+<td align="center">-0.01659537</td>
+<td align="center">0.14793338</td>
+</tr>
+<tr>
+<td align="left">Author E</td>
+<td align="center">-1.21146183</td>
+<td align="center">-1.18014685</td>
+</tr>
+<tr>
+<td align="left">Author F</td>
+<td align="center">-1.07869889</td>
+<td align="center">-1.27852317</td>
+</tr>
+<tr>
+<td align="left">Author G</td>
+<td align="center">-0.94593595</td>
+<td align="center">-1.22933501</td>
+</tr>
+<tr>
+<td align="left">Author H</td>
+<td align="center">-1.07869889</td>
+<td align="center">-1.1309587</td>
+</tr>
+<tr>
+<td align="left">Author I</td>
+<td align="center">-0.68041007</td>
+<td align="center">-0.34394819</td>
+</tr>
+<tr>
+<td align="left">Author J</td>
+<td align="center">-0.81317301</td>
+<td align="center">-0.83582976</td>
+</tr>
+<tr>
+<td align="left">Author K</td>
+<td align="center">-0.41488419</td>
+<td align="center">-0.54070081</td>
+</tr>
+<tr>
+<td align="left">Author L</td>
+<td align="center">-0.54764713</td>
+<td align="center">-0.43838945</td>
+</tr>
+<tr>
+<td align="left">Author M</td>
+<td align="center">1.1782711</td>
+<td align="center">1.62357809</td>
+</tr>
+<tr>
+<td align="left">Author N</td>
+<td align="center">1.31103404</td>
+<td align="center">1.52520177</td>
+</tr>
+<tr>
+<td align="left">Author O</td>
+<td align="center">1.57655992</td>
+<td align="center">1.41698783</td>
+</tr>
+<tr>
+<td align="left">Author P</td>
+<td align="center">1.97484874</td>
+<td align="center">1.03332021</td>
+</tr>
+</tbody></table><p>We can now plot the silhouette score for different cluster numbers n. In this example, we will plot the silhouette scores for two, three, and four clusters using <emph>k</emph>-means.</p>
+<figure><desc>Figure 5: Silhouette plots using *k*-means with n clusters between two and five.</desc><graphic url="clustering-with-sklearn-in-python-fig5.png"/></figure>
+<p>The vertical dashed line indicates the average silhouette score of all data points. The horizontal &#8220;knives&#8221; represent an overview of all data points in a cluster and their individual silhouette scores in descending order (from top to bottom). The silhouette plots show us that a cluster number between four and five seems to be most appropriate for our dataset. Particularly the data points with n=4 clusters have a relatively high average silhouette score (over 0.6), and the cluster &#8220;knives&#8221; seem to have approximately the same size and are not too sharp, which indicates that the cohesion within each cluster is not too bad. Indeed, if we plot our data using <emph>k</emph>-means with n=4 clusters, we can see that this choice is a reasonable cluster number for our dataset and offers a good impression of the overall distribution of the data points.</p>
+<figure><desc>Figure 6: Scatterplot of the dataset using *k*-means clustering with n=4 clusters.</desc><graphic url="clustering-with-sklearn-in-python-fig6.png"/></figure>
+</div></div>
+      <div type="2"><head>How Does DBSCAN Work?</head>
+<p>DBSCAN is short for "Density-Based Spatial Clustering of Applications with Noise." Unlike the <emph>k</emph>-means algorithm, DBSCAN does not try to cluster every single data point in a dataset. Instead, DBSCAN looks for dense regions of data points in a set while classifying data points without any direct neighbors as outliers or &#8216;noise points&#8217;. DBSCAN can be a great choice when dealing with datasets that are not linearly clustered but still include dense regions of data points.</p>
+<div type="3"><head>The DBSCAN Algorithm</head>
+<p>The basic DBSCAN algorithm is very well explained in the corresponding <link target="https://perma.cc/6JNW-DCNT">wikipedia article</link>.</p>
+<ol>
+<li>The first step consists of defining an &#949;-distance (eps) that defines the neighborhood region (radius) of a data point. Just as in the case of k-means-clustering, <link target="https://perma.cc/W5TT-ZS4N">scikit-learn's DBSCAN implementation uses Euclidean distance as the standard metric</link> to calculate distances between data points. The second value that needs to be defined is the minimum number of data points that should be located in the neighborhood of data point to define its region as dense (including the data point itself).</li>
+<li>The algorithm starts by choosing a random data point in the dataset as a starting point. DBSCAN then looks for other data points within the &#949;-region around the starting point. Suppose there are at least n datapoints (with n equals the minimum number of data points specified before) in the neighborhood (including the starting point). In that case, the starting point and all the data points in the &#949;-region of the starting point are defined as core points that define a core cluster. If there are less than n data points found in the starting point's neighborhood, the datapoint is labeled as an noise point or outlier (yet, it might still become a member of another cluster later on). In this case, the algorithm continues by choosing another unlabeled data point from the dataset and restarts the algorithm at step 2.</li>
+<li>If an initial cluster is found, the DBSCAN algorithm analyzes the &#949;-region of each core point in the initial cluster. If a region includes at least n data points, new core points are created, and the algorithm continues by looking at the neighborhood of these newly assigned core points, and so on. If a core point has less than n data points, some of which are still unlabeled, they will also be included in the cluster (as so-called border points). In cases where border points are part of different clusters, they will be associated with the nearest cluster</li>
+<li>Once every datapoint has been visited and labeled as either part of a cluster or as a noise point or outlier, the algorithm stops.</li>
+</ol>
+<p>Unlike the <emph>k</emph>-means algorithm, the difficulty does not lie in finding the right amount of clusters to start with but in figuring out which &#949;-region is most appropriate for the dataset. A helpful method for finding the proper eps value is explained in <link target="https://perma.cc/5H99-4EX6">this article on towardsdatascience.com</link>. In short, DBSCAN enables us to plot the distance between each data point in a dataset and itentify its nearest neighbor. It is then possible to sort by distance in ascending order. Finally, we can look for the point in the plot which initiates the steepest ascent and make a visual evaluation of the eps value, similar to the &#8216;elbow&#8217; evaluation method described above in the case of <emph>k</emph>-means)&#8217;. We will use this method later in this tutorial.</p>
+<p>Now that we know how our clustering algorithms generally work and which methods we can apply to settle on the right amount of clusters let us apply these concepts in the context of our datasets from <emph>Brill's New Pauly</emph> and the journal <emph>Religion</emph>. We will start by analyzing the <code type="inline">DNP_ancient_authors.csv</code> dataset.</p>
+</div></div>
+      <div type="2"><head>First Case Study: Applying <emph>K</emph>-Means to the Ancient Authors Dataset from <emph>Brill's New Pauly</emph></head>
+<div type="3"><head>1. Exploring the Dataset</head>
+<p>Before starting with the clustering, we will explore the data by loading <code type="inline">DNP_ancient_authors.csv</code> into Python with <emph>pandas</emph>. Next, we will print out the first five rows and look at some information and overview statistics about each dataset using pandas' <code type="inline">info()</code> and <code type="inline">describe()</code> methods.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_0" type="block" corresp="code_clustering-with-scikit-learn-in-python_0.txt"></code></pre>
+<p>The output of the <code type="inline">info()</code> method should look like this:</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_1" type="block" corresp="code_clustering-with-scikit-learn-in-python_1.txt"></code></pre>
+<p>As we can see, our data consists of 238 entries of type integer. Next, we will examine our data through the output of the <emph>pandas</emph> <code type="inline">describe()</code> method.</p>
+<p>The output of <code type="inline">df_authors.describe()</code> should look like this:</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_2" type="block" corresp="code_clustering-with-scikit-learn-in-python_2.txt"></code></pre>
+<p>We can see that the standard deviation and the mean values vary significantly between the <code type="inline">word_count</code> column and the other columns. When working with metrics such as Euclidean distance in the <emph>k</emph>-means algorithm, different scales between the columns can become problematic. Thus, we should standardize the data before applying the clustering algorithm.</p>
+<p>Furthermore, we have an significant standard deviation in almost every column and a vast difference between the 75th percentile value and the maximum value, particularly in the <code type="inline">word_count</code> column. This indicates that we might have some noise in our dataset, and it might be necessary to get rid of the noisy data points before we continue with our analysis. Therefore, we only keep those data points in our data frame with a word count within the 90th percentile range.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_3" type="block" corresp="code_clustering-with-scikit-learn-in-python_3.txt"></code></pre>
+</div><div type="3"><head>2. Imports and Additional Functions</head>
+<p>Before we start with the actual clustering process, we first import all the necessary libraries and write a couple of functions that will help us to plot our results during the analysis. We will also use these functions and imports during the second case study in this tutorial (analyzing the <emph>Religion</emph> abstracts data). Thus, if you decide to skip the analysis of the ancient authors data, you still need to import these functions and libraries to execute the code in the second part of this tutorial.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_4" type="block" corresp="code_clustering-with-scikit-learn-in-python_4.txt"></code></pre>
+<p>The following function will help us to plot (and save) the silhouette plots.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_5" type="block" corresp="code_clustering-with-scikit-learn-in-python_5.txt"></code></pre>
+<p>The next function will help us to plot (and save) the elbow plots.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_6" type="block" corresp="code_clustering-with-scikit-learn-in-python_6.txt"></code></pre>
+<p>The next function assists us in finding the right eps value when using DBSCAN.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_7" type="block" corresp="code_clustering-with-scikit-learn-in-python_7.txt"></code></pre>
+<p>The last function <code type="inline">progressiveFeatureSelection()</code> implements a basic algorithm to select features from our dataset based on the silhouette score and <emph>k</emph>-means clustering. The algorithm first identifies a single feature with the best silhouette score when using <emph>k</emph>-means clustering. Afterward, the algorithm trains a <emph>k</emph>-means instance for each combination of the initially chosen feature and one of the remaining features. Next, it selects the two-feature combination with the best silhouette score. The algorithm uses this newly discovered pair of features to find the optimal combination of these two features with one of the remaining features, and so on. The algorithm continues until it has discovered the optimal combination of n features (where n is the value of the <code type="inline">max_features</code> parameter).</p>
+<p>The algorithm is inspired by <link target="https://perma.cc/K5PD-GQPQ">this discussion on stackexchange.com</link>. Yet, don't worry too much about this implementation; there are better solutions for feature selection algorithms out there, as shown in <link target="https://perma.cc/3HQR-RL27">in Manoranjan Dash and Huan Liu's paper 'Feature Selection for Clustering'</link> and <link target="https://perma.cc/25Y9-NS94">Salem Alelyani, Jiliang Tang, and Huan Liu's 'Feature Selection for Clustering: A Review'</link>. However, most of the potential algorithms for feature selection in an unsupervised context are not implemented in scikit-learn, which is why I have decided to implement one myself, albeit basic.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_8" type="block" corresp="code_clustering-with-scikit-learn-in-python_8.txt"></code></pre>
+<p>Note that we have selected n=3 clusters as default for the <emph>k</emph>-means instance in <code type="inline">progressiveFeatureSelection()</code>. In the context of an advanced hyperparameter tuning (which is beyond the scope of this tutorial), it might make sense to train the <code type="inline">progressiveFeatureSelection()</code> with different n values for the <emph>k</emph>-means instance as well. For the sake of simplicity, we stick to n=3 clusters in this tutorial.</p>
+</div><div type="3"><head>3. Standardizing the DNP Ancient Authors Dataset</head>
+<p>Next, we initialize scikit-learn's <code type="inline">StandardScaler()</code> to standardize our data. We apply scikit-learn's <link target="https://perma.cc/36NS-WUJT"><code type="inline">StandardScaler()</code></link> (z-score) to cast the mean of the columns to approximately zero and the standard deviation to one, to account for the huge differences between the <code type="inline">word_count</code> and the other columns in <code type="inline">df_ancient_authors.csv</code>.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_9" type="block" corresp="code_clustering-with-scikit-learn-in-python_9.txt"></code></pre>
+</div><div type="3"><head>4. Feature Selection</head>
+<p>If you were to cluster the entire <code type="inline">DNP_ancient_authors.csv</code> with <emph>k</emph>-means, you would not find any reasonable clusters in the dataset. This is frequently the case when working with real-world data. However, in such cases, it might be pertinent to search for subsets of features that help us to structure the data. As we are only dealing with ten features, we could theoretically do this manually. However, because we have already implemented a basic algorithm to help us find potentially interesting combinations of features, we can also use our <code type="inline">progressiveFeatureSelection()</code> function. In this tutorial, we will search for three features that might be interesting to look at. Yet, feel free to try out different <code type="inline">max_features</code> with the <code type="inline">progressiveFeatureSelection()</code> function (as well as <code type="inline">n_clusters</code>). The selection of only three features (as well as n=3 clusters for the <emph>k</emph>-means instance) was a random choice which unexpectedly led to some exciting results; however, this does not mean that there are no other promising combinations which might be worth examining. </p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_10" type="block" corresp="code_clustering-with-scikit-learn-in-python_10.txt"></code></pre>
+<p>Running this function, it turns out that the three features <code type="inline">known_works_standardized</code>, <code type="inline">commentaries_standardized</code>, and <code type="inline">modern_editions_standardized</code> might be worth considering when trying to cluster our data. Thus, we next create a new data frame with only these three features.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_11" type="block" corresp="code_clustering-with-scikit-learn-in-python_11.txt"></code></pre>
+</div><div type="3"><head>5. Choosing the Right Amount of Clusters</head>
+<p>We will now apply the elbow method and then use silhouette plots to obtain an impression of how many clusters we should choose to analyze our dataset. We will check for two to ten clusters. Note, however, that the feature selection was also made with a pre-defined <emph>k</emph>-means algorithm using n=3 clusters. Thus, our three selected features might already tend towards this number of clusters.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_12" type="block" corresp="code_clustering-with-scikit-learn-in-python_12.txt"></code></pre>
+<p>The elbow plot looks like this:</p>
+<figure><desc>Figure 7: Elbow plot of the df_standardized_sliced dataset.</desc><graphic url="clustering-with-sklearn-in-python-fig7.png"/></figure>
+<p>Looking at the elbow plot indeed shows us that we find an &#8220;elbow&#8221; at n=3 as well as n=5 clusters. Yet, it is still quite challenging to decide whether to use three, four, five, or even six clusters. Therefore, we should also look at the silhouette plots.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_13" type="block" corresp="code_clustering-with-scikit-learn-in-python_13.txt"></code></pre>
+<p>The silhouette plots look like this:</p>
+<figure><desc>Figure 8: Silhouette plots of the df_standardized_sliced dataset.</desc><graphic url="clustering-with-sklearn-in-python-fig8.png"/></figure>
+<p>Looking at the silhouette scores underlines our previous intuition that a selection of n=3 or n=5 seems to be the right choice of clusters. The silhouette plot with n=3 clusters in particular has a relatively high average silhouette score. Yet, because the two other clusters are far below the average silhouette score for n=3 clusters, we decide to analyze the dataset with <emph>k</emph>-means using n=5 clusters. However, the different sizes of the &#8220;knives&#8221; and their sharp form in both n=3 and n=5 clusters indicate a single dominant cluster and a couple of rather small and less cohesive clusters.</p>
+</div><div type="3"><head>6. n=5 <emph>K</emph>-Means Analysis of the DNP Ancient Authors Dataset</head>
+<p>Eventually, we can now train a <emph>k</emph>-means instance with n=5 clusters and plot the results using <emph>seaborn</emph>. I prefer plotting in two dimensions in Python, so we will use <code type="inline">PCA()</code> (<hi rend="bold">Principal Component Analysis</hi>) to reduce the <link target="https://perma.cc/68J8-UFV9">dimensionality</link> of our dataset to two dimensions. <link target="https://perma.cc/E3RE-TKMM">PCA</link> is a great way to reduce the dimensionality of a dataset while keeping the variance from higher dimensions.</p>
+<blockquote>
+<p>PCA allows us to reduce the dimensionality of the original data substantially while retaining most of the salient information. On the PCA-reduced feature set, other machine learning algorithms&#8212;downstream in the machine learning pipeline&#8212;will have an easier time separating the data points in space (to perform tasks such as anomaly detection and clustering) and will require fewer computational resources. (quote from the online version of Ankur A. Patel: <emph>Hands-On Unsupervised Learning Using Python</emph>, O'Reilly Media 2020)</p>
+</blockquote>
+<p>PCA can be used to reduce high-dimensional datasets for computational reasons. Yet, in this context, we only use PCA to plot the clusters in our dataset in a two-dimensional space. We will also apply PCA in the following text clustering. One huge disadvantage of using PCA is that we lose our initial features and create new ones that are somewhat nebulous to us, as they do not allow us to look at specific aspects of our data anymore (such as word counts or known works).</p>
+<p>Before using PCA and plotting the results, we will instantiate a <emph>k</emph>-means instance with n=5 clusters and a <code type="inline">random_state</code> of 42. The latter parameter allows us to reproduce our results. 42 is an arbitrary choice here that refers to <link target="https://perma.cc/33RA-4ZS9">"Hitchhiker's Guide to the Galaxy"</link>, but you can choose whichever number you like.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_14" type="block" corresp="code_clustering-with-scikit-learn-in-python_14.txt"></code></pre>
+<p>In the corresponding plot (see figure 9), we can clearly distinguish several clusters in our data. However, we also perceive what was already visible in the silhouette plots, namely that we only have one dense cluster and two to three less cohesive ones with several noise points.</p>
+<figure><desc>Figure 9: Final plot of the clustered df_standardized_sliced dataset with seaborn.</desc><graphic url="clustering-with-sklearn-in-python-fig9.png"/></figure>
+</div><div type="3"><head>7. Conclusion</head>
+<p>We were able to observe some clear clusters in our data when using <code type="inline">known_works_standardized</code>, <code type="inline">commentaries_standardized</code>, and <code type="inline">modern_editions_standardized</code> as a feature subset. But what does this actually tell us? This is a question that the algorithm cannot answer. The clustering algorithms only demonstrate that there are specific clusters under certain conditions, in this case, when looking for n=5 clusters with <emph>k</emph>-means and the above-mentioned subset of features. But what are these clusters about? Do they grant us valuable insights into our data? To answer this question, we need to look at the members of each cluster and analyze whether their grouping hints at certain aspects that might be worth exploring further.</p>
+<p>In our example, looking at cluster 0 (the dense one in the left part of our plot) reveals that this cluster includes authors with very few known works, few to no commentaries, few modern editions, and rather short entries in the DNP (average word count of 513). Consequently, it largely consists of relatively unknown ancient authors.</p>
+<table>
+<thead>
+<tr>
+<th align="left">authors</th>
+<th align="right">word_count</th>
+<th align="right">modern_translations</th>
+<th align="right">known_works</th>
+<th align="right">manuscripts</th>
+<th align="right">early_editions</th>
+<th align="right">early_translations</th>
+<th align="right">modern_editions</th>
+<th align="right">commentaries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Achilles Tatius of Alexandria</td>
+<td align="right">383</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">9</td>
+<td align="right">2</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="left">Aelianus Tacticus</td>
+<td align="right">350</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">Aelianus, Claudius (Aelian)</td>
+<td align="right">746</td>
+<td align="right">8</td>
+<td align="right">3</td>
+<td align="right">6</td>
+<td align="right">10</td>
+<td align="right">8</td>
+<td align="right">7</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">Aeneas Tacticus</td>
+<td align="right">304</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">6</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">Aesop</td>
+<td align="right">757</td>
+<td align="right">18</td>
+<td align="right">1</td>
+<td align="right">6</td>
+<td align="right">10</td>
+<td align="right">2</td>
+<td align="right">11</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="left">Agatharchides of Cnidus</td>
+<td align="right">330</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">Agathias</td>
+<td align="right">427</td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">Alexander of Tralleis</td>
+<td align="right">871</td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">4</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td align="left">Ammianus Marcellinus</td>
+<td align="right">573</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">6</td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">6</td>
+</tr>
+<tr>
+<td align="left">Anacreontea</td>
+<td align="right">544</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">10</td>
+<td align="right">5</td>
+<td align="right">0</td>
+</tr>
+</tbody></table><p>As we can see in this snippet that shows the first ten entries in cluster 0, the author names (except Aesop) are more or less supporting our initial assumption that we are predominately dealing with authors whose work is produced in few modern editions, particularly compared to the authors in cluster 4.</p>
+<p>The authors in cluster 4 (the less cohesive cluster at the upper right of our plot) comprise well-known and extensively discussed authors including Plato or Aristophanes, who have all written several works that are still famous and have remained relevant over the centuries, demonstrated by the high number of modern editions and commentaries.</p>
+<table>
+<thead>
+<tr>
+<th align="left">authors</th>
+<th align="right">word_count</th>
+<th align="right">modern_translations</th>
+<th align="right">known_works</th>
+<th align="right">manuscripts</th>
+<th align="right">early_editions</th>
+<th align="right">early_translations</th>
+<th align="right">modern_editions</th>
+<th align="right">commentaries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Aeschylus of Athens</td>
+<td align="right">1758</td>
+<td align="right">31</td>
+<td align="right">7</td>
+<td align="right">5</td>
+<td align="right">10</td>
+<td align="right">14</td>
+<td align="right">15</td>
+<td align="right">20</td>
+</tr>
+<tr>
+<td align="left">Aristophanes of Athens</td>
+<td align="right">1108</td>
+<td align="right">18</td>
+<td align="right">11</td>
+<td align="right">2</td>
+<td align="right">6</td>
+<td align="right">30</td>
+<td align="right">7</td>
+<td align="right">18</td>
+</tr>
+<tr>
+<td align="left">Lucanus, Marcus Annaeus</td>
+<td align="right">1018</td>
+<td align="right">17</td>
+<td align="right">1</td>
+<td align="right">11</td>
+<td align="right">8</td>
+<td align="right">15</td>
+<td align="right">20</td>
+<td align="right">25</td>
+</tr>
+<tr>
+<td align="left">Plato</td>
+<td align="right">1681</td>
+<td align="right">31</td>
+<td align="right">18</td>
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">10</td>
+<td align="right">20</td>
+</tr>
+<tr>
+<td align="left">Plutarchus of Chaeronea (Plutarch)</td>
+<td align="right">1485</td>
+<td align="right">37</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">15</td>
+<td align="right">42</td>
+</tr>
+<tr>
+<td align="left">Propertius, Sextus</td>
+<td align="right">1443</td>
+<td align="right">22</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">24</td>
+<td align="right">22</td>
+</tr>
+<tr>
+<td align="left">Sallustius Crispus, Gaius (Sallust)</td>
+<td align="right">1292</td>
+<td align="right">17</td>
+<td align="right">5</td>
+<td align="right">12</td>
+<td align="right">7</td>
+<td align="right">15</td>
+<td align="right">15</td>
+<td align="right">16</td>
+</tr>
+<tr>
+<td align="left">Sophocles</td>
+<td align="right">1499</td>
+<td align="right">67</td>
+<td align="right">8</td>
+<td align="right">4</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">14</td>
+<td align="right">18</td>
+</tr>
+<tr>
+<td align="left">Tacitus, (Publius?) Cornelius</td>
+<td align="right">1504</td>
+<td align="right">29</td>
+<td align="right">5</td>
+<td align="right">6</td>
+<td align="right">10</td>
+<td align="right">14</td>
+<td align="right">31</td>
+<td align="right">20</td>
+</tr>
+</tbody></table><p>If you want to have a closer look at the other clusters, I advise you to check out the Jupyter notebook in the <link target="https://github.com/programminghistorian/jekyll/tree/gh-pages/assets/clustering-with-scikit-learn-in-python">GitHub repository</link>.</p>
+<p>Thus, our clustering of the <code type="inline">DNP_ancient_authors.csv</code> dataset has resulted in some promising clusters, which might help us develop new research questions. For instance, we could now take these clusters and apply our hypothesis about their relevance to further explore clustering the authors, based on their early and modern translations/editions. However, this is beyond the scope of this tutorial, which is primarily concerned with introducing tools and methods to examine such research questions. </p>
+</div></div>
+      <div type="2"><head>Second Case Study: Clustering Textual Data</head>
+<p>The second section of this tutorial will deal with textual data, namely all abstracts scraped from the <link target="https://perma.cc/P4VN-6K9K"><emph>Religion</emph> (journal)</link> website. We will try to cluster the abstracts based on their word features in the form of <hi rend="bold">TF-IDF</hi> vectors (which is short for "<hi rend="bold">T</hi>ext <hi rend="bold">F</hi>requency - <hi rend="bold">I</hi>nverted <hi rend="bold">D</hi>ocument <hi rend="bold">F</hi>requency").</p>
+<div type="3"><head>1. Loading the Dataset &amp; Exploratory Data Analysis</head>
+<p>Using a similar method as that used to analyze the <code type="inline">DNP_ancient_authors.csv</code> dataset, we will first load the <code type="inline">RELIGION_abstracts.csv</code> into our program and look at some summary statistics.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_15" type="block" corresp="code_clustering-with-scikit-learn-in-python_15.txt"></code></pre>
+<p>The result of the <code type="inline">describe()</code> method should print out something like this:</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_16" type="block" corresp="code_clustering-with-scikit-learn-in-python_16.txt"></code></pre>
+<p>Unlike in the previous dataset, we are now dealing with features where every single observation is unique.</p>
+</div><div type="3"><head>2. TF-IDF Vectorization</head>
+<p>In order to process the textual data with clustering algorithms, we need to convert the texts into vectors. For this purpose, we are using the scikit-learn implementation of <link target="https://perma.cc/Q2JN-YWV6">TF-IDF vectorization</link>. For a good introduction to how TF-IDF works, see this <link target="https://perma.cc/3XT2-DB6X">great tutorial by Melanie Walsh</link>.</p>
+<div type="4"><head><emph>Optional Step</emph>: Lemmatization</head>
+<p>As an optional step, I have implemented a function called <code type="inline">lemmatizeAbstracts()</code> that groups, or &#8216;lemmatizes&#8217; the abstracts using <link target="https://perma.cc/RTM6-8B27">spaCy</link>. Considering that we are not interested in stylistic similarities between the abstracts, this step helps to reduce the overall amount of features (words) in our dataset. As part of the lemmatization function, we also clean the text of all punctuation and other noise such as brackets. In the following analysis, we will continue working with the lemmatized version of the abstracts. However, you can also keep using the original texts and skip the lemmatization, although this might lead to different results.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_17" type="block" corresp="code_clustering-with-scikit-learn-in-python_17.txt"></code></pre>
+<p>I have decided to save the new lemmatized version of our abstracts as <code type="inline">RELIGION_abstracts_lemmatized.csv</code>. This prevents from having to redo the lemmatization each time we restart our notebook.</p>
+</div><div type="4"><head>TF-IDF Vectorization</head>
+<p>The first step is to instantiate our TF-IDF model by passing it the <code type="inline">argument</code> to ignore stop words, such as "the," "a," etc. The second step is rather similar to the training of our <emph>k</emph>-means instance in the previous part: We are passing the abstracts from our dataset to the vectorizer in order to convert them to machine-readable vectors. For the moment, we are not passing any additional arguments. Finally, we create a new pandas DataFrame object based on the TF-IDF matrix of our textual data.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_18" type="block" corresp="code_clustering-with-scikit-learn-in-python_18.txt"></code></pre>
+<p>When printing out the <code type="inline">df_abstracts_tfidf</code> object, you can see that our initial matrix is <emph>huge</emph> and includes over 8,000 words from the overall vocabulary of the 701 abstracts. This is obviously too much, not only from a computational perspective but also because clustering algorithms such as <emph>k</emph>-means become less efficient due to the so-called <link target="https://perma.cc/S748-FPNG">"curse of dimensionality"</link>. We will thus need to reduce the number of features significantly.</p>
+<p>To do so, we first create a new version of our TF-IDF vectorized data. This time, however, we tell the vectorizer that we only want a reduced set of 250 features. We also tell the model to only consider words from the vocabulary that appear in at least five different documents but in no more than 200. We also add the possibility to include single words and bigrams (such as &#8220;19th century&#8221;). Finally, we tell our model to clean the text of any potential accents.</p>
+<p>Secondly, we are also using the <emph>Principal Component Analysis</emph> (PCA), this time to reduce the dimensionality of the dataset from 250 to 10 dimensions. </p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_19" type="block" corresp="code_clustering-with-scikit-learn-in-python_19.txt"></code></pre>
+</div></div><div type="3"><head>3. Dimensionality Reduction Using PCA</head>
+<p>As mentioned above, let us next apply <code type="inline">PCA()</code> to caste the dimension from d=250 to d=10 to account for the <emph>curse of dimensionality</emph> when using <emph>k</emph>-means. Similar to the selection of n=3 <code type="inline">max_features</code> during the analysis of our ancient authors dataset, setting the dimensionality to d=10 was a random choice that happened to produce promising results. However, feel free to play around with these parameters while conducting a more elaborate hyperparameter tuning. Maybe you can find values for these parameters that result in an even more effective clustering of the data. For instance, you might want to use a <link target="https://perma.cc/PYZ5-6QAV">scree plot</link> to figure out the optimal number of principal components in PCA, which works quite similarly to our elbow method in the context of <emph>k</emph>-means.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_20" type="block" corresp="code_clustering-with-scikit-learn-in-python_20.txt"></code></pre>
+</div><div type="3"><head>4. Applying <emph>K</emph>-Means Clustering on Textual Data</head>
+<p>Next, we try to find a reasonable method for clustering the abstracts using <emph>k</emph>-means. As we did in the case of the <code type="inline">DNP_ancient_authors.csv</code> dataset, we will start by searching for the right amount of clusters applying the elbow method and the silhouette score.</p>
+<figure><desc>Figure 10: Elbow plot with 3 to 99 clusters.</desc><graphic url="clustering-with-sklearn-in-python-fig10.png"/></figure>
+<p>As we can see, there is no real elbow in our plot this time. This might imply that there are no big clusters in our <code type="inline">RELIGION_abstracts.csv</code> dataset. But is it likely that a journal such as <emph>Religion</emph> that covers a vast spectrum of phenomena (which are all, of course, related to religion) only comprises a few thematic clusters? Probably not. Therefore, let us continue by skipping the silhouette score plots (which are most likely of no value with such a huge number of clusters) and just train a <emph>k</emph>-means instance with n=100 clusters and assess the results.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_21" type="block" corresp="code_clustering-with-scikit-learn-in-python_21.txt"></code></pre>
+<p>We will next evaluate the results by printing out some article titles of randomly chosen clusters. For instance, when analyzing the titles in cluster 75, we can perceive that all articles in this cluster are related to Therav&#257;da Buddhism, Karma, and their perception in "the West":</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_22" type="block" corresp="code_clustering-with-scikit-learn-in-python_22.txt"></code></pre>
+<table>
+<thead>
+<tr>
+<th align="right"/>
+<th align="left">title</th>
+<th align="right">cluster</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">210</td>
+<td align="left">Checking the heavenly &#8216;bank account of karma&#8217;: cognitive metaphors for karma in Western perception and early Therav&#257;da Buddhism</td>
+<td align="right">75</td>
+</tr>
+<tr>
+<td align="right">211</td>
+<td align="left">Karma accounts: supplementary thoughts on Therav&#257;da, Madhyamaka, theosophy, and Protestant Buddhism</td>
+<td align="right">75</td>
+</tr>
+<tr>
+<td align="right">258</td>
+<td align="left">Resonant paradigms in the study of religions and the emergence of Therav&#257;da Buddhism</td>
+<td align="right">75</td>
+</tr>
+</tbody></table><p>Cluster 15 includes articles related to the body and its destruction:</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_23" type="block" corresp="code_clustering-with-scikit-learn-in-python_23.txt"></code></pre>
+<table>
+<thead>
+<tr>
+<th align="right"/>
+<th align="left">title</th>
+<th align="right">cluster</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">361</td>
+<td align="left">Candanb&#257;l&#257;'s hair: Fasting, beauty, and the materialization of Jain wives</td>
+<td align="right">15</td>
+</tr>
+<tr>
+<td align="right">425</td>
+<td align="left">Monkey kings make havoc: Iconoclasm and murder in the Chinese cultural revolution</td>
+<td align="right">15</td>
+</tr>
+<tr>
+<td align="right">623</td>
+<td align="left">Techniques of body and desire in Kashmir &#346;aivism</td>
+<td align="right">15</td>
+</tr>
+<tr>
+<td align="right">695</td>
+<td align="left">Body-symbols and social reality: Resurrection, incarnation and asceticism in early Christianity</td>
+<td align="right">15</td>
+</tr>
+</tbody></table><p>To be fair, other clusters are harder to interpret. A good example is cluster 84. Yet, even in the case of cluster 84 there still seems to be a pattern, namely that almost all articles are related to famous scholars and works in the study of religion, such as Durkheim, Tylor, Otto, Said, etc.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_24" type="block" corresp="code_clustering-with-scikit-learn-in-python_24.txt"></code></pre>
+<table>
+<thead>
+<tr>
+<th align="right"/>
+<th align="left">title</th>
+<th align="right">cluster</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">80</td>
+<td align="left">Latin America 1520&#8211;1600: a page in the history of the study of religion</td>
+<td align="right">84</td>
+</tr>
+<tr>
+<td align="right">141</td>
+<td align="left">On elves and freethinkers: criticism of religion and the emergence of the literary fantastic in Nordic literature</td>
+<td align="right">84</td>
+</tr>
+<tr>
+<td align="right">262</td>
+<td align="left">Is Durkheim's understanding of religion compatible with believing?</td>
+<td align="right">84</td>
+</tr>
+<tr>
+<td align="right">302</td>
+<td align="left">Dreaming and god concepts</td>
+<td align="right">84</td>
+</tr>
+<tr>
+<td align="right">426</td>
+<td align="left">Orientalism, representation and religion: The reality behind the myth</td>
+<td align="right">84</td>
+</tr>
+<tr>
+<td align="right">448</td>
+<td align="left">The Science of Religions in a Fascist State: Rudolf Otto and Jakob Wilhelm Hauer During the Third Reich</td>
+<td align="right">84</td>
+</tr>
+<tr>
+<td align="right">458</td>
+<td align="left">Religion Within the Limits of History: Schleiermacher and Religion&#8212;A Reappraisal</td>
+<td align="right">84</td>
+</tr>
+<tr>
+<td align="right">570</td>
+<td align="left">Cognitive and Ideological Aspects of Divine Anthropomorphism</td>
+<td align="right">84</td>
+</tr>
+<tr>
+<td align="right">571</td>
+<td align="left">Tylor's Anthropomorphic Theory of Religion</td>
+<td align="right">84</td>
+</tr>
+<tr>
+<td align="right">614</td>
+<td align="left">&#8216;All my relatives&#8217;: Persons in Oglala religion</td>
+<td align="right">84</td>
+</tr>
+<tr>
+<td align="right">650</td>
+<td align="left">Colloquium: Does autonomy entail theology? Autonomy, legitimacy, and the study of religion</td>
+<td align="right">84</td>
+</tr>
+</tbody></table><p>As we can see, even a simple implementation of <emph>k</emph>-means on textual data without much feature-tuning has resulted in a <emph>k</emph>-means instance that is, despite its shortcomings, able to assist us by doing the work of a basic <link target="https://perma.cc/57JH-G9EZ">recommender system</link>. For example, we could use our trained <emph>k</emph>-means instance to suggest articles to visitors of our website based on their previous readings. Of course, we can also use our model during our exploratory data analysis to show us thematic clusters discussed in <emph>Religion</emph>.</p>
+<p>Yet, as the textual data in this example is rather difficult to cluster and includes noise points or clusters that contain very few articles, it might make better sense to apply a different clustering algorithm and see how it performs.</p>
+</div><div type="3"><head>5. Applying DBSCAN Clustering on Textual Data</head>
+<p>Even though the <emph>k</emph>-means clustering of our data already resulted in some valuable insights, it might still be interesting to apply a different clustering algorithm such as DBSCAN. As explained above, DBSCAN excludes noise points and outliers in our data, meaning that it focuses on those regions in our data that may rightfully be called dense.</p>
+<p>We will be using the d=10 reduced version of our <code type="inline">RELIGION_abstracts.csv</code> dataset, which allows us to use Euclidean distance as a metric. If we were to use the initial TF-IDF matrix with 250 features, we would need to consider changing the underlying metric to <link target="https://perma.cc/HVZ5-9MXU">cosine distance</link>, which is more suitable when dealing with sparse matrices, as in the case of textual data. </p>
+<p>The first step will be to use our <code type="inline">findOptimalEps()</code> function to figure out which eps value is most suitable for our data.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_25" type="block" corresp="code_clustering-with-scikit-learn-in-python_25.txt"></code></pre>
+<p>As can be seen in figure 11, the eps-plotting suggests choosing an eps value between 0.2 and 0.25.</p>
+<figure><desc>Figure 11: Eps plot for the abstracts dataset.</desc><graphic url="clustering-with-sklearn-in-python-fig11.png"/></figure>
+<p>We are selecting 0.2 as eps value and train a DBSCAN instance.</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_26" type="block" corresp="code_clustering-with-scikit-learn-in-python_26.txt"></code></pre>
+<p>As we can see when looking at the DBSCAN results in our Jupyter notebook, using a DBSCAN instance under these circumstances results in only four clusters and a vast noise points cluster (-1) with more than 150 entries and an even bigger cluster with more than 500 entries (cluster 0). These clusters are plotted in figure 12 (using a PCA-reduced dataset), where the inconclusive results become even more visible. In this case, we could consider using the original TF-IDF matrix with cosine distance instead.</p>
+<p>Its shortcomings aside, the current version of our DBSCAN instance does give some promising insights, for example with cluster 3, which collects articles related to gender and women in different religions:</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_27" type="block" corresp="code_clustering-with-scikit-learn-in-python_27.txt"></code></pre>
+<table>
+<thead>
+<tr>
+<th align="right"/>
+<th align="left">title</th>
+<th align="right">cluster</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">154</td>
+<td align="left">Lifelong minority religion: routines and reflexivity: A Bourdieuan perspective on the habitus of elderly Finnish Orthodox Christian women</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">161</td>
+<td align="left">Quiet beauty: problems of agency and appearance in evangelical Christianity</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">388</td>
+<td align="left">Renunciation feminised? Joint renunciation of female&#8211;male pairs in Bengali Vaishnavism</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">398</td>
+<td align="left">Conclusion: Construction sites at the juncture of religion and gender</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">502</td>
+<td align="left">Gender and the Contest over the Indian Past</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">506</td>
+<td align="left">Art as Neglected &#8216;Text&#8217; for the Study of Gender and Religion in Africa</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">507</td>
+<td align="left">A Medieval Feminist Critique of the Chinese World Order: The Case of Wu Zhao (r. 690&#8211;705)</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">509</td>
+<td align="left">Notions of Destiny in Women's Self-Construction</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">526</td>
+<td align="left">The Fundamental Unity of the Conservative and Revolutionary Tendencies in Venezuelan Evangelicalism: The Case of Conjugal Relations</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">551</td>
+<td align="left">Hindu Women, Destiny and Stridharma</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">644</td>
+<td align="left">The women around James Nayler, Quaker: A matter of emphasis</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td align="right">668</td>
+<td align="left">Women as aspects of the mother Goddess in India: A case study of Ramakrishna</td>
+<td align="right">1</td>
+</tr>
+</tbody></table><p>Cluster 2, on the other hand, seems to be related to belief and atheism:</p>
+<pre><code class="language-python" xml:id="code_clustering-with-scikit-learn-in-python_28" type="block" corresp="code_clustering-with-scikit-learn-in-python_28.txt"></code></pre>
+<table>
+<thead>
+<tr>
+<th align="right"/>
+<th align="left">title</th>
+<th align="right">cluster</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">209</td>
+<td align="left">Three cognitive routes to atheism: a dual-process account</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td align="right">282</td>
+<td align="left">THE CULTURAL TRANSMISSION OF FAITH Why innate intuitions are necessary, but insufficient, to explain religious belief</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td align="right">321</td>
+<td align="left">Religion is natural, atheism is not: On why everybody is both right and wrong</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td align="right">322</td>
+<td align="left">Atheism is only skin deep: Geertz and Markusson rely mistakenly on sociodemographic data as meaningful indicators of underlying cognition</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td align="right">323</td>
+<td align="left">The relative unnaturalness of atheism: On why Geertz and Mark&#250;sson are both right and wrong</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td align="right">378</td>
+<td align="left">The science of religious beliefs</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td align="right">380</td>
+<td align="left">Adaptation, evolution, and religion</td>
+<td align="right">2</td>
+</tr>
+</tbody></table><figure><desc>Figure 12: PCA-reduced version of the abstracts dataset displaying the DBSCAN clustering with eps=0.2.</desc><graphic url="clustering-with-sklearn-in-python-fig12.png"/></figure>
+<p>Although the clustering was far from perfect in this case, it did produce some valuable information, which we could use in combination with the more promising results of the <emph>k</emph>-means clustering. It might also be pertinent to keep tuning the parameters and trying out different feature sets (reduced, non-reduced, maybe by adding some additional feature selection steps of choosing promising word fields, etc.) to achieve better results with DBSCAN. Of course, we could also apply some other clustering algorithms and then combine the results.</p>
+<p>As a next step, we could pursue the idea of building a basic recommender system which suggests articles with similar topics to readers based on their previous readings. This recommender system should consider the clustering of the <emph>k</emph>-means instance but also include suggestions made by DBSCAN and other potential clustering algorithms. When applied in combination, the rather unsatisfactory results of the DBSCAN model might be less problematic because they are now used as additional information only.</p>
+<p>Of course, we as scholars in the humanities will be more likely to use these techniques as part of our research during the exploratory data analysis phase. In this case, combining the results of different clustering algorithms helps us to discover structures and thematic clusters in our data. These discoveries could then lead to new research questions. For instance, there might be specific clusters in the <emph>Religion</emph> abstracts data that include more articles than the other clusters, thereby indicating an overall thematic focus of this journal that might be worth examining to get an overview of research trends in the study of religion throughout recent decades.</p>
+</div></div>
+      <div type="2"><head>Summary</head>
+<p>I hope to have shown that clustering is indeed a valuable step during exploratory data analysis that enables you to gain new insights into your data.</p>
+<p>The clustering of the <code type="inline">DNP_ancient_authors.csv</code> and the <code type="inline">RELIGION_abstracts.csv</code> datasets provided decent results and identified reasonable groupings of authors and articles in the data. In the case of the abstracts dataset, we have even built a basic recommender system that assists us when searching for articles with similar topics. Yet, the discussion of the results also illustrated that there is always room for interpretation and that not every cluster necessarily needs to provide useful insights from a scholarly (or human) perspective. Despite this general ambiguity when applying machine learning algorithms, our analysis demonstrated that <emph>k</emph>-means and DBSCAN are great tools that can help you to develop or empirically support new research questions. In addition, they may also be implemented for more practical tasks, for instance, when searching for articles related to a specific topic.</p>
+</div>
+      <div type="2"><head>Bibliography</head>
+<ul>
+<li>G&#233;ron, Aur&#233;lien. <emph>Hands-on machine learning with Scikit-Learn, Keras, and TensorFlow. Concepts, tools, and techniques to build intelligent systems, 2nd ed</emph>. Sebastopol: O&#8217;Reilly, 2019.</li>
+<li>Mitchell, Ryan. <emph>Web scraping with Python. Collecting more data from the modern web, 1st ed</emph>. Sebastopol: O&#8217;Reilly, 2018.  </li>
+<li>Patel, Ankur A. <emph>Hands-on unsupervised learning using Python: How to build applied machine learning solutions from unlabeled data, 1st ed</emph>. Sebastopol: O&#8217;Reilly, 2019.  </li>
+</ul>
+</div>
+      <div type="2"><head>Footnotes</head>
+<p><note id="1"> For a good introduction to the use of <emph>requests</emph> and web scraping in general, see the corresponding articles on <emph>The Programming Historian</emph> such as <link target="https://perma.cc/J5BV-MZPZ">Introduction to BeautifulSoup</link> (last accessed: 2021-04-22) or books such as Mitchell (2018).</note></p>
+<p><note id="2"> Yet, there are certain cases where <emph>k</emph>-means clustering might fail to identify the clusters in your data. Thus, it is usually recommended to apply several clustering algorithms. A good illustration of the restrictions of <emph>k</emph>-means clustering can be seen in the examples under <link target="https://perma.cc/MH6W-A6UP">this link</link> (last accessed: 2021-04-23) to the scikit-learn website, particularly in the second plot on the first row.</note></p>
+<p><note id="3"> <link target="https://perma.cc/DZT5-VPLV">Definition of inertia on scikit-learn</link> (last accessed: 2021-04-23).</note></p>
+</div>
+    </body>
+  </text>
+</TEI>

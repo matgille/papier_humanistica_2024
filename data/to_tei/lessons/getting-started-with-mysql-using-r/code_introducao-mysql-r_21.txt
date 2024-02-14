@@ -1,0 +1,34 @@
+library(RMariaDB)
+# O método de conexão abaixo utiliza uma senha armazenada num ficheiro de configuração.
+
+# O R precisa de um caminho completo para encontrar o ficheiro de configuração. 
+rmariadb.settingsfile<-"C:/Program Files/MySQL/MySQL Server 8.0/periodicos_resultados_pesquisa.cnf"
+
+rmariadb.db<-"periodicos_resultados_pesquisa"
+artigosDb<-dbConnect(RMariaDB::MariaDB(),default.file=rmariadb.settingsfile,group=rmariadb.db)
+
+# Opcional. Liste a tabela. Isso confirma que nos conectamos ao banco de dados.
+dbListTables(artigosDb)
+
+# Cria a declaração de query.
+query<-"INSERT INTO tbl_periodicos_resultados_pesquisa (
+titulo_artigo,
+data_publicacao_artigo,
+url_artigo,
+termo_busca_usado)
+VALUES('THE LOST LUSITANIA.',
+'1915-05-21',
+LEFT(RTRIM('http://newspapers.library.wales/view/4121281/4121288/94/'),99),
+'German+Submarine');"
+
+# Opcional. Exibe o query para o caso de ser necessário solucionar problemas.
+print(query)
+
+# Executa o query no artigoDb que conectamos abaixo.
+rsInsert <- dbSendQuery(artigosDb, query)
+
+# Limpa o resultado.
+dbClearResult(rsInsert)
+
+# Desconecta para limpar a conexão com o banco de dados.
+dbDisconnect(artigosDb)

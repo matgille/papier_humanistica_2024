@@ -1,0 +1,20 @@
+def new_file_layout(filename, input_dir, store_dir):
+
+    if not os.path.exists(store_dir):
+        os.mkdir(store_dir)
+
+    #Create a path where the output file will be stored.
+    new_filepath=os.path.join(store_dir, filename)
+
+    #Convert document in list of images.
+    pages = convert_from_path(os.path.join(input_dir, filename))
+
+    #Initiate empty list to store the new version of each page.
+    lim_p=[]
+
+    for p in pages:
+        lim=list_regions(p)
+        page_im=page(lim)
+        lim_p.append(page_im)
+
+    lim_p[0].save(new_filepath, "PDF" ,resolution=100.0, save_all=True, append_images=lim_p[1:])

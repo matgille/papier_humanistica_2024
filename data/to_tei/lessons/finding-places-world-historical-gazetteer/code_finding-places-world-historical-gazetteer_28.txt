@@ -1,0 +1,23 @@
+start_date = "1800" #YYYY-MM-DD
+end_date = "2000"
+source_title = "Karl-Heinz Quade Diary"
+
+output_text = ""
+column_header = "id\ttitle\ttitle_source\tstart\tend\n"  
+output_text += column_header  
+
+places_list = []
+if matches:
+    places_list.extend([ doc[start:end].text for match_id, start, end in matches ])
+if doc.ents:
+    places_list.extend([ ent.text for ent in doc.ents if ent.label_ == "GPE" or ent.label_ == "LOC"])
+
+# remove duplicate place names by creating a list of names and then converting the list to a set
+unique_places = set(places_list)
+
+for id, place in enumerate(unique_places):
+    output_text += f"{id}\t{place}\t{source_title}\t{start_date}\t{end_date}\n"
+
+filename = source_title.lower().replace(' ','_') + '.tsv'
+Path(filename).write_text(output_text)
+print('created: ', filename)

@@ -1,0 +1,11 @@
+features_binary = SelectKBest(f_classif, k=3500).fit(Z_binary, y_binary)
+
+selected_binary = features_binary.get_support()
+
+features_df_binary = pd.DataFrame()
+features_df_binary['term'] = v_binary.feature_names_
+features_df_binary['selected'] = selected_binary
+features_df_binary = features_df_binary.loc[features_df_binary['selected'] == True]
+features_df_binary['coef'] = lr_binary.coef_[0]
+
+coefficients_binary = features_df_binary.sort_values(by='coef', ascending=False).reset_index(drop=True)

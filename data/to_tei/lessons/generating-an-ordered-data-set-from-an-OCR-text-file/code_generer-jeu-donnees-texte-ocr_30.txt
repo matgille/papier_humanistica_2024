@@ -1,0 +1,16 @@
+summary_date = re.compile('\((\d{1,2})?(.*?)(\d{1,4})?\)')
+from datetime import date
+for ch in charters:
+    c = charters[ch]
+    i = summary_date.finditer(c['summary'])
+    for m in i:
+        # souvenez-vous: 'i' est un itérateur donc même s’il y a plus d’une
+        # expression entre parenthèses dans c['summary'], la clause try 
+        # réussira sur la dernière, ou échouera sur chacune d'entre elles
+        try:
+            yr = int(m.group(3))
+            mo = ital2int[m.group(2).strip()]
+            day = int(m.group(1))
+            c['date'] = date(yr, mo, day)
+        except:
+            c['date'] = "date won't parse, see summary line"

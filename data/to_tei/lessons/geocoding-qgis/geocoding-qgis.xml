@@ -1,0 +1,251 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>Geocoding Historical Data using QGIS</title>
+  <authors>Justin Colson</authors>
+  <date>2017-01-27</date>
+  <reviewers>Adam Dennett,L&#233;on Robichaud</reviewers>
+  <editors>Adam Crymble</editors>
+  <layout>lesson</layout>
+  <difficulty>2</difficulty>
+  <review-ticket>https://github.com/programminghistorian/ph-submissions/issues/27</review-ticket>
+  <activity>transforming</activity>
+  <topics>mapping</topics>
+  <abstract>Learn how to use QGIS to convert lists of place names in to geographic coordinates, allowing you to map them.
+</abstract>
+  <redirect_from>/lessons/geocoding-qgis</redirect_from>
+  <avatar_alt>A young man kissing a young woman on the cheek</avatar_alt>
+  <doi>10.46430/phen0066</doi>
+</metadata>
+  <text xml:lang="en">
+    <body>
+      <div type="2"><head>Lesson Goals</head>
+<p>Many types of sources used by historians are inherently spatial. For example:</p>
+<ul>
+<li>Census, population or taxation data</li>
+<li>Imports and exports</li>
+<li>Routes and itineraries</li>
+</ul>
+<p>In this tutorial, you will learn how to 'geocode' historial data containing placenames (towns, counties, countries, etc), thus making them mappable using <link target="http://www.qgis.org/en/site/">QGIS</link>, a digital mapping software suite. This will allow you to:</p>
+<ul>
+<li>Display your data as a map (whether it originated as a list, table, or prose)</li>
+<li>Analyse distances between locations in your data</li>
+<li>View and analyse geographical distribution within your data</li>
+</ul>
+<p>This tutorial forms part of the Mapping and GIS series on <emph>Programming Historian</emph>, and builds upon skills you will have learned in earlier tutorials, especially <link target="/lessons/qgis-layers">Installing QGIS 2.0 and Adding Layers</link>. It presumes that you have a set of <link target="https://en.wikipedia.org/wiki/Shapefile">shapefiles</link> relevant to the region for which you intend to produce a map, and data that you would like to get into those shapefiles so that it can be visualised and analysed.</p>
+</div>
+      <div type="2"><head>About Geocoding</head>
+<p>Mapping data such as these involves rendering spatial information which humans can understand (such as names of towns or counties) into a format that can be understood by <link target="https://en.wikipedia.org/wiki/Geographic_information_system">GIS</link> (mapping) software. This is limited to some kind of geometry (a point, line or polygon in a vector representation) relating to the coordinates of this place in two dimensional space &#8211; these might be latitude and longitude expressed in degrees, or as is often the case in the UK, eastings and northings of the <link target="https://www.ordnancesurvey.co.uk/resources/maps-and-geographic-resources/the-national-grid.html">British National Grid</link>. Geocoding always depends on the use of a <link target="https://en.wikipedia.org/wiki/Gazetteer">gazetter</link>, or list of places and coordinates.</p>
+<p>There is often confusion between processes of <link target="https://en.wikipedia.org/wiki/Geocoding">geocoding</link> and <link target="https://en.wikipedia.org/wiki/Georeference">georeferencing</link>.</p>
+<ul>
+<li>Georeferencing refers to placing visual elements, usually raster images such as satellite photographs, scans of old maps, or some types of vector image such as architectural or archaeological drawings, into geographical space. This involves specifying latitude, longitude coordinates, and scale.</li>
+<li>Geocoding is the process of resolving addresses (or some other kind of spatial description) which form part of a dataset into geometries on a map. This gives the ability to view, analyse and query that dataset spatially.</li>
+</ul>
+<p>In many modern applications geocoding is completed automatically, often using the mapping tools and gazetters offered seamlessly as part of <link target="https://www.google.co.uk/maps">Google Maps</link> or <link target="https://www.openstreetmap.org/">OpenStreetMap</link>. When working with contemporary data, or data from relatively recent periods, and Western European or North American historical contexts, this is often sufficient. If you are using data containing place names that are consistent with the present day, you can use the QGIS web geocoder plugin detailed in the postscript to this tutorial, or the <link target="/lessons/geoparsing-text-with-edinburgh">Edinburgh Geoparser</link>.</p>
+<p>Many historians will be working on contexts where the place names in their data do not match the present day. Remember that street names tend to change relatively frequently, either in terms of spelling or entirely. Administrative areas have changed relatively frequently and were sometimes used inconsistently in historical sources (e.g. was Bristol in Gloucestershire, Somerset, City of Bristol, Avon?) and indeed places have moved between countries, and countries have changed in name and extent. Even town names have changed and are subject to linguistic ambiguities (e.g. <emph>Lynn Episcopi</emph>, Bishop's Lynn, Lynn, King's Lynn, Kings Lynn). For these reasons it is often better to avoid using automated online geocoding tools and create a gazetteer to suit the historical context which you are researching. The processes described in this tutorial are manual, and can be modified and applied to almost any geographical or historical context.</p>
+</div>
+      <div type="2"><head>Lesson Structure</head>
+<p>This lesson is divided into two main sections:</p>
+<ul>
+<li>Part 1: <hi rend="bold">Joining tables</hi>, which is a simple way of mapping simple summary data such as totals or averages</li>
+<li>Part 2: <hi rend="bold">Geocoding full datasets</hi>, which maps each item of data to a location, allowing much more flexibility, detailed spatial analysis, and more interesting maps</li>
+</ul>
+<p>At the end of the tutorial there is a note on using automated geocoding tools which are available to work with modern addresses, but these are of limited relevance to historians working on eras before the late nineteenth or twentieth centuries.</p>
+</div>
+      <div type="2"><head>Getting Started</head>
+<p>This tutorial assumes that you have installed QGIS version 2 or newer and have followed the <emph>Programming Historian</emph> tutorial <link target="/lessons/qgis-layers">Installing QGIS 2.0 and Adding Layers</link> by Jim Clifford, Josh MacFadyen and Daniel Macfarlane. Or, at least that you are familiar with the process of adding vector layers in QGIS.</p>
+<p>This tutorial was prepared using QGIS 2.14 'Essen' on Mac OS X 10.11. Menus, windows, and options might appear slightly different on different platforms or versions, but it should not be difficult to translate any differences. At a few points in the tutorial reference is made to how these techniques could be applied using <link target="https://www.arcgis.com/features/index.html">ArcGIS</link>, which is the industry standard commercial GIS application, and is widely available at universities, but is not always superior to QGIS.</p>
+<p>You will also need to use a relational database such as Microsoft Access or <link target="https://www.libreoffice.org/get-help/install-howto/">LibreOffice Base</link>, or alternatively be very proficient with spreadsheets. The instructions in the tutorial are designed for use with LibreOffice Base, which is a free download as part of the <link target="https://www.libreoffice.org/get-help/install-howto/">LibreOffice</link> suite.</p>
+<p><hi rend="bold">NB</hi> LibreOffice requires a full installation of Java in order to use the Base application. This is achieved most easily by downloading and installing the Java 8 Development Kit for your operating system from <link target="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">Oracle</link>. The Java 8 Runtime Environment does NOT work with LibreOffice on Mac OS X 10.11.</p>
+<p>The tutorial will map the data extracted from <link target="http://www.british-history.ac.uk/alumni-oxon/1500-1714"><emph>Alumni Oxonienses</emph></link> in the <emph>Programming Historian</emph> lesson <link target="/lessons/extracting-keywords">Using Gazetteers to Extract Sets of Keywords from Free-Flowing Texts</link> using publically available maps of English and Welsh historic counties. If you complete that tutorial first it will help you to understand the nature of the data which is being mapped here. These data are provided as both a full dataset and also a separate file which is a summary of the numbers of Oxford alumni by their county of origin, created from the first file using an Excel PivotTable.</p>
+<div type="1"><head>The Data</head>
+<ul>
+<li><link target="/assets/geocoding-qgis/The_Dataset-Alum-Oxon-Jas1-Placenames.csv">The_Dataset-Alum-Oxon-Jas1-Placenames.csv</link></li>
+<li><link target="/assets/geocoding-qgis/AlumniCounties.csv">AlumniCounties.csv</link></li>
+</ul>
+<h2>Part 1: Joining Tables and Maps</h2>
+<p>The simplest way to map historical data is to 'join' (connect) a table of data containing place names to a layer of map features with the same names. This technique is commonly used by historians to create a map depicting a set of descriptive statistics for a set of data, for instance the number of individuals within a group originating from each county, or the proportion of inhabitants of each county working in a certain industry.</p>
+<p>However, joining tables to features in GIS only works on a one-to-one basis (or at least only one-to-one relationships can be used to define the appearance of the map). This means that each map feature can only have one value associated with each of its attributes. You can say there are 50 students from the county Essex in your data, and thus link that to the Essex polygon feature in your shapefile (Table 1). But you cannot store the data as 50 rows, each of which represents a single student that points to the Essex feature in your shapefile (Table 2). One shapefile feature, one value. For this reason, joins are best suited to representing the results of analysis completed in a spreadsheet or database (eg, when you have already calculated the sum of people from a particular area - or whatever value you want to map).</p>
+<p><emph>Table 1: This table would work for 'joins', as each shapefile has a calculated value.</emph></p>
+<table>
+<thead>
+<tr>
+<th>Shapefile</th>
+<th>Number of Students</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Essex</td>
+<td>50</td>
+</tr>
+<tr>
+<td>Norfolk</td>
+<td>28</td>
+</tr>
+<tr>
+<td>Middlesex</td>
+<td>81</td>
+</tr>
+</tbody></table><p><emph>Table 2: This table would not work for a 'table join'.</emph></p>
+<table>
+<thead>
+<tr>
+<th>Student Name</th>
+<th>Place of Origin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Joe Smith</td>
+<td>Essex</td>
+</tr>
+<tr>
+<td>Tom Jones</td>
+<td>Essex</td>
+</tr>
+<tr>
+<td>Matthew Rogers</td>
+<td>Essex</td>
+</tr>
+</tbody></table><p>In this short tutorial we will map the total numbers of early modern University of Oxford alumni from each county. The file <code type="inline">AlumniCounties.csv</code> contains a summary of the full dataset which has already been created using a <link target="https://en.wikipedia.org/wiki/Pivot_table">PivotTable</link> in Microsoft Excel. Take a look at this file using your spreadsheet software to look at the column titles and the nature of the data contained in it.</p>
+<p><emph>NB</emph>: QGIS is very sensitive to correct formatting of Comma Separated Values (CSV) files, specifically the type of line breaks. If you have difficulties using a CSV file created using Microsoft Excel (especially Excel 2007 or 2011 for MacOS) try re-saving the CSV file using LibreOffice Calc or Excel 2016.</p>
+<div type="3"><head>Tutorial: Joining Tables and Maps</head>
+<ul>
+<li>Open QGIS (on a Windows computer you will probably have many options within the QGIS Start Menu folder &#8211; choose the 'QGIS Desktop' option &#8211; not 'QGIS Browser' or 'GRASS')</li>
+<li>Set up a new Project file in QGIS and save it in your choice of location. (<emph>NB.</emph> QGIS defaults to saving 'relative pathnames' which means that as long as you save all of your project files in the same folder or its subfolders, you can move it to a different location, such as a USB stick. You can check this setting via the menu <code type="inline">Project&gt;Project Properties</code> and the <code type="inline">General</code> side tab).</li>
+<li>It is very important to set the <link target="https://en.wikipedia.org/wiki/Spatial_reference_system">Coordinate Reference System</link> (CRS) to one that suits the data you will import, and the location you plan to map. Go to the menu <code type="inline">Project&gt;Project Properties</code> and select the 'CRS' tab at the side. First select &#8216;Enable on the fly CRS transformation&#8217; at the top of this window then use the filter box to find and select <code type="inline">OSGB 1936 / the British National Grid</code> with the authority ID <code type="inline">ESPG:27700</code> from under the projected coordinate systems heading.</li>
+</ul>
+<p>There is an important distinction between Geographic Coordinate Systems, which simply define measurement units and the datum, and Projected Coordinate Systems, which also define the way in which the globe is &#8216;flattened&#8217; onto a map. <link target="https://en.wikipedia.org/wiki/Ordnance_Survey_National_Grid">OSGB</link> is available in both variants in QGIS, so choose the 'projected' version to get a map in which the United Kingdom appears the shape you would expect. For more details on projections in GIS, see the <link target="http://www.qgistutorials.com/en/docs/working_with_projections.html">Working with Projections in QGIS Tutorial</link>.</p>
+<ul>
+<li>Download a Shapefile containing polygons of the historic counties of England and Wales from <link target="http://www.county-borders.co.uk/">http://www.county-borders.co.uk</link> (choose the file <code type="inline">Definition A: SHP OSGB36 Simplified</code> which is a version of the pre-1843 county boundaries of Great Britain projected on the OS National Grid, without detached portions of counties). Unzip the contents of the ZIP file in the same folder as your project file</li>
+<li>Click the <code type="inline">Add Vector Layer</code> button (looks like a line graph) from the Manage Layers toolbar and then <code type="inline">Browse</code> to select and add the Shapefile <code type="inline">UKDefinitionA.shp</code> from within the folder you&#8217;ve unzipped.</li>
+</ul>
+<figure><desc>Figure 1: The QGIS Add Vector window on MacOS (the Add Vector button is circled on the left hand toolbar)</desc><graphic url="QGISFigureAddVector.png"/></figure>
+<p>You should now see an outline map of British counties in a random colour. If you right-click on the name of this layer in the Layers Panel (shown by default on the bottom left) you can select <code type="inline">Open Attribute Table</code> to view the database properties already associated with each feature on the map. Notice that the name of each county is named in three different ways, the fullest of which is in the column called <code type="inline">NAME</code>, as well as two ID columns. We now need to join this to the alumni data that we want to map using the fact that the values in the <code type="inline">NAME</code> column are the same as those in one of the columns in our spreadsheet (they must be exactly the same for this to work).</p>
+<p>The file <code type="inline">AlumniCounties.csv</code> contains a summary of the alumni dataset created using a PivotTable in Microsoft Excel. Two named columns contain county names (this column is called <code type="inline">Row Labels</code>) and simple totals of individuals originating in those places.</p>
+<ul>
+<li>In QGIS select the <code type="inline">Add Delimited Text Layer</code> button from the Manage Layers toolbox (looks like a large comma symbol). Browse to locate the file and select <code type="inline">CSV</code> as file format and <code type="inline">No geometry (attribute only table)</code> under <code type="inline">Geometry definition</code>. The name for the new table is automatically specified in the field <code type="inline">Layer Name</code> as the same as the name of the file you have imported (<code type="inline">AlumniCounties</code>)</li>
+<li>In the Layers Panel right click on the map layer (called the same as the shapefile that you added: <code type="inline">UKDefinitionA</code>) and select <code type="inline">Properties</code>, and then choose the <code type="inline">Joins</code> tab on the left. Use the <code type="inline">+</code> button to create a join.</li>
+<li>In the pop-up window select the new table you imported (<code type="inline">AlumniCounties</code>) as the <code type="inline">Join layer</code> and in the <code type="inline">Join field</code> and <code type="inline">Target field</code> choose the columns in each which contain the same information (the county name). The <code type="inline">Join field</code> is <code type="inline">Row Labels</code> in this case, and the <code type="inline">Target field</code> is the field in the map layer&#8217;s attribute table which contains the corresponding information (in this case <code type="inline">NAME</code>).</li>
+<li>You can check that this join has worked by right-clicking on the shapefile layer and choosing <code type="inline">Open Attribute Table</code>. Notice that <code type="inline">AlumniCounties_Count Place of Origin</code> has now appeared as one of the columns in the counties shape layer, along with the various codes and ID numbers that are part of the shapefile we downloaded.</li>
+</ul>
+ <figure><desc>Figure 2: The join fields to vector dialogue</desc><graphic url="QGISFigure1.png"/></figure>
+<p>This data can now be shown as a <link target="https://en.wikipedia.org/wiki/Choropleth_map">choropleth map</link> by changing the options in the the <code type="inline">Style</code> tab of layer properties. QGIS offers a very wide range of style options to convey the data associated with each map element in a graphical form. The style called <code type="inline">Graduated</code>  allows you to create a choropleth map with a colour gradient repesenting the range of numerical values in your data, while <code type="inline">Categorised</code> allows you to assign colours or other visual styles to specific or text values in your tables. For data such as these, with many different values within a logical range, the <code type="inline">graduated</code> style of representation is appropriate; if there were just a limited range of potential values, these could be displayed more effectively using the <code type="inline">categorized</code> option.</p>
+<ul>
+<li>In the Layers Panel right click on the map layer (probably called the same as the shapefile that you added: <code type="inline">UKDefinitionA</code>) and select Properties, and then choose the Style tab on the left.</li>
+<li>From the top dropdown box select the <code type="inline">Graduated</code> style</li>
+<li>Select the column <code type="inline">AlumniCounties_Count Place of Origin</code> in the second drop-down box. Click <code type="inline">classify</code> to instruct QGIS to analyse the values in this column and create a series of ranges and colour ramp reflecting the range in the data. This is set to <code type="inline">Equal Interval</code> classification by default, but you may wish to experiment with this and select a different number of classes, or a different method, such as quantiles. Clicking OK will colour your map.</li>
+</ul>
+<figure><desc>Figure 3: The vector layer Styles tab showing classified values based on the field joined from the table</desc><graphic url="QGISFigure2.png"/></figure>
+<p>For more information on choosing the correct classification method for your data, start by looking at this article on <link target="http://wiki.gis.com/wiki/index.php/Classification">Classification in GIS</link>. Examine the results of your map and think about what is actually being represented. Are the raw numbers of alumni, coloured according to the same classes, for very differently sized counties, helpful? Choropleth maps should normally display data that has been normalised in some way, for example showing population density, rather than raw population.</p>
+<p>You may wish to experiment with the Expression Builder (accessed via the &#8721; symbol next to <code type="inline">Column</code> in <code type="inline">Properties&gt;Style</code>) to normalise these values using other columns and values that are available to you. Ideally we might normalise by population, but in the absence of this data, you might experiment by using the <code type="inline">$area</code> property, which is intrinsic to polygon shape layers in GIS. The very simple expression needed to create a map colour ramp on this would be (note that the field name contains spaces, so needs to be contained within double quotation marks):</p>
+<pre><code class="language-text" xml:id="code_geocoding-qgis_0" type="block" corresp="code_geocoding-qgis_0.txt"></code></pre>
+<p>When you alter any of these settings within the graduated style page you will need to click <code type="inline">Classify</code> again to reassign colours to the numerical ranges in your data. If you don&#8217;t reclassify, you might find that the layer becomes invisible on your map.</p>
+<h2>Part 2: Geocoding Historical Data</h2>
+<p>Geocoding is a much more powerful technique than simple table joins because each and every line of your data remains visible and able to be analysed within the GIS software as an individual point on the map (as in table 2). Fundamentally the aim is to join each item of data to a pair of coordinates. Most historical data cannot be geocoded automatically using online tools or QGIS plugins. The geocoding process must therefore be carried out manually to match each data row with a location. This is a simple database operation joining (matching) your data with a gazetteer (a list of places with coordinates). Many gazetteers are available, but relatively few are suitable for use with historical data, for example, for England:</p>
+<ul>
+<li><link target="http://www.gazetteer.org.uk/index.php">Association of British Counties Gazetteer</link> (data available to purchase)</li>
+<li><link target="http://web.archive.org/web/20180320174206/http://www.placenames.org.uk/">The Historical Gazetteer of England's Place Names</link> allows you to geocode individual locations online only, unfortunately the API service for accessing this data for use in automated geocoding, known as DEEP, part of Unlock, has now (late 2016) been withdrawn. A better browsing interface is available for those with UK Higher Education logins at the <link target="https://epns.nottingham.ac.uk/browse">Survey of English Place-Names</link></li>
+</ul>
+<p>If no gazetteer exists for the area or period that you are studying, you can make your own relatively simply from a vector map by creating a point layer containing the information that you require within QGIS (potentially by combining information from other existing layers) and exporting that complete with XY coordinates. For some parts of the world there are neither historical gazetters, nor vector maps suitable for historical periods, in these cases you will have to investigate creating your own vector and point layer; see the tutorial <link target="/lessons/vector-layers-qgis">Creating New Vector Layers in QGIS 2.0</link>.</p>
+</div><div type="3"><head>Tutorial: Creating a Custom Gazetteer and Geocoding in Relational Database</head>
+<p>If you have completed the first part, you can carry on and follow the steps below in the same project. If you did not, or you want to start a new clean project, follow the instructions from the first section to:</p>
+<ul>
+<li>Set up a new Project file in QGIS, and set the Coordinate Reference System to <code type="inline">OSGB 1936/the British National Grid</code> with the authority ID <code type="inline">ESPG:27700</code> as a projected coordinate system using <code type="inline">Project&gt;Project Properties&gt;CRS</code></li>
+<li>Download a Shapefile containing polygons of the historic counties of England and Wales from <link target="http://www.county-borders.co.uk/">http://www.county-borders.co.uk/</link> (choose definition A and the OS National Grid).</li>
+</ul>
+<p>Using your existing project, you can now start to add more layers to create your gazetteer:</p>
+<ul>
+<li>Use <code type="inline">Add Vector Layer</code> to add a new copy of the Shapefile to your project. (GIS software allows you to add the same Shapefile to your project as many times as you like and each instance will appear as a separate layer).</li>
+<li>Examine the data contained within the Shapefile by right-clicking on the name of the map in the Layers Panel and selecting <code type="inline">Open Attribute Table</code>. Notice that columns include various codes, the names of the counties, and abbreviations, but not any coordinates. A polygon is comprised of a whole sequence of coordinates defining its boundary points (nodes) therefore they are hidden from you.</li>
+<li>As we want to assign a single pair of coordinates to each row of our data, we need to generate suitable coordinates from our polygons by finding their centre points (centroids). It is easy to create a new layer of points from this polygon layer which will have a single pair of centroid coordinates for each county. Select <code type="inline">Vector&gt;Geometry Tools&gt;Polygon Centroids</code>. Select a new name for the resulting Shapefile such as <code type="inline">CountiesCentroids</code> and select <code type="inline">add to canvas</code></li>
+</ul>
+<figure><desc>Figure 4: The Polygon Centroids dialogue and result</desc><graphic url="QGISFigure3.png"/></figure>
+<ul>
+<li>Right click on the new centroids layer in the layers panel and select <code type="inline">Save As</code> to export, and click the first dropdown marked <code type="inline">Format</code> and select the CSV (Comma separated values) format. Set the file name to <code type="inline">CountiesXY.csv</code>, in the same folder as the rest of your project</li>
+</ul>
+<ul>
+<li>Ensure that you select the same CRS that has already been used in your project, and make a note of it.</li>
+<li>Under <code type="inline">Layer Options</code> within the <code type="inline">Save vector layer as&#8230;</code> window ensure that Geometry is set to <code type="inline">AS_XY</code> &#8211; this will add extra columns to the beginning of the table containing the X and Y coordinates of each point.</li>
+</ul>
+<figure><desc>Figure 5: The save vector layer as dialog configured for CSV gazetteer export</desc><graphic url="QGISFigure4.png"/></figure>
+<p>This data can now be matched against your existing data to complete the geocoding process.</p>
+</div><div type="3"><head>Geocoding your Data Table</head>
+<p>We can now create a composite table of these locations and the data from our original table. This is created by matching the name of the county in the 'place' field of the alumni table with its equivalent in the new gazetteer using a relational database. This tutorial assumes that you have many hundreds or thousands or rows of data (as we do in this tutorial), requiring an automated method. If you only have a few rows, or you have difficulties using these methods, it is possible to do it manually - see 'Geocoding your own Historical Data' below.</p>
+<p>In simple scenarios (such as this one where we are only matching a single 'place' attribute &#8211; i.e. only 'county') it is possible to code your data to a gazetteer using the <link target="https://support.office.com/en-gb/article/VLOOKUP-function-0bbc8083-26fe-4963-8ab8-93a18ad188a1">VLOOKUP</link> function in Microsoft Excel (or equivalent spreadsheets) or even using the <link target="http://michaelminn.com/linux/mmqgis/">MMQGIS</link> plugin within QGIS. However, in most practical scenarios you will probably wish to match  on several attributes simultaneously (for instance town, county and country &#8211; you would want to distinguish between Sudbury, Suffolk, England; Sudbury, Derbyshire, England; Sudbury, Middlesex, England; and Sudbury, Ontario, Canada). This can be achieved in a somewhat cumbersome way using the <link target="https://support.office.com/en-gb/article/INDEX-function-a5dcf0dd-996d-40a4-a822-b56b061328bd">INDEX</link> function in Excel, but is more practical, and extensible, in a relational database such as Microsoft Access or LibreOffice Base.</p>
+<p>This tutorial uses LibreOffice, which is an Open Source alternative to Microsoft Office and is available for Windows, Mac OS X and all variants of Linux etc (NB it requires a full Java installation). It includes a relational database application on all platforms, unlike Microsoft Access which is available only in the Windows version of Office. However, it is quite restricted in its functionality. If you use Microsoft Access, or are a very proficient spreadsheet user, please feel free to replicate this process using your preferred software.</p>
+<ul>
+<li>Open LibreOffice Base and create and save a new database project using the default settings.</li>
+<li>Data can be imported into Base only by opening in LibreOffice Calc and copy-pasting the whole sheet. Open LibreOffice Calc and load the CSV file <code type="inline">CountiesXY.csv</code> (which is the full output of the 'Using Gazetteers to Extract Sets of Keywords from Free-Flowing Texts' tutorial ) and click <code type="inline">Copy</code></li>
+<li>Open LibreOffice Base and click <code type="inline">Paste</code>. In the dialog that appears set a table name such as <code type="inline">Alumni</code> and choose <code type="inline">Definition and data</code> and <code type="inline">use first line as column names</code>, and finally click <code type="inline">Create</code>.</li>
+<li>You will be prompted to create a primary key, which is a unique id number for each row, which you should accept. You may also get a warning about a value that is too long in one of the fields, which you can accept in this instance (but note that it means some records may get truncated).</li>
+<li>Repeat for the CSV file containing the historical data of Oxford University Alumni (<code type="inline">AlumniCounties.csv</code>)</li>
+<li>Look at each to refresh yourself on the contents of the columns.</li>
+</ul>
+ <figure><desc>Figure 6: Copying a table into LibreOffice Base</desc><graphic url="QGISFigure5.png"/></figure>
+<ul>
+<li>Go to the <code type="inline">Queries</code> pane and select <code type="inline">Create a Query using Design View</code> and add both tables so that you see small windows appear with lists of the field names in each table. Link the &#8216;Place of origin&#8217; field in the alumni table to the <code type="inline">Name</code> field of the Counties table by dragging and dropping one field name onto the other.</li>
+<li>Double click each field in the alumni table, which adds it to the list of fields below (which define the structure of the table that you will get as the result of the query).</li>
+<li>Add the <code type="inline">x</code> and <code type="inline">y</code> fields from the counties by double clicking them. This query now contains all of the data you need to be able to map your data.</li>
+</ul>
+<figure><desc>Figure 7: The query design completed in LibreOffice Base, showing the join between the tables and the grid detailing the fields that will show in the result</desc><graphic url="QGISFigure6.png"/></figure>
+<ul>
+<li>Click <code type="inline">Save</code> and then <code type="inline">Run Query</code> (cylinder icon with a plus symbol). Once you are happy with the results close the query window.</li>
+<li>Export the results as a CSV file, in LibreOffice Base this is done by dragging the query itself onto the first cell of a new LibreOffice Calc spreadsheet.  Then choosing <code type="inline">Save As</code>, select the CSV format using the <code type="inline">File Type</code> drop down at the bottom of the Save window, and click save to create the file as <code type="inline">GeocodedAlumni.csv</code>.</li>
+</ul>
+<p><emph>NB</emph> While relational database queries such as this are very powerful in allowing you match multiple criteria simultaneously, they can also present misleading results if not checked carefully. Check the section <hi rend="bold">Troubleshooting Database Gazetteer Joins</hi> at the end of this tutorial for hints on checking results of joins when working with your own data.</p>
+</div><div type="3"><head>Adding Geocoded Data to QGIS</head>
+<p>You can now return to QGIS and add the data back to your map, using the new X and Y columns to map the data onto the map.</p>
+<ul>
+<li>Use the <code type="inline">Add Delimited Text Layer</code> button (large comma symbol) to add your new CSV file to your GIS project.</li>
+<li>Notice that when you choose this CSV file the options <code type="inline">First record has field names</code> and <code type="inline">Geometry definition: point coordinates</code> are automatically enabled, and the fields <code type="inline">X</code> and <code type="inline">Y</code> are chosen in the drop-down fields for X and Y coordinates.</li>
+<li>Once you click OK you will be prompted to select the Coordinate Reference System for these coordinates. This should be the same as that which you chose when originally creating your project and exporting the gazetteer information: <code type="inline">OSGB 1936 (EPSG:27700)</code>.</li>
+<li>Click OK and your data should be instantly mapped onto your project.</li>
+</ul>
+<p>When you add data that has been geocoded as points in this way, you only initially see a single point in each location. Because each row of data has been geocoded with exactly the same coordinates, they overlap and you can't immediately see how many there are.</p>
+<p>There are several ways to display this data in ways that are more meaningful, and in this regard QGIS has many advantages over the leading commercial software ArcGIS. The most basic way that this can be achieved by creating a new polygon layer containing a new column with a count of points contained within each polygon (this feature is equivalent to a spatial join in ArcGIS). The result of this method would be essentially the same as summarising your data externally (in a database or spreadsheet) and then performing a table join.</p>
+<ul>
+<li>Select the tool <code type="inline">Vector&gt;Analysis Tools&gt;Count Points in Polygon</code></li>
+<li>In the Count Points in Polygon window select your counties layer (<code type="inline">UKDefinitionA</code>) as <code type="inline">Polygons</code> and the geocoded alumni layer that you imported (<code type="inline">GeocodedAlumni</code>) as <code type="inline">Points</code>. The box <code type="inline">Count Field Name</code> defaults to 'NUMPOINTS' - this is the name of the extra column that will be added. The final box <code type="inline">Count</code> specifies what to do with the result of this action, leaving it set to default will create a new temporary (that is, not yet saved to a file) layer called <code type="inline">Count</code>. You could click the <code type="inline">...</code> to specify a file name to save it straight away.</li>
+<li>Click <code type="inline">Run</code> and a new layer will be created</li>
+<li>Right click the new layer in the Layers Panel (called <code type="inline">Count</code> unless you specified otherwise) and choose the <code type="inline">Style</code> tab on the left. You can then change the drop down at the top from default <code type="inline">Single Symbol</code> to <code type="inline">Graduated</code> to display the results of the count in the form of a graduated colour scale fill of the polygons.</li>
+<li>Click the next drop down <code type="inline">Column</code> to select the new column <code type="inline">NUMPOINTS</code> as the basis for this.</li>
+<li>Click the button <code type="inline">Classify</code> toward the bottom to create a colour scale based on the range of numbers here. By default this scale is created with equal intervals (based on the number of classes specified on the right), but you might want to experiment with changing the <code type="inline">Mode</code> drop down to another method, such as <code type="inline">Standard Deviation</code> - the results can look very different. Finally click OK to see the results</li>
+</ul>
+<p>A more useful way of depicting the geocoded data is to use QGIS's advanced display styles such as Heatmap or Point Displacement (these features are laborious to replicate in ArcGIS, and involve creating 'representations' in parallel to layers). Point Displacement is probably the most appropriate way to explore this particular data. The advantage of displaying your data using styles, rather than mapping a summary created externally in a spreadsheet using a table join (as in part 1 of this tutorial), or creating a copy of your polygons containing a count of points that had been inside them using the previous steps,  is that the layer remains dynamic.</p>
+<ul>
+<li>In the Layers Panel again right-click on the <code type="inline">GeocodedAlumni</code> layer and select <code type="inline">Layer properties</code> then the <code type="inline">Style</code> tab. In the top dropdown select <code type="inline">Point Displacement</code> and click <code type="inline">Apply</code></li>
+<li>Tweak the options to make a view that is clear and legible. Changing <code type="inline">Placement Method</code> from <code type="inline">Rings</code> to <code type="inline">Concentric Rings</code>  probably makes it clearer. Remember the sizes remain constant regardless of the zoom level, so zoom in to see the results more clearly.</li>
+<li>The Heat Map style is another popular way of representing concentrations of points like this. Return to the <code type="inline">Layer properties</code> then the <code type="inline">Style</code> tab for the <code type="inline">GeocodedAlumni</code> layer and change the top dropdown <code type="inline">Heatmap</code> and click <code type="inline">Apply</code>.</li>
+<li>You can use the options here to change the colour scale, while the <code type="inline">Radius</code> option controls the size of the 'glow' around each point - when this is set to a high figure, nearby concentrations of points merge together, creating a more organic appearance (but you should think carefully as to whether this presents an accurate impression of your data).</li>
+</ul>
+<figure><desc>Figure 8: The layer properties Style tab, showing point displacement styles, depicting points that actually overlap at precisely the same location</desc><graphic url="QGISFigure7.png"/></figure>
+<p>You have now completed the geocoding process, and can enjoy the advantages of being able to analyse this inherently spatial historical data in a spatial way. In a real world scenario, you would probably only geocode data which is more precise than simple county level, giving a good deal more analytical potential and making maps plotted more meaningful. Where you have data which can be geocoded to a high &#8211; and crucially consistent &#8211; level of precision, it is possible to conduct a wide range of geographical analyses such as measures of clustering or distances.</p>
+<p>For example, you can easily tweak and refine which records are mapped by changing the definition query in the properties of your geocoded layer (Right click on <code type="inline">GeocodedAlumni</code> in Layers Panel and select <code type="inline">Layer Properties&gt;General&gt;Provider Feature Filter&gt;Query Builder</code>). You can use the less than or greater than operators to define years and see if trends change over time, or use the <link target="http://www.w3schools.com/sql/sql_like.asp">SQL LIKE</link> statement to query the &#8216;details&#8217; column to filter particular colleges &#8211; did they tend to attract students from particular counties? These queries use standard <link target="http://www.w3schools.com/sql/">SQL language</link> and can be combined with <code type="inline">AND</code>, <code type="inline">NOT</code> etc. This example would select only those students who had matriculated at Magdalen College:</p>
+<pre><code xml:id="code_geocoding-qgis_1" type="block" corresp="code_geocoding-qgis_1.txt"></code></pre>
+<p>While the following would select only those who matriculated before 1612:</p>
+<pre><code xml:id="code_geocoding-qgis_2" type="block" corresp="code_geocoding-qgis_2.txt"></code></pre>
+</div><div type="3"><head>Geocoding your own Historical Data</head>
+<p>The processes outlined here &#8211; matching using external queries &#8211; should be adaptable to a wide variety of scenarios wherever you can obtain or create a suitable gazetteer. Remember that your success will depend on the consistency and accuracy of your data. Ensure that the same conventions are followed in both your data and your gazetteer, especially with regard to punctuation (e.g. &#8216;Devon&#8217; or &#8216;Devonshire&#8217;, &#8216;Hay-on-Wye&#8217;, or &#8216;Hay on Wye&#8217; etc.) If you are lucky enough to have data which is presented in modern format (i.e. modern countries, streets or even postcodes), it is possible to use the much easier process of automated geocoding. See the section below.</p>
+<p>If you only have a small number of rows in your data, or if you are having difficulty standardising your location information in one field so that it can be geocoded using the methods in this tutorial, you should remember that it is possible to do this process manually. Simply use one of many online geocoding tools to manually find the X and Y coordinates for each row of your data directly into X and Y columns in your spreadsheet or database. Remember to note the coordinate system used by the tool you use to find these coordinates though (probably WGS1984)! If you have manually geocoded data like this, simply follow the instructions above from 'Adding Geocoded Data to QGIS'</p>
+</div><div type="3"><head>Troubleshooting Database Gazetteer Joins</head>
+<p>While relational database queries are very powerful tools for doing customised geocoding, by allowing you to match multiple criteria simultaneously, they can also present misleading results if not checked carefully. Any data that is not matched will usually be ignored 'silently' (i.e. you will not see an error message), so it is important to check whether the total number of lines in your results matches that in your original data.</p>
+<p>If there are too few results, this means some values cannot be matched. In this table, for example, <code type="inline">Place of origin</code> includes values such as 'London' and 'Germany', which do not match any of the places in the gazetteer that we created. You could either conclude that the lower number of results is acceptable, or try to correct it by either altering places of origin, or adding locations to your gazetteer manually. Changing the properties of the join between the two tables from <code type="inline">Inner Join</code> to <code type="inline">Right Join</code> will ensure that ALL records from the alumni table are returned, whether or not there is matching data from the gazetteer <code type="inline">counties</code> table (presuming that the alumni table is on the right). This is a very useful diagnostic step.</p>
+<p>If there are too many results, then each row in one table is matching multiple rows in the other. This is actually quite common with gazetteers, as there are likely to be duplicate points with the same, or very similar, place names in many datasets. This is especially true of very high resolution gazetteers which might have many neighbourhoods within a town individually located, but it is the 'town' column that you might want to match against. To guard against stray duplicates like this, you can use database functions to ensure only a single result is returned from your gazetteer. If you encounter this problem you should first create a query which uses the <code type="inline">minimum</code> or <code type="inline">maximum</code> functions (called sum functions in Access) on the ID field of your gazetteer, together with the <code type="inline">group by</code> function on the name field of your gazetteer, to isolate only a single occurence of each place name. You can then treat this as a subquery and add it to your existing query and join the now unique ID field to the existing gazetteer field using an <code type="inline">Inner Join</code> to ensure only one occurrence of each place name is matched.</p>
+<h2>Postscript: Geocoding Modern Addresses</h2>
+<p>If you have data which contains present-day addresses (such as postal addresses using contemporary street names, post or ZIP codes, or higher-level descriptions such as town or county names that follow modern conventions) then geocoding is very easy, using online tools or tools that use online <link target="https://en.wikipedia.org/wiki/Application_programming_interface">APIs</link>. Remember that online geocoding is unlikely to work if any of these elements of an address are not consistent with the present day.</p>
+<p>Major online mapping providers such as Google, Bing, and OpenStreetMap all offer API (Application Programming Interface) connections to their highly sophisticated geocoding tools. These are the same tools that power the map search features of these websites, so are very effective at making 'best guess' decisions on ambiguous or incomplete addresses. It is worth noting that when accessed via an API, rather than their normal website, it will be necessary to provide country names as part of the address.</p>
+<ul>
+<li>Google provides two web based tools that allow direct use of their geocoding tools as well as their cartography: <link target="https://www.google.com/maps/d/">Google My Maps</link> and <link target="https://fusiontables.google.com">Google Fusion Tables</link>. Both allow the upload of spreadsheets containing address columns, which are automatically geocoded.</li>
+<li>Within QGIS these APIs are available to geocode data via a number of dedicated plugins. Currently (February 2017) the most popular and well supported of these is MMQGIS.</li>
+</ul>
+<ul>
+<li>Install MMQGIS using the &#8216;Manage and Install Plugins&#8217; tool</li>
+<li>Once installed, a new MMQGIS menu appears in the menu bar. <code type="inline">Geocoding</code> is one of the menu options within this, and <code type="inline">GeoCode CSV using Google Maps / Open Street Map</code> within that.</li>
+<li>The <code type="inline">GeoCode CSV using Google Maps / Open Street Map</code> dialog allows you to load a data table from a CSV file and specify the columns that contain (street) address, city, state and country. These are then processed using the selected online service. Successful results are created as points in a new layer (in the specified shapefile). Rows from the table that are not matched are listed in a new CSV file that is also created.</li>
+</ul>
+<figure><desc>Figure 9: The 'Web Service Geocode' dialog from the MMQGIS plugin</desc><graphic url="QGISFigure8.png"/></figure>
+</div></div></div>
+    </body>
+  </text>
+</TEI>

@@ -1,0 +1,24 @@
+# Colecione as páginas com pelo menos um bloco de imagem
+img_pages = []
+
+with gzip.open(abbyy_file) as fp:
+    tree = ET.parse(fp)
+    document = tree.getroot()
+    for i, page in enumerate(document):
+        for block in page:
+            try:
+                if block.attrib['blockType'] == 'Picture':
+                    img_pages.append(i)
+                    break
+            except KeyError:
+                continue
+
+# 0 não é uma página válida para a realização de solicitações GET ao IA, mas às vezes
+# está no ficheiro Abbyy comprimido
+img_pages = [page for page in img_pages if page > 0]
+
+# Acompanhe o progresso do download
+total_pages = len(img_pages)
+
+# Os ficheiros do OCR são pesados, por isso elimine assim que tivermos a lista de páginas
+os.remove(abbyy_file)

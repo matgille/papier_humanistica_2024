@@ -1,0 +1,27 @@
+# Dividir a lista de corpus entre autores e obras destacadas    
+autores = list(obras.keys())[:5]
+obras_destacadas = list(obras.keys())[5:]
+
+obras_distribuicao_comprimento_normalizado = {}
+
+# Normalizar a distribuição de comprimentos de tokens em um novo dicionário
+for index, obra in obras_distribuicao_comprimento.items():
+    obras_distribuicao_comprimento_normalizado[index] = {k: 
+                                                          v/max(obra.values()) 
+                                                          for k, v in dict(obra).items()}
+
+# Calcular a soma da diferença da distribuição entre o documento de teste e cada autor (de 1 até 15 caracteres)
+for obra in obras_destacadas:    
+    for autor in autores:
+        soma_diferenca = 0
+        for i in range(1,16):
+            diferenca = abs(obras_distribuicao_comprimento_normalizado[obra][i] - 
+                         obras_distribuicao_comprimento_normalizado[autor][i])
+            soma_diferenca = soma_diferenca + diferenca
+        print('A soma da diferença do documento ' + 
+              obra + 
+              ' para o autor ' + 
+              autor + 
+              ' é ' + 
+              str(soma_diferenca))
+    print('\n')

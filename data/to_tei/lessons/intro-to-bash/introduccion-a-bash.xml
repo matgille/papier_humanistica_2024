@@ -1,0 +1,267 @@
+<TEI xmlns="https://tei-c.org/ns/1-0/">
+  <metadata>
+  <title>Introducci&#243;n a la l&#237;nea de comandos en Bash</title>
+  <authors>Ian Milligan,James Baker</authors>
+  <date>2014-09-20</date>
+  <translation_date>2017-07-29</translation_date>
+  <editors>Adam Crymble</editors>
+  <reviewers>M. H. Beals,Allison Hegel,Charlotte Tupman,Adam Crymble</reviewers>
+  <translator>V&#237;ctor Gayol</translator>
+  <translation-editor>Antonio Rojas Castro</translation-editor>
+  <translation-reviewer>Antonio Jes&#250;s S&#225;nchez Padial,Antonio Rojas Castro</translation-reviewer>
+  <review-ticket>https://github.com/programminghistorian/ph-submissions/issues/62</review-ticket>
+  <avatar_alt>un grupo de soldados (infanter&#237;a) a punto de atacar</avatar_alt>
+  <original>intro-to-bash</original>
+  <layout>lesson</layout>
+  <difficulty>1</difficulty>
+  <activity>transforming</activity>
+  <topics>data-manipulation,get-ready</topics>
+  <abstract>Con esta lecci&#243;n aprender&#225;s introducir &#243;rdenes a trav&#233;s de una Interfaz de L&#237;nea de comandos, en lugar de hacerlo en una Interfaz Gr&#225;fica de Usuario. La Interfaz de L&#237;nea de comandos es &#250;til cuando el usuario necesita un mayor grado de precisi&#243;n para llevar a cabo su investigaci&#243;n. Por ejemplo, permite a&#241;adir modificadores de tal modo que se puede ejecutar un programa de una manera determinada. Asimismo, te ser&#225; &#250;til para automatizar programas mediante scripts, es decir, recetas o paquetes que contienen una serie de instrucciones.</abstract>
+  <doi>10.46430/phes0013</doi>
+</metadata>
+  <text xml:lang="es">
+    <body>
+      <div type="2"><head>Introducci&#243;n a l&#237;nea de comandos en Bash</head>
+<div type="3"><head>Introducci&#243;n</head>
+<p>Muchas de las lecciones en <emph>The Programming Historian en espa&#241;ol</emph> requieren que introduzcas &#243;rdenes a trav&#233;s de una <hi rend="bold">Interfaz de l&#237;nea de comandos</hi>. La manera habitual en la que los usuarios de computadoras interact&#250;an actualmente con sus sistemas es a trav&#233;s de la <hi rend="bold">Interfaz Gr&#225;fica de Usuario</hi>, o GUI (siglas de <emph>Graphical User Inteface</emph>). Esto significa que cuando entras en una carpeta, haces clic en una imagen de una carpeta de archivos; cuando ejecutas un programa, haces clic en &#233;l; y cuando navegas por la Web, utilizas el rat&#243;n para interactuar con los diferentes elementos de una p&#225;gina Web. Sin embargo, antes de la aparici&#243;n de las GUI a finales de la d&#233;cada de 1980, la principal forma de interactuar con una computadora era a trav&#233;s de una interfaz de l&#237;nea de comandos.</p>
+<figure><desc>GUI de la computadora de Ian Milligan</desc><graphic url="GUI.png"/></figure>
+<p>Las interfaces de l&#237;nea de comandos ofrecen ventajas para los usuarios de computadoras que necesitan mayor precisi&#243;n en su trabajo -como los historiadores digitales. Permiten un uso m&#225;s detallado a la hora de ejecutar algunos programas, ya que puedes agregar par&#225;metros para especificar <emph>exactamente</emph> c&#243;mo deseas ejecutar tu programa. Adem&#225;s, se pueden automatizar procesos f&#225;cilmente mediante <link target="http://www.tldp.org/LDP/Bash-Beginners-Guide/html/chap_01.html">scripts</link>, que son esencialmente recetas de &#243;rdenes escritas en un archivo de texto.</p>
+<p>Hay dos interfaces de l&#237;nea de comandos principales, o <emph>shells</emph>, que utilizan muchos historiadores digitales. En OS X, as&#237; como en muchas de las distribuciones de Linux, el <emph>shell</emph> se conoce como <code type="inline">bash</code> (<emph>Bourne-again shell</emph>). Para los usuarios de sistemas Windows, la interfaz de l&#237;nea de comandos est&#225; basada en MS-DOS por defecto, y aunque utiliza diferentes comandos y <link target="https://es.wikipedia.org/wiki/Sintaxis">sintaxis</link>, puede realizar tareas similares. Este tutorial proporciona una introducci&#243;n b&#225;sica a la terminal <code type="inline">bash</code>. Los usuarios de Windows pueden seguir instalando alg&#250;n <emph>shell</emph> popular como <link target="https://www.cygwin.com/">Cygwin</link> o Git Bash (ver m&#225;s adelante).</p>
+<p>Esta lecci&#243;n utiliza un <hi rend="bold"><link target="https://es.wikipedia.org/wiki/Shell_de_Unix"><emph>shell</emph> de Unix</link></hi>, es decir, un int&#233;rprete de l&#237;nea de comandos que proporciona una interfaz de usuario para el sistema operativo <link target="https://es.wikipedia.org/wiki/Unix">Unix</link> y similares. Esta lecci&#243;n cubre un peque&#241;o n&#250;mero de &#243;rdenes b&#225;sicas. Cuando termines este tutorial, podr&#225;s navegar a trav&#233;s de tu sistema de archivos y encontrar archivos, abrirlos, realizar tareas b&#225;sicas de manipulaci&#243;n de datos como combinar y copiar archivos, as&#237; como leerlos y realizar ediciones relativamente sencillas. Estos comandos constituyen los cimientos sobre los que se pueden construir &#243;rdenes m&#225;s complejas que se ajusten a tus datos de investigaci&#243;n y proyectos. A los lectores que deseen una gu&#237;a de referencia que vaya m&#225;s all&#225; de esta lecci&#243;n les recomendamos leer Deborah S. Ray and Eric J. Ray, <emph>Unix and Linux: Visual Quickstart Guide</emph>, 4th edition (2009).</p>
+</div><div type="3"><head>S&#243;lo para usuarios de Windows: instalar Git Bash</head>
+<p>Los usuarios de OS X y la mayor&#237;a de las distribuciones de Linux tienen suerte pues ya cuentan con un Bash <emph>shell</emph> instalado por defecto. Para los usuarios de Windows, es necesario cubrir un paso extra e instalar Git Bash descargando la versi&#243;n m&#225;s reciente en <link target="https://git-for-windows.github.io/">esta p&#225;gina</link>. Las instrucciones de instalaci&#243;n est&#225;n disponibles en <link target="https://web.archive.org/web/20190114082523/https://openhatch.org/missions/windows-setup/install-git-bash">Open Hatch</link>.</p>
+</div><div type="3"><head>Abrir el int&#233;rprete de l&#237;nea de comandos</head>
+<p>Vamos a iniciar el int&#233;rprete de l&#237;nea de comandos (<emph>shell</emph>). En Windows, ejecuta <code type="inline">Git Bash</code> desde el directorio en el que lo instalaste. Lo tendr&#225;s que ejecutar como administrador. Para hacerlo, haz clic con el bot&#243;n derecho sobre el programa y selecciona "ejecutar como administrador" (<emph>Run as Administrator</emph>). En OS X, el <emph>shell</emph> se encuentra localizado por defecto en:</p>
+<p><code type="inline">Aplicaciones -&gt; Utilidades -&gt; Terminal</code></p>
+<figure><desc>El programa Terminal.app en OS X</desc><graphic url="Terminal.png"/></figure>
+<p>Cuando lo ejecutes ver&#225;s esto en la ventana:</p>
+<figure><desc>Pantalla de Terminal en blanco en nuestra estaci&#243;n de trabajo de OS X</desc><graphic url="Blank-Terminal.png"/></figure>
+<p>Quiz&#225; quieras cambiar la apariencia que por defecto tiene la terminal para no esforzarte de m&#225;s al mirar continuamente texto negro sobre fondo blanco. En la aplicaci&#243;n por defecto de OS X puedes abrir el men&#250; 'Perfiles' en 'Preferencias', bajo 'Terminal'. Haz clic en la pesta&#241;a 'Perfiles' y c&#225;mbialo por un nuevo esquema de color. Personalmente preferimos algo con menor contraste entre el fondo y el primer plano, pues lo estar&#225;s viendo durante mucho tiempo. 'Novel' es uno muy relajante ya que es la paleta de colores de la popular <emph>suite</emph> <link target="http://ethanschoonover.com/solarized">Solarized</link>. Los usuarios de Windows pueden obtener un efecto similar utilizando la pesta&#241;a 'Properties' de Git bash. Para llegar a ella, haz click con el bot&#243;n derecho en cualquier lugar de la barra superior y seleciona 'Properties'.</p>
+<figure><desc>Pantalla de configutaci&#243;n en Terminal de OS X</desc><graphic url="Settings.png"/></figure>
+<p>Una vez satisfecho con la apariencia de la interfaz, ya est&#225;s listo para comenzar.</p>
+</div><div type="3"><head>Navegando por el sistema de archivos de tu computadora</head>
+<p>Si cuando abres la ventana del int&#233;rprete no est&#225;s seguro del sitio en que est&#225;s en el sistema de archivos de tu computadora, el primer paso es descubrirlo. A diferencia de un sistema gr&#225;fico, cuando est&#225;s en un <emph>shell</emph> no puedes ubicarte en distintos directorios a la vez. Cuando abres el explorador de archivos en tu escritorio est&#225;s mostrando los archivos que est&#225;n dentro de un directorio. Puedes saber en qu&#233; directorio est&#225;s a trav&#233;s del comando <code type="inline">pwd</code>, que significa "imprime el directorio de trabajo" (<emph>print working directory</emph>). As&#237;, pues, introduce:</p>
+<p><code type="inline">pwd</code></p>
+<p>y pulsa Intro. Si usas OS X o Linux, tu computadora probablemente mostrar&#225; <code type="inline">/usuarios/nombre-de-usuario</code> con tu propio nombre de usuario. Por ejemplo, la ruta de Ian en OS X es <code type="inline">/users/ianmilligan1/</code>. Aqu&#237; es donde te dar&#225;s cuenta que aquellos que usan OS X/Linux y los que usan Windows tendr&#225;n experiencias ligeramente distintas. En Windows, James se localiza en:</p>
+<p><code type="inline">C:\users\jbaker</code></p>
+<p>Hay peque&#241;as diferencias, pero no te preocupes: una vez que aprendas a moverte y a manipular archivos estas divergencias entre plataformas pasar&#225;n a un segundo plano.</p>
+<p>Para orientarnos, obtengamos una lista de los archivos que est&#225;n en ese directorio. Escribe:</p>
+<p><code type="inline">ls</code></p>
+<p>y ver&#225;s un listado de cada archivo y directorio que se encuentre en tu ubicaci&#243;n actual. Tu directorio puede estar desordenado o puede verse pr&#237;stino, pero al menos observar&#225;s algunas ubicaciones conocidas. En OS X, por ejemplo, ver&#225;s <code type="inline">Applications</code>, <code type="inline">Desktop</code>, <code type="inline">Documents</code>, <code type="inline">Downloads</code>, <code type="inline">Library</code>, <code type="inline">Pictures</code>, etc.</p>
+<p>Posiblemente quieras ver m&#225;s informaci&#243;n que &#250;nicamente la lista de archivos. Puedes obtenerla utilizando varios par&#225;metros (<emph>flags</emph>) para completar las &#243;rdenes b&#225;sicas. Se trata de adiciones a un comando que proporcionan a la computadora un poco m&#225;s de orientaci&#243;n de qu&#233; tipo de salida o manipulaci&#243;n deseas. Para obtener una lista de &#233;stos, los usuarios de OS X/Linux pueden recurrir al programa de ayuda integrado. Los usuarios de OS X/Linux pueden escribir:</p>
+<p><code type="inline">man ls</code></p>
+<figure><desc>P&#225;gina del manual para el comando LS</desc><graphic url="man-ls.png"/></figure>
+<p>Aqu&#237; ver&#225;s una lista del nombre del comando, la forma en la que puedes manipularlo y lo que hace. <hi rend="bold">Muchos de estos comandos no tendr&#225;n sentido en esta etapa, pero no te preocupes: con el tiempo te familiarizar&#225;s con ellos</hi>. Puedes explorar esta p&#225;gina de varias maneras: la barra espaciadora te permite moverte hacia abajo de la p&#225;gina, o puedes utilizar la flecha hacia abajo y la flecha hacia arriba por todo el documento.</p>
+<p>Para abandonar la p&#225;gina del manual, escribe: <code type="inline">q</code> y esto te llevar&#225; de regreso a la l&#237;nea de comandos en la que estabas antes de entrar a la p&#225;gina del manual.</p>
+<p>Trata de jugar un poco con la p&#225;gina <code type="inline">man</code> para ver qu&#233; puedes hacer con otra orden que ya aprendiste: <code type="inline">pwd</code>.</p>
+<p>Los usuarios de Windows pueden utilizar el comando <code type="inline">help</code>, aunque esta orden tiene menos funciones que <code type="inline">man</code> de OS X/Linux. Escribe <code type="inline">help</code> para ver la ayuda disponible, y <code type="inline">help pwd</code> para ejemplos de la salida del comando.</p>
+<p>Ahora intentaremos utilizar algunas de las opciones que viste en la p&#225;gina <code type="inline">man</code> de <code type="inline">ls</code>. A lo mejor lo &#250;nico que quieres ver son los archivos TXT que est&#225;n en tu directorio principal. Escribe:</p>
+<p><code type="inline">ls *.txt</code></p>
+<p>Esto te mostrar&#225; una lista de los archivos de texto, si es que tienes alguno en tu directorio principal (posiblemente no, y eso est&#225; bien). El comando * es un <hi rend="bold">comod&#237;n</hi> que se traduce como 'todo' o 'cualquier cosa'. As&#237; que en este caso le est&#225;s indicando a la m&#225;quina que te muestre todo lo que encaje con el patr&#243;n</p>
+<p>[todo.txt]</p>
+<p>Ensaya diferentes combinaciones. Si, por ejemplo, tienes varios archivos en el formato <code type="inline">1-espa&#241;ol.txt</code>, <code type="inline">2-espa&#241;ol.txt</code>, etc&#233;tera, el comando <code type="inline">ls *-espa&#241;ol.txt</code> te mostrar&#225; todos ellos pero excluir&#225; los que no se ajusten al patr&#243;n.</p>
+<p>Digamos que quieres m&#225;s informaci&#243;n. En esa larga p&#225;gina de <code type="inline">man</code> ver&#225;s una ocpi&#243;n que podr&#237;a resultar &#250;til:</p>
+<blockquote>
+<pre><code xml:id="code_introduccion-a-bash_0" type="block" corresp="code_introduccion-a-bash_0.txt"></code></pre>
+</blockquote>
+<p>As&#237; que, si escribes</p>
+<p><code type="inline">ls -l</code></p>
+<p>la computadora te mostrar&#225; una larga lista de archivos que contiene informaci&#243;n similar a la que encontrar&#237;as en tu Finder o explorador de archivos: el tama&#241;o de los archivos en <emph>bites</emph>, la fecha de creaci&#243;n o de &#250;ltima modificaci&#243;n, y el nombre del archivo. No obstante, esto puede ser un poco confuso pues ver&#225;s que, por ejemplo, el archivo prueba.html tiene '6020' bits. En lenguaje cotidiano estamos m&#225;s acostumbrados a utilizar unidades de medida como bytes, kilobytes, megabytes y gigabytes.</p>
+<p>Afortunadamente hay otra bandera:</p>
+<blockquote>
+<pre><code xml:id="code_introduccion-a-bash_1" type="block" corresp="code_introduccion-a-bash_1.txt"></code></pre>
+</blockquote>
+<p>Cuando quieres utilizar dos banderas puedes simplemente ejecutarlas juntas. As&#237;, al escribir</p>
+<p><code type="inline">ls -lh</code></p>
+<p>obtendr&#225;s una salida en un formato legible para seres humanos; aprender&#225;s que 6020 bits son tambi&#233;n 5.9KB, que otro archivo tiene 1 megabite y as&#237; sucesivamente.</p>
+<p>Estas opciones son <emph>muy</emph> importantes. Lo ver&#225;s en otras lecciones de <emph>The Programming Historian en espa&#241;ol</emph>. <link target="/lessons/applied-archival-downloading-with-wget">Wget</link>, <link target="/lessons/topic-modeling-and-mallet">MALLET</link> y <link target="/lessons/sustainable-authorship-in-plain-text-using-pandoc-and-markdown">Pandoc</link> utilizan la misma sintaxis. Afortunadamente no necesitas memorizar la sintaxis; en lugar de ello, mant&#233;n estas lecciones a mano para que puedas echar un vistazo r&#225;pido si es necesario ajustar algo. Estas lecciones se pueden hacer en cualquier orden.</p>
+<p>Ya has estado mucho tiempo en tu directorio personal. Vamos a otro lugar; puedes hacerlo a trav&#233;s del comando <code type="inline">cd</code> que significa 'Cambiar de directorio'.</p>
+<p>Si escribes:</p>
+<p><code type="inline">cd desktop</code></p>
+<p>al pulsar Intro estar&#225;s en tu escritorio. Esto es similar a cuando haces doble click en el folder de 'Escritorio' en el explorador de archivos. Para confirmarlo, escribe <code type="inline">pwd</code> y debes ver entonces algo como esto:</p>
+<p><code type="inline">/Users/ianmilligan1/desktop</code></p>
+<p>Juega un poco con estos primeros comandos: explora tu directorio actual utilizando el comando <code type="inline">ls</code>. Si quieres regresar al directorio anterior, puedes escribir:</p>
+<p><code type="inline">cd ..</code></p>
+<p>Esto mueve hacia "arriba" un directorio llev&#225;ndonos de regreso a <code type="inline">/Users/ianmilligan1/</code>. Si en alg&#250;n momento te sientes completamente perdido, el comando</p>
+<p><code type="inline">cd --</code></p>
+<p>te llevar&#225; de regreso al directorio principal, exactamente donde empezaste.</p>
+<p>Intenta explorar: visita tus directorios de documentos, im&#225;genes, carpetas que posiblemente tengas en el escritorio. Acost&#250;mbrate a moverte adentro y afuera de los directorios. Imagina que est&#225;s navegando por una <link target="https://es.wikipedia.org/wiki/Topolog%C3%ADa_arb%C3%B3rea">estructura de &#225;rbol</link>. Si est&#225;s en el escritorio no podr&#225;s hacer <code type="inline">cd documents</code> para cambiar a la carpeta documentos ya que es dependiente de tu directorio principal, mientras que la carpeta de escritorio y de la documentos son 'hermanas'. Para llegar a una carpeta hermana debes regresar al directorio matriz de ambas. Para hacerlo, tienes que volver al directorio principal (<code type="inline">cd ..</code>) y luego seguir adelante de nuevo a <code type="inline">cd documents</code>.</p>
+<p>Es muy importante que seas capaz de navegar por el sistema de archivos utilizando la l&#237;nea de comandos (<emph>shell</emph>) para muchas de las lecciones en <emph>The Programming Historian en espa&#241;ol</emph>. A medida que te sientas m&#225;s c&#243;modo pronto te encontrar&#225;s saltando al directorio que deseas. En nuestro caso, desde cualquier lugar de nuestro sistema, se puede escribir:</p>
+<p><code type="inline">cd /users/ianmilligan1/mallet-2.0.7</code></p>
+<p>O en Windows algo como:</p>
+<p><code type="inline">cd c:\mallet-2.0.7\</code></p>
+<p>e ir a nuestro directorio MALLET para <link target="/lessons/topic-modeling-and-mallet">modelado de t&#243;picos</link>.</p>
+<p>Finalmente, prueba:</p>
+<p><code type="inline">open .</code></p>
+<p>en OS X o</p>
+<p><code type="inline">explorer .</code></p>
+<p>en Windows. Este comando abrir&#225; tu GUI en el directorio actual. Aseg&#250;rate de dejar un espacio entre <code type="inline">open</code> o <code type="inline">explorer</code> y el punto.</p>
+</div><div type="3"><head>Interactuar con archivos</head>
+<p>Adem&#225;s de navegar por directorios, puedes interactuar con archivos a trav&#233;s de la l&#237;nea de comandos: puedes leerlos, abrirlos, ejecutarlos e incluso editarlos sin tener que salir de la interfaz. Hay cierto debate sobre por qu&#233; alguien querr&#237;a hacer todo esto; la raz&#243;n principal es la extrema comodidad de trabajar con la l&#237;nea de comandos: nunca tienes que tocar el rat&#243;n o el <emph>track pad</emph> de la computadora y, aunque tiene una curva de aprendizaje pronunciada, eventualmente puede convertirse en el &#250;nico entorno de escritura. Adem&#225;s, muchos programas requieren la utilizaci&#243;n de la l&#237;nea de comandos para operar con ellos. Puesto que vas a utilizar programas a trav&#233;s de la l&#237;nea de comandos, a menudo puede ser m&#225;s r&#225;pido crear peque&#241;as ediciones sin necesidad de cambiar a un programa separado. Para algunos de estos argumentos v&#233;ase el texto de Jon Beltran de Heredia, <link target="http://www.viemu.com/a-why-vi-vim.html">"Why, oh WHY, do those #?@! nutheads use vi?"</link>.</p>
+<p>A continuaci&#243;n, presentaremos unas formas b&#225;sicas de interactuar con archivos.</p>
+<p>Primero, puedes crear un nuevo directorio para que puedas interactuar con archivos de texto. Lo crearemos en tu escritorio, por conveniencia. Siempre se podr&#225; mover m&#225;s tarde. Navega hasta tu escritorio con el <emph>shell</emph> y escribe:</p>
+<p><code type="inline">mkdir ProgHist-Textos</code></p>
+<p>Esto crea un directorio llamado (&#161;adivinaste!) <code type="inline">ProgHist-Textos</code>. En general, es bueno evitar poner espacios en tus nombres de archivos y directorios cuando se utiliza la l&#237;nea de comandos (hay soluciones alternativas, pero este m&#233;todo es m&#225;s simple); del mismo modo es recomendable evira la '&#241;' y el resto de caracteres especiales del castellano, tildes, etc. Aunque los sistemas actuales son capaces de utilizarlos, podemos encontrar problemas si tenemos que utilizar estos ficheros en sistemas antiguos. Puedes mirar en tu escritorio para verificar que funcion&#243;. Ahora, mu&#233;vete dentro de ese directorio (recuerda que ser&#225; <code type="inline">cd ProgHist-Textos</code>).</p>
+<p>Pero &#161;espera! Hay un truco para hacer las cosas un poco m&#225;s r&#225;pido. Ve arriba un directorio (<code type="inline">cd ..</code>, lo cual te llevar&#225; de regreso al escritorio). Para navegar al directorio <code type="inline">ProgHist-Textos</code> puedes escribir <code type="inline">cd ProgHist-Textos</code>. Alternativamente puedes escribir <code type="inline">cd Prog</code> y luego pulsar la tecla de tabulador. Te dar&#225;s cuenta de que la interfaz completa la l&#237;nea como <code type="inline">cd ProgHist-Textos</code>. <hi rend="bold">Si pulsas el tabulador en cualquier momento dentro del <emph>shell</emph> le pedir&#225;s que intente completar autom&#225;ticamente la l&#237;nea en funci&#243;n de los archivos o subdirectorios que est&#233;n en el directorio actual. Sin embargo, la funci&#243;n es sensible a may&#250;sculas (as&#237;, en el ejemplo anterior, <code type="inline">cd prog</code> no podr&#225; autocompletarse como <code type="inline">cd ProgHist-Textos</code>). En donde haya dos archivos con los mismos caracteres, autocompletar solamente llenar&#225; la l&#237;nea hasta el primer punto de diferencia. Sugerimos utilizar este m&#233;todo a lo largo de la lecci&#243;n para ver c&#243;mo se comporta.</hi></p>
+<p>Ahora necesitas encontrar un archivo de texto b&#225;sico para que nos ayude con el ejemplo. &#191;Por qu&#233; no utilizar un libro que sabes que es largo, como la &#233;pica "Guerra y Paz" de Leon Tolst&#243;i? El archivo de texto est&#225; disponible en <link target="http://www.gutenberg.org/ebooks/2600">Project Gutenberg</link>. Si ya instalaste <link target="/lessons/applied-archival-downloading-with-wget">wget</link>, puedes escribir:</p>
+<p><code type="inline">wget  http://www.gutenberg.org/files/2600/2600-0.txt</code></p>
+<p>Si no lo has instalado, descarga el texto utilizando tu navegador. Ve al enlace anterior y, desde tu navegador, usa el comando 'Guardar como' del men&#250; 'Archivo'. Gu&#225;rdalo en tu nuevo directorio <code type="inline">ProgHist-Textos</code>. Ahora, cuando escribas</p>
+<p><code type="inline">ls -lh</code></p>
+<p>ver&#225;s algo as&#237; como:</p>
+<blockquote>
+<blockquote>
+<p>-rw-r--r--+ 1 ianmilligan1  staff   3.1M  1 May 10:03 2600-0.txt</p>
+</blockquote>
+</blockquote>
+<p>Puedes leer el texto de este archivo de diferentes maneras. Primero, puedes decirle a la computadora que quieres leerlo utilizando el programa est&#225;ndar que usas para abrir los archivos de texto. Por defecto, este debe ser TextEdit en OS X o Notepad en Windows. Para abrir un archivo solamente escribe:</p>
+<p><code type="inline">open 2600-0.txt</code></p>
+<p>en OS X, o</p>
+<p><code type="inline">explorer 2600-0.txt</code></p>
+<p>en Windows. Lo anterior selecciona el programa por defecto para abrir ese tipo de archivos y lo abre.</p>
+<p>Sin embargo, a veces querr&#225;s trabajar sin dejar la l&#237;nea de comandos. Tambi&#233;n puedes leer archivos en este entorno. Para probar esto, escribe:</p>
+<p><code type="inline">cat 2600-0.txt</code></p>
+<p>La ventana de Terminal entra en erupci&#243;n y <emph>Guerra y Paz</emph> se despliega en cascada. Esto es magn&#237;fico, en teor&#237;a, pero realmente no puedes obtener sentido de esta cantidad de texto. En lugar de ello, puede ser que s&#243;lo quieras ver el primer o el &#250;ltimo fragmento del archivo.</p>
+<p><code type="inline">head 2600-0.txt</code></p>
+<p>proporciona una visi&#243;n de las primeras diez l&#237;neas, mientras que</p>
+<p><code type="inline">tail 2600-0.txt</code></p>
+<p>ofrece una perspectiva de las &#250;ltimas diez l&#237;neas. &#201;sta es una buena manera de determinar r&#225;pidamente el contenido del archivo. Puedes a&#241;adir un comando para cambiar la cantidad de l&#237;neas que se muestran: <code type="inline">head -20 2600-0.txt</code>, por ejemplo, mostrar&#225; las primeras veinte l&#237;neas.</p>
+<p>Tambi&#233;n puedes cambiar el nombre del archivo a algo m&#225;s descriptivo. Puedes asignarle un nuevo nombre escribiendo:</p>
+<p><code type="inline">mv 2600-0.txt tolstoi.txt</code></p>
+<p>Despu&#233;s, cuando ejecutes el comando <code type="inline">ls</code>, ver&#225;s que ahora se llama <code type="inline">tolstoi.txt</code>. Si hubieras querido duplicarlo podr&#237;as haber ejecutado el comando 'copiar' escribiendo:</p>
+<p><code type="inline">cp 2600-0.txt tolstoi.txt</code></p>
+<p>Volveremos sobre este comando en breve.</p>
+<p>Ahora que has utilizado varios comandos nuevos, es hora de aprender otro truco. Pulsa la flecha hacia arriba en tu teclado. Observa que <code type="inline">cp 2600-0.txt tolstoi.txt</code> aparece delante del cursor. Puedes continuar pulsando la flecha hacia arriba para recorrer los comandos anteriores. La flecha hacia abajo retrocede hacia el comando m&#225;s reciente.</p>
+<p>Despu&#233;s de haber le&#237;do y renombrado varios archivos, es posible que quieras reunir tu texto en uno solo. Para combinar o concatenar dos a m&#225;s archivos, puedes utilizar el comando <code type="inline">cat</code>. Primero, vamos a duplicar el archivo Tolstoi (<code type="inline">cp tolstoi.txt tolstoi2.txt</code>). Ahora que tienes dos copias de <emph>Guerra y Paz</emph>, vamos a ponerlas juntas para hacer un libro <hi rend="bold">a&#250;n m&#225;s largo</hi>.</p>
+<p>Para combinar o concatenar dos o m&#225;s archivos usa el comando <code type="inline">cat</code>. Escribe:</p>
+<p><code type="inline">cat tolstoi.txt tolstoi2.txt</code></p>
+<p>y pulsa Intro. Esto imprime o muestra los archivos combinados en el <emph>shell</emph>. Sin embargo, es demasiado largo para leer en esta ventana. Afortunadamente, utilizando el comando <code type="inline">&gt;</code> puedes enviar la salida a un nuevo archivo en vez de a la ventana de la terminal. Escribe:</p>
+<p><code type="inline">cat tolstoi.txt tolstoi2.txt &gt; tolstoi-repetido.txt</code></p>
+<p>Ahora, cuando escribas <code type="inline">ls</code> ver&#225;s que <code type="inline">tolstoi-repetido.txt</code> aparece en tu directorio.</p>
+<p>Cuando combinas m&#225;s de dos archivos, la utilizaci&#243;n de un comod&#237;n evita escribir cada uno de los nombres de archivo de manera individual. Como has visto antes, <code type="inline">*</code> es un marcador de posici&#243;n que te permite incluir de cero a m&#225;s caracteres o n&#250;meros. As&#237; que, si escribes:</p>
+<p><code type="inline">cat *.txt &gt; todo-junto.txt</code></p>
+<p>y pulsas Intro, todos los archivos .txt que est&#233;n en el directorio de trabajo son combinados en orden alfab&#233;tico dentro de <code type="inline">todo-junto.txt</code>. Esto puede ser muy &#250;til cuando necesitas combinar una gran cantidad de peque&#241;os archivos dentro de un directorio para poder trabajar con ellos en un programa de an&#225;lisis de textos. Otro comod&#237;n que vale la pena recordar es <code type="inline">?</code> que reemplaza un &#250;nico car&#225;cter o n&#250;mero.</p>
+</div><div type="3"><head>Editar archivos de texto directamente en l&#237;nea de comandos</head>
+<p>Si quieres leer un archivo completo sin salir de l&#237;nea de comandos, puedes abrir <link target="https://es.wikipedia.org/wiki/Vim">Vim</link>. Vim es un editor de texto adecuado para utilizarse con programas como <link target="http://johnmacfarlane.net/pandoc/">Pandoc</link> para el procesamiento de textos, o editar tu c&#243;digo sin tener que cambiar a otro programa. Lo mejor de todo es que viene incluido con <emph>bash</emph> tanto en OS X como en Windows. Vim tiene una curva de aprendizaje bastante grande, por lo que vamos a tocar algunos puntos menores.</p>
+<p>Escribe:</p>
+<p><code type="inline">vim tolstoi.txt</code></p>
+<p>Ver&#225;s aparecer Vim frente a ti, un editor de texto en l&#237;nea de comandos.</p>
+<figure><desc>Vim</desc><graphic url="vim.png"/></figure>
+<p>Si quieres aprender m&#225;s de Vim, aqu&#237; tienes una <link target="http://vimdoc.sourceforge.net/htmldoc/quickref.html">buena gu&#237;a</link> disponible.</p>
+<p>El uso de Vim para leer archivos es relativamente simple. Puedes usar las teclas de flechas para navegar alrededor y te&#243;ricamente leer <emph>Guerra y Paz</emph> a trav&#233;s de l&#237;nea de comandos (lo cual ser&#237;a todo un logro, por cierto). A continuaci&#243;n hay algunos comandos de navegaci&#243;n b&#225;sica:</p>
+<p><code type="inline">Ctrl+F</code> (esto es, mant&#233;n oprimida la tecla 'Control' y presiona a la vez la tecla 'F'), te mover&#225; una p&#225;gina adelante (en Windows: <code type="inline">Shift+FlechaArriba</code>).</p>
+<p><code type="inline">Ctrl+B</code> te mover&#225; una p&#225;gina arriba. (<code type="inline">Shift+FlechaAbajo</code> para usuarios de Windows).</p>
+<p>Si te quieres desplazar r&#225;pidamente al final de una l&#237;nea, puedes oprimir <code type="inline">$</code> y para moverte al inicio: <code type="inline">0</code>. Tambi&#233;n puedes moverte entre frases escribiendo <code type="inline">)</code> (hacia adelante) o <code type="inline">(</code> (atr&#225;s). Para p&#225;rrafos, utiliza <code type="inline">}</code> y <code type="inline">{</code>. Dado que est&#225;s haciendo todo con el teclado, en vez de tener que mantener pulsada la tecla de flecha para moverte por el documento, esto te permite pasar volando hacia atr&#225;s y adelante.</p>
+<p>Vamos a desplazarnos a la parte superior para hacer un peque&#241;o cambio, como a&#241;adir un campo de 'lector' en el encabezado. Sit&#250;a el cursor entre <hi rend="bold">Author:</hi> y <hi rend="bold">Translator:</hi>, como esto:</p>
+<figure><desc>A punto de a&#241;adir un campo</desc><graphic url="about-to-insert.png"/></figure>
+<p>Si s&#243;lo comienzas a escribir obtendr&#225;s un mensaje de error o el cursor comenzar&#225; a saltar. Esto se debe a que tienes que especificar que deseas hacer una edici&#243;n. Presiona la letra</p>
+<p><code type="inline">a</code></p>
+<p>Al final de la pantalla ver&#225;s:</p>
+<p><code type="inline">-- INSERT --</code></p>
+<p>Esto significa que est&#225;s en el modo 'insertar'. Ahora puedes escribir y editar como si estuvieras en un editor de texto est&#225;ndar. Pulsa <code type="inline">Intro</code> dos veces, luego <code type="inline">flecha arriba</code>, y escribe:</p>
+<p><code type="inline">Reader: un historiador programador</code></p>
+<p>Cuando termines, presiona <code type="inline">ESC</code> para abandonar el modo de inserci&#243;n de texto.</p>
+<p>Para abandonar Vim o guardar cambios, tienes que introducir una serie de comandos. Presiona <code type="inline">:</code> y te mover&#225;s a la linea de entrada de comandos de Vim. Aqu&#237; puedes introducir una variedad de comandos. Si deseas guardar el archivo, escribe <code type="inline">w</code> y pulsa Intro para 'escribir' el archivo. Si ejecutas este comando ver&#225;s:</p>
+<blockquote>
+<blockquote>
+<p>"tolstoi.txt" [dos] 65009L, 3291681C written</p>
+</blockquote>
+</blockquote>
+<figure><desc>Despu&#233;s de escribir el archivo con nuestro peque&#241;o cambio</desc><graphic url="after-writing.png"/></figure>
+<p>Si deseas salir del programa, escribe de nuevo <code type="inline">:</code> y luego <code type="inline">q</code>. Esto te regresar&#225; a la l&#237;nea de comandos. Al igual que con el resto de <emph>bash</emph>, tambi&#233;n podr&#237;as haber combinado los dos comandos. Presionando <code type="inline">:</code> y luego poniendo <code type="inline">wq</code> habr&#237;amos guardado el archivo y luego habr&#237;amos salido del programa. O, si quer&#237;as salir <hi rend="bold">sin</hi> guardar, <code type="inline">q!</code>, habr&#237;as salido de Vim y cancelado la preferencia de sobreescribir, por defecto, para guardar tus cambios.</p>
+<p>Vim es diferente a los procesadores de texto a los que est&#225;s acostumbrado y requerir&#225; m&#225;s trabajo y pr&#225;ctica para llegar a tener fluidez en su uso. Pero si est&#225;s ajustando cosas menores en archivos, es una buena manera de empezar. A medida que te sientas m&#225;s c&#243;modo podr&#237;as incluso escribir documentos con &#233;l, aprovechando el potencial de <link target="/lessons/sustainable-authorship-in-plain-text-using-pandoc-and-markdown">formar y poner notas a pie de Pandoc y Markdown</link>.</p>
+</div><div type="3"><head>Mover, copiar y borrar archivos</head>
+<p>Supongamos que has terminado de trabajar con este directorio y que ahora quieres mover el archivo <code type="inline">tolstoy.txt</code> a otro sitio. En primer lugar debes crear una copia de seguridad. El <emph>shell</emph> es bastante implacable con los errores y hacer copias de seguridad es a&#250;n m&#225;s importante que con las GUI. Si borras algo aqu&#237;, no hay papelera de reciclaje para recobrarlo. Para crear una copia de seguridad puedes escribir:</p>
+<p><code type="inline">cp tolstoi.txt tolstoi-backup.txt</code></p>
+<p>Ahora, cuando ejecutes el comando <code type="inline">ls</code> ver&#225;s cinco archivos, dos de los cuales son el mismo: <code type="inline">tolstoi.txt</code> y <code type="inline">tolstoi-backup.txt</code>.</p>
+<p>Vamos a mover el primero de ellos a alg&#250;n otro sitio. Por ejemplo, vamos a crear un segundo directorio en tu escritorio. Mu&#233;vete al escritorio (<code type="inline">cd ..</code>) y crea (<code type="inline">mkdir</code>) otra carpeta. Vamos a llamarla <code type="inline">proghist-dest</code>.</p>
+<p>Para copiar <code type="inline">tolstoy.txt</code> tienes algunas cuantas opciones. Puedes ejecutar estos comandos desde cualquier sitio en el <emph>shell</emph>, o puedes hacerlo tanto desde el directorio de origen como el de destino. Para este ejemplo, vamos a ejecutarlos desde aqu&#237;. El formato b&#225;sico del comando de copiado es <code type="inline">cp [origen] [destino]</code>. Esto es, escribes <code type="inline">cp</code> primero y luego incluyes el archivo o archivos que quieres copiar seguido de el lugar donde deben irse.</p>
+<p>En este caso el comando:</p>
+<p><code type="inline">cp /users/ianmilligan1/desktop/ProgHist-Textos/tolstoy.txt /users/ianmilligan1/desktop/proghist-dest/</code></p>
+<p>copiar&#225; <code type="inline">tolstoy.txt</code> del primer directorio al segundo directorio. Tienes que insertar tu propio nombre de usuario en lugar de 'ianmilligan1'. Con esto ahora tendremos tres copias de la novela en nuestra computadora. La original, la copia de seguridad y la nueva copia en el segundo directorio. Si quer&#237;as <hi rend="bold">mover</hi> el archivo, es decir, sin dejar una copia detr&#225;s, podr&#237;as ejecutar el comando de nuevo cambiando <code type="inline">cp</code> por <code type="inline">mv</code>; pero no lo hagamos todav&#237;a.</p>
+<p>Podr&#237;as tambi&#233;n copiar m&#250;ltiples archivos con un s&#243;lo comando. Si quer&#237;as copiar ambos, el original y la copia de seguridad, debes utilizar el comando comod&#237;n.</p>
+<p><code type="inline">cp /users/ianmilligan1/desktop/ProgHist-Textos/*.txt /users/ianmilligan1/desktop/proghist-dest/</code></p>
+<p>Este comando copia <hi rend="bold">todos</hi> los archivos de texto desde la carpeta original a la carpeta de destino.</p>
+<blockquote>
+<p>Nota: si est&#225;s en alguno de los directorios desde donde quieres copiar o a donde quieres llevar los archivos, no tienes que escribir toda la estructura de directorios. Vamos a hacerlo con ejemplos r&#225;pidos. Trasl&#225;date al directorio <code type="inline">ProgHist-Textos</code>. Desde esta ubicaci&#243;n, si quieres copiar estos dos archivos a <code type="inline">proghist-dest</code>, este comando funcionar&#225;:</p>
+</blockquote>
+<p><code type="inline">cp *.txt /users/ianmilligan1/desktop/proghist-dest/</code> (en OS X. Para Windows substituye el directorio)</p>
+<p>Alternativamente, si estuvieras en el directorio <code type="inline">proghist-dest</code>, este comando debe funcionar:</p>
+<p><code type="inline">cp /users/ianmilligan1/desktop/ProgHist-Textos/*.txt ./</code></p>
+<p>El comando <code type="inline">./</code> hace referencia al directorio <hi rend="bold">actual</hi>, en el que est&#225;s. <hi rend="bold">Ciertamente, &#233;ste es un comando valioso.</hi></p>
+<p>Finalmente, si quieres borrar un archivo, por cualquier raz&#243;n, el comando es <code type="inline">rm</code>, o 'retira' (<emph>remove</emph>). <hi rend="bold">Ten cuidado con el comando <code type="inline">rm</code></hi>, dado que no querr&#225;s borrar archivos sin querer. Al contrario de borrar desde la GUI, <hi rend="bold">NO</hi> hay papelera de reciclaje ni opciones de deshacer. Por esta raz&#243;n, si tienes una duda, deber&#225;s ser cauteloso o hacer copias de seguridad de tus datos regularmente.</p>
+<p>Ve a <code type="inline">ProgHist-Textos</code> y borra el archivo original escribiendo:</p>
+<p><code type="inline">rm tolstoy.txt</code></p>
+<p>Confirma que el archivo desapareci&#243; ejecutando el comando <code type="inline">ls</code>.</p>
+<p>Si quieres borrar un directorio completo, tienes dos opciones. Puedes utilizar <code type="inline">rmdir</code>, el opuesto a <code type="inline">mkdir</code>, para borrar un diretorio <hi rend="bold">vac&#237;o</hi>. Para borrar un directorio con archivos, puedes usar desde el escritorio:</p>
+<p><code type="inline">rm -r ProgHist-Textos</code></p>
+</div><div type="3"><head>Conclusiones</head>
+<p>Llegados hasta aqu&#237;, seguramente quieras descansar de la terminal. Para ello, escribe <code type="inline">exit</code> y eso cerrar&#225; tu sesi&#243;n.</p>
+<p>Hay m&#225;s comandos para probar a medida que te sientas m&#225;s c&#243;modo con la l&#237;nea de comandos. Algunos de nuestros favoritos son <code type="inline">du</code>, que es una forma de averiguar cu&#225;nto espacio del disco se est&#225; utilizando (<code type="inline">du -h</code> lo hace legible a humanos, como con otros comandos). Para aquellos usuarios de OS X, <code type="inline">top</code> proporciona una visi&#243;n general de los procesos que se est&#225;n ejecutando (<code type="inline">mem</code> en Windows), y <code type="inline">touch NOMBREDEARCHIVO</code> puede crear un archivo de texto b&#225;sico en ambos sistemas.</p>
+<p>En este punto esperamos que tengas una buena comprensi&#243;n b&#225;sica de c&#243;mo desplazarte usando la l&#237;nea de comandos, mover archivos y realizar ediciones menores aqu&#237; y all&#225;. Esta lecci&#243;n para principiantes est&#225; dise&#241;ada para darte cierta fluidez y confianza b&#225;sicas. En el futuro, es posible que quieras atreverte con los <emph>scripts</emph>.</p>
+<p>&#161;Que te diviertas! Antes de que te des cuenta, te encontrar&#225;s a gusto con la conveniencia y la precisi&#243;n del uso de la l&#237;nea de comandos -para ciertas aplicaciones, por lo menos-, mucho m&#225;s que con la voluminosa GUI que viene con tu sistema. Tu caja de herramientas acaba de hacerse m&#225;s grande.</p>
+</div><div type="3"><head>Gu&#237;a de referencia</head>
+<p>Para tu comodidad, aqu&#237; est&#225;n los comandos que acabas de aprender en esta lecci&#243;n:</p>
+<table>
+<thead>
+<tr>
+<th>Comando</th>
+<th>Qu&#233; hace</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code type="inline">pwd</code></td>
+<td>Imprime el 'directorio actual de trabajo', permiti&#233;ndote saber d&#243;nde est&#225;s.</td>
+</tr>
+<tr>
+<td><code type="inline">ls</code></td>
+<td>Enlista los archivos en el directorio actual.</td>
+</tr>
+<tr>
+<td><code type="inline">man *</code></td>
+<td>Enlista el manual del comando, sustituyendo el <code type="inline">*</code> por el nombre del comando.</td>
+</tr>
+<tr>
+<td><code type="inline">cd *</code></td>
+<td>Cambia el directorio actual a <code type="inline">*</code>.</td>
+</tr>
+<tr>
+<td><code type="inline">mkdir *</code></td>
+<td>Crea un directorio llamado <code type="inline">*</code>.</td>
+</tr>
+<tr>
+<td><code type="inline">open</code> or <code type="inline">explorer</code></td>
+<td>En OS X, <code type="inline">open</code> seguido del nombre del archivo lo abre; en Windows, el comando <code type="inline">explorer</code> seguido por el nombre del archivo hace lo mismo.</td>
+</tr>
+<tr>
+<td><code type="inline">cat *</code></td>
+<td><code type="inline">cat</code> es un comando vers&#225;til. Leer&#225; un archivo poniendo el nombre en vez de <code type="inline">*</code>, pero tambi&#233;n se utiliza para combinar archivos.</td>
+</tr>
+<tr>
+<td><code type="inline">head *</code></td>
+<td>Muestra las primeras diez l&#237;neas de <code type="inline">*</code>.</td>
+</tr>
+<tr>
+<td><code type="inline">tail *</code></td>
+<td>Muestra las &#250;ltimas diez l&#237;neas de <code type="inline">*</code>.</td>
+</tr>
+<tr>
+<td><code type="inline">mv</code></td>
+<td>Mueve un archivo.</td>
+</tr>
+<tr>
+<td><code type="inline">cp</code></td>
+<td>Copia un archivo.</td>
+</tr>
+<tr>
+<td><code type="inline">rm</code></td>
+<td>Borra un archivo.</td>
+</tr>
+<tr>
+<td><code type="inline">vim</code></td>
+<td>Abre el editor de documentos <code type="inline">vim</code>.</td>
+</tr>
+</tbody></table></div></div>
+    </body>
+  </text>
+</TEI>

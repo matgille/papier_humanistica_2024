@@ -1,0 +1,13 @@
+list_of_dictionaries = []
+for row in df_all.iterrows():
+    if row[1]['cluster_id'] == 'none':
+        txt_file_name = ''.join(['term-frequency-tables/', row[1]['nyt_id'], '.csv'])
+    else:
+        txt_file_name = ''.join(['term-frequency-tables/', row[1]['nyt_id'], '-', row[1]['cluster_id'], '.csv'])
+
+    df = pd.read_csv(txt_file_name).dropna().reset_index(drop=True).set_index('term')
+    mydict = df['count'].to_dict()
+
+    list_of_dictionaries.append(mydict)
+
+len(list_of_dictionaries)
