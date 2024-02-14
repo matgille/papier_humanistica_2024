@@ -63,11 +63,11 @@ def main(directory):
             
             # try:
             try:
-                os.mkdir(f"../../data/structured/{directory_name}")
+                os.mkdir(f"../../data/to_tei/struct_aligned/{directory_name}")
             except FileExistsError:
                 pass
             
-            with open(f"../../data/structured/{directory_name}/{filename}", "w") as structured_div:
+            with open(f"../../data/to_tei/struct_aligned/{directory_name}/{filename}", "w") as structured_div:
                 structured_div.write(ET.tostring(tree, pretty_print=True, encoding="utf-8").decode('utf8'))
 
 
