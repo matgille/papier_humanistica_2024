@@ -1,5 +1,6 @@
 # First shot of outputs 
 ----------------------------- analyzing-documents-with-tfidf
+```
 ============>  fr
 {'tf-idf': 4, 'apprentissage automatique': 2, 'modélisation thématique': 2, 'nombres entiers': 2, 'dictionnaires': 2, 'variables': 2, 'listes': 2, 'boucles': 2, 'opérations élémentaires': 2, 'nombres réels': 2, 'types de données élémentaires': 2, "classes d'objets": 2, 'Python pour les sciences humaines et sociales': 2, 'feuilles de calcul au format CSV': 2, 'types de données': 2, 'chaînes de caractères': 2, 'tuples': 2, 'idf': 2, 'Tf-idf': 2, 'algorithme': 2, 'fréquence de document': 2, 'Df': 2, 'Overlooked': 2, 'Latent Dirichlet Allocation': 2, 'html': 2, 'TfidfVectorizer': 2, 'HTML': 2}
 ============>  en
@@ -13,3 +14,4 @@
 {'Funções': 2, 'funções': 2, 'função': 2, 'seções': 2, 'módulo.Fizemos algumas coisas aqui. Primeiro, dissemos ao Python': 2, 'módulos': 2, 'utilizando-cumprimento.py': 2, 'cumprimento.py': 2, 'sistema de ignição': 2, 'import': 2, 'Python Basics': 2, 'Leituras': 2}
 ============>  es
 {'tarea que vas a utilizar una y otra vez. Los programas': 2, 'sangría de la manera en que te demostramos. Ejecuta el programa': 2, 'invocada': 2, 'mecanismos': 2, 'rutinas': 2, 'Módulos': 2, 'saludoEntidad': 2, 'Funciones': 2, 'función': 2, 'funciones': 2, 'código': 2, 'módulo': 2, 'módulos': 2, 'modularidad': 2, 'saludo.py': 2, 'archivo': 2, 'módulos básicos aún más pequeños. Lo mismo aplica cuando escribes código': 2, 'Modularidad': 2, 'encapsulamiento': 2, 'sistema de carburación': 2, 'Python Basics': 2}
+```
