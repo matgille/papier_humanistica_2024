@@ -9,6 +9,14 @@ tei_ns = "http://www.tei-c.org/ns/1.0"
 ns_decl = {"tei": tei_ns}
 
 
+
+def remove_parent_keep_self(tree, ancestor, node):
+    for ancestor in tree.xpath(ancestor):
+        for img in ancestor.xpath(node):
+            ancestor.addnext(img)
+        ancestor.getparent().remove(ancestor)
+
+
 def create_new_node(dictionnary:dict, target_node:str, target_attr:tuple, parent_node:ET._Element, sourceKey:str):
     """
     This function updates the XML tree according with a given JSON dict.
@@ -43,6 +51,9 @@ def write_to_log(message):
     with open("logs/log.txt", "a") as log_file:
         log_file.write("\n"+message)
 
+def pop_attribute(tree, element, attribute_name):
+    for element in tree.xpath(f"//{element}[@{attribute_name}]"):
+        element.attrib.pop(attribute_name, None) 
 
 def change_element_name(tree, element, replacement, attr=None, attr_value=None, attr_change:tuple=None):
     for element in tree.xpath(f"//{element}"):
@@ -50,11 +61,13 @@ def change_element_name(tree, element, replacement, attr=None, attr_value=None, 
         if attr:
             element.set(attr, attr_value)
         if attr_change:
-            orig, reg = attr_change
-            current_attr_value = element.xpath(f"@{orig}")[0]
-            element.set(reg, current_attr_value)
-            element.attrib.pop(orig)
-            write_tree(tree, "test")
+            for orig, reg in attr_change.items():
+                try:
+                    current_attr_value = element.xpath(f"@{orig}")[0]
+                    element.set(reg, current_attr_value)
+                    element.attrib.pop(orig)
+                except IndexError:
+                    pass
             
 
 
@@ -144,11 +157,13 @@ def xmlify(path):
     try:
         textClass = ET.Element("textClass")
         topics = python_dict["topics"]
+        keywords = ET.Element("keywords")
+        textClass.append(keywords)
         for topic in topics:
-            keyword = ET.Element("keyword")
-            keyword.set("{http://www.w3.org/XML/1998/namespace}lang", "en")
-            keyword.text = topic
-            textClass.append(keyword)
+            term = ET.Element("term")
+            term.set("{http://www.w3.org/XML/1998/namespace}lang", "en")
+            term.text = topic
+            keywords.append(term)
         profileDesc.append(textClass)
     except KeyError:
         pass
@@ -168,26 +183,26 @@ def xmlify(path):
 
     create_new_node(dictionnary=python_dict,
                     target_node="author",
-                    target_attr=("type", "original_author"),
+                    target_attr=("role", "original_author"),
                     parent_node=titleStmt,
                     sourceKey='authors')
 
     create_new_node(dictionnary=python_dict, 
                     target_node="editor", 
-                    target_attr=("type","reviewers"),
+                    target_attr=("role","reviewers"),
                     parent_node=titleStmt,
                     sourceKey='reviewers')
     
     create_new_node(dictionnary=python_dict,
                     target_node="author",
-                    target_attr=("type", "translators"),
+                    target_attr=("role", "translators"),
                     parent_node=titleStmt,
                     sourceKey='translator')
 
 
     create_new_node(dictionnary=python_dict, 
                     target_node="editor", 
-                    target_attr=("type","translation-reviewers"),
+                    target_attr=("role","translation-reviewers"),
                     parent_node=titleStmt,
                     sourceKey='translation-reviewer')
 
@@ -196,7 +211,7 @@ def xmlify(path):
     
     create_new_node(dictionnary=python_dict, 
                     target_node="editor", 
-                    target_attr=("type","editors"),
+                    target_attr=("role","editors"),
                     parent_node=titleStmt,
                     sourceKey='editors')
     
@@ -206,6 +221,10 @@ def xmlify(path):
     ## Metadata management
     
     
+    # There is a problem with footnotemarks that are placed before colon, they lead to a wrong note creation.
+    # We add a space before the colon to avoid this.
+    footnotemark_pattern = r"(\[\^\d+\]):"
+    transformed = re.sub(footnotemark_pattern, r"\1 :", transformed)
 
     
     # Let's remove some unuseful data
@@ -227,6 +246,11 @@ def xmlify(path):
     
     
     # GFM extension of marko parses tables too.
+    # Let's strip some markup marko doesnt process correctly
+    style_regex = re.compile(r"<style[^>]*>.+?(?=<\/style>)<\/style>", re.DOTALL)
+    match = re.findall(style_regex, transformed)
+    transformed = re.sub(style_regex, "", transformed)
+    
     converted_doc = gfm.convert(transformed)
     parser = ET.HTMLParser(recover=True)
     
@@ -242,6 +266,7 @@ def xmlify(path):
     different_headings = [int(val) for val in list(set(all_headings))]
     minimal_heading = min(different_headings)
     print(minimal_heading)
+    
 
     print("Structure check")
     heading_check = True
@@ -391,13 +416,50 @@ def xmlify(path):
     # Let's modify some tagnames, clean some other
     change_element_name(root, "strong", "hi", "rend", "bold")
     change_element_name(root, "div[@class='alert alert-warning']", "p", "style", "alert alert-warning")
+    pop_attribute(root, "p", "class")
     change_element_name(root, "div[@class='alert alert-info']", "p", "style", "alert alert-info")
+    pop_attribute(root, "p[@class='alert alert-info']", "class")
     change_element_name(root, "div[@class='alert alert-block alert-warning']", "p", "style", "alert alert-block alert-warning")
     change_element_name(root, "em", "emph")
+    change_element_name(root, "pre[code]", "ab")
     change_element_name(root, "code[not(@type)]", "code", "type", "inline")
-    change_element_name(root, "a[@href]", "link", attr_change=('href', 'target'))
+    change_element_name(root, "code[@type]", "code", attr_change={'class': 'lang', 'type':'rend'})
+    change_element_name(root, "a[@href]", "ref", attr_change={'href': 'target'})
+    change_element_name(root, "ul", "list", "type", "unordered")
+    change_element_name(root, "ol", "list", "type", "ordered")
+    change_element_name(root, "blockquote", "quote")
+    change_element_name(root, "li", "item")
     pop_element(root, "hr")
+
+    # Better to convert it to desc 
+    pop_attribute(root, "graphic", "alt")
+
+    # Let's change the notes xml:id
+    for note in root.xpath("//note"):
+        xml_id = note.xpath("@id")[0]
+        note.set("{http://www.w3.org/XML/1998/namespace}id", f"note_{xml_id}")
+    pop_attribute(root, "note", "id")
     
+    for note in root.xpath("//ref[@type='footnotemark']"):
+        xml_id = note.xpath("@target")[0].replace("#", "")
+        note.set("target", f"#note_{xml_id}")
+        
+        
+    ## Let's clean the tables
+
+    pop_attribute(root, "table", "border")
+    pop_attribute(root, "div", "markdown")
+    pop_attribute(root, "div[@class]", "class")
+    change_element_name(root, "table", "table", attr_change={'class': 'type'})
+    change_element_name(root, "th", "cell")
+    change_element_name(root, "td", "cell")
+    change_element_name(root, "cell[ancestor::thead]", "cell", "role", "label")
+    change_element_name(root, "tr", "row")
+    pop_attribute(root, "row", "style")
+    remove_parent_keep_self(root, "//thead", "row")
+    remove_parent_keep_self(root, "//tbody", "row")
+    remove_parent_keep_self(root, "//div[child::table]", "table")
+
     
             
     with open(f"../../data/to_tei/{dir_name}/{lesson_name}.xml", "w") as output_file:
@@ -413,31 +475,39 @@ def link_lessons():
     to the teiHeader
     :return: None
     """
+    lesson = "computer-vision-deep-learning-pt2"
+    lesson = "*"
+    glob_expression = f"../../data/to_tei/*/{lesson}.xml"
     print("Linking lessons")
     tei_ns = "http://www.tei-c.org/ns/1.0"
     ns_decl = {"tei": tei_ns}
     all_lessons = dict()
-    for lesson in glob.glob("../../data/to_tei/*/*.xml"):
+    for lesson in glob.glob(glob_expression):
+        print(lesson)
         as_tree = ET.parse(lesson)
         id = as_tree.xpath("@xml:id", namespaces=ns_decl)[0]
+        print(id)
         if len(as_tree.xpath("//tei:sourceDesc/descendant::tei:ref", namespaces=ns_decl)) == 0:
             all_lessons[id] = []
 
-    for lesson in glob.glob("../../data/to_tei/*/*.xml"):
+    for lesson in glob.glob(glob_expression):
         as_tree = ET.parse(lesson)
         id = as_tree.xpath("@xml:id", namespaces=ns_decl)[0]
         if len(as_tree.xpath("//tei:sourceDesc/descendant::tei:ref", namespaces=ns_decl)) != 0:
             corresp = as_tree.xpath("//tei:sourceDesc/descendant::tei:ref/@target", namespaces=ns_decl)[0]
             corresp = corresp.replace("#", "")
-            all_lessons[corresp].append(id)
+            try:
+                all_lessons[corresp].append(id)
+            except KeyError:
+                pass
     
-    for lesson in glob.glob("../../data/to_tei/*/*.xml"):
+    for lesson in glob.glob(glob_expression):
         as_tree = ET.parse(lesson)
         id = as_tree.xpath("@xml:id", namespaces=ns_decl)[0]
 
         # Si il s'agit d'une leçon originale.
         source_desc_p = as_tree.xpath("//tei:sourceDesc/tei:p", namespaces=ns_decl)[0]
-        if id in all_lessons:
+        if id in all_lessons and all_lessons[id] != []:
             refs = " ".join(f"#{element}" for element in all_lessons[id])
             source_desc_p.text = f"{source_desc_p.text} Available translations are the following:"
             ref_element = ET.Element("ref")
@@ -468,8 +538,10 @@ def link_lessons():
 if __name__ == '__main__':
     
     # Let's select the lessons in all languages
-    regexp = r"/home/mgl/Bureau/Travail/PH/jekyll/(es|fr|en|pt)/l[^/]*/[^/]*\.md"
-    lessons = [f for f in glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/*.md") if re.search(regexp, f)]
+    lesson = "computer-vision-deep-learning-pt2"
+    lesson = "*"
+    regexp = rf"/home/mgl/Bureau/Travail/PH/jekyll/(es|fr|en|pt)/l[^/]*/[^/]*\.md"
+    lessons = [f for f in glob.glob(f"/home/mgl/Bureau/Travail/PH/jekyll/*/l*/{lesson}.md") if re.search(regexp, f)]
     # lessons = glob.glob("/home/mgl/Bureau/Travail/PH/jekyll/*/l*/generer-jeu-donnees-texte-ocr.md")
     # Removing log file
     try:
