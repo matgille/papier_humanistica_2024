@@ -3,50 +3,50 @@
  <fileDesc>
   <titleStmt>
    <title>OCR with Google Vision API and Tesseract</title>
-  <author type="original_author">Isabelle Gribomont</author><editor type="reviewers"><persName>Ryan Cordell</persName><persName>Clemens Neudecker</persName></editor><editor type="editors">Liz Fischer</editor></titleStmt>
+  <author role="original_author">Isabelle Gribomont</author><editor role="reviewers"><persName>Ryan Cordell</persName><persName>Clemens Neudecker</persName></editor><editor role="editors">Liz Fischer</editor></titleStmt>
   <publicationStmt>
    <idno type="doi">10.46430/phen0109</idno><date type="published">03/31/2023</date><p>Lesson reviewed and published in Programming Historian.</p>
   </publicationStmt>
   <sourceDesc>
-  <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target=""/></p></sourceDesc>
+  <p>Born digital, in a markdown format. This lesson is original.</p></sourceDesc>
  </fileDesc>
- <profileDesc><abstract><p>Google Vision and Tesseract are both popular and powerful OCR tools, but they each have their weaknesses. In this lesson, you will learn how to combine the two to make the most of their individual strengths and achieve even more accurate OCR results.</p></abstract><textClass><keyword xml:lang="en">api</keyword><keyword xml:lang="en">python</keyword><keyword xml:lang="en">data-manipulation</keyword></textClass></profileDesc>
+ <profileDesc><abstract><p>Google Vision and Tesseract are both popular and powerful OCR tools, but they each have their weaknesses. In this lesson, you will learn how to combine the two to make the most of their individual strengths and achieve even more accurate OCR results.</p></abstract><textClass><keywords><term xml:lang="en">api</term><term xml:lang="en">python</term><term xml:lang="en">data-manipulation</term></keywords></textClass></profileDesc>
 </teiHeader>
   <text xml:lang="en">
     <body>
       <div type="1"><head>Introduction</head>
-<p>Historians working with digital methods and text-based material are often confronted with PDF files that need to be converted to plain text. Whether you are interested in network analysis, named entity recognition, corpus linguistics, text reuse, or any other type of text-based analysis, good quality <link target="https://perma.cc/9TQL-X6WP">Optical Character Recognition</link> (OCR), which transforms a PDF to a computer-readable file,  will be the first step. However, OCR becomes trickier when dealing with historical fonts and characters, damaged manuscripts or low-quality scans. Fortunately, tools such as <link target="https://perma.cc/WW8P-FC36">Tesseract</link>, <link target="https://perma.cc/8G54-AF4A">TRANSKRIBUS</link>, <link target="https://perma.cc/W2V7-HFHF">OCR4all</link>, <link target="https://perma.cc/99NE-78UV">eScriptorium</link> and <link target="https://perma.cc/L6VF-8ZPS">OCR-D</link> (among others) have allowed humanities scholars to work with all kinds of documents, from handwritten nineteenth-century letters to medieval manuscripts.</p>
-<p>Despite these great tools, it can still be difficult to find an OCR solution that aligns with our technical knowledge, can be easily integrated within a workflow, or can be applied to a multilingual/diverse corpus without requiring any extra input from the user. This lesson offers a possible alternative by introducing two ways of combining Google Vision's character recognition with Tesseract's layout detection. <link target="https://perma.cc/GN54-DJER">Google Cloud Vision</link> is one of the best 'out-of-the-box' tools when it comes to recognising individual characters but, contrary to Tesseract, it has poor layout recognition capabilities. Combining both tools creates a "one-size-fits-most" method that will generate high-quality OCR outputs for a wide range of documents.</p>
+<p>Historians working with digital methods and text-based material are often confronted with PDF files that need to be converted to plain text. Whether you are interested in network analysis, named entity recognition, corpus linguistics, text reuse, or any other type of text-based analysis, good quality <ref target="https://perma.cc/9TQL-X6WP">Optical Character Recognition</ref> (OCR), which transforms a PDF to a computer-readable file,  will be the first step. However, OCR becomes trickier when dealing with historical fonts and characters, damaged manuscripts or low-quality scans. Fortunately, tools such as <ref target="https://perma.cc/WW8P-FC36">Tesseract</ref>, <ref target="https://perma.cc/8G54-AF4A">TRANSKRIBUS</ref>, <ref target="https://perma.cc/W2V7-HFHF">OCR4all</ref>, <ref target="https://perma.cc/99NE-78UV">eScriptorium</ref> and <ref target="https://perma.cc/L6VF-8ZPS">OCR-D</ref> (among others) have allowed humanities scholars to work with all kinds of documents, from handwritten nineteenth-century letters to medieval manuscripts.</p>
+<p>Despite these great tools, it can still be difficult to find an OCR solution that aligns with our technical knowledge, can be easily integrated within a workflow, or can be applied to a multilingual/diverse corpus without requiring any extra input from the user. This lesson offers a possible alternative by introducing two ways of combining Google Vision's character recognition with Tesseract's layout detection. <ref target="https://perma.cc/GN54-DJER">Google Cloud Vision</ref> is one of the best 'out-of-the-box' tools when it comes to recognising individual characters but, contrary to Tesseract, it has poor layout recognition capabilities. Combining both tools creates a "one-size-fits-most" method that will generate high-quality OCR outputs for a wide range of documents.</p>
 <p>The principle of exploring different combinations of tools to create customised workflows is widely applicable in digital humanities projects, where tools tailored to our data are not always available.</p>
 <div type="2"><head>The Pros and Cons of Google Vision, Tesseract, and their Powers Combined</head>
 <div type="3"><head>Google Vision</head>
 <p><hi rend="bold">Pros</hi></p>
-<ul>
-<li>Character detection accuracy: Although it has its limitations, Google Vision tends to be highly accurate, even in cases where other tools might struggle, such as when several languages coexist in the same text. It is among the best 'out-of-the-box' tools when it comes to recognising characters.</li>
-<li>Versatility: The tool performs well across a wide range of documents. Moreover, Google Vision offers other functionalities such as <link target="https://perma.cc/U9HX-CYHN">object detection</link> in images and <link target="https://perma.cc/2FKR-3G4N">OCR for handwritten documents/images</link>.</li>
-<li>User-friendliness: Once the setup is completed, Google Vision is easy to use. There is usually no need to develop and train your own model.</li>
-<li>Languages support: At the time of writing, Google Vision fully supports 60 languages. In addition, 36 are under active development and 133 are mapped to another language code or a general character recogniser. Many indigenous, regional, and historical languages are among the latter. You can consult the full list of supported languages in the <link target="https://perma.cc/Z4KG-TF5X">Cloud Vision documentation</link>.</li>
-</ul>
+<list type="unordered">
+<item>Character detection accuracy: Although it has its limitations, Google Vision tends to be highly accurate, even in cases where other tools might struggle, such as when several languages coexist in the same text. It is among the best 'out-of-the-box' tools when it comes to recognising characters.</item>
+<item>Versatility: The tool performs well across a wide range of documents. Moreover, Google Vision offers other functionalities such as <ref target="https://perma.cc/U9HX-CYHN">object detection</ref> in images and <ref target="https://perma.cc/2FKR-3G4N">OCR for handwritten documents/images</ref>.</item>
+<item>User-friendliness: Once the setup is completed, Google Vision is easy to use. There is usually no need to develop and train your own model.</item>
+<item>Languages support: At the time of writing, Google Vision fully supports 60 languages. In addition, 36 are under active development and 133 are mapped to another language code or a general character recogniser. Many indigenous, regional, and historical languages are among the latter. You can consult the full list of supported languages in the <ref target="https://perma.cc/Z4KG-TF5X">Cloud Vision documentation</ref>.</item>
+</list>
 <p><hi rend="bold">Cons</hi></p>
-<ul>
-<li>Layout detection accuracy: Although Google Vision performs well with character detection, layout detection is often an issue.</li>
-<li>Google email address and Cloud storage: To sign in to the Google Cloud Platform, a Google email address is required and the PDF files must be uploaded to the Google Cloud Storage to be processed.</li>
-<li>Sustainability: Google Cloud is known for sunsetting tools. Although Google now has a policy in place guaranteeing a year's notice before deprecating products, the potential instability of the Google Cloud Platform should be noted.</li>
-<li>Cost: The service is only free for the first 1000 pages per month. After that, it costs $1.50 per 1000 pages. Current prices in other currencies are available via <link target="https://cloud.google.com/skus/">Google Cloud Platform services</link>. In addition, to use the OCR functionality of Google Vision, you need to momentarily store your PDF documents in Google Storage. Storing one GB over a month costs $0.02. One GB represents thousands of PDF pages. Since the cost is prorated, if you store 1GB for 12 hours over the course of the month, it will cost $0.0003. Therefore, to avoid paying, you should delete your data from Google Storage as soon as the OCR process is complete. You can find details about the current cost of Google Storage <link target="https://cloud.google.com/storage/pricing">on their pricing page</link>. Although this is not guaranteed, new accounts often come with free credits.</li>
-</ul>
+<list type="unordered">
+<item>Layout detection accuracy: Although Google Vision performs well with character detection, layout detection is often an issue.</item>
+<item>Google email address and Cloud storage: To sign in to the Google Cloud Platform, a Google email address is required and the PDF files must be uploaded to the Google Cloud Storage to be processed.</item>
+<item>Sustainability: Google Cloud is known for sunsetting tools. Although Google now has a policy in place guaranteeing a year's notice before deprecating products, the potential instability of the Google Cloud Platform should be noted.</item>
+<item>Cost: The service is only free for the first 1000 pages per month. After that, it costs $1.50 per 1000 pages. Current prices in other currencies are available via <ref target="https://cloud.google.com/skus/">Google Cloud Platform services</ref>. In addition, to use the OCR functionality of Google Vision, you need to momentarily store your PDF documents in Google Storage. Storing one GB over a month costs $0.02. One GB represents thousands of PDF pages. Since the cost is prorated, if you store 1GB for 12 hours over the course of the month, it will cost $0.0003. Therefore, to avoid paying, you should delete your data from Google Storage as soon as the OCR process is complete. You can find details about the current cost of Google Storage <ref target="https://cloud.google.com/storage/pricing">on their pricing page</ref>. Although this is not guaranteed, new accounts often come with free credits.</item>
+</list>
 </div><div type="3"><head>Tesseract</head>
 <p><hi rend="bold">Pros</hi></p>
-<ul>
-<li>Sustainability: Tesseract was originally developed by Hewlett-Packard but was made open scource in 2005. An active community has contributed to its development since. It was also developed by Google from 2006 to 2018.</li>
-<li>Cost: Free.</li>
-<li>Layout detection accuracy: In comparison to Google Vision, Tesseract performs a lot better at layout detection.</li>
-<li>User-friendliness: Contrary to Google Vision, Tesseract does not require any initial setup besides downloading the software. Since it is open source, Tesseract is integrated with many tools and can be used from the command line.</li>
-<li>Languages support: It currently supports over 110 languages including many non-Indo-European languages and writing systems.</li>
-</ul>
+<list type="unordered">
+<item>Sustainability: Tesseract was originally developed by Hewlett-Packard but was made open scource in 2005. An active community has contributed to its development since. It was also developed by Google from 2006 to 2018.</item>
+<item>Cost: Free.</item>
+<item>Layout detection accuracy: In comparison to Google Vision, Tesseract performs a lot better at layout detection.</item>
+<item>User-friendliness: Contrary to Google Vision, Tesseract does not require any initial setup besides downloading the software. Since it is open source, Tesseract is integrated with many tools and can be used from the command line.</item>
+<item>Languages support: It currently supports over 110 languages including many non-Indo-European languages and writing systems.</item>
+</list>
 <p><hi rend="bold">Cons</hi></p>
-<ul>
-<li>Character detection accuracy: In comparison to Google Vision, Tesseract does not perform as well with complex characters (for example, historical characters and ligatures).</li>
-</ul>
+<list type="unordered">
+<item>Character detection accuracy: In comparison to Google Vision, Tesseract does not perform as well with complex characters (for example, historical characters and ligatures).</item>
+</list>
 </div><div type="3"><head>Combining Google Vision and Tesseract</head>
 <p>Tesseract is a great option for clean text for which typography does not present particular challenges. Google Vision will produce high-quality results on more complex characters, as long as the layout is very basic. If your material includes complex characters and layouts (such as columns), the combination of Google Vision and Tesseract will come in handy. This approach takes the best of both worlds &#8212;layout recognition from Tesseract and character recognition from Google Vision&#8212; and tend to perform better than either method separately.</p>
 <div type="4"><head>First Combined Method</head>
@@ -57,323 +57,295 @@
 <p>This method has the advantage of not relying on Google Vision's layout detection at all. However, the downside is that line breaks that were not initially identified by Google Vision cannot be easily reintroduced. Therefore, if it is important for your project that the OCRed text retains line breaks at the correct locations, the first combined method will be the best choice.</p>
 <p>The following three examples highlight the potential benefits of using Google Vision, Tesseract, or one of the combined methods. Each image represents two pages from the dataset we will be using in this lesson. Outputs created for the passages highlighted in yellow by each of the four methods are detailed in the table below each image.</p>
 </div></div></div><div type="2"><head>Comparing Results</head>
-<div type="3"><head>Example 1</head>
-<figure><desc>Figure 1: First two pages of _Tomb of King Henry IV in Canterbury Cathedral_, with four highlighted lines indicating the text used in the OCR results below.</desc><graphic url="ocr-with-google-vision-and-tesseract1.png" alt="Two scanned pages of English text in a modern font and occasional diacritics."/></figure>
 <table>
-<thead>
-<tr>
-<th>Google Vision</th>
-<th>Tesseract</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>KING BENRY IV. IN THE CATHEDRAL OF CANTERBURY, AUGUST</td>
-<td>KING HENRY IV. IN THE CATHEDRAL OF CANTERBURY, AUGUST</td>
-</tr>
-<tr>
-<td>** Clemens Maydestone, filius Thom&#230; Maydestone Armigeri, fuit</td>
-<td>* * Olemens Maydestone, filius Thoms Maydestone Armigeri, fuit</td>
-</tr>
-<tr>
-<td>Trinitatis de Howndeslow. vescendi caus&#226;; et cum in prandio sermocina-</td>
-<td>Trinitatis de Howndeslow vescendi eaus&amp;; et cum in prandio sermocina-</td>
-</tr>
-<tr>
-<td>quod cum a Westmonasteri&#226; corpus ejus versus Cantuariam in paiva</td>
-<td>quod eum a Westmonasterii corpus ejus versus Cantuariam in parva</td>
-</tr>
-</tbody></table><table>
-<thead>
-<tr>
-<th>Combined Method I</th>
-<th>Combined Method II</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>KING HENRY IV. IN THE CATHEDRAL OF CANTERBURY, AUGUST</td>
-<td>KING BENRY IV. IN THE CATHEDRAL OF CANTERBURY, AUGUST</td>
-</tr>
-<tr>
-<td>* "Clemens Maydestone, filius Thom&#230; Maydestone Armigeri, fuit</td>
-<td>** Clemens Maydestone, filius Thom&#230; Maydestone Armigeri, fuit</td>
-</tr>
-<tr>
-<td>Trinitatis de Howndeslow vescendi caus&#226; ; et cum in prandio sermocina-</td>
-<td>Trinitatis de Howndeslow. vescendi caus&#226; ; et cum in prandio sermocina-</td>
-</tr>
-<tr>
-<td>quod cum a Westmonasteri&#226; corpus ejus versus Cantuariam in parva</td>
-<td>quod cum a Westmonasteri&#226; corpus ejus versus Cantuariam in paiva</td>
-</tr>
-</tbody></table><p>In the above example, we can observe that words such as "Thom&#230;" and "caus&#226;" are correctly spelled in all three methods involving Google Vision but are mispelled by Tesseract. The two combined methods perform similarly but the first is the most accurate, notably because of an improved rendering of punctuation.</p>
-</div><div type="3"><head>Example 2</head>
-<figure><desc>Figure 2: First two pages of _Aelfric's Life of Saints_, with several highlighted sections indicating the text used in the OCR results below.</desc><graphic url="ocr-with-google-vision-and-tesseract2.png" alt="Two scanned pages of old English text with a yellow background. The first page is a title page with text in gothic font. The second page features footnotes arranged in columns."/></figure>
-<table>
-<thead>
-<tr>
-<th>Google Vision</th>
-<th>Tesseract</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Aelfries Lives of Saints,</td>
-<td>Aelfrics Fives of Saints,</td>
-</tr>
-<tr>
-<td>A Set of Sermons on Saints' Days formerly observed</td>
-<td>A Set of Sermons on Saints&#8217; Days formerly observey</td>
-</tr>
-<tr>
-<td>BY N. TR&#220;BNER &amp; CO., 57 AND 59 LUDGATE HILL.</td>
-<td>BY N. TRUBNER &amp; CO., 57 AND 59 LUDGATE HILL.</td>
-</tr>
-<tr>
-<td>XXI. NATALE SANCTI SWY&#208;UNI, EPISCOPI.</td>
-<td>440 XXI. NATALE SANCTI SWYDUNI, EPISCOPI.</td>
-</tr>
-<tr>
-<td>and eac da &#254;e hrepodon &#254;&#230;s reafes &#230;nigne d&#230;l.</td>
-<td>and eac Sa pe hrepodon pes reafes zenigne del .</td>
-</tr>
-<tr>
-<td>se w&#230;s &#254;ryttig geara mid his wife on cl&#230;nnysse .</td>
-<td>se wes pryttig geara mid his* wife on clennysse . 124</td>
-</tr>
-<tr>
-<td>116. h&#225;le. <br/>119. b&#243;c. 0. &#254;&#230;t (for &#254;e). sette.<br/>117. miclum seo cyst. <br/> 1 Leaf 94, back.<br/> 2 Above the line.<br/>I do. b&#233;c.</td>
-<td>116. hale. 11g. b&#233;c. O. pt (for pe).  sette.<br/>117. miclum seo cyst. 120. b&#233;c.<br/> 1 Leaf 94, back. ? Above the line.</td>
-</tr>
-</tbody></table><table>
-<thead>
-<tr>
-<th>Combined Method I</th>
-<th>Combined Method II</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Aelfrie's Lives of Saints,</td>
-<td>Aelfries Lives of Saints,</td>
-</tr>
-<tr>
-<td>A Set of Sermons on Saints' Days formerly observed</td>
-<td>A Set of Sermons on Saints' Days formerly observed</td>
-</tr>
-<tr>
-<td>BY N. TR&#220;BNER &amp; CO., 57 AND 59 LUDGATE HILL.</td>
-<td>BY N. TR&#220;BNER &amp; CO., 57 AND 59 LUDGATE HILL.</td>
-</tr>
-<tr>
-<td>440 XXI. NATALE SANCTI SWY&#272;UNI, EPISCOPI.</td>
-<td>440<br/>XXI. NATALE SANCTI SWY&#272;UNI, EPISCOPI.</td>
-</tr>
-<tr>
-<td>and eac da &#254;e hrepodon &#254;&#230;s reafes &#230;nigne d&#230;l.</td>
-<td>and eac da &#254;e hrepodon &#254;&#230;s reafes &#230;nigne d&#230;l.</td>
-</tr>
-<tr>
-<td>se w&#230;s &#254;ryttig geara mid his 2 wife on cl&#230;nnysse .</td>
-<td>se w&#230;s &#254;ryttig geara mid his wife on cl&#230;nnysse .</td>
-</tr>
-<tr>
-<td>116. h&#225;le.<br/>119. b&#243;c. 0. &#254;&#230;t (for &#254;e). sette.<br/>117. mielum seo cyst.<br/>I do. b&#233;c.<br/>1 Leaf 94, back.<br/>2 Above the line.</td>
-<td>116. h&#225;le.<br/>119. b&#243;c. 0. &#254;&#230;t (for &#254;e). sette.<br/>117. miclum seo cyst.<br/>I do. b&#233;c.<br/>1 Leaf 94, back.<br/>2 Above the line.</td>
-</tr>
-</tbody></table><p>Example 2 reveals Google Vision's weakness when it comes to layout. For instance, Google Vision places the footnote 120 at the very end of the page. However, both combined methods solve this issue. Even though the output provided by Google Vision is of a much better overall quality, this example also shows that Tesseract occasionally performs better than Google Vision at character recognition. The footnote number 120 became "I do" in all three Google Vision outputs.</p>
-</div><div type="3"><head>Example 3</head>
-<figure><desc>Figure 3: Two pages from _The Gentleman's Magazine - Volume XXVI_, with several highlighted sections indicating the text used in the OCR results below.</desc><graphic url="ocr-with-google-vision-and-tesseract3.png" alt="Two scanned pages of English text with a yellowed background. The text features archaic characters such as the long 's'. The first page is a title page and the second contains two columns of text."/></figure>
-<table>
-<thead>
-<tr>
-<th>Google Vision</th>
-<th>Tesseract</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>PRODESSE &amp; DELICTARI<br/>E PLURIBUS UNUM.</td>
-<td>Propesse &amp; DErEecTARE E Prvurrsavs UNUM.</td>
-</tr>
-<tr>
-<td>LONDON:<br/>Printed for D. Henry, and R. Cave, at St John's GATE.</td>
-<td>EON DO #:<br/>Printed for D. Hznry, and R. Cave, at St Joun&#8217;s GaTE.</td>
-</tr>
-<tr>
-<td>as negative virtue, and that ab&#383;olute in his exi&#383;tence from the time of his re- <br/>dlene&#383;s is impracticable. He who does formation froni evil cour&#383;es. The in- <br/>[...]Agreeable to this way of thinking, I Here is depo&#383;ited thi body of the ce- <br/> remember to have met with the epitaph lebrated Beau Tawdry, who wis born<br/>or an aged man four years old; dating</td>
-<td>Acreeable to this way of thinking, I<br/> remember to have met with ehe epitaph<br/> oF an uged man tour years old 5 Gating<br/> his exi&#383;tence from the time of his re- <br/> formation from evil cour&#383;es.</td>
-</tr>
-</tbody></table><table>
-<thead>
-<tr>
-<th>Combined Method I</th>
-<th>Combined Method II</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>PRODESSE &amp; DELICTARI<br/>E PLURIBUS UNUM.</td>
-<td>PRODESSE &amp; DELICTARI<br/>E PLURIBUS UNUM.</td>
-</tr>
-<tr>
-<td>L O N D ON:<br/>Printed for D. Henry, and R. Cave, at St John's Gate.</td>
-<td>LONDON:<br/>Printed for D. Henry, and R. Cave, at St John's GATE.</td>
-</tr>
-<tr>
-<td>Agreeable to this way of thinking, I<br/> remember to have met with the epitapha<br/> or an aged mau four years old; dating<br/> his exi&#383;tence from the time of his re- <br/> formation from evil cour&#383;es.</td>
-<td>Agreeable to this way of thinking, I remember to have met with the epitaph or an aged man four years old; dating <br/>his exi&#383;tence from the time of his re- <br/> formation froni evil cour&#383;es</td>
-</tr>
-</tbody></table><p>Example 3 demonstrates how columns result in a completely erroneous output from Google Vision. The tool rarely takes vertical text separations into account, and reads across columns instead. Both combined methods allow this issue to be resolved.</p>
-<p>The difference between the outputs produced by the two combined methods is minimal. However, the line breaks at the end of the left columns are not present in the output of the second combined method. This method uses the original PDF and, since Google Vision reads across columns, these line breaks were simply not recorded.</p>
-</div></div></div>
+<row>
+<cell role="label">Combined Method I</cell>
+<cell role="label">Combined Method II</cell>
+</row>
+<row>
+<cell>quod cum a Westmonasteri&#226; corpus ejus versus Cantuariam in parva</cell>
+<cell>quod cum a Westmonasteri&#226; corpus ejus versus Cantuariam in paiva</cell>
+</row>
+<row>
+<cell>Trinitatis de Howndeslow vescendi caus&#226; ; et cum in prandio sermocina-</cell>
+<cell>Trinitatis de Howndeslow. vescendi caus&#226; ; et cum in prandio sermocina-</cell>
+</row>
+<row>
+<cell>* "Clemens Maydestone, filius Thom&#230; Maydestone Armigeri, fuit</cell>
+<cell>** Clemens Maydestone, filius Thom&#230; Maydestone Armigeri, fuit</cell>
+</row>
+<row>
+<cell>KING HENRY IV. IN THE CATHEDRAL OF CANTERBURY, AUGUST</cell>
+<cell>KING BENRY IV. IN THE CATHEDRAL OF CANTERBURY, AUGUST</cell>
+</row>
+</table><table>
+<row>
+<cell role="label">Google Vision</cell>
+<cell role="label">Tesseract</cell>
+</row>
+<row>
+<cell>quod cum a Westmonasteri&#226; corpus ejus versus Cantuariam in paiva</cell>
+<cell>quod eum a Westmonasterii corpus ejus versus Cantuariam in parva</cell>
+</row>
+<row>
+<cell>Trinitatis de Howndeslow. vescendi caus&#226;; et cum in prandio sermocina-</cell>
+<cell>Trinitatis de Howndeslow vescendi eaus&amp;; et cum in prandio sermocina-</cell>
+</row>
+<row>
+<cell>** Clemens Maydestone, filius Thom&#230; Maydestone Armigeri, fuit</cell>
+<cell>* * Olemens Maydestone, filius Thoms Maydestone Armigeri, fuit</cell>
+</row>
+<row>
+<cell>KING BENRY IV. IN THE CATHEDRAL OF CANTERBURY, AUGUST</cell>
+<cell>KING HENRY IV. IN THE CATHEDRAL OF CANTERBURY, AUGUST</cell>
+</row>
+</table><table>
+<row>
+<cell role="label">Combined Method I</cell>
+<cell role="label">Combined Method II</cell>
+</row>
+<row>
+<cell>116. h&#225;le.<br/>119. b&#243;c. 0. &#254;&#230;t (for &#254;e). sette.<br/>117. mielum seo cyst.<br/>I do. b&#233;c.<br/>1 Leaf 94, back.<br/>2 Above the line.</cell>
+<cell>116. h&#225;le.<br/>119. b&#243;c. 0. &#254;&#230;t (for &#254;e). sette.<br/>117. miclum seo cyst.<br/>I do. b&#233;c.<br/>1 Leaf 94, back.<br/>2 Above the line.</cell>
+</row>
+<row>
+<cell>se w&#230;s &#254;ryttig geara mid his 2 wife on cl&#230;nnysse .</cell>
+<cell>se w&#230;s &#254;ryttig geara mid his wife on cl&#230;nnysse .</cell>
+</row>
+<row>
+<cell>and eac da &#254;e hrepodon &#254;&#230;s reafes &#230;nigne d&#230;l.</cell>
+<cell>and eac da &#254;e hrepodon &#254;&#230;s reafes &#230;nigne d&#230;l.</cell>
+</row>
+<row>
+<cell>440 XXI. NATALE SANCTI SWY&#272;UNI, EPISCOPI.</cell>
+<cell>440<br/>XXI. NATALE SANCTI SWY&#272;UNI, EPISCOPI.</cell>
+</row>
+<row>
+<cell>BY N. TR&#220;BNER &amp; CO., 57 AND 59 LUDGATE HILL.</cell>
+<cell>BY N. TR&#220;BNER &amp; CO., 57 AND 59 LUDGATE HILL.</cell>
+</row>
+<row>
+<cell>A Set of Sermons on Saints' Days formerly observed</cell>
+<cell>A Set of Sermons on Saints' Days formerly observed</cell>
+</row>
+<row>
+<cell>Aelfrie's Lives of Saints,</cell>
+<cell>Aelfries Lives of Saints,</cell>
+</row>
+</table><table>
+<row>
+<cell role="label">Google Vision</cell>
+<cell role="label">Tesseract</cell>
+</row>
+<row>
+<cell>116. h&#225;le. <br/>119. b&#243;c. 0. &#254;&#230;t (for &#254;e). sette.<br/>117. miclum seo cyst. <br/> 1 Leaf 94, back.<br/> 2 Above the line.<br/>I do. b&#233;c.</cell>
+<cell>116. hale. 11g. b&#233;c. O. pt (for pe).  sette.<br/>117. miclum seo cyst. 120. b&#233;c.<br/> 1 Leaf 94, back. ? Above the line.</cell>
+</row>
+<row>
+<cell>se w&#230;s &#254;ryttig geara mid his wife on cl&#230;nnysse .</cell>
+<cell>se wes pryttig geara mid his* wife on clennysse . 124</cell>
+</row>
+<row>
+<cell>and eac da &#254;e hrepodon &#254;&#230;s reafes &#230;nigne d&#230;l.</cell>
+<cell>and eac Sa pe hrepodon pes reafes zenigne del .</cell>
+</row>
+<row>
+<cell>XXI. NATALE SANCTI SWY&#208;UNI, EPISCOPI.</cell>
+<cell>440 XXI. NATALE SANCTI SWYDUNI, EPISCOPI.</cell>
+</row>
+<row>
+<cell>BY N. TR&#220;BNER &amp; CO., 57 AND 59 LUDGATE HILL.</cell>
+<cell>BY N. TRUBNER &amp; CO., 57 AND 59 LUDGATE HILL.</cell>
+</row>
+<row>
+<cell>A Set of Sermons on Saints' Days formerly observed</cell>
+<cell>A Set of Sermons on Saints&#8217; Days formerly observey</cell>
+</row>
+<row>
+<cell>Aelfries Lives of Saints,</cell>
+<cell>Aelfrics Fives of Saints,</cell>
+</row>
+</table><table>
+<row>
+<cell role="label">Combined Method I</cell>
+<cell role="label">Combined Method II</cell>
+</row>
+<row>
+<cell>Agreeable to this way of thinking, I<br/> remember to have met with the epitapha<br/> or an aged mau four years old; dating<br/> his exi&#383;tence from the time of his re- <br/> formation from evil cour&#383;es.</cell>
+<cell>Agreeable to this way of thinking, I remember to have met with the epitaph or an aged man four years old; dating <br/>his exi&#383;tence from the time of his re- <br/> formation froni evil cour&#383;es</cell>
+</row>
+<row>
+<cell>L O N D ON:<br/>Printed for D. Henry, and R. Cave, at St John's Gate.</cell>
+<cell>LONDON:<br/>Printed for D. Henry, and R. Cave, at St John's GATE.</cell>
+</row>
+<row>
+<cell>PRODESSE &amp; DELICTARI<br/>E PLURIBUS UNUM.</cell>
+<cell>PRODESSE &amp; DELICTARI<br/>E PLURIBUS UNUM.</cell>
+</row>
+</table><table>
+<row>
+<cell role="label">Google Vision</cell>
+<cell role="label">Tesseract</cell>
+</row>
+<row>
+<cell>as negative virtue, and that ab&#383;olute in his exi&#383;tence from the time of his re- <br/>dlene&#383;s is impracticable. He who does formation froni evil cour&#383;es. The in- <br/>[...]Agreeable to this way of thinking, I Here is depo&#383;ited thi body of the ce- <br/> remember to have met with the epitaph lebrated Beau Tawdry, who wis born<br/>or an aged man four years old; dating</cell>
+<cell>Acreeable to this way of thinking, I<br/> remember to have met with ehe epitaph<br/> oF an uged man tour years old 5 Gating<br/> his exi&#383;tence from the time of his re- <br/> formation from evil cour&#383;es.</cell>
+</row>
+<row>
+<cell>LONDON:<br/>Printed for D. Henry, and R. Cave, at St John's GATE.</cell>
+<cell>EON DO #:<br/>Printed for D. Hznry, and R. Cave, at St Joun&#8217;s GaTE.</cell>
+</row>
+<row>
+<cell>PRODESSE &amp; DELICTARI<br/>E PLURIBUS UNUM.</cell>
+<cell>Propesse &amp; DErEecTARE E Prvurrsavs UNUM.</cell>
+</row>
+</table></div></div>
       <div type="1"><head>Preparation</head>
 <h2>Prerequisites</h2>
-<p>Although it is suitable for beginners, this lesson supposes some familiarity with the Python programming language. If you are not already familiar with Python 3, you will better understand the code used here if you work through the <link target="/en/lessons/introduction-and-installation">Python lesson series</link> first. The Python series will teach you how to install Python 3 and download a text editor where you can write your code.</p>
+<p>Although it is suitable for beginners, this lesson supposes some familiarity with the Python programming language. If you are not already familiar with Python 3, you will better understand the code used here if you work through the <ref target="/en/lessons/introduction-and-installation">Python lesson series</ref> first. The Python series will teach you how to install Python 3 and download a text editor where you can write your code.</p>
 <h2>Sample Dataset</h2>
-<p>You can work through this lesson with any PDF documents you have to hand. I suggest you use at least two documents since the lesson shows how to OCR several files at once. Place them in a directory named <code type="inline">docs_to_OCR</code>, for instance.</p>
-<p>Alternatively, you can use the same set of three nineteenth century editions of medieval documents that we will be using as examples throughout this lesson. If you opt to do so, begin by <link target="/assets/ocr-with-google-vision-and-tesseract/ocr-with-google-vision-and-tesseract-data.zip">downloading the set of files</link>. Unzip it, rename it <code type="inline">docs_to_OCR</code>.</p>
-<p>These three documents are copyright-free and available on <link target="https://archive.org/">archive.org</link>.</p>
+<p>You can work through this lesson with any PDF documents you have to hand. I suggest you use at least two documents since the lesson shows how to OCR several files at once. Place them in a directory named <code rend="inline">docs_to_OCR</code>, for instance.</p>
+<p>Alternatively, you can use the same set of three nineteenth century editions of medieval documents that we will be using as examples throughout this lesson. If you opt to do so, begin by <ref target="/assets/ocr-with-google-vision-and-tesseract/ocr-with-google-vision-and-tesseract-data.zip">downloading the set of files</ref>. Unzip it, rename it <code rend="inline">docs_to_OCR</code>.</p>
+<p>These three documents are copyright-free and available on <ref target="https://archive.org/">archive.org</ref>.</p>
 </div>
       <div type="1"><head>OCR with Tesseract</head>
-<p>Tesseract takes image files as input. If you have PDFs, you can transform them into .tiff files using any image editing tool, <link target="https://imagemagick.org/">ImageMagick</link> for instance. The process of converting PDFs to TIFFs using ImageMagick is detailed in the <emph>Programming Historian</emph> lesson <link target="/en/lessons/OCR-and-Machine-Translation#converting-pdfs-to-tiffs-with-imagemagick">OCR and Machine Translation</link>. </p>
-<p>Alternatively, you can use OCRmyPDF. This software is based on Tesseract but works with PDFs. More information can be found in the <emph>Programming Historian</emph> lesson <link target="/en/lessons/working-with-batches-of-pdf-files">Working with batches of PDF files</link>. </p>
+<p>Tesseract takes image files as input. If you have PDFs, you can transform them into .tiff files using any image editing tool, <ref target="https://imagemagick.org/">ImageMagick</ref> for instance. The process of converting PDFs to TIFFs using ImageMagick is detailed in the <emph>Programming Historian</emph> lesson <ref target="/en/lessons/OCR-and-Machine-Translation#converting-pdfs-to-tiffs-with-imagemagick">OCR and Machine Translation</ref>. </p>
+<p>Alternatively, you can use OCRmyPDF. This software is based on Tesseract but works with PDFs. More information can be found in the <emph>Programming Historian</emph> lesson <ref target="/en/lessons/working-with-batches-of-pdf-files">Working with batches of PDF files</ref>. </p>
 <p>Both ImageMagick and OCRmyPDF can be operated from the command line.</p>
-<p>If you opt for to use OCRmyPDF, run the following commands after navigating to the <code type="inline">docs_to_OCR</code> directory.</p>
+<p>If you opt for to use OCRmyPDF, run the following commands after navigating to the <code rend="inline">docs_to_OCR</code> directory.</p>
 <p>First command:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_0" type="block" corresp="code_ocr-with-google-vision-and-tesseract_0.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_0" corresp="code_ocr-with-google-vision-and-tesseract_0.txt" rend="block"/></ab>
 <p>Second command:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_1" type="block" corresp="code_ocr-with-google-vision-and-tesseract_1.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_1" corresp="code_ocr-with-google-vision-and-tesseract_1.txt" rend="block"/></ab>
 <p>Third command:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_2" type="block" corresp="code_ocr-with-google-vision-and-tesseract_2.txt"/></pre>
-<p>With Tesseract, it is necessary to specify the language(s) or script(s) of the text using the <code type="inline">-l</code> flag. More than one language or script may be specified by using <code type="inline">+</code>. You can find the list of language codes and more information about the language models on the <link target="https://perma.cc/HP8K-US5M">Tesseract GitHub page</link>. Depending on your operating system, you might be required to install language packages separately, as described on OCRmyPDF's <link target="https://perma.cc/G9JR-NXA3">documentation page</link>.</p>
-<p>OCRmyPDF creates a new PDF file with an OCR overlay. If you are working with PDFs that already have a (presumably unsatisfactory) OCR overlay, the <code type="inline">redo-ocr</code> argument allows for a new overlay to be created. The <code type="inline">sidecar</code> argument creates a text file that contains the OCR text found by OCRmyPDF. An alternative to the <code type="inline">sidecar</code> argument would be to use another program such as <link target="https://perma.cc/K9GT-NBGR">pdftotext</link> to extract the embedded texts from the newly created PDF files.</p>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_2" corresp="code_ocr-with-google-vision-and-tesseract_2.txt" rend="block"/></ab>
+<p>With Tesseract, it is necessary to specify the language(s) or script(s) of the text using the <code rend="inline">-l</code> flag. More than one language or script may be specified by using <code rend="inline">+</code>. You can find the list of language codes and more information about the language models on the <ref target="https://perma.cc/HP8K-US5M">Tesseract GitHub page</ref>. Depending on your operating system, you might be required to install language packages separately, as described on OCRmyPDF's <ref target="https://perma.cc/G9JR-NXA3">documentation page</ref>.</p>
+<p>OCRmyPDF creates a new PDF file with an OCR overlay. If you are working with PDFs that already have a (presumably unsatisfactory) OCR overlay, the <code rend="inline">redo-ocr</code> argument allows for a new overlay to be created. The <code rend="inline">sidecar</code> argument creates a text file that contains the OCR text found by OCRmyPDF. An alternative to the <code rend="inline">sidecar</code> argument would be to use another program such as <ref target="https://perma.cc/K9GT-NBGR">pdftotext</ref> to extract the embedded texts from the newly created PDF files.</p>
 </div>
       <div type="1"><head>OCR with Google Vision</head>
 <h3>Google Cloud Platform setup</h3>
-<p>To be able to use the Google Vision API, the first step is to set up your project on the <link target="https://console.cloud.google.com/">Google console</link>. The instructions for each step are linked below. Although the Google Cloud documentation can seem daunting if you are not familiar with API services, the process to create a personal project is relatively straightforward and many of Google's documentation pages include practical, step-by-step instructions. You can either set up your project with the console interface in your browser (recommended for beginners) or with code, if you wish to integrate these steps directly into your script.</p>
-<p>1. <link target="https://cloud.google.com/resource-manager/docs/creating-managing-projects#console">Create a new Google Cloud project</link></p>
+<p>To be able to use the Google Vision API, the first step is to set up your project on the <ref target="https://console.cloud.google.com/">Google console</ref>. The instructions for each step are linked below. Although the Google Cloud documentation can seem daunting if you are not familiar with API services, the process to create a personal project is relatively straightforward and many of Google's documentation pages include practical, step-by-step instructions. You can either set up your project with the console interface in your browser (recommended for beginners) or with code, if you wish to integrate these steps directly into your script.</p>
+<p>1. <ref target="https://cloud.google.com/resource-manager/docs/creating-managing-projects#console">Create a new Google Cloud project</ref></p>
 <p>Before using any of the Google API services, it is necessary to create a project. Each project can have different APIs enabled and be linked to a different billing account.</p>
-<p>2. <link target="https://cloud.google.com/billing/docs/how-to/manage-billing-account">Link your project to a billing account</link></p>
+<p>2. <ref target="https://cloud.google.com/billing/docs/how-to/manage-billing-account">Link your project to a billing account</ref></p>
 <p>To use the API, you will need to link the project to a billing account, even if you are only planning to use the free portion of the service or use any free credits you may have received as a new user.</p>
-<p>3. <link target="https://cloud.google.com/endpoints/docs/openapi/enable-api">Enable the Cloud Vision API</link></p>
+<p>3. <ref target="https://cloud.google.com/endpoints/docs/openapi/enable-api">Enable the Cloud Vision API</ref></p>
 <p>Google APIs have to be enabled before they are used. To enable the Vision API, you will need to look for it in the Google Cloud API Library. There, you can also browse through the other APIs offered by Google, such as the Cloud Natural Language API which provides natural language understanding technologies, and the Cloud Translation API which allows you to integrate translation into a workflow.</p>
-<p>4. <link target="https://cloud.google.com/iam/docs/creating-managing-service-accounts#creating">Create a Google Cloud Service Account</link></p>
+<p>4. <ref target="https://cloud.google.com/iam/docs/creating-managing-service-accounts#creating">Create a Google Cloud Service Account</ref></p>
 <p>To make requests to a Google API, you need to use a service account, which is different from your Google user account. A service account is associated to a service account key (see next step). In this step, you will create a service account and grant it access to your project. I suggest you pick 'Owner' in the role drop-down menu to grant full access.</p>
-<p>5. <link target="https://cloud.google.com/iam/docs/creating-managing-service-account-keys#creating">Download and save a service account key</link></p>
+<p>5. <ref target="https://cloud.google.com/iam/docs/creating-managing-service-account-keys#creating">Download and save a service account key</ref></p>
 <p>The service account key is a JSON file which can be created and downloaded from the Google Cloud Console. It is used to identify the service account from which the API requests are coming from. To access the Vision API through Python, you will need to include the path to this file in your code.</p>
-<p>6. <link target="https://cloud.google.com/storage/docs/creating-buckets">Create a Google bucket</link></p>
+<p>6. <ref target="https://cloud.google.com/storage/docs/creating-buckets">Create a Google bucket</ref></p>
 <p>In Cloud Storage, data are stored in 'buckets'. Although it is possible to upload folders or files to buckets in your browser, this step is integrated in the code provided below.</p>
 <h3>Python Setup</h3>
-<p>It is always best to create a new virtual environment when you start a Python project. This means that each project can have its own dependencies, regardless of what dependencies other projects need. To do so, you could use <link target="https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">conda</link> or <link target="https://docs.python.org/3/library/venv.html">venv</link>, for instance.</p>
+<p>It is always best to create a new virtual environment when you start a Python project. This means that each project can have its own dependencies, regardless of what dependencies other projects need. To do so, you could use <ref target="https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">conda</ref> or <ref target="https://docs.python.org/3/library/venv.html">venv</ref>, for instance.</p>
 <p>For this project, I would recommend installing all packages and libraries via conda.</p>
-<p>Install the <link target="https://cloud.google.com/python/docs/reference/storage/latest">Cloud Storage</link> and <link target="https://cloud.google.com/python/docs/reference/vision/latest">Cloud Vision</link> libraries:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_3" type="block" corresp="code_ocr-with-google-vision-and-tesseract_3.txt"/></pre>
-<p>The code below adapts the code provided in the <link target="https://perma.cc/Y3FZ-CTA9">Google Vision documentation</link> to work with batches instead of individual files, and to save the full-text outputs.</p>
-<p>Google Vision takes single files stored in Cloud Storage buckets as input. Therefore, the code iterates through a local directory to upload the file in the Cloud Storage, request the full-text annotation of the PDF, then read the <link target="https://perma.cc/VQP3-VDCM">JSON</link> output files stored in the Cloud Storage and save the full-text OCR responses locally.</p>
-<p>To begin, you will need to import the libraries (<code type="inline">google-cloud-storage</code> and <code type="inline">google-cloud-vision</code>) that you just installed, as well as the built-in libraries <code type="inline">os</code>, <code type="inline">json</code> and <code type="inline">glob</code>.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_4" type="block" corresp="code_ocr-with-google-vision-and-tesseract_4.txt"/></pre>
+<p>Install the <ref target="https://cloud.google.com/python/docs/reference/storage/latest">Cloud Storage</ref> and <ref target="https://cloud.google.com/python/docs/reference/vision/latest">Cloud Vision</ref> libraries:</p>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_3" corresp="code_ocr-with-google-vision-and-tesseract_3.txt" rend="block"/></ab>
+<p>The code below adapts the code provided in the <ref target="https://perma.cc/Y3FZ-CTA9">Google Vision documentation</ref> to work with batches instead of individual files, and to save the full-text outputs.</p>
+<p>Google Vision takes single files stored in Cloud Storage buckets as input. Therefore, the code iterates through a local directory to upload the file in the Cloud Storage, request the full-text annotation of the PDF, then read the <ref target="https://perma.cc/VQP3-VDCM">JSON</ref> output files stored in the Cloud Storage and save the full-text OCR responses locally.</p>
+<p>To begin, you will need to import the libraries (<code rend="inline">google-cloud-storage</code> and <code rend="inline">google-cloud-vision</code>) that you just installed, as well as the built-in libraries <code rend="inline">os</code>, <code rend="inline">json</code> and <code rend="inline">glob</code>.</p>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_4" corresp="code_ocr-with-google-vision-and-tesseract_4.txt" rend="block"/></ab>
 <p>Then, you will need to provide the name of your Google Cloud Storage bucket and the path to your JSON service account key.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_5" type="block" corresp="code_ocr-with-google-vision-and-tesseract_5.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_5" corresp="code_ocr-with-google-vision-and-tesseract_5.txt" rend="block"/></ab>
 <p>Then, you can create variables for the different processes needed in the code:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_6" type="block" corresp="code_ocr-with-google-vision-and-tesseract_6.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_6" corresp="code_ocr-with-google-vision-and-tesseract_6.txt" rend="block"/></ab>
 <p>The larger the batch size, the faster the progress. However, too large a batch size could cause Python to "crash" if your computer's memory gets overwhelmed.</p>
 <h3>Running Google Vision</h3>
 <p>The first step is to create a function that uploads a file to your Google Cloud Storage bucket and requests the OCR annotation according to the information specified above. The request will create JSON files containing all the OCR information, which will also be stored in your bucket.</p>
 <p>This function returns the remote path of the folder where the JSON response files are stored so that they can be easily retrieved in the next step.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_7" type="block" corresp="code_ocr-with-google-vision-and-tesseract_7.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_7" corresp="code_ocr-with-google-vision-and-tesseract_7.txt" rend="block"/></ab>
 <p>Now that the OCR process is complete and the response files are stored in the console, you can create an ordered list containing each "blob" ensuring that they will be read in the correct order.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_8" type="block" corresp="code_ocr-with-google-vision-and-tesseract_8.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_8" corresp="code_ocr-with-google-vision-and-tesseract_8.txt" rend="block"/></ab>
 <p>Next, we can use this list to extract the full-text annotations of each blob, join them to create the full text, and save it to a local file.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_9" type="block" corresp="code_ocr-with-google-vision-and-tesseract_9.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_9" corresp="code_ocr-with-google-vision-and-tesseract_9.txt" rend="block"/></ab>
 <p>The following function executes the entire workflow.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_10" type="block" corresp="code_ocr-with-google-vision-and-tesseract_10.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_10" corresp="code_ocr-with-google-vision-and-tesseract_10.txt" rend="block"/></ab>
 <p>Finally, the last function executes the workflow for every PDF file within a given directory.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_11" type="block" corresp="code_ocr-with-google-vision-and-tesseract_11.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_11" corresp="code_ocr-with-google-vision-and-tesseract_11.txt" rend="block"/></ab>
 <p>Usage example:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_12" type="block" corresp="code_ocr-with-google-vision-and-tesseract_12.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_12" corresp="code_ocr-with-google-vision-and-tesseract_12.txt" rend="block"/></ab>
 <h3>Understanding JSON Ouputs</h3>
-<p>As explained above, the text-detection API creates JSON files which contain full-text annotations of the input PDF file. In the code above, this full-text annotation is queried from the JSON file and saved as a <code type="inline">.txt</code> file to your local output folder. These JSON files contain additional information and can be consulted or downloaded from the <code type="inline">json_output</code> subfolder in your storage bucket.</p>
+<p>As explained above, the text-detection API creates JSON files which contain full-text annotations of the input PDF file. In the code above, this full-text annotation is queried from the JSON file and saved as a <code rend="inline">.txt</code> file to your local output folder. These JSON files contain additional information and can be consulted or downloaded from the <code rend="inline">json_output</code> subfolder in your storage bucket.</p>
 <p>For each page, you will find the following information:</p>
-<ul>
-<li>language(s) detected</li>
-<li>width and height</li>
-<li>full text</li>
-</ul>
+<list type="unordered">
+<item>language(s) detected</item>
+<item>width and height</item>
+<item>full text</item>
+</list>
 <p>For each block, paragraph, and word:</p>
-<ul>
-<li>language(s) detected</li>
-<li>coordinates of the bounding box that "frames" the relevant text</li>
-</ul>
+<list type="unordered">
+<item>language(s) detected</item>
+<item>coordinates of the bounding box that "frames" the relevant text</item>
+</list>
 <p>For each character:</p>
-<ul>
-<li>language detected</li>
-<li>the "symbol" detected (i.e. the letter or punctuation mark itself)</li>
-</ul>
+<list type="unordered">
+<item>language detected</item>
+<item>the "symbol" detected (i.e. the letter or punctuation mark itself)</item>
+</list>
 <p>Most of this information comes with a confidence score between 0 and 1.</p>
 <p>The code block below shows the information for the word "HENRY" in the subtitle of Example 1.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_13" type="block" corresp="code_ocr-with-google-vision-and-tesseract_13.txt"/></pre>
-<p>To learn more about JSON and how to query JSON data with the command-line utility <link target="https://perma.cc/9R4H-3RUF">jq</link>, consult the <emph>Programming Historian</emph> lesson <link target="/en/lessons/json-and-jq">Reshaping JSON with jq</link>.</p>
-<p>You can also query JSON files stored in the <code type="inline">json_output</code> subfolder of your bucket with Python. For instance, if you'd like to know which words have a low confidence score, and which language was detected for these words, you can try running the following code:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_14" type="block" corresp="code_ocr-with-google-vision-and-tesseract_14.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_13" corresp="code_ocr-with-google-vision-and-tesseract_13.txt" rend="block"/></ab>
+<p>To learn more about JSON and how to query JSON data with the command-line utility <ref target="https://perma.cc/9R4H-3RUF">jq</ref>, consult the <emph>Programming Historian</emph> lesson <ref target="/en/lessons/json-and-jq">Reshaping JSON with jq</ref>.</p>
+<p>You can also query JSON files stored in the <code rend="inline">json_output</code> subfolder of your bucket with Python. For instance, if you'd like to know which words have a low confidence score, and which language was detected for these words, you can try running the following code:</p>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_14" corresp="code_ocr-with-google-vision-and-tesseract_14.txt" rend="block"/></ab>
 <p>Result:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_15" type="block" corresp="code_ocr-with-google-vision-and-tesseract_15.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_15" corresp="code_ocr-with-google-vision-and-tesseract_15.txt" rend="block"/></ab>
 <p>This information could help you correct the text. For instance, it would be possible to output all words whose OCR annotation is below a certain confidence threshold in a different colour for manual verification.</p>
 </div>
       <div type="1"><head>Combining Layout and Character Recognition</head>
 <p>Combining the two tools is not as straightforward as it should be since Google Vision, unfortunately, does not allow the user to set a detection area using coordinates before the OCR process takes place. However, there are (at least) two ways to go about it.</p>
-<ul>
-<li>The first is to create a new PDF file where text regions are re-arranged vertically so that Google Vision's inability to detect complex layouts is no longer a problem. With this method, we can still use the "full-text annotation" from the JSON response file.</li>
-<li>The second method is to use the coordinates of the text blocks detected by Tesseract to select the corresponding words detected by Google Vision. In this case, we have to re-create the text, character by character, instead of using the "full-text annotation".</li>
-</ul>
+<list type="unordered">
+<item>The first is to create a new PDF file where text regions are re-arranged vertically so that Google Vision's inability to detect complex layouts is no longer a problem. With this method, we can still use the "full-text annotation" from the JSON response file.</item>
+<item>The second method is to use the coordinates of the text blocks detected by Tesseract to select the corresponding words detected by Google Vision. In this case, we have to re-create the text, character by character, instead of using the "full-text annotation".</item>
+</list>
 <h3>Tesseract + Google Vision: Method One</h3>
-<p>The first combined methods converts a document into a list of images (i.e. each page becomes an image). For each new image, the Tesseract API is used to identify text regions. These text regions are then cut, padded and arranged vertically into a new image. For instance, a page featuring two columns will become an image where the two columns are stacked on top of each other. The new image will therefore be roughly half the width and twice the height as the original. The new images are appended and transformed back into one PDF. This PDF is then processed with the <code type="inline">vision_method</code> function defined above.</p>
-<p>To create these new PDFs sequenced by regions, three new packages are needed. First, <link target="https://perma.cc/MD5E-ZJ2W">pdf2image</link> converts PDFs to <link target="https://perma.cc/99LP-GQW2">PIL</link> (Python Imaging Library) image objects. Second, <link target="https://perma.cc/SJ9L-AGPP">tesserocr</link> provides the coordinates of the different text regions. Third, <link target="https://perma.cc/BP96-MACG">pillow</link> helps us rebuild images for each page according to the coordinates provided by tesserocr. Using <link target="https://docs.conda.io/projects/conda/en/latest/">conda</link> is the simplest way to install the packages.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_16" type="block" corresp="code_ocr-with-google-vision-and-tesseract_16.txt"/></pre>
+<p>The first combined methods converts a document into a list of images (i.e. each page becomes an image). For each new image, the Tesseract API is used to identify text regions. These text regions are then cut, padded and arranged vertically into a new image. For instance, a page featuring two columns will become an image where the two columns are stacked on top of each other. The new image will therefore be roughly half the width and twice the height as the original. The new images are appended and transformed back into one PDF. This PDF is then processed with the <code rend="inline">vision_method</code> function defined above.</p>
+<p>To create these new PDFs sequenced by regions, three new packages are needed. First, <ref target="https://perma.cc/MD5E-ZJ2W">pdf2image</ref> converts PDFs to <ref target="https://perma.cc/99LP-GQW2">PIL</ref> (Python Imaging Library) image objects. Second, <ref target="https://perma.cc/SJ9L-AGPP">tesserocr</ref> provides the coordinates of the different text regions. Third, <ref target="https://perma.cc/BP96-MACG">pillow</ref> helps us rebuild images for each page according to the coordinates provided by tesserocr. Using <ref target="https://docs.conda.io/projects/conda/en/latest/">conda</ref> is the simplest way to install the packages.</p>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_16" corresp="code_ocr-with-google-vision-and-tesseract_16.txt" rend="block"/></ab>
 <p>Before cutting up the text regions to re-arrange them vertically, it is useful to create a function that adds padding to images. The padding adds space between the text region in the new PDF document. Without it, the close proximity between text regions might lead to OCR errors. It is possible to match the padding to the colour of the background, but I have not found that it significantly improves results. The function takes three arguments: the image, the number of pixels added to each side of the image, and the colour of the padding.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_17" type="block" corresp="code_ocr-with-google-vision-and-tesseract_17.txt"/></pre>
-<p>The next step is to create a function that takes an image of a page as input, uses Tesseract's API to identify the different text regions, and stores them in a list called 'regions'. Each element of the list will be a <link target="https://perma.cc/N9YE-L573">tuple</link> containing an image of one of the regions and a dictionary containing the four coordinates of the region (the 'x' and 'y' coordinates of the top-left corner, as well as the height and the width). For each region, the image is padded using the function defined above and appended to a list initiated at the beginning of the function.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_18" type="block" corresp="code_ocr-with-google-vision-and-tesseract_18.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_17" corresp="code_ocr-with-google-vision-and-tesseract_17.txt" rend="block"/></ab>
+<p>The next step is to create a function that takes an image of a page as input, uses Tesseract's API to identify the different text regions, and stores them in a list called 'regions'. Each element of the list will be a <ref target="https://perma.cc/N9YE-L573">tuple</ref> containing an image of one of the regions and a dictionary containing the four coordinates of the region (the 'x' and 'y' coordinates of the top-left corner, as well as the height and the width). For each region, the image is padded using the function defined above and appended to a list initiated at the beginning of the function.</p>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_18" corresp="code_ocr-with-google-vision-and-tesseract_18.txt" rend="block"/></ab>
 <p>With this list of images containing the text regions, we can re-create the page by arranging the regions vertically. The function iterates through the images and records their dimension in order to calculate the dimension of the new page to be created. Since the text regions are stacked vertically, the dimension of the new image will be the sum of the heights and the width of the widest text region. Once the empty image is created, each image is pasted onto it, one below the other.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_19" type="block" corresp="code_ocr-with-google-vision-and-tesseract_19.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_19" corresp="code_ocr-with-google-vision-and-tesseract_19.txt" rend="block"/></ab>
 <p>We are now ready to apply this method to all pages of a PDF file. The following function converts each page of the input PDF into a new image, stores those images in a list, and saves them locally as a new PDF stored in a new directory.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_20" type="block" corresp="code_ocr-with-google-vision-and-tesseract_20.txt"/></pre>
-<p>The following function executes the above and OCRs the new PDF with the <code type="inline">vision_method</code> defined <link target="#google-vision-2">in the previous section</link>.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_21" type="block" corresp="code_ocr-with-google-vision-and-tesseract_21.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_20" corresp="code_ocr-with-google-vision-and-tesseract_20.txt" rend="block"/></ab>
+<p>The following function executes the above and OCRs the new PDF with the <code rend="inline">vision_method</code> defined <ref target="#google-vision-2">in the previous section</ref>.</p>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_21" corresp="code_ocr-with-google-vision-and-tesseract_21.txt" rend="block"/></ab>
 <p>Finally, we will execute the workflow for every PDF file within a given directory.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_22" type="block" corresp="code_ocr-with-google-vision-and-tesseract_22.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_22" corresp="code_ocr-with-google-vision-and-tesseract_22.txt" rend="block"/></ab>
 <p>Usage example:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_23" type="block" corresp="code_ocr-with-google-vision-and-tesseract_23.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_23" corresp="code_ocr-with-google-vision-and-tesseract_23.txt" rend="block"/></ab>
 <h3>Tesseract + Google Vision: Method Two</h3>
-<p>The second combined method uses the text region coordinates provided by Tesseract to create text output. We will be extracting any words that fall within the defined regions from the JSON response files we generated earlier using the <code type="inline">JSON_OCR</code> function as explained in the <link target="#google-vision-2">Google Vision section</link>.</p>
+<p>The second combined method uses the text region coordinates provided by Tesseract to create text output. We will be extracting any words that fall within the defined regions from the JSON response files we generated earlier using the <code rend="inline">JSON_OCR</code> function as explained in the <ref target="#google-vision-2">Google Vision section</ref>.</p>
 <p>First, we'll create a function that will output a dictionary which contains the coordinates of each text region, as well as the height and width of each page. The height and width are necessary for converting the pixel coordinates provided by Tesseract to the normalised coordinates provided by Google Vision.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_24" type="block" corresp="code_ocr-with-google-vision-and-tesseract_24.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_24" corresp="code_ocr-with-google-vision-and-tesseract_24.txt" rend="block"/></ab>
 <p>Then, we can create a function that uses the JSON response files produced by Google Vision to extract the words that fall within the defined text regions (whose coordinates are stored in the dictionary created by the function above).</p>
-<p>This function iterates through the pages identified in the JSON files (if you set <code type="inline">batch_size = 2</code>, then two pages are processed in each JSON file). For each page, we store the list of JSON blocks in a variable. Using a page counter initiated at the beginning of the function, we retrieve the page's dimensions (width and height) plus text region coordinates from the dictionary created above.</p>
+<p>This function iterates through the pages identified in the JSON files (if you set <code rend="inline">batch_size = 2</code>, then two pages are processed in each JSON file). For each page, we store the list of JSON blocks in a variable. Using a page counter initiated at the beginning of the function, we retrieve the page's dimensions (width and height) plus text region coordinates from the dictionary created above.</p>
 <p>Tesseract gives four region coordinates in pixels: the x and y coordinates for the top-left corner, as well as the height and length of the text region. For each region, the Tesseract coordinates have to be converted to normalised coordinates, since this is what Google Vision is using. Normalised coordinates give the relative position of a point and are therefore numbers between 0 and 1. To be normalised, an absolute coordinate is divided by the width of the page (for x coordinates) or the height (for y coordinates).</p>
 <p>The Google Vision JSON file provides the x and y normalised coordinates for all four corners of each word. The order depends of the orientation of the text. Using the minimum and maximum x and y values ensures that we systematically obtain the top-left and bottom-right corner coordinates of the word box. With the normalised coordinates of the top-left (x1, y1) and bottom-right (x2, y2) corner of a Tesseract region, we obtain the box that words from the Google Vision response file need to "fit" into to be added to the text output for that region. Since we are comparing coordinates provided by different tools; and a one-pixel difference might be key, it could be a good idea to slightly reduce the size of the word box which needs to "fit" into the region box for the word to be added to the text output for that region. Note that "words" include the spaces, punctuation, or line breaks that follow them.</p>
 <p>Once these normalised region coordinates are established, we can iterate through each word on a page in the Google Vision JSON file and assess whether it is part of a particular text region. This process is repeated for each text region on each page. The text within each region is appended and written to file when the entire document has been processed.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_25" type="block" corresp="code_ocr-with-google-vision-and-tesseract_25.txt"/></pre>
-<p>To clarify this process and the normalisation of coordinates, let's focus again on the word "HENRY" from the subtitle of the first example document &#8212; Miscellania: Tomb of King Henry IV. in Canterbury Cathedral. The dictionary created with the <code type="inline">region_segmentation</code> function provides the following information for the first page of this document:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_26" type="block" corresp="code_ocr-with-google-vision-and-tesseract_26.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_25" corresp="code_ocr-with-google-vision-and-tesseract_25.txt" rend="block"/></ab>
+<p>To clarify this process and the normalisation of coordinates, let's focus again on the word "HENRY" from the subtitle of the first example document &#8212; Miscellania: Tomb of King Henry IV. in Canterbury Cathedral. The dictionary created with the <code rend="inline">region_segmentation</code> function provides the following information for the first page of this document:</p>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_26" corresp="code_ocr-with-google-vision-and-tesseract_26.txt" rend="block"/></ab>
 <p>As we can see, Tesseract identified 11 text regions and indicated that this first page was 1112 pixels wide and 1800 pixels high.</p>
-<p>The coordinates of the top-left and bottom-right corners of the sixth text region of the page (which contains the subtitle of the text and the word "HENRY") are calculated as follows by the <code type="inline">local_file_region</code> function:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_27" type="block" corresp="code_ocr-with-google-vision-and-tesseract_27.txt"/></pre>
+<p>The coordinates of the top-left and bottom-right corners of the sixth text region of the page (which contains the subtitle of the text and the word "HENRY") are calculated as follows by the <code rend="inline">local_file_region</code> function:</p>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_27" corresp="code_ocr-with-google-vision-and-tesseract_27.txt" rend="block"/></ab>
 <p>To process this text region, our function iterates through each word which appears in the JSON block corresponding to this page and checks if it "fits" in this region. When it gets to the word "HENRY", the function checks the coordinates of the word, which, as we have seen in the JSON section, are:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_28" type="block" corresp="code_ocr-with-google-vision-and-tesseract_28.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_28" corresp="code_ocr-with-google-vision-and-tesseract_28.txt" rend="block"/></ab>
 <p>Using the minimum and maximum x and y values, the function calculates that the top-left corner is (0.435, 0.25) and the bottom-right is (0.5325, 0.2685185). With these coordinates, the function assesses if the word "HENRY" fits within the text region. This is done by checking that the x coordinates (0.435 and 0.5325) are both between 0.1942 and 0.8516, and the y coordinates (0.25 and 0.2685185) are both between 0.2494 and 0.2867. Since this is the case, the word "HENRY" is added to the text string for this region.</p>
-<p>The following function executes the entire workflow. First, it generates an ordered list of response JSON from Google Vision, just as it would if we were using Google Vision alone. Then, it generates the dictionary containing the Tesseract coordinates of all text regions. Finally, it uses the <code type="inline">local_file_region</code> function defined above to create the text output.</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_29" type="block" corresp="code_ocr-with-google-vision-and-tesseract_29.txt"/></pre>
+<p>The following function executes the entire workflow. First, it generates an ordered list of response JSON from Google Vision, just as it would if we were using Google Vision alone. Then, it generates the dictionary containing the Tesseract coordinates of all text regions. Finally, it uses the <code rend="inline">local_file_region</code> function defined above to create the text output.</p>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_29" corresp="code_ocr-with-google-vision-and-tesseract_29.txt" rend="block"/></ab>
 <p>The following function executes the workflow for every PDF file within a given directory:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_30" type="block" corresp="code_ocr-with-google-vision-and-tesseract_30.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_30" corresp="code_ocr-with-google-vision-and-tesseract_30.txt" rend="block"/></ab>
 <p>Usage example:</p>
-<pre><code xml:id="code_ocr-with-google-vision-and-tesseract_31" type="block" corresp="code_ocr-with-google-vision-and-tesseract_31.txt"/></pre>
+<ab><code xml:id="code_ocr-with-google-vision-and-tesseract_31" corresp="code_ocr-with-google-vision-and-tesseract_31.txt" rend="block"/></ab>
 </div>
       <div type="1"><head>Conclusions</head>
 <p>When undertaking digital research projects in the humanities, and more so when dealing with historical sources, it is rare to encounter tools that were designed with your material in mind. Therefore, it is often useful to consider whether several different tools are interoperable, and how combining them could offer novel solutions.</p>
 <p>This lesson combines Tesseract's layout recognition tool with Google Vision's text annotation feature to create an OCR workflow that will produce better results than Tesseract or Google Vision alone. If training your own OCR model or paying for a licensed tool is not an option, this versatile solution might be a cost-efficient answer to your OCR problems.</p>
-<p class="alert alert-info" style="alert alert-info">
+<p style="alert alert-info">
 This workflow was designed in the context of the UKRI-funded project "The Human Remains: Digital Library of Mortuary Science &amp; Investigation", led by Dr. Ruth Nugent at the University of Liverpool.
 </p>
 </div>

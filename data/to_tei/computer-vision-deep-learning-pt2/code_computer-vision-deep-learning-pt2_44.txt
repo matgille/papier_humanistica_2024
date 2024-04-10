@@ -1,1 +1,10 @@
-tfms = setup_aug_tfms([Rotate(max_deg=90, p=0.75), Zoom(), Flip()])
+photo_data = ImageDataLoaders.from_df(
+    df,  # dataframe containing paths to images and labels
+    folder="photo_data/images",  # folder where images are stored
+    bs=32,  # batch size
+    label_delim="|",  # the deliminator for multiple labels
+    item_tfms=Resize(224),  # resize images to a standard size
+    batch_tfms=[*tfms],  # pass in our transforms
+    valid_pct=0.3,  # 30% of data used for validation
+    seed=42,  # set a seed,
+)

@@ -3,43 +3,43 @@
  <fileDesc>
   <titleStmt>
    <title>Normaliza&#231;&#227;o de Dados Textuais com Python</title>
-  <author type="original_author"><persName>William J. Turkel</persName><persName>Adam Crymble</persName></author><editor type="reviewers"><persName>Jim Clifford</persName><persName>Frederik Elwert</persName></editor><author type="translators">Felipe Lamarca</author><editor type="translation-reviewers"><persName>Andr&#233; Salvo</persName><persName>Gabriela Kucuruza</persName></editor><editor type="editors">Miriam Posner</editor></titleStmt>
+  <author role="original_author"><persName>William J. Turkel</persName><persName>Adam Crymble</persName></author><editor role="reviewers"><persName>Jim Clifford</persName><persName>Frederik Elwert</persName></editor><author role="translators">Felipe Lamarca</author><editor role="translation-reviewers"><persName>Andr&#233; Salvo</persName><persName>Gabriela Kucuruza</persName></editor><editor role="editors">Miriam Posner</editor></titleStmt>
   <publicationStmt>
    <idno type="doi">10.46430/phpt0029</idno><date type="published">07/17/2012</date><date type="translated">10/27/2022</date><p>Lesson reviewed and published in Programming Historian.</p>
   </publicationStmt>
   <sourceDesc>
   <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#normalizing-data"/>.</p><p>There are other translations: <ref target="#normalizar-datos"/></p></sourceDesc>
  </fileDesc>
- <profileDesc><abstract><p>Nesta li&#231;&#227;o tornar&#225; a lista criada na li&#231;&#227;o 'De HTML para Lista de Palavras' mais f&#225;cil de ser analisada atrav&#233;s da normaliza&#231;&#227;o desses dados.</p></abstract><textClass><keyword xml:lang="en">python</keyword></textClass></profileDesc>
+ <profileDesc><abstract><p>Nesta li&#231;&#227;o tornar&#225; a lista criada na li&#231;&#227;o 'De HTML para Lista de Palavras' mais f&#225;cil de ser analisada atrav&#233;s da normaliza&#231;&#227;o desses dados.</p></abstract><textClass><keywords><term xml:lang="en">python</term></keywords></textClass></profileDesc>
 </teiHeader>
   <text xml:lang="pt">
     <body>
       <div type="2"><head>Objetivos da Li&#231;&#227;o</head>
-<p>A lista que cri&#225;mos na li&#231;&#227;o <link target="/pt/licoes/HTML-lista-palavras-2">De HTML para Lista de Palavras (parte 2)</link> precisa ser normalizada antes de poder ser utilizada. Faremos isso atrav&#233;s da aplica&#231;&#227;o de alguns m&#233;todos de string adicionais, bem como utilizando express&#245;es regulares. Uma vez normalizados, estaremos aptos a analisar os nossos dados mais facilmente.</p>
+<p>A lista que cri&#225;mos na li&#231;&#227;o <ref target="/pt/licoes/HTML-lista-palavras-2">De HTML para Lista de Palavras (parte 2)</ref> precisa ser normalizada antes de poder ser utilizada. Faremos isso atrav&#233;s da aplica&#231;&#227;o de alguns m&#233;todos de string adicionais, bem como utilizando express&#245;es regulares. Uma vez normalizados, estaremos aptos a analisar os nossos dados mais facilmente.</p>
 </div>
       <div type="2"><head>Ficheiros Necess&#225;rios para esta Li&#231;&#227;o</head>
-<ul>
-<li><code type="inline">html-to-list1.py</code></li>
-<li><code type="inline">obo.py</code></li>
-</ul>
-<p>Caso n&#227;o tenha esses ficheiros das li&#231;&#245;es anteriores, pode fazer o <emph>download</emph> de um <link target="/assets/python-lessons3.zip">zip</link>.</p>
+<list type="unordered">
+<item><code rend="inline">html-to-list1.py</code></item>
+<item><code rend="inline">obo.py</code></item>
+</list>
+<p>Caso n&#227;o tenha esses ficheiros das li&#231;&#245;es anteriores, pode fazer o <emph>download</emph> de um <ref target="/assets/python-lessons3.zip">zip</ref>.</p>
 </div>
       <div type="2"><head>Limpando a Lista</head>
-<p>Na li&#231;&#227;o <link target="/pt/licoes/HTML-lista-palavras-2">De HTML para Lista de Palavras (parte 2)</link>, escrevemos um programa em Python chamado <code type="inline">html-to-list1.py</code> que fazia o <emph>download</emph> de uma <link target="https://perma.cc/8LM6-W39K">p&#225;gina web</link>, removia a formata&#231;&#227;o HTML e os metadados e retornava uma lista de "palavras" como a apresentada abaixo. Tecnicamente, essas entidades s&#227;o chamadas de "<emph>tokens</emph>" ao inv&#233;s de "palavras". Elas incluem alguns elementos que, estritamente falando, n&#227;o s&#227;o palavras (como a abrevia&#231;&#227;o &amp;c. para "etcetera"). Elas tamb&#233;m incluem elementos que podem ser considerados composi&#231;&#245;es de mais de uma palavra. O possessivo "Akerman's", por exemplo, &#233; ocasionalmente analisado por linguistas como duas palavras: "Akerman" e um marcador de posse. "o'clock" &#233; uma palavra ou duas? E assim por diante.</p>
-<p>Volte ao seu programa <code type="inline">html-to-list1.py</code> e certifique-se de que o seu resultado se assemelha ao seguinte:</p>
-<pre><code class="language-python" xml:id="code_normalizacao-dados-textuais-python_0" type="block" corresp="code_normalizacao-dados-textuais-python_0.txt"/></pre>
+<p>Na li&#231;&#227;o <ref target="/pt/licoes/HTML-lista-palavras-2">De HTML para Lista de Palavras (parte 2)</ref>, escrevemos um programa em Python chamado <code rend="inline">html-to-list1.py</code> que fazia o <emph>download</emph> de uma <ref target="https://perma.cc/8LM6-W39K">p&#225;gina web</ref>, removia a formata&#231;&#227;o HTML e os metadados e retornava uma lista de "palavras" como a apresentada abaixo. Tecnicamente, essas entidades s&#227;o chamadas de "<emph>tokens</emph>" ao inv&#233;s de "palavras". Elas incluem alguns elementos que, estritamente falando, n&#227;o s&#227;o palavras (como a abrevia&#231;&#227;o &amp;c. para "etcetera"). Elas tamb&#233;m incluem elementos que podem ser considerados composi&#231;&#245;es de mais de uma palavra. O possessivo "Akerman's", por exemplo, &#233; ocasionalmente analisado por linguistas como duas palavras: "Akerman" e um marcador de posse. "o'clock" &#233; uma palavra ou duas? E assim por diante.</p>
+<p>Volte ao seu programa <code rend="inline">html-to-list1.py</code> e certifique-se de que o seu resultado se assemelha ao seguinte:</p>
+<ab><code xml:id="code_normalizacao-dados-textuais-python_0" corresp="code_normalizacao-dados-textuais-python_0.txt" lang="language-python" rend="block"/></ab>
 <p>Por si s&#243;, a habilidade de separar um documento em palavras n&#227;o &#233; muito &#250;til, j&#225; que somos capazes de ler. Podemos usar o texto, no entanto, para executar tarefas que n&#227;o s&#227;o sempre poss&#237;veis sem <emph>softwares</emph> especiais. Come&#231;aremos calculando as frequ&#234;ncias dos <emph>tokens</emph> e outras unidades lingu&#237;sticas, uma forma cl&#225;ssica de mensurar textos. </p>
-<p>Est&#225; claro que a nossa lista precisar&#225; de uma limpeza antes de conseguirmos utiliz&#225;-la para contar frequ&#234;ncias. Em linha com as pr&#225;ticas estabelecidas em <link target="/pt/licoes/HTML-lista-palavras-1">De HTML para Lista de Palavras (parte 1)</link>, vamos tentar descrever o nosso algoritmo em portugu&#234;s primeiro. Desejamos saber a frequ&#234;ncia de cada palavra com sentido que aparece na transcri&#231;&#227;o do julgamento. Desse modo, as etapas envolvidas podem ser semelhantes a estas:</p>
-<ul>
-<li>Converter todas as palavras para letras min&#250;sculas de modo que "BENJAMIN" e "benjamin" sejam contabilizadas como a mesma palavra</li>
-<li>Remover quaisquer caracteres estranhos ou incomuns</li>
-<li>Contar o n&#250;mero de vezes que cada palavra aparece</li>
-<li>Remover palavras excessivamente comuns como "it", "the", "and", etc.</li>
-</ul>
+<p>Est&#225; claro que a nossa lista precisar&#225; de uma limpeza antes de conseguirmos utiliz&#225;-la para contar frequ&#234;ncias. Em linha com as pr&#225;ticas estabelecidas em <ref target="/pt/licoes/HTML-lista-palavras-1">De HTML para Lista de Palavras (parte 1)</ref>, vamos tentar descrever o nosso algoritmo em portugu&#234;s primeiro. Desejamos saber a frequ&#234;ncia de cada palavra com sentido que aparece na transcri&#231;&#227;o do julgamento. Desse modo, as etapas envolvidas podem ser semelhantes a estas:</p>
+<list type="unordered">
+<item>Converter todas as palavras para letras min&#250;sculas de modo que "BENJAMIN" e "benjamin" sejam contabilizadas como a mesma palavra</item>
+<item>Remover quaisquer caracteres estranhos ou incomuns</item>
+<item>Contar o n&#250;mero de vezes que cada palavra aparece</item>
+<item>Remover palavras excessivamente comuns como "it", "the", "and", etc.</item>
+</list>
 </div>
       <div type="2"><head>Converter para Min&#250;sculas</head>
-<p>Tipicamente tokens s&#227;o convertidos em letras min&#250;sculas ao contar frequ&#234;ncias, ent&#227;o faremos isso atrav&#233;s do m&#233;todo de string <code type="inline">lower</code> que foi introduzido em <link target="/pt/licoes/manipular-strings-python">Manipular strings com Python</link>. J&#225; que este &#233; um m&#233;todo de string, devemos aplic&#225;-lo &#224; string <code type="inline">text</code> no programa <code type="inline">html-to-list1.py</code>. Ajuste <code type="inline">html-to-list1.py</code> adicionando a <emph>string tag</emph> <code type="inline">lower()</code> ao final da string <code type="inline">text</code>. </p>
-<pre><code class="language-python" xml:id="code_normalizacao-dados-textuais-python_1" type="block" corresp="code_normalizacao-dados-textuais-python_1.txt"/></pre>
+<p>Tipicamente tokens s&#227;o convertidos em letras min&#250;sculas ao contar frequ&#234;ncias, ent&#227;o faremos isso atrav&#233;s do m&#233;todo de string <code rend="inline">lower</code> que foi introduzido em <ref target="/pt/licoes/manipular-strings-python">Manipular strings com Python</ref>. J&#225; que este &#233; um m&#233;todo de string, devemos aplic&#225;-lo &#224; string <code rend="inline">text</code> no programa <code rend="inline">html-to-list1.py</code>. Ajuste <code rend="inline">html-to-list1.py</code> adicionando a <emph>string tag</emph> <code rend="inline">lower()</code> ao final da string <code rend="inline">text</code>. </p>
+<ab><code xml:id="code_normalizacao-dados-textuais-python_1" corresp="code_normalizacao-dados-textuais-python_1.txt" lang="language-python" rend="block"/></ab>
 <p>Agora deve ver a mesma lista de palavras de antes, mas com todos os caracteres min&#250;sculos.</p>
 <p>Ao chamar m&#233;todos em sequ&#234;ncia como mostrado, torna-se poss&#237;vel manter o nosso c&#243;digo curto e fazer mudan&#231;as bastante significativas no nosso programa.</p>
 <p>Como afirm&#225;mos anteriormente, o Python torna f&#225;cil a execu&#231;&#227;o de muitas tarefas com pouqu&#237;ssimo c&#243;digo.</p>
@@ -48,26 +48,26 @@
 </div>
       <div type="2"><head>Express&#245;es Regulares de Python</head>
 <p>N&#243;s eliminamos as letras mai&#250;sculas. Agora s&#243; precisamos nos livrar da pontua&#231;&#227;o. A pontua&#231;&#227;o prejudicar&#225; as nossas contagens de frequ&#234;ncia se as mantivermos l&#225;. Desejamos que "evening?" seja contabilizado como "evening" e "1780." como "1780", claro.</p>
-<p>&#201; poss&#237;vel utilizar o m&#233;todo de string <code type="inline">replace</code> para remover cada tipo de pontua&#231;&#227;o:</p>
-<pre><code class="language-python" xml:id="code_normalizacao-dados-textuais-python_2" type="block" corresp="code_normalizacao-dados-textuais-python_2.txt"/></pre>
+<p>&#201; poss&#237;vel utilizar o m&#233;todo de string <code rend="inline">replace</code> para remover cada tipo de pontua&#231;&#227;o:</p>
+<ab><code xml:id="code_normalizacao-dados-textuais-python_2" corresp="code_normalizacao-dados-textuais-python_2.txt" lang="language-python" rend="block"/></ab>
 <p>No entanto, isso n&#227;o &#233; muito eficiente. Em linha com o nosso objetivo de criar programas curtos e poderosos, utilizaremos um mecanismo chamado <emph>express&#245;es regulares</emph>. Express&#245;es regulares s&#227;o fornecidas por muitas linguagens de programa&#231;&#227;o de v&#225;rias maneiras distintas.</p>
-<p>Express&#245;es regulares permitem que busque por padr&#245;es bem definidos e podem diminuir drasticamente o comprimento do c&#243;digo. Por exemplo, se desejasse saber se uma substring corresponde a uma letra do alfabeto, ao inv&#233;s de usar uma condi&#231;&#227;o <code type="inline">if/else</code> para verificar se ela representa a letra "a", depois "b", depois "c" e assim por diante, poderia usar uma express&#227;o regular para verificar se a substring se assemelha a uma letra entre "a" e "z". Ou poderia verificar a presen&#231;a de um d&#237;gito, uma letra mai&#250;scula, ou qualquer caractere alfanum&#233;rico, ou um <link target="https://perma.cc/T7DA-RG2L">retorno de carro</link>, ou qualquer combina&#231;&#227;o dos itens acima e muito mais.</p>
-<p>Em Python, express&#245;es regulares est&#227;o dispon&#237;veis como um m&#243;dulo. Para acelerar o processamento, ele n&#227;o &#233; carregado automaticamente porque nem todos os programas o exigem. Ent&#227;o, precisar&#225; importar (<code type="inline">import</code>) o m&#243;dulo (chamado <code type="inline">re</code>, abrevia&#231;&#227;o de <emph>regular expressions</emph>) da mesma forma que importou o m&#243;dulo <code type="inline">obo.py</code>.</p>
-<p>Como estamos interessados apenas em caracteres alfanum&#233;ricos, criaremos uma express&#227;o regular que ir&#225; isol&#225;-los e remover&#225; o resto. Copie a fun&#231;&#227;o a seguir e cole-a ao final do m&#243;dulo <code type="inline">obo.py</code>. Pode manter as outras fun&#231;&#245;es do m&#243;dulo, j&#225; que continuaremos a us&#225;-las.</p>
-<pre><code class="language-python" xml:id="code_normalizacao-dados-textuais-python_3" type="block" corresp="code_normalizacao-dados-textuais-python_3.txt"/></pre>
-<p>A express&#227;o regular no c&#243;digo acima &#233; o material dentro da string, em outras palavras: <code type="inline">W+</code>. <code type="inline">W</code> &#233; uma abreviatura para a classe de caracteres n&#227;o-alfanum&#233;ricos. Numa express&#227;o regular de Python, o sinal de adi&#231;&#227;o (+) encontra uma ou mais c&#243;pias de um determinado caractere. <code type="inline">re.UNICODE</code> informa ao interpretador que desejamos incluir caracteres de outros idiomas do mundo em nossa defini&#231;&#227;o de alfanum&#233;rico, assim como de "A" a "Z", "a" a "z" e 0-9 do portugu&#234;s. Express&#245;es regulares devem ser <emph>compiladas</emph> antes de poderem ser utilizadas, que &#233; o que o resto do comando faz. N&#227;o se preocupe em compreender a parte da compila&#231;&#227;o agora.</p>
-<p>Agora que refinamos o nosso programa <code type="inline">html-to-list1.py</code>, ele se parece com isto:</p>
-<pre><code class="language-python" xml:id="code_normalizacao-dados-textuais-python_4" type="block" corresp="code_normalizacao-dados-textuais-python_4.txt"/></pre>
-<p>Ao executar o programa e verificar a sa&#237;da no painel "Sa&#237;da de Comando", ver&#225; que ele fez um bom trabalho. Esse c&#243;digo ir&#225; dividir formas hifenizadas como "coach-wheels" em duas palavras e ir&#225; transformar o possessivo "s" ou "o'clock" em palavras separadas ao perderem o ap&#243;strofo. Ainda assim, o c&#243;digo faz uma aproxima&#231;&#227;o boa o suficiente para os nossos objetivos e devemos agora passar para a contagem de frequ&#234;ncias antes de tentar melhor&#225;-lo. (Caso trabalhe com fontes em mais de um idioma, precisa aprender um pouco mais a respeito do padr&#227;o <link target="https://perma.cc/7ACH-KCDN">Unicode</link> e sobre o <link target="https://web.archive.org/web/20180502053841/http://www.diveintopython.net/xml_processing/unicode.html">suporte de Python</link> a ele.)</p>
+<p>Express&#245;es regulares permitem que busque por padr&#245;es bem definidos e podem diminuir drasticamente o comprimento do c&#243;digo. Por exemplo, se desejasse saber se uma substring corresponde a uma letra do alfabeto, ao inv&#233;s de usar uma condi&#231;&#227;o <code rend="inline">if/else</code> para verificar se ela representa a letra "a", depois "b", depois "c" e assim por diante, poderia usar uma express&#227;o regular para verificar se a substring se assemelha a uma letra entre "a" e "z". Ou poderia verificar a presen&#231;a de um d&#237;gito, uma letra mai&#250;scula, ou qualquer caractere alfanum&#233;rico, ou um <ref target="https://perma.cc/T7DA-RG2L">retorno de carro</ref>, ou qualquer combina&#231;&#227;o dos itens acima e muito mais.</p>
+<p>Em Python, express&#245;es regulares est&#227;o dispon&#237;veis como um m&#243;dulo. Para acelerar o processamento, ele n&#227;o &#233; carregado automaticamente porque nem todos os programas o exigem. Ent&#227;o, precisar&#225; importar (<code rend="inline">import</code>) o m&#243;dulo (chamado <code rend="inline">re</code>, abrevia&#231;&#227;o de <emph>regular expressions</emph>) da mesma forma que importou o m&#243;dulo <code rend="inline">obo.py</code>.</p>
+<p>Como estamos interessados apenas em caracteres alfanum&#233;ricos, criaremos uma express&#227;o regular que ir&#225; isol&#225;-los e remover&#225; o resto. Copie a fun&#231;&#227;o a seguir e cole-a ao final do m&#243;dulo <code rend="inline">obo.py</code>. Pode manter as outras fun&#231;&#245;es do m&#243;dulo, j&#225; que continuaremos a us&#225;-las.</p>
+<ab><code xml:id="code_normalizacao-dados-textuais-python_3" corresp="code_normalizacao-dados-textuais-python_3.txt" lang="language-python" rend="block"/></ab>
+<p>A express&#227;o regular no c&#243;digo acima &#233; o material dentro da string, em outras palavras: <code rend="inline">W+</code>. <code rend="inline">W</code> &#233; uma abreviatura para a classe de caracteres n&#227;o-alfanum&#233;ricos. Numa express&#227;o regular de Python, o sinal de adi&#231;&#227;o (+) encontra uma ou mais c&#243;pias de um determinado caractere. <code rend="inline">re.UNICODE</code> informa ao interpretador que desejamos incluir caracteres de outros idiomas do mundo em nossa defini&#231;&#227;o de alfanum&#233;rico, assim como de "A" a "Z", "a" a "z" e 0-9 do portugu&#234;s. Express&#245;es regulares devem ser <emph>compiladas</emph> antes de poderem ser utilizadas, que &#233; o que o resto do comando faz. N&#227;o se preocupe em compreender a parte da compila&#231;&#227;o agora.</p>
+<p>Agora que refinamos o nosso programa <code rend="inline">html-to-list1.py</code>, ele se parece com isto:</p>
+<ab><code xml:id="code_normalizacao-dados-textuais-python_4" corresp="code_normalizacao-dados-textuais-python_4.txt" lang="language-python" rend="block"/></ab>
+<p>Ao executar o programa e verificar a sa&#237;da no painel "Sa&#237;da de Comando", ver&#225; que ele fez um bom trabalho. Esse c&#243;digo ir&#225; dividir formas hifenizadas como "coach-wheels" em duas palavras e ir&#225; transformar o possessivo "s" ou "o'clock" em palavras separadas ao perderem o ap&#243;strofo. Ainda assim, o c&#243;digo faz uma aproxima&#231;&#227;o boa o suficiente para os nossos objetivos e devemos agora passar para a contagem de frequ&#234;ncias antes de tentar melhor&#225;-lo. (Caso trabalhe com fontes em mais de um idioma, precisa aprender um pouco mais a respeito do padr&#227;o <ref target="https://perma.cc/7ACH-KCDN">Unicode</ref> e sobre o <ref target="https://web.archive.org/web/20180502053841/http://www.diveintopython.net/xml_processing/unicode.html">suporte de Python</ref> a ele.)</p>
 </div>
       <div type="2"><head>Leituras Sugeridas</head>
-<p>Para praticar mais as Express&#245;es Regulares, o cap&#237;tulo 7 de "<link target="https://web.archive.org/web/20180416143856/http://www.diveintopython.net/regular_expressions/index.html">Dive into Python</link>" de Mark Pilgrim pode ser um tutorial &#250;til.</p>
+<p>Para praticar mais as Express&#245;es Regulares, o cap&#237;tulo 7 de "<ref target="https://web.archive.org/web/20180416143856/http://www.diveintopython.net/regular_expressions/index.html">Dive into Python</ref>" de Mark Pilgrim pode ser um tutorial &#250;til.</p>
 </div>
       <div type="2"><head>Sincroniza&#231;&#227;o de C&#243;digo</head>
 <p>Para acompanhar as li&#231;&#245;es futuras, &#233; importante que tenha os ficheiros e programas corretos no seu diret&#243;rio <emph>programming historian</emph>. Ao final de cada cap&#237;tulo nesta s&#233;rie pode fazer o <emph>download</emph> do ficheiro zip do programming historian para garantir que possui o c&#243;digo correto. </p>
-<ul>
-<li>python-lessons4.zip (<link target="/assets/python-lessons4.zip">zip sync</link>)</li>
-</ul>
+<list type="unordered">
+<item>python-lessons4.zip (<ref target="/assets/python-lessons4.zip">zip sync</ref>)</item>
+</list>
 </div>
     </body>
   </text>

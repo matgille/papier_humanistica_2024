@@ -3,14 +3,14 @@
  <fileDesc>
   <titleStmt>
    <title>Clustering and Visualising Documents using Word Embeddings</title>
-  <author type="original_author"><persName>Jonathan Reades</persName><persName>Jennie Williams</persName></author><editor type="reviewers"><persName>Quinn Dombrowski</persName><persName>Barbara McGillivray</persName></editor><editor type="editors">Alex Wermer-Colan</editor></titleStmt>
+  <author role="original_author"><persName>Jonathan Reades</persName><persName>Jennie Williams</persName></author><editor role="reviewers"><persName>Quinn Dombrowski</persName><persName>Barbara McGillivray</persName></editor><editor role="editors">Alex Wermer-Colan</editor></titleStmt>
   <publicationStmt>
    <idno type="doi">10.46430/phen0111</idno><date type="published">08/09/2023</date><p>Lesson reviewed and published in Programming Historian.</p>
   </publicationStmt>
   <sourceDesc>
-  <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target=""/></p></sourceDesc>
+  <p>Born digital, in a markdown format. This lesson is original.</p></sourceDesc>
  </fileDesc>
- <profileDesc><abstract><p>This lesson uses word embeddings and clustering algorithms in Python to identify groups of similar documents in a corpus of approximately 9,000 academic abstracts. It will teach you the basics of dimensionality reduction for extracting structure from a large corpus and how to evaluate your results.</p></abstract><textClass><keyword xml:lang="en">machine-learning</keyword><keyword xml:lang="en">network-analysis</keyword><keyword xml:lang="en">python</keyword><keyword xml:lang="en">data-visualization</keyword></textClass></profileDesc>
+ <profileDesc><abstract><p>This lesson uses word embeddings and clustering algorithms in Python to identify groups of similar documents in a corpus of approximately 9,000 academic abstracts. It will teach you the basics of dimensionality reduction for extracting structure from a large corpus and how to evaluate your results.</p></abstract><textClass><keywords><term xml:lang="en">machine-learning</term><term xml:lang="en">network-analysis</term><term xml:lang="en">python</term><term xml:lang="en">data-visualization</term></keywords></textClass></profileDesc>
 </teiHeader>
   <text xml:lang="en">
     <body>
@@ -19,474 +19,410 @@
 <p>This lesson shows <emph>one</emph> way to achieve this: uncovering meaningful structure in a large corpus of about 9,000 documents through the use of two techniques &#8212;&#160;dimensionality reduction and hierarchical clustering &#8212; to find and group similar documents with minimal human guidance. Our approach to document classification is <emph>unsupervised</emph>: we do not use either keywords or human expertise &#8212; except to validate the results and provide a measure of 'quality' &#8212; relying instead on the information contained in the text itself. </p>
 <p>To do this we take advantage of word and document embeddings; these lie at the root of recent advances in text-mining and Natural Language Processing, and they provide us with a numerical representation of a text that extends what's possible with counts or TF/IDF representations of text. We take these embeddings and then apply our selected techniques to extract a hierarchical structure of relationships from the corpus. In this lesson, we'll explore why documents on similar topics tend be closer in the (numerical) 'space' of the word and document embeddings than those that are on very different topics. </p>
 <p>To help make sense of this multidimensional 'space', this lesson explicates the corpus through a range of data visualisations that (we hope) bring the process to life. Based on these visualizations, this lesson demonstrates how this approach can help with a range of practical applications: at the word- and document-level we can use similarity to suggest missing keywords or find documents on the same topic (even if they use a slightly different vocabulary to do so!); and at the corpus-level we can look at how topics have grown and changed over time, and identify core/peripheries of disciplines or knowledge domains. </p>
-<p>For a fuller introduction to word embeddings and their use in Natural Language Processing, you may wish to read Barbara McGillivray's <emph>How to use word embeddings for Natural Language Processing</emph> (see the King's College London <link target="https://perma.cc/S9FR-Q8KT">Institutional Repository</link> for details; <link target="https://perma.cc/5NKB-WQAL">direct download</link>). In addition, the details of <emph>how</emph> word and documents embeddings are created will be covered in future <emph>Programming Historian</emph> lessons. This lesson will also provide a brief overview of what embeddings <emph>do</emph> (and why they differ from, say, TF/IDF), using embeddings that we trained on a corpus composed of the title and abstract of completed doctoral research in the Arts and Humanities lodged with the British Library. </p>
+<p>For a fuller introduction to word embeddings and their use in Natural Language Processing, you may wish to read Barbara McGillivray's <emph>How to use word embeddings for Natural Language Processing</emph> (see the King's College London <ref target="https://perma.cc/S9FR-Q8KT">Institutional Repository</ref> for details; <ref target="https://perma.cc/5NKB-WQAL">direct download</ref>). In addition, the details of <emph>how</emph> word and documents embeddings are created will be covered in future <emph>Programming Historian</emph> lessons. This lesson will also provide a brief overview of what embeddings <emph>do</emph> (and why they differ from, say, TF/IDF), using embeddings that we trained on a corpus composed of the title and abstract of completed doctoral research in the Arts and Humanities lodged with the British Library. </p>
 <div type="3"><head>Learning Outcomes</head>
-<ol>
-<li>An appreciation of the 'curse of dimensionality' and why it is an important to text mining.</li>
-<li>The ability to use (nonlinear) dimensionality reduction to reveal structure in corpora.</li>
-<li>The ability to use hierarchical clustering  to group similar documents within a corpus.</li>
-</ol>
+<list type="ordered">
+<item>An appreciation of the 'curse of dimensionality' and why it is an important to text mining.</item>
+<item>The ability to use (nonlinear) dimensionality reduction to reveal structure in corpora.</item>
+<item>The ability to use hierarchical clustering  to group similar documents within a corpus.</item>
+</list>
 </div><div type="3"><head>Prerequisites</head>
-<p>This article can be seen as building on, and responding to, the <link target="/en/lessons/clustering-with-scikit-learn-in-python">Clustering with Scikit-Learn in Python</link> tutorial already available on <emph>The Programming Historian</emph>. Like Thomas Jurczyk, we are interested in applying clustering algorithms with Python to textual data 'in order to discover thematic groups'. Contrasting these two tutorials will allow you to develop a broader understanding of the Natural Language Processing (NLP) landscape. </p>
+<p>This article can be seen as building on, and responding to, the <ref target="/en/lessons/clustering-with-scikit-learn-in-python">Clustering with Scikit-Learn in Python</ref> tutorial already available on <emph>The Programming Historian</emph>. Like Thomas Jurczyk, we are interested in applying clustering algorithms with Python to textual data 'in order to discover thematic groups'. Contrasting these two tutorials will allow you to develop a broader understanding of the Natural Language Processing (NLP) landscape. </p>
 <p>The most important differences between these tutorials are:</p>
-<ol>
-<li>The use of word2vec instead of TF/IDF</li>
-<li>The use of UMAP instead of PCA for dimensionality reduction</li>
-<li>The use of hierarchical instead of <emph>k</emph>-means clustering</li>
-</ol>
+<list type="ordered">
+<item>The use of word2vec instead of TF/IDF</item>
+<item>The use of UMAP instead of PCA for dimensionality reduction</item>
+<item>The use of hierarchical instead of <emph>k</emph>-means clustering</item>
+</list>
 <p>This lesson's steps enable you to convert each document to a point that can be plotted on a graph and grouped together based on their proximity to other documents.</p>
 </div></div>
       <div type="2"><head>Background: from Words to Data</head>
 <p>For computers to 'make sense' of large corpora, we ultimately need two things: </p>
-<ol>
-<li>a way to transform words into numerical data</li>
-<li>a way to make use of those numbers in order to find groups of 'similar' documents</li>
-</ol>
+<list type="ordered">
+<item>a way to transform words into numerical data</item>
+<item>a way to make use of those numbers in order to find groups of 'similar' documents</item>
+</list>
 <p>Until quite recently, this process was fairly simple: assign each unique term in the corpus a number;  create a kind of 'latent fingerprint' for each document using those numbers; and, finally, group documents together based on the similarity of their fingerprints. </p>
 <p>In practical terms, we create a matrix in which each column is a term from the corpus, and each document is a row. In a corpus with thousands of documents this matrix can quickly become unwieldy: 50,000 documents ($m$ rows) and 25,000 terms ($n$ columns) implies a matrix of 1,250,000,000 elements ($m \times n$)! The number of columns in this matrix is also known as its <emph>dimensionality</emph>: a corpus of 25 terms is 25-dimensional, while a corpus with 25,000 unique words is... of <emph>high</emph>-dimensionality. </p>
 <p>High-dimensional data are not just problematic because they're computationally intractable (1.25 <emph>billion</emph> elements is a <emph>lot</emph> any way you look at it), but also because data in high-dimensional spaces don't necessarily <emph>behave</emph> the same way that low-dimensional ones do! The core issue is sparsity: across those billions of elements <emph>many</emph> are zeroes (because most words contain only a small proportion of the terms in the corpus), and most term counts are also fairly low (once you've stripped out stopwords and other low-value terms). To put it another way: most rows contain a few ones, and <emph>lots</emph> of zeroes.</p>
-<p>Collectively, these kinds of issues are known as '<link target="https://perma.cc/2L27-2XHJ">the curse of dimensionality</link>'. For NLP applications, you end up in a situation where the majority of documents <emph>look</emph> disimilar to one another (from a computational standpoint) because of the sparsity of data. And that is an environment in which clustering algorithms perform very poorly. So to make this all work, we need a way to create a <emph>dense</emph> representation of the corpus and its contents, and that is where word embeddings and dimensionality reduction come into play.</p>
-<div type="3"><head>Word Embeddings to the Rescue</head>
-<p>We understand intuitively that documents on similar topics should have similar vocabularies, but simply assigning a unique number to each word doesn't respect this intuition. For example, 'apple' may be assigned term id 1 and 'aardvark' is 2, while 'pear' is assigned id 23,472, even though we know that apples and pairs are more similar than apples and aardvarks. The issue is that we've thrown away the context! A child can spot the similarity between, say, &#8220;the King ruled for 20 years&#8221; and &#8220;the Queen ruled for 30 years&#8221;, but in a simple term-document matrix, this link is lost. </p>
-<p>Word embeddings encode meaningful information about that context, so words used in similar sentences or phrases end up with similar embeddings. We also now represent each term not with a single number, but a whole <emph>row of numbers</emph> or a 'vector'. Properly set up, vector embeddings allow us to do all sorts of interesting things &#8212; finding synonyms, working out <emph>mathematically</emph> that a Queen is <emph>like</emph> a King, or grouping documents without keywords &#8212; that aren't possible with the simpler approaches. </p>
-<p>Critically, whereas we used to need as many columns as there were words to represent a corpus's vocabulary, now all words are represented within the space of the embedding's dimensions. Table 1 shows the first three dimensions for some randomly-selected words from a corpus using 125-dimensional embeddings: notice that we're now using decimals instead of whole numbers, and that while 'transcript' and 'bilingualism' might have similar loadings on the first dimension, they don't on subsequent dimensions. </p>
+<p>Collectively, these kinds of issues are known as '<ref target="https://perma.cc/2L27-2XHJ">the curse of dimensionality</ref>'. For NLP applications, you end up in a situation where the majority of documents <emph>look</emph> disimilar to one another (from a computational standpoint) because of the sparsity of data. And that is an environment in which clustering algorithms perform very poorly. So to make this all work, we need a way to create a <emph>dense</emph> representation of the corpus and its contents, and that is where word embeddings and dimensionality reduction come into play.</p>
 <table>
-<thead>
-<tr>
-<th align="right">Term</th>
-<th align="right">Dim 1</th>
-<th align="right">Dim 2</th>
-<th align="right">Dim 3</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">transcript</td>
-<td align="right">0.041880</td>
-<td align="right">-0.353720</td>
-<td align="right">0.313199</td>
-</tr>
-<tr>
-<td align="right">bilingualism</td>
-<td align="right">0.042781</td>
-<td align="right">-0.161887</td>
-<td align="right">-0.437908</td>
-</tr>
-<tr>
-<td align="right">externalism</td>
-<td align="right">0.116406</td>
-<td align="right">0.085796</td>
-<td align="right">0.109329</td>
-</tr>
-</tbody></table><p>These embeddings are also known as <emph>dense represetations</emph> because they can be understood as packing a corpus into a smaller 'space', which has computational and analytical benefits. However, before we get there, there are additional issues to consider: </p>
-<ol>
-<li><hi rend="bold">Data Cleaning</hi>: although this is not the focus of <emph>this</emph> tutorial, it's important to consider how you process the raw texts <emph>before</emph> building the word embedding. In our case, text cleaning included: a) removal of HTML and other 'markup', accents, possessives, punctuation, and quote-marks; b) Named Entity Recognition and detection of acronyms using custom code applied before the text was converted to lower case; c) lemmatisation; d) automated detection of bigrams and trigrams; and e) removal of very high- and very low-frequency terms. These steps aren't always necessary; it depends on what you want to do.</li>
-<li><hi rend="bold">Pre-training</hi>: the process of learning the word embeddings for a corpus can be both computationally- and data-intensive. People with neither a lot of time, nor a lot of text, often use  <emph>pre</emph>-trained embeddings since these have been trained on enormous corpora to capture a wide range of variations in usage. Pre-trained embeddings are available for both generic and specific application domains. We would assume that embeddings generated <link target="https://perma.cc/Z34U-NE8Y">from social media sources</link> <emph>should</emph> outperform generic embeddings for Twitter or Facebook analyses; however, we think we'll get <emph>better</emph> results here by training our own model because academic English differs from what you'll find in most pre-trained embeddings.</li>
-<li><hi rend="bold">Windowing Choice</hi>: once we've made the decision to train our own embeddings, we need to specify the amount of 'context' that we want to consider by defining a 'window' across which the neural network learns. This window can be: a) asymmetric or symmetric (the former are commonly used for predictive or corrective applications); b) narrow or wide (the former are used to capture short-range patterns in text); and c) weighted or unweighted (the former used to give nearby terms greater importance than more distant ones). We employed a symmetric, weighted window of size 6.</li>
-<li><hi rend="bold">Minimum Frequency</hi>: 'rare' words may not occur often enough for a meaningful embedding to be learned, leading not only to additional computational effort, but also to unreliable embeddings that impact the overall quality of the vectors. In the context of corpus analysis we may also be more interested in terms that occur in some minimum proportion of all texts, in order to better-define relationships between them: a term that occurs in just three documents in a 25,000 document corpus is unlikely to be of much use for <emph>our</emph> purposes (of course, there might be other applications where this does matter!).</li>
-</ol>
-<p>To be clear: 'similar' word embeddings implies words that can be found in similar contexts. So if we only had documents relating to Physics then the embedding for 'accelerator' would be 'similar' to the embeddings for CERN, beam, particle, and so forth. But if we included documents about automobiles then we might also find terms like 'brake' or 'clutch' having similar embeddings as well! </p>
-<p>The fact that the same term is used in two quite different contexts &#8212; because: different meanings &#8212; is irrelevant to the more basic embedding algorithms (as we employ here) but can obviously have a significant effect on your results. We're not particularly interested in how <emph>non</emph>-academics use the term 'theory' or 'narrative', so training our own embeddings helps us to filter out less useful associations from pre-trained embeddings. Newer algorithms <emph>can</emph> distinguish between multiple contexts but these are harder to train (i.e. require faster computers and more data).</p>
-</div><div type="3"><head>From Words to Documents</head>
+<row>
+<cell align="right" role="label">Term</cell>
+<cell align="right" role="label">Dim 1</cell>
+<cell align="right" role="label">Dim 2</cell>
+<cell align="right" role="label">Dim 3</cell>
+</row>
+<row>
+<cell align="right">externalism</cell>
+<cell align="right">0.116406</cell>
+<cell align="right">0.085796</cell>
+<cell align="right">0.109329</cell>
+</row>
+<row>
+<cell align="right">bilingualism</cell>
+<cell align="right">0.042781</cell>
+<cell align="right">-0.161887</cell>
+<cell align="right">-0.437908</cell>
+</row>
+<row>
+<cell align="right">transcript</cell>
+<cell align="right">0.041880</cell>
+<cell align="right">-0.353720</cell>
+<cell align="right">0.313199</cell>
+</row>
+</table><div type="3"><head>From Words to Documents</head>
 <p>If you're still with us, then you'll notice that we're still talking about <emph>word</emph> embeddings and haven't yet explained how these models will help us group documents together. The latter <emph>can</emph> be done by averaging together the individual word embeddings to produce a document vector. It might sound bizarre (shouldn't that produce an 'average' word?), but this method works because common words are averaged out in their effects across the corpus, while less common ones affect the final position of a term relative to all other terms in the corpus. We have tried this method, and it does work surprisingly well.</p>
 <p>However, a more sophisticated method is to adapt word2vec to recognise that the distribution of terms in a corpus is meaningful in ways <emph>beyond</emph> their immediate context. Doc2vec is this extension: it adds a 'paragraph vector' that represents the source text as a whole and which is trained in parallel with the word embeddings. In a sense, this implements the intuition which we <emph>also</emph> see in Latent Dirichlet Allocation (LDA) that a paragraph is <emph>about</emph> something &#8212; a topic &#8212; that subtly influences word choice and usage. In this tutorial we found that doc2vec delivered more readily interpretable results.</p>
 </div></div>
       <div type="2"><head>Case Study: E-Theses Online</head>
-<p>This tutorial uses a bibliographic corpus managed by the <link target="https://www.bl.uk/">British Library</link> (BL) to enhance public access to doctoral research. <link target="https://ethos.bl.uk/"><emph>E-Theses Online</emph></link> (EThOS, hereafter) provides metadata &#8212; which is to say, data <emph>about</emph> a PhD, <emph>not</emph> the data <emph>of</emph> the PhD&#8212;such as Author, Title, Abstract, Keywords, <link target="https://perma.cc/R6LX-T8F8">Dewey Decimal Classification</link> (DDC), etc. Most users of EThOS will search this metadata using the BL's web interface to find and retrieve individual documents (see Figure 1); however, in aggregate, <link target="https://bl.iro.bl.uk/catalog?locale=en&amp;q=%22UK+Doctoral+Thesis+Metadata+from+EThOS%22&amp;search_field=all_fields&amp;sort=year_published_isi+desc&amp;_ga=2.85833567.757719569.1646905901-495121888.1646905901">the data</link> also provides a unique perspective on U.K. Higher Education.</p>
-<figure><desc>Figure 1. EThOS Web Interface for an Individual Metadata Record</desc><graphic url="or-en-clustering-visualizing-word-embeddings-1.png" alt="Screenshot of EThOS web interface showing the kinds of information available in the EThOS metadata and the dominant way of interacting with this data set."/></figure>
-<p>In the terminology of the BL, EThOS is '<link target="https://perma.cc/V2C4-HGJN">living knowledge</link>' which is to say that not only is it constantly growing as students complete their research and become newly-minted PhDs, but it is also constantly evolving in terms of what fields are captured and how reliably they are filled in by librarians at the student's host institution. The full data set currently stands at more than 500,000 documents and is available for download <link target="https://bl.iro.bl.uk/concern/datasets/c815b271-09be-4123-8156-405094429198">via DOI</link>.</p>
-<div type="3"><head>Selection</head>
-<p>The Dewey Decimal Classification (or DDC) field is not normally included and we have therefore agreed with the BL to share a subset of ca. 8,000 records that includes this attribute. We used the DDC to select documents that might present challenges to automated text-analysis and classification (see Table 1). In this set of documents, two branches of History PhDs dominate (4,591 documents in all), while there is roughly equal representation from Linguistics and Philosophy.</p>
-<p><hi rend="bold">Table 1. Selected Records from EThOS Dataset</hi></p>
+<p>This tutorial uses a bibliographic corpus managed by the <ref target="https://www.bl.uk/">British Library</ref> (BL) to enhance public access to doctoral research. <ref target="https://ethos.bl.uk/"><emph>E-Theses Online</emph></ref> (EThOS, hereafter) provides metadata &#8212; which is to say, data <emph>about</emph> a PhD, <emph>not</emph> the data <emph>of</emph> the PhD&#8212;such as Author, Title, Abstract, Keywords, <ref target="https://perma.cc/R6LX-T8F8">Dewey Decimal Classification</ref> (DDC), etc. Most users of EThOS will search this metadata using the BL's web interface to find and retrieve individual documents (see Figure 1); however, in aggregate, <ref target="https://bl.iro.bl.uk/catalog?locale=en&amp;q=%22UK+Doctoral+Thesis+Metadata+from+EThOS%22&amp;search_field=all_fields&amp;sort=year_published_isi+desc&amp;_ga=2.85833567.757719569.1646905901-495121888.1646905901">the data</ref> also provides a unique perspective on U.K. Higher Education.</p>
+<figure><desc>Figure 1. EThOS Web Interface for an Individual Metadata Record</desc><graphic url="or-en-clustering-visualizing-word-embeddings-1.png"/></figure>
+<p>In the terminology of the BL, EThOS is '<ref target="https://perma.cc/V2C4-HGJN">living knowledge</ref>' which is to say that not only is it constantly growing as students complete their research and become newly-minted PhDs, but it is also constantly evolving in terms of what fields are captured and how reliably they are filled in by librarians at the student's host institution. The full data set currently stands at more than 500,000 documents and is available for download <ref target="https://bl.iro.bl.uk/concern/datasets/c815b271-09be-4123-8156-405094429198">via DOI</ref>.</p>
 <table>
-<thead>
-<tr>
-<th align="left">DDC1 Group ('Class')</th>
-<th align="left">DDC2 Group ('Division')</th>
-<th align="right">Count</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><hi rend="bold">History and Geography (900)</hi></td>
-<td align="left"/>
-<td align="right"><hi rend="bold">4,591</hi></td>
-</tr>
-<tr>
-<td align="left"/>
-<td align="left">History (900-909)</td>
-<td align="right">2,277</td>
-</tr>
-<tr>
-<td align="left"/>
-<td align="left">History of ancient world (to c. 499) (930-939)</td>
-<td align="right">2,314</td>
-</tr>
-<tr>
-<td align="left"><hi rend="bold">Language (400)</hi></td>
-<td align="left"/>
-<td align="right"><hi rend="bold">1,655</hi></td>
-</tr>
-<tr>
-<td align="left"/>
-<td align="left">Linguistics (410-419)</td>
-<td align="right">1,655</td>
-</tr>
-<tr>
-<td align="left"><hi rend="bold">Philosophy and psychology (100)</hi></td>
-<td align="left"/>
-<td align="right"><hi rend="bold">1,756</hi></td>
-</tr>
-<tr>
-<td align="left"/>
-<td align="left">Philosophy (100-109)</td>
-<td align="right">1,756</td>
-</tr>
-<tr>
-<td align="left"><hi rend="bold">Total</hi></td>
-<td align="left"/>
-<td align="right"><hi rend="bold">8,002</hi></td>
-</tr>
-</tbody></table><p>If the clustering that we do later in this lesson fails to reproduce any of the disciplinary distinctions shown in Table 1, then our findings would suggest it's better to stick with simpler, more intuitive approaches, such as TF/IDF. But if, instead, we see that the computer is able to reproduce the finer-grained structure of the EThOS sample based on nothing more than a Title and Abstract, then that would suggest a useful improvement.</p>
-</div><div type="3"><head>Similarity</head>
-<p>We've already created the document embeddings that we'll be using for this tutorial, but we think it's helpful to <emph>briefly</emph> look at how the word embeddings upon which the results depend vary with the type of embedding employed. Table 2 shows three randomly-selected terms from the corpus together with the seven <emph>most similar</emph> terms for each based on 1) usage <emph>within</emph> the EThOS corpus alone, and 2) usage in the Gigaword corpus (a source of pre-trained embeddings).</p>
-<p><hi rend="bold">Table 2. Illustration of embedding outputs and similarity for Doc2Vec</hi></p>
-<table>
-<thead>
-<tr>
-<th align="right">Term</th>
-<th>7 Most Similar<br/>(EThOS Embeddings)</th>
-<th>7 Most Similar<br/>(Gigaword Embeddings)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">transcript</td>
-<td>transcribe, retrospective, session, observation_interview, transcription, interview_data, television_programme</td>
-<td>transcripts, excerpts, videotape, taped, tape, snippets, excerpt</td>
-</tr>
-<tr>
-<td align="right">bilingualism</td>
-<td>multilingualism, multilingual, language_choice, arabic_french, bilingual_education, linguistic_situation, write_texts</td>
-<td>multilingualism, multiculturalism, biculturalism, post-secondary, monogamy, interlinear, lesbianism</td>
-</tr>
-<tr>
-<td align="right">externalism</td>
-<td>internalism, externalist, internalist, desire_belief, semantic_content, disjunctivism, epistemic_status</td>
-<td>fideism, chatroulette, lawfare, coherentism, educology, neuros, incommensurability</td>
-</tr>
-</tbody></table><p>So we get <emph>different</emph> 'most similar' words depending on the training corpus, which also nicely points towards the persistence of bias in Machine Learning (a topic beyond the scope of this lesson). These differences highlight the importance of considering the source of any embeddings when undertaking an analysis on a corpus. Even if the Gigaword embeddings are less than ideal for our use case, these types of word associations would be all the more invisible &#8212; or buried in the statistical noise &#8212; to LDA or TF/IDF approaches. The potency of customised embedding models was demonstrated by Tshitoyan <emph>et al.</emph> (2019), whose analysis of over 3 million materials science abstracts showed that they could help researchers to <emph>anticipate</emph> the discovery of new materials by a year or more! While such commercially valuable applications may be few and far between, as a marker of just how far we have come with our ability to mine patterns from texts, this is extraordinarily exciting.</p>
-</div><div type="3"><head>Required Libraries</head>
-<p>We have provided a <link target="https://nbviewer.org/github/programminghistorian/jekyll/blob/gh-pages/assets/clustering-visualizing-word-embeddings/clustering-visualizing-word-embeddings.ipynb">Google Colab notebook</link> that allows you to run all of the code in this tutorial without needing to install anything on your own computer.<ref type="footnotemark" target="#1"/> However, if you wish to run the code locally, in addition to the core 'data science' libraries of <code type="inline">numpy</code>, <code type="inline">pandas</code>, and <code type="inline">seaborn</code>, you will need to install several more specialised libraries:</p>
-<ul>
-<li>For the derivation of Word or Document Embeddings, you will need <link target="https://radimrehurek.com/gensim/"><code type="inline">gensim</code></link>, but we have performed this step already</li>
-<li>For the dimensionality reduction, you need <link target="https://umap-learn.readthedocs.io/en/latest/"><code type="inline">umap-learn</code></link></li>
-<li>For the hierarchical clustering and visualisastion, you should use <link target="https://scipy.org/"><code type="inline">scipy</code></link>, <link target="https://scikit-learn.org/stable/"><code type="inline">scikit-learn</code></link>,  <link target="https://kneed.readthedocs.io/en/stable/"><code type="inline">kneed</code></link>, and <link target="https://amueller.github.io/word_cloud/generated/wordcloud.WordCloud.html"><code type="inline">wordcloud</code></link></li>
-<li>The <link target="https://github.com/astanin/python-tabulate"><code type="inline">tabulate</code></link> library is required to produce a table, but the relevant block of code that can be skipped without impacting the rest of the tutorial</li>
-<li>The <link target="https://perma.cc/LJE2-PEWU">class-TF/IDF library</link> developed by <link target="https://perma.cc/SZB4-7R6A">Maarten Grootendorst</link> is used to implement class-based (i.e. cluster-based) TF/IDF plots. There is apparently no installer for this library, so you will need to <link target="https://raw.githubusercontent.com/MaartenGr/cTFIDF/master/ctfidf.py">download it</link> and save it to the same directory</li>
-<li>The <code type="inline">pyarrow</code> library is required to read/write Parquet files. Parquet is a highly-compressed, column-oriented file format that allows you to work very quickly with very large data sets, and it preserves more complex data structures, such as lists, in a way that CSV files cannot.</li>
-</ul>
-<p>We have provided a <link target="https://perma.cc/43TA-DJFH"><code type="inline">requirements.txt</code></link> file that will install all of the libraries (except cTFIDF) needed to run the standalone <link target="https://nbviewer.org/github/programminghistorian/jekyll/blob/gh-pages/assets/clustering-visualizing-word-embeddings/clustering-visualizing-word-embeddings.ipynb">Google Colab notebook</link>.</p>
+<row>
+<cell align="left" role="label">DDC1 Group ('Class')</cell>
+<cell align="left" role="label">DDC2 Group ('Division')</cell>
+<cell align="right" role="label">Count</cell>
+</row>
+<row>
+<cell align="left"><hi rend="bold">Total</hi></cell>
+<cell align="left"/>
+<cell align="right"><hi rend="bold">8,002</hi></cell>
+</row>
+<row>
+<cell align="left"/>
+<cell align="left">Philosophy (100-109)</cell>
+<cell align="right">1,756</cell>
+</row>
+<row>
+<cell align="left"><hi rend="bold">Philosophy and psychology (100)</hi></cell>
+<cell align="left"/>
+<cell align="right"><hi rend="bold">1,756</hi></cell>
+</row>
+<row>
+<cell align="left"/>
+<cell align="left">Linguistics (410-419)</cell>
+<cell align="right">1,655</cell>
+</row>
+<row>
+<cell align="left"><hi rend="bold">Language (400)</hi></cell>
+<cell align="left"/>
+<cell align="right"><hi rend="bold">1,655</hi></cell>
+</row>
+<row>
+<cell align="left"/>
+<cell align="left">History of ancient world (to c. 499) (930-939)</cell>
+<cell align="right">2,314</cell>
+</row>
+<row>
+<cell align="left"/>
+<cell align="left">History (900-909)</cell>
+<cell align="right">2,277</cell>
+</row>
+<row>
+<cell align="left"><hi rend="bold">History and Geography (900)</hi></cell>
+<cell align="left"/>
+<cell align="right"><hi rend="bold">4,591</hi></cell>
+</row>
+</table><table>
+<row>
+<cell align="right" role="label">Term</cell>
+<cell role="label">7 Most Similar<br/>(EThOS Embeddings)</cell>
+<cell role="label">7 Most Similar<br/>(Gigaword Embeddings)</cell>
+</row>
+<row>
+<cell align="right">externalism</cell>
+<cell>internalism, externalist, internalist, desire_belief, semantic_content, disjunctivism, epistemic_status</cell>
+<cell>fideism, chatroulette, lawfare, coherentism, educology, neuros, incommensurability</cell>
+</row>
+<row>
+<cell align="right">bilingualism</cell>
+<cell>multilingualism, multilingual, language_choice, arabic_french, bilingual_education, linguistic_situation, write_texts</cell>
+<cell>multilingualism, multiculturalism, biculturalism, post-secondary, monogamy, interlinear, lesbianism</cell>
+</row>
+<row>
+<cell align="right">transcript</cell>
+<cell>transcribe, retrospective, session, observation_interview, transcription, interview_data, television_programme</cell>
+<cell>transcripts, excerpts, videotape, taped, tape, snippets, excerpt</cell>
+</row>
+</table><div type="3"><head>Required Libraries</head>
+<p>We have provided a <ref target="https://nbviewer.org/github/programminghistorian/jekyll/blob/gh-pages/assets/clustering-visualizing-word-embeddings/clustering-visualizing-word-embeddings.ipynb">Google Colab notebook</ref> that allows you to run all of the code in this tutorial without needing to install anything on your own computer.<ref type="footnotemark" target="#note_1"/> However, if you wish to run the code locally, in addition to the core 'data science' libraries of <code rend="inline">numpy</code>, <code rend="inline">pandas</code>, and <code rend="inline">seaborn</code>, you will need to install several more specialised libraries:</p>
+<list type="unordered">
+<item>For the derivation of Word or Document Embeddings, you will need <ref target="https://radimrehurek.com/gensim/"><code rend="inline">gensim</code></ref>, but we have performed this step already</item>
+<item>For the dimensionality reduction, you need <ref target="https://umap-learn.readthedocs.io/en/latest/"><code rend="inline">umap-learn</code></ref></item>
+<item>For the hierarchical clustering and visualisastion, you should use <ref target="https://scipy.org/"><code rend="inline">scipy</code></ref>, <ref target="https://scikit-learn.org/stable/"><code rend="inline">scikit-learn</code></ref>,  <ref target="https://kneed.readthedocs.io/en/stable/"><code rend="inline">kneed</code></ref>, and <ref target="https://amueller.github.io/word_cloud/generated/wordcloud.WordCloud.html"><code rend="inline">wordcloud</code></ref></item>
+<item>The <ref target="https://github.com/astanin/python-tabulate"><code rend="inline">tabulate</code></ref> library is required to produce a table, but the relevant block of code that can be skipped without impacting the rest of the tutorial</item>
+<item>The <ref target="https://perma.cc/LJE2-PEWU">class-TF/IDF library</ref> developed by <ref target="https://perma.cc/SZB4-7R6A">Maarten Grootendorst</ref> is used to implement class-based (i.e. cluster-based) TF/IDF plots. There is apparently no installer for this library, so you will need to <ref target="https://raw.githubusercontent.com/MaartenGr/cTFIDF/master/ctfidf.py">download it</ref> and save it to the same directory</item>
+<item>The <code rend="inline">pyarrow</code> library is required to read/write Parquet files. Parquet is a highly-compressed, column-oriented file format that allows you to work very quickly with very large data sets, and it preserves more complex data structures, such as lists, in a way that CSV files cannot.</item>
+</list>
+<p>We have provided a <ref target="https://perma.cc/43TA-DJFH"><code rend="inline">requirements.txt</code></ref> file that will install all of the libraries (except cTFIDF) needed to run the standalone <ref target="https://nbviewer.org/github/programminghistorian/jekyll/blob/gh-pages/assets/clustering-visualizing-word-embeddings/clustering-visualizing-word-embeddings.ipynb">Google Colab notebook</ref>.</p>
 <p>Once the libraries are installed, import them as follows:</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_0" type="block" corresp="code_clustering-visualizing-word-embeddings_0.txt"/></pre>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_0" corresp="code_clustering-visualizing-word-embeddings_0.txt" lang="language-python" rend="block"/></ab>
 <p>For the word clouds, we prefer to change the default Matplotlib font to one called &#8220;Liberation Sans Narrow&#8221;, because the narrow format of the letters is usually easier to read in crowded word clouds, but you are unlikely to have it installed locally unless you are using a Linux system! So here's code to use Arial Narrow instead:</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_1" type="block" corresp="code_clustering-visualizing-word-embeddings_1.txt"/></pre>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_1" corresp="code_clustering-visualizing-word-embeddings_1.txt" lang="language-python" rend="block"/></ab>
 <p>You can find out what fonts are available to Matplotlib on <emph>your</emph> system using:</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_2" type="block" corresp="code_clustering-visualizing-word-embeddings_2.txt"/></pre>
-<p>You can then experiment with different fonts by changing the value of <code type="inline">fname</code> to see what works for you. We also set two configuration parameters that are used for reproducibility and exploration:</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_3" type="block" corresp="code_clustering-visualizing-word-embeddings_3.txt"/></pre>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_2" corresp="code_clustering-visualizing-word-embeddings_2.txt" lang="language-python" rend="block"/></ab>
+<p>You can then experiment with different fonts by changing the value of <code rend="inline">fname</code> to see what works for you. We also set two configuration parameters that are used for reproducibility and exploration:</p>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_3" corresp="code_clustering-visualizing-word-embeddings_3.txt" lang="language-python" rend="block"/></ab>
 </div><div type="3"><head>Load the Data</head>
 <p>With the libraries loaded you're now ready to begin by downloading and saving the data file. The nice thing about using a Parquet file is that it contains <emph>nested</emph> data structures in a highly-compressed format, making it smaller to transfer and store. Note that this code includes a step to save a copy locally so that you can run this tutorial offline and spare the host the bandwidth costs.</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_4" type="block" corresp="code_clustering-visualizing-word-embeddings_4.txt"/></pre>
-<p>This loads the EThOS sample into a new pandas data frame called <code type="inline">df</code>. </p>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_4" corresp="code_clustering-visualizing-word-embeddings_4.txt" lang="language-python" rend="block"/></ab>
+<p>This loads the EThOS sample into a new pandas data frame called <code rend="inline">df</code>. </p>
 <p>Let's begin!</p>
 </div></div>
       <div type="2"><head>Dimensionality Reduction</head>
-<p>Using doc2vec we've managed to represent every document in the EThOS data set with 125 numbers, meaning that our matrix contains 1,000,250 elements ($8,002 \times 125$). However, from the standpoint of a clustering algorithm we are <emph>still</emph> working in a 'high-dimensional' space and many algorithms &#8212; traditional <emph>k</emph>-means is a good example &#8212; perform poorly on this many dimensions. One way to address this is to select a clustering algorithm <emph>designed</emph> for high-dimensional spaces &#8212; <link target="https://perma.cc/8655-KYDR">Spherical <emph>k</emph>-means</link> would be one solution &#8212; but the more usual response is to further reduce the dimensionality of the data. </p>
-<p>The standard tool for dimensionality reduction is Principal Components Analysis (PCA). If the <link target="/en/lessons/clustering-with-scikit-learn-in-python#3-dimensionality-reduction-using-pca"><emph>Programming Historian</emph> tutorial on using PCW</link> is not enough backgound, you can see <link target="https://perma.cc/XSG8-NLU7">this introduction</link> and <link target="https://doi.org/10.1098/rsta.2015.0202">this review</link> for further information. Up to a point, principal components are fairly easy to calculate even for large data sets, especially when their 'meaning' is already well-understood. But the output of PCA is both linear <emph>and</emph> results in a loss of information, because only a proportion of the observed variance in the data is retained. We keep the 'highlights', if you will, but potentially lose subtle but important differences at the finer scale because they look like 'noise'.</p>
-<p>In the 2nd case study from the <link target="/en/lessons/clustering-with-scikit-learn-in-python#second-case-study-clustering-textual-data">Clustering with Scikit-Learn in Python</link> tutorial we see exactly this issue; PCA is applied to TF/IDF-transformed abstracts from the <link target="https://perma.cc/P4VN-6K9K">Religion</link> journal as a precursor to clustering articles. The tutorial correctly identifies issues with the suitability of the approach and suggests different clustering approaches and further experimentation with the input parameters to improve the results. However, our <link target="https://perma.cc/4KG8-K5VJ">replication of that analysis</link> shows that the first 10 principal components account for just 12% of the variance observed in the data. In other words, 88% of the variation in the data is being lost, so it's not surprising that there is less explanatory power to the loosely-fitted clusters.</p>
+<p>Using doc2vec we've managed to represent every document in the EThOS data set with 125 numbers, meaning that our matrix contains 1,000,250 elements ($8,002 \times 125$). However, from the standpoint of a clustering algorithm we are <emph>still</emph> working in a 'high-dimensional' space and many algorithms &#8212; traditional <emph>k</emph>-means is a good example &#8212; perform poorly on this many dimensions. One way to address this is to select a clustering algorithm <emph>designed</emph> for high-dimensional spaces &#8212; <ref target="https://perma.cc/8655-KYDR">Spherical <emph>k</emph>-means</ref> would be one solution &#8212; but the more usual response is to further reduce the dimensionality of the data. </p>
+<p>The standard tool for dimensionality reduction is Principal Components Analysis (PCA). If the <ref target="/en/lessons/clustering-with-scikit-learn-in-python#3-dimensionality-reduction-using-pca"><emph>Programming Historian</emph> tutorial on using PCW</ref> is not enough backgound, you can see <ref target="https://perma.cc/XSG8-NLU7">this introduction</ref> and <ref target="https://doi.org/10.1098/rsta.2015.0202">this review</ref> for further information. Up to a point, principal components are fairly easy to calculate even for large data sets, especially when their 'meaning' is already well-understood. But the output of PCA is both linear <emph>and</emph> results in a loss of information, because only a proportion of the observed variance in the data is retained. We keep the 'highlights', if you will, but potentially lose subtle but important differences at the finer scale because they look like 'noise'.</p>
+<p>In the 2nd case study from the <ref target="/en/lessons/clustering-with-scikit-learn-in-python#second-case-study-clustering-textual-data">Clustering with Scikit-Learn in Python</ref> tutorial we see exactly this issue; PCA is applied to TF/IDF-transformed abstracts from the <ref target="https://perma.cc/P4VN-6K9K">Religion</ref> journal as a precursor to clustering articles. The tutorial correctly identifies issues with the suitability of the approach and suggests different clustering approaches and further experimentation with the input parameters to improve the results. However, our <ref target="https://perma.cc/4KG8-K5VJ">replication of that analysis</ref> shows that the first 10 principal components account for just 12% of the variance observed in the data. In other words, 88% of the variation in the data is being lost, so it's not surprising that there is less explanatory power to the loosely-fitted clusters.</p>
 <div type="3"><head>How it works</head>
-<p>In contrast, manifold learning techniques such as <link target="https://perma.cc/JAA3-WT9H">UMAP</link> (Uniform Manifold Approximation and Projection) embed the higher-dimensional space into a lower-dimensional one in its <emph>entirety</emph>. UMAP seeks to preserve both local <emph>and</emph> global structure &#8212; though this balance can be adjusted by playing with the parameters &#8212; making it more useful as a precursor to clustering. Figure 2 shows what the <emph>Religion</emph> data 'looks like' when UMAP is used to project the TF/IDF data down into just 2 dimensions. The colours show the clusters assigned by following the tutorial's approach.</p>
-<figure><desc>Figure 2. UMAP embedding of Religion journal abstracts</desc><graphic url="or-en-clustering-visualizing-word-embeddings-2.png" alt="Scatter plot created using UMAP to show that clusters of articles created using PCA will be of poor quality since there is little structure in the data and PCA fails to cpature this effectively."/></figure>
+<p>In contrast, manifold learning techniques such as <ref target="https://perma.cc/JAA3-WT9H">UMAP</ref> (Uniform Manifold Approximation and Projection) embed the higher-dimensional space into a lower-dimensional one in its <emph>entirety</emph>. UMAP seeks to preserve both local <emph>and</emph> global structure &#8212; though this balance can be adjusted by playing with the parameters &#8212; making it more useful as a precursor to clustering. Figure 2 shows what the <emph>Religion</emph> data 'looks like' when UMAP is used to project the TF/IDF data down into just 2 dimensions. The colours show the clusters assigned by following the tutorial's approach.</p>
+<figure><desc>Figure 2. UMAP embedding of Religion journal abstracts</desc><graphic url="or-en-clustering-visualizing-word-embeddings-2.png"/></figure>
 <p>We should not imagine that what we <emph>see</emph> after UMAP projection is how the data actually <emph>is</emph>, because the data has been manipulated in a non-linear way, such that changing the parameters can alter the embedding space produced (unlike PCA). But what this UMAP projection allows us to see quite quickly is that, realistically, tweaking parameters for the clustering algorithm is unlikely to improve the original results: the data simply isn't structured in a way that will permit a small number of natural clusters to emerge.</p>
 </div><div type="3"><head>Configuring the process</head>
 <p>UMAP offers several distance measures for performing dimensionality reduction. Common choices would be the Euclidean, cosine, and Manhattan distances.</p>
 <p>Where there is wide variation in the number of terms in documents, the cosine distance might be a good choice because it is unaffected by magnitude; very long documents essentially get 'more votes', so that their averaged vectors often prove larger in magnitude than those of shorter documents. While our corpus has variation, fewer than 2% of the records might be considered 'extreme' in length so we've stuck with Euclidean distance.</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_5" type="block" corresp="code_clustering-visualizing-word-embeddings_5.txt"/></pre>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_5" corresp="code_clustering-visualizing-word-embeddings_5.txt" lang="language-python" rend="block"/></ab>
 <p>We've selected four dimensions as the target manifold output: so we're now going from 125 dimensions down to just 4!</p>
 </div><div type="3"><head>Reducing dimensionality</head>
-<p>Because the embeddings are stored in a list-type column, more wrangling is necessary to make these columns useable. You convert the <code type="inline">doc_vec</code> column into a data frame in its own right using <code type="inline">x_from_df</code>, which assumes that there is a list-type column <code type="inline">col</code> (default value of <code type="inline">Embedding</code>) in the DataFrame <code type="inline">df</code>. Each embedding dimension from the list becomes a new named column following the pattern <code type="inline">E{dimension_number}</code> (so E0...E124), and the index is set to the <code type="inline">EThOS_ID</code>, so that the results can be linked back to the data.</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_6" type="block" corresp="code_clustering-visualizing-word-embeddings_6.txt"/></pre>
-<p>UMAP uses a <code type="inline">fit_transform</code> syntax that is similar to Scikit-Learn's, because it is intended to fill a gap in that library. The process will <hi rend="bold">normally take less than 1 minute</hi> with this sample size. With just four dimensions most clustering algorithms will now perform well, and you can finish by merging the 4-dimensional data frame (<code type="inline">dfe</code>) with the original EThOS sample (<code type="inline">df</code>):</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_7" type="block" corresp="code_clustering-visualizing-word-embeddings_7.txt"/></pre>
+<p>Because the embeddings are stored in a list-type column, more wrangling is necessary to make these columns useable. You convert the <code rend="inline">doc_vec</code> column into a data frame in its own right using <code rend="inline">x_from_df</code>, which assumes that there is a list-type column <code rend="inline">col</code> (default value of <code rend="inline">Embedding</code>) in the DataFrame <code rend="inline">df</code>. Each embedding dimension from the list becomes a new named column following the pattern <code rend="inline">E{dimension_number}</code> (so E0...E124), and the index is set to the <code rend="inline">EThOS_ID</code>, so that the results can be linked back to the data.</p>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_6" corresp="code_clustering-visualizing-word-embeddings_6.txt" lang="language-python" rend="block"/></ab>
+<p>UMAP uses a <code rend="inline">fit_transform</code> syntax that is similar to Scikit-Learn's, because it is intended to fill a gap in that library. The process will <hi rend="bold">normally take less than 1 minute</hi> with this sample size. With just four dimensions most clustering algorithms will now perform well, and you can finish by merging the 4-dimensional data frame (<code rend="inline">dfe</code>) with the original EThOS sample (<code rend="inline">df</code>):</p>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_7" corresp="code_clustering-visualizing-word-embeddings_7.txt" lang="language-python" rend="block"/></ab>
 </div><div type="3"><head>Visualising the results</head>
 <p>The best way to get a sense of whether this was all worth it is to make a plot of the first two dimensions. Do we see any expected and important groupings in the data? And do the results look different if we opt for the Dewecy Deciaml Classification views (DDC1 or DDC2)? Here's the code for a side-by-side comparison:</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_8" type="block" corresp="code_clustering-visualizing-word-embeddings_8.txt"/></pre>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_8" corresp="code_clustering-visualizing-word-embeddings_8.txt" lang="language-python" rend="block"/></ab>
 <p>Figure 3 therefore shows the 'projected' data coloured by the DDC1 and DDC2 groups respectively. It's clear that the vocabularies of the selected disciplines differ significantly, though we should note that there <emph>are</emph> nearly 8,000 points on each plot. There is a significant risk of overplotting, so that some overlap is potentially hidden. In other words, two or more points from different DDCs occupy the same coordinates, which is why we've opted to include some transparency in the output.</p>
-<figure><desc>Figure 3. UMAP embedding of selected EThOS data coloured by assigned DDC</desc><graphic url="or-en-clustering-visualizing-word-embeddings-3.png" alt="Scatter plot of UMAP embedded documents with points coloured by the expert-assigned DDC to show that textual similarities are being effectively captured by embedding and dimensionality reduction."/></figure>
+<figure><desc>Figure 3. UMAP embedding of selected EThOS data coloured by assigned DDC</desc><graphic url="or-en-clustering-visualizing-word-embeddings-3.png"/></figure>
 <p>If we're only going to look at the first two dimensions then why did we choose four above? Well, we've found that a (slightly) higher number of dimensions will allow more of the underlying variation in the data to be preserved, increasing the separability of clusters. Here we come to the trade-offs surrounding dimensionality; too many and we suffer the curse of dimensionality, too few and we lose the distinctiveness of the clusters! In practice, we have found four to eight dimensions to be a good range for avoiding the issues associated with too few, or too many, dimensions.</p>
 <p>Of particular note in Figure 3 should be the areas where the DDC classification does <emph>not</emph> appear to align with the location of the thesis in the reduced corpus-space. Zooming in reveals a small number of Linguistics theses over by History of the Ancient World, and some History theses towards the 'far' side of the Philosophy grouping. We'll take a slightly closer look at these later, but any way you look at it, this is a promising start. There are distinct groupings in the data that seem to map fairly well on to the classes assigned by experts. In short, it's not a jumble of overlapping DDCs!</p>
 </div></div>
       <div type="2"><head>Hierarchical Clustering</head>
-<p>We could stop here and say "Well clearly we've done something useful", but it it would behoove us to cluster the data independently of its expert classification and compare the results in a more rigorous way. On both a practical and a philosophical level we feel that a <link target="https://perma.cc/PWS5-Y3J4">hierarchical clustering</link> approach is more appropriate: all PhDs are, in some sense, related to one another as they must build on (and distinguish themselves from) what has come before, but we hope that you will also agree on the existence of at least <emph>some</emph> high-level distinctions between, say, the interests of Historians and Linguists, especially when it comes to how they write about their work!</p>
+<p>We could stop here and say "Well clearly we've done something useful", but it it would behoove us to cluster the data independently of its expert classification and compare the results in a more rigorous way. On both a practical and a philosophical level we feel that a <ref target="https://perma.cc/PWS5-Y3J4">hierarchical clustering</ref> approach is more appropriate: all PhDs are, in some sense, related to one another as they must build on (and distinguish themselves from) what has come before, but we hope that you will also agree on the existence of at least <emph>some</emph> high-level distinctions between, say, the interests of Historians and Linguists, especially when it comes to how they write about their work!</p>
 <div type="3"><head>How it works</head>
 <p>Hierarchical clustering takes a 'bottom-up' approach. Every document starts in its own cluster of size 1. Then you merge the two <emph>closest</emph> 'clusters' in the data set to create a cluster of size 2. You then look for the <emph>next closest</emph> pair of clusters; this search includes the centroid of the cluster of size 2 created in the preceding step. Next you progressively join documents to clusters and, ultimately, clusters to clusters, resulting in one mega-cluster containing the entire corpus. This generates a tree of relationships that you can 'cut' at different levels; delving down branches in order to investigate relations at a finer scale, but also able to see where and when clusters merged form larger groups.</p>
 </div><div type="3"><head>Configuring the process</head>
 <p>Hierarchical clustering has relatively few parameters; as with other approaches there is a choice of distance measures and, depending on the metric chosen, a 'method' or measure. Because we employed (by default) a Euclidean metric in dimensionality reduction, we don't feel it's appropriate to use a cosine-based approach here, though you can (and should) experiment with the parameters to see what's best for your data. We therefore combine a Euclidean representation of the 'semantic space' with the widely-used Ward's quality measure, which seeks to minimise within-cluster <emph>variance</emph> rather than within-cluster <emph>distance</emph>. Ward's will tend to produce smaller, more compact clusters thanks to the sum-of-squares effect, which is to say that it attaches a much greater penalty to large distances between observations and the cluster centroid because these are <emph>squared</emph>. That said, this approach is very much a <emph>choice</emph>, and there are arguments dating back more than forty years (Milligan 1981) over which techniques are 'best' (and see Hashimoto <emph>et al.</emph> 2016 for an updated discussion relating to Word Embeddings). </p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_9" type="block" corresp="code_clustering-visualizing-word-embeddings_9.txt"/></pre>
-<p>This takes <hi rend="bold">under 2 minutes</hi>, but it <emph>is</emph> RAM-intensive. On Google Colab you may need to downsample the data (code for downsampling is included in the standalone <link target="https://nbviewer.org/github/programminghistorian/jekyll/blob/gh-pages/assets/clustering-visualizing-word-embeddings/clustering-visualizing-word-embeddings.ipynb">Colab notebook</link>). We use the prefix <code type="inline">Dim</code> to select columns out of the <code type="inline">projected</code> data frame; even if you change the number of dimensions, the clustering code need not change.</p>
-</div><div type="3"><head>Visualising the results</head>
-<p><code type="inline">Z</code> is effectively a 'tree' that can be cut at any level. By comparing the output in Figure 4 &#8212; which shows the last 100 clusterings in the agglomeration process &#8212; with Figure 3's plot of the 'semantic space' (above), you can develop insights about the clusters. On the <emph>y</emph>-axis is a distance measure indicating how far apart two clusters were when they merged (the horizontal bar on the plot); on the <emph>x</emph>-axis are the number of observations in each cluster (in parentheses); a number without parentheses would mean an original document's index.</p>
-<figure><desc>Figure 4. Top of EThOS dendrogram showing last 100 clusters</desc><graphic url="or-en-clustering-visualizing-word-embeddings-4.png" alt="Dendrogram showing the last 100 steps in the hierarchical clustering process to provide a more intuitive understanding of how the clusters capture the structure shown in Figure 3.."/></figure>
-<p>So this plot tells us that Linguistics and Philosophy (on the right side) are <emph>more</emph> dissimilar than the two classes of History (on the left) since they merge <emph>later</emph> (higher up the <emph>y</emph>-axis). Even though the top-level History class contains more records and covers a larger share of the semantic space, its constituent theses cluster (slightly) sooner, such that we don't, for instance, find Philosophy merging with History first. You can also see that Philosophy theses will be the first to split when opting for five clusters, followed by History of the ancient world with six or seven clusters, then Linguistics, before, finally, <emph>non</emph>-ancient world History splits at nine clusters. </p>
-<p>Here's the code that enabled us to do this:</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_10" type="block" corresp="code_clustering-visualizing-word-embeddings_10.txt"/></pre>
-<p>The dendrogram is a top-down view, but recall that this is <emph>not</emph> how we clustered the data; you can peek inside the <code type="inline">Z</code> object to see what happened and when. Table 6 shows what happened on the first and final iterations of the algorithm as well when we were one-quarter, one-half and three-quarters done with the clustering. On the first iteration, observations 4,445 and 6,569 were merged into a cluster of size 2 ($\sum{c_{i}, c_{j}}$) because the distance ($d$) between them was close to 0.000. Iteration 6,002 is a merge of two clusters to form a larger cluster of five observations. We know this because $c_{i}$ and $c_{j}$ <emph>both</emph> have higher indices than there are data points in the sample. On the last iteration, clusters 16,000 and 16,001 were merged to create one cluster of 8,002 records. That is the 'link' shown at the very top of the dendrogram and it also has a very large $d_{ij}$ between clusters.</p>
-<p><hi rend="bold">Table 3. Selections from hierarhical linkage object showing cluster merges at various iterations</hi></p>
-<table>
-<thead>
-<tr>
-<th align="right">Iteration</th>
-<th align="right">$c_{i}$</th>
-<th align="right">$c_{j}$</th>
-<th align="right">$d_{ij}$</th>
-<th align="right">$\sum{c_{i}, c_{j}}</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">0</td>
-<td align="right">4,445</td>
-<td align="right">6,569</td>
-<td align="right">0.002</td>
-<td align="right">2</td>
-</tr>
-<tr>
-<td align="right">2,001</td>
-<td align="right">492</td>
-<td align="right">9,484</td>
-<td align="right">0.063</td>
-<td align="right">3</td>
-</tr>
-<tr>
-<td align="right">4,001</td>
-<td align="right">6,533</td>
-<td align="right">9,616</td>
-<td align="right">0.116</td>
-<td align="right">3</td>
-</tr>
-<tr>
-<td align="right">6,002</td>
-<td align="right">11,480</td>
-<td align="right">12,029</td>
-<td align="right">0.234</td>
-<td align="right">5</td>
-</tr>
-<tr>
-<td align="right">8,002</td>
-<td align="right">16,000</td>
-<td align="right">16,001</td>
-<td align="right">371.842</td>
-<td align="right">8,002</td>
-</tr>
-</tbody></table><p>The output above was created by interrogating the <code type="inline">Z</code> clustering matrix:</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_11" type="block" corresp="code_clustering-visualizing-word-embeddings_11.txt"/></pre>
-<p>With luck, this will help the dendrogram to make more sense, and it also provides an intuition as to how you can work with <code type="inline">Z</code> to output any number of desired clusters, cutting the tree at 2, 24,  &#8230; 5,000!</p>
-</div></div>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_9" corresp="code_clustering-visualizing-word-embeddings_9.txt" lang="language-python" rend="block"/></ab>
+<p>This takes <hi rend="bold">under 2 minutes</hi>, but it <emph>is</emph> RAM-intensive. On Google Colab you may need to downsample the data (code for downsampling is included in the standalone <ref target="https://nbviewer.org/github/programminghistorian/jekyll/blob/gh-pages/assets/clustering-visualizing-word-embeddings/clustering-visualizing-word-embeddings.ipynb">Colab notebook</ref>). We use the prefix <code rend="inline">Dim</code> to select columns out of the <code rend="inline">projected</code> data frame; even if you change the number of dimensions, the clustering code need not change.</p>
+</div><table>
+<row>
+<cell align="right" role="label">Iteration</cell>
+<cell align="right" role="label">$c_{i}$</cell>
+<cell align="right" role="label">$c_{j}$</cell>
+<cell align="right" role="label">$d_{ij}$</cell>
+<cell align="right" role="label">$\sum{c_{i}, c_{j}}</cell>
+</row>
+<row>
+<cell align="right">8,002</cell>
+<cell align="right">16,000</cell>
+<cell align="right">16,001</cell>
+<cell align="right">371.842</cell>
+<cell align="right">8,002</cell>
+</row>
+<row>
+<cell align="right">6,002</cell>
+<cell align="right">11,480</cell>
+<cell align="right">12,029</cell>
+<cell align="right">0.234</cell>
+<cell align="right">5</cell>
+</row>
+<row>
+<cell align="right">4,001</cell>
+<cell align="right">6,533</cell>
+<cell align="right">9,616</cell>
+<cell align="right">0.116</cell>
+<cell align="right">3</cell>
+</row>
+<row>
+<cell align="right">2,001</cell>
+<cell align="right">492</cell>
+<cell align="right">9,484</cell>
+<cell align="right">0.063</cell>
+<cell align="right">3</cell>
+</row>
+<row>
+<cell align="right">0</cell>
+<cell align="right">4,445</cell>
+<cell align="right">6,569</cell>
+<cell align="right">0.002</cell>
+<cell align="right">2</cell>
+</row>
+</table></div>
       <div type="2"><head>Validation</head>
-<p>One of the challenges in text and document classification is having a suitable baseline. The gold standard for machine learning problems is one generated by human experts; if our automated analysis produces broadly the same categories as the experts then we would consider that a 'good result'. The <link target="https://perma.cc/HBH3-48U9">Dewey Decimal Classification</link>, which is assigned by a librarian in the researcher's institution at the point of submission, provides just such a standard.</p>
-<p>In order to evaluate the performance of our approach we need two utility functions; these will label each cluster by finding the 'dominant' (modal) DDC class for that cluster. This is potentially a <emph>bit</emph> misleading (imagine a situation where 50.1% of a class was from one DDC and 49.9% from another) but it's a good way to get a sense of how we're doing. <code type="inline">label_clusters</code> is a kind of 'wrapper' meaning that it saves you have to call <code type="inline">get_dominant_cat</code> directly: you pass in a source data frame (<code type="inline">src_df</code>), a clustering result (<code type="inline">clusterings</code>), and a DDC level (<code type="inline">ddc_level</code>, which can be 1, 2, or 3 for consistency with the explanation above). The functions work out how many clusters there are and use this to specify the column labels in the returned data frame (e.g. <code type="inline">Cluster_5</code> and <code type="inline">Cluster_Name_5</code>). <code type="inline">Cluster_5</code> would contain the raw clustering result from <code type="inline">clusterings</code>, while <code type="inline">Cluster_Name_5</code> contains the dominant DDC label for that cluster.</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_12" type="block" corresp="code_clustering-visualizing-word-embeddings_12.txt"/></pre>
-<div type="3"><head>3 Clusters</head>
-<p>Let's start at the DDC1 level: History forms a single category, while Linguistics and Philosophy are distinct. To evaluate how the clustering performed, the silhouette plot is a common method, but it is not always the most useful. There is the 'confusion matrix', with which you can directly compare the original 'labels' (the DDCs) to the predictions (the clusters), as well as calculate precision and recall measures. </p>
-<p>Precision is essentially our correct prediction rate, calculated from the number of True Positives (TPs) divided by the sum of True Positives and <emph>False</emph> Positives (FPs), so $\frac{TP}{TP+FP}$. Recall measures something slightly different, involving evaluating the proportion of positives that were predicted correctly (<emph>ie.</emph> allowing for False Negatives), so $\frac{TP}{TP+FN}$. In turn, these underpin the F-score, which allows us to attach a measure of sensitivity to our predictions, though this will become a <emph>bit</emph> more problematic if the number of observations in each cluster become seriously unbalanced. </p>
-<p>We have parameterised the code so that you can adjust the DDC level (<code type="inline">ddc</code>) and number of clusters (<code type="inline">ncls</code>) to make it easy to experiment with alternative 'solutions':</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_13" type="block" corresp="code_clustering-visualizing-word-embeddings_13.txt"/></pre>
-<p>The hierarchical clsutering code makes use of functions (<code type="inline">dendrogram</code>, <code type="inline">linkage</code>, and <code type="inline">fcluster</code>) provided by the <code type="inline">scipy</code> library. These help cut the <code type="inline">Z</code> object into arbitrary numbers of clusters according to a specified objective (the <code type="inline">criterion</code>). We then use <code type="inline">scikit-learn</code>'s <code type="inline">classification_report</code> to understand how well the clustering performs in reproducing the expert knowledge embodied in DDC assignments. You <emph>could</emph> use the same library's <code type="inline">confusion_matrix</code> function to generate a Confusion Matrix, but we have opted to produce our own using panda's <code type="inline">crosstab</code> instead.</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_14" type="block" corresp="code_clustering-visualizing-word-embeddings_14.txt"/></pre>
-<p>Table 4 compares the top-level DDC assignments against the 3-cluster assignment: if the clustering has gone well, we'd expect to see the majority of the observations on the diagonal. Indeed, that's exactly what we see, with just a small fraction of theses being assigned to the 'wrong' cluster. The overall precision and recall are both 93%, as is the F1 score. Notice, however, the lower recall on Philosophy and psychology: 308 (17%) were misclassified compared to less than 4% of History theses. </p>
-<p><hi rend="bold">Table 4. Confusion Matrix for 3 Cluster Solution</hi></p>
+<p>One of the challenges in text and document classification is having a suitable baseline. The gold standard for machine learning problems is one generated by human experts; if our automated analysis produces broadly the same categories as the experts then we would consider that a 'good result'. The <ref target="https://perma.cc/HBH3-48U9">Dewey Decimal Classification</ref>, which is assigned by a librarian in the researcher's institution at the point of submission, provides just such a standard.</p>
+<p>In order to evaluate the performance of our approach we need two utility functions; these will label each cluster by finding the 'dominant' (modal) DDC class for that cluster. This is potentially a <emph>bit</emph> misleading (imagine a situation where 50.1% of a class was from one DDC and 49.9% from another) but it's a good way to get a sense of how we're doing. <code rend="inline">label_clusters</code> is a kind of 'wrapper' meaning that it saves you have to call <code rend="inline">get_dominant_cat</code> directly: you pass in a source data frame (<code rend="inline">src_df</code>), a clustering result (<code rend="inline">clusterings</code>), and a DDC level (<code rend="inline">ddc_level</code>, which can be 1, 2, or 3 for consistency with the explanation above). The functions work out how many clusters there are and use this to specify the column labels in the returned data frame (e.g. <code rend="inline">Cluster_5</code> and <code rend="inline">Cluster_Name_5</code>). <code rend="inline">Cluster_5</code> would contain the raw clustering result from <code rend="inline">clusterings</code>, while <code rend="inline">Cluster_Name_5</code> contains the dominant DDC label for that cluster.</p>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_12" corresp="code_clustering-visualizing-word-embeddings_12.txt" lang="language-python" rend="block"/></ab>
 <table>
-<thead>
-<tr>
-<th align="right">DDC</th>
-<th align="right">Cluster 1</th>
-<th align="right">Cluster 2</th>
-<th align="right">Cluster 3</th>
-<th align="right">Total</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right"><hi rend="bold">History and geography</hi></td>
-<td align="right">4,426</td>
-<td align="right">43</td>
-<td align="right">122</td>
-<td align="right">4,591</td>
-</tr>
-<tr>
-<td align="right"><hi rend="bold">Language</hi></td>
-<td align="right">61</td>
-<td align="right">1,566</td>
-<td align="right">28</td>
-<td align="right">1,655</td>
-</tr>
-<tr>
-<td align="right"><hi rend="bold">Philosophy and psychology</hi></td>
-<td align="right">250</td>
-<td align="right">58</td>
-<td align="right">1,448</td>
-<td align="right">1,756</td>
-</tr>
-<tr>
-<td align="right"><hi rend="bold">Total</hi></td>
-<td align="right">4,737</td>
-<td align="right">1,667</td>
-<td align="right">1,598</td>
-<td align="right">8,002</td>
-</tr>
-</tbody></table></div><div type="3"><head>4 Clusters</head>
-<p>Repeating this analysis at the DDC2 level requires changing just one line of code:</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_15" type="block" corresp="code_clustering-visualizing-word-embeddings_15.txt"/></pre>
-<p>In the interests of brevity, we'll report only the precision, recall, and F-1 scores for this clustering:</p>
-<table>
-<thead>
-<tr>
-<th/>
-<th align="right">Precision</th>
-<th align="right">Recall</th>
-<th align="right">F-1 Score</th>
-<th align="right">Support</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><hi rend="bold">History</hi></td>
-<td align="right">0.72</td>
-<td align="right">0.91</td>
-<td align="right">0.80</td>
-<td align="right">2,277</td>
-</tr>
-<tr>
-<td><hi rend="bold">History of ancient world (to c. 499)</hi></td>
-<td align="right">0.95</td>
-<td align="right">0.76</td>
-<td align="right">0.85</td>
-<td align="right">2,314</td>
-</tr>
-<tr>
-<td><hi rend="bold">Linguistics</hi></td>
-<td align="right">0.94</td>
-<td align="right">0.95</td>
-<td align="right">0.94</td>
-<td align="right">1,655</td>
-</tr>
-<tr>
-<td><hi rend="bold">Philosophy</hi></td>
-<td align="right">0.91</td>
-<td align="right">0.82</td>
-<td align="right">0.86</td>
-<td align="right">1,756</td>
-</tr>
-<tr>
-<td/>
-<td align="right"/>
-<td align="right"/>
-<td align="right"/>
-<td align="right"/>
-</tr>
-<tr>
-<td><emph>Accuracy</emph></td>
-<td align="right"/>
-<td align="right"/>
-<td align="right">0.86</td>
-<td align="right">8,002</td>
-</tr>
-<tr>
-<td><emph>Macro Average</emph></td>
-<td align="right">0.88</td>
-<td align="right">0.86</td>
-<td align="right">0.86</td>
-<td align="right">8,002</td>
-</tr>
-<tr>
-<td><emph>Weighted Average</emph></td>
-<td align="right">0.87</td>
-<td align="right">0.86</td>
-<td align="right">0.86</td>
-<td align="right">8,002</td>
-</tr>
-</tbody></table><p>Notice here that the two History classes differ in their precision and recall. We can understand this to be indicating that we're 'over-predicting' the History class by 'under-predicting' the Ancient World class. The lower recall on Philosophy is consistent with what we saw in Table 4; a small, but significant, set of theses are being grouped with History theses. Nonetheless, our overall accuracy remains above 85% on an <emph>unsupervised</emph> classification!</p>
-</div><div type="3"><head>Are the experts 'wrong'?</head>
+<row>
+<cell align="right" role="label">DDC</cell>
+<cell align="right" role="label">Cluster 1</cell>
+<cell align="right" role="label">Cluster 2</cell>
+<cell align="right" role="label">Cluster 3</cell>
+<cell align="right" role="label">Total</cell>
+</row>
+<row>
+<cell align="right"><hi rend="bold">Total</hi></cell>
+<cell align="right">4,737</cell>
+<cell align="right">1,667</cell>
+<cell align="right">1,598</cell>
+<cell align="right">8,002</cell>
+</row>
+<row>
+<cell align="right"><hi rend="bold">Philosophy and psychology</hi></cell>
+<cell align="right">250</cell>
+<cell align="right">58</cell>
+<cell align="right">1,448</cell>
+<cell align="right">1,756</cell>
+</row>
+<row>
+<cell align="right"><hi rend="bold">Language</hi></cell>
+<cell align="right">61</cell>
+<cell align="right">1,566</cell>
+<cell align="right">28</cell>
+<cell align="right">1,655</cell>
+</row>
+<row>
+<cell align="right"><hi rend="bold">History and geography</hi></cell>
+<cell align="right">4,426</cell>
+<cell align="right">43</cell>
+<cell align="right">122</cell>
+<cell align="right">4,591</cell>
+</row>
+</table><table>
+<row>
+<cell role="label"/>
+<cell align="right" role="label">Precision</cell>
+<cell align="right" role="label">Recall</cell>
+<cell align="right" role="label">F-1 Score</cell>
+<cell align="right" role="label">Support</cell>
+</row>
+<row>
+<cell><emph>Weighted Average</emph></cell>
+<cell align="right">0.87</cell>
+<cell align="right">0.86</cell>
+<cell align="right">0.86</cell>
+<cell align="right">8,002</cell>
+</row>
+<row>
+<cell><emph>Macro Average</emph></cell>
+<cell align="right">0.88</cell>
+<cell align="right">0.86</cell>
+<cell align="right">0.86</cell>
+<cell align="right">8,002</cell>
+</row>
+<row>
+<cell><emph>Accuracy</emph></cell>
+<cell align="right"/>
+<cell align="right"/>
+<cell align="right">0.86</cell>
+<cell align="right">8,002</cell>
+</row>
+<row>
+<cell/>
+<cell align="right"/>
+<cell align="right"/>
+<cell align="right"/>
+<cell align="right"/>
+</row>
+<row>
+<cell><hi rend="bold">Philosophy</hi></cell>
+<cell align="right">0.91</cell>
+<cell align="right">0.82</cell>
+<cell align="right">0.86</cell>
+<cell align="right">1,756</cell>
+</row>
+<row>
+<cell><hi rend="bold">Linguistics</hi></cell>
+<cell align="right">0.94</cell>
+<cell align="right">0.95</cell>
+<cell align="right">0.94</cell>
+<cell align="right">1,655</cell>
+</row>
+<row>
+<cell><hi rend="bold">History of ancient world (to c. 499)</hi></cell>
+<cell align="right">0.95</cell>
+<cell align="right">0.76</cell>
+<cell align="right">0.85</cell>
+<cell align="right">2,314</cell>
+</row>
+<row>
+<cell><hi rend="bold">History</hi></cell>
+<cell align="right">0.72</cell>
+<cell align="right">0.91</cell>
+<cell align="right">0.80</cell>
+<cell align="right">2,277</cell>
+</row>
+</table><div type="3"><head>Are the experts 'wrong'?</head>
 <p>Ordinarily, if an expert assigns label <emph>x</emph> to an observation then <emph>x</emph> is assumed to be 'The Truth'. However, in the case of a PhD thesis it's worth questioning this assumption for a moment; are time-pressured, resource-constrained librarians necessarily going to gloss an abstract and <emph>always</emph> select the most appropriate DDC? Will they <emph>never</emph> be influenced by 'extraneous' factors, such as the department in which the PhD student was enrolled or their knowledge of the history of DDCs assigned by the institution? </p>
 <p>So while most approaches would treat 'misclassifications' as an error to be solved, you might reasonably ask whether every thesis has been correctly classified in the first place. To investigate this question further you can turn to the trusty word cloud, replacing the document-level view with a <emph>class</emph>-based TF/IDF in which you look at what is distinctive across a <emph>set</emph> of documents that were 'misclustered' when compared to their original DDC. </p>
-<p>To do this we've made use of Maarten Grootendorst's <link target="https://perma.cc/U7FP-PEBC">CTFIDF</link> module (as developed in posts on <link target="https://perma.cc/6RXK-RUHB">topic modelling with BERT</link> and <link target="https://perma.cc/TKY7-YEGP">class-based TF/IDF</link>).</p>
-<p>When creating titles for each plot, the line-length can become a bit of a problem. Here's some simple code to split a title at some arbitrary <code type="inline">target_len</code>. We split on whitespace on the basis that this is roughly into word-like chunks, and then try to add a line break (<code type="inline">\n</code>) into the formatted title (<code type="inline">fmt_title</code>) right <emph>before</emph> a word that would take us over the target line length (<code type="inline">target_len</code>):</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_16" type="block" corresp="code_clustering-visualizing-word-embeddings_16.txt"/></pre>
-<p>To actually produce the class-based TF/IDF we now run the same code we've seen before (in case you've experimented with/changed the parameters) and then produce one plot per DDC class. So this is just a <code type="inline">for</code> loop over the DDC names for the specified DDC level. However, to create a class-based TF/IDF plot we need to create one document for each class (aggregating all the individual documents together into one very long string) before calculating the TF/IDF scores. To make the results look 'nice', we then dynamically work out the number of plots (<code type="inline">nplots</code>) and number of columns to show (<code type="inline">ncols</code>). After that it's a case of trying to tune the height and width of the image so that it looks correct for the dimensions of the output and the desired resolution. You'll see this same code used below where <code type="inline">ncols</code> is set directly because we want to show the output from 11 clusters instead.</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_17" type="block" corresp="code_clustering-visualizing-word-embeddings_17.txt"/></pre>
+<p>To do this we've made use of Maarten Grootendorst's <ref target="https://perma.cc/U7FP-PEBC">CTFIDF</ref> module (as developed in posts on <ref target="https://perma.cc/6RXK-RUHB">topic modelling with BERT</ref> and <ref target="https://perma.cc/TKY7-YEGP">class-based TF/IDF</ref>).</p>
+<p>When creating titles for each plot, the line-length can become a bit of a problem. Here's some simple code to split a title at some arbitrary <code rend="inline">target_len</code>. We split on whitespace on the basis that this is roughly into word-like chunks, and then try to add a line break (<code rend="inline">\n</code>) into the formatted title (<code rend="inline">fmt_title</code>) right <emph>before</emph> a word that would take us over the target line length (<code rend="inline">target_len</code>):</p>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_16" corresp="code_clustering-visualizing-word-embeddings_16.txt" lang="language-python" rend="block"/></ab>
+<p>To actually produce the class-based TF/IDF we now run the same code we've seen before (in case you've experimented with/changed the parameters) and then produce one plot per DDC class. So this is just a <code rend="inline">for</code> loop over the DDC names for the specified DDC level. However, to create a class-based TF/IDF plot we need to create one document for each class (aggregating all the individual documents together into one very long string) before calculating the TF/IDF scores. To make the results look 'nice', we then dynamically work out the number of plots (<code rend="inline">nplots</code>) and number of columns to show (<code rend="inline">ncols</code>). After that it's a case of trying to tune the height and width of the image so that it looks correct for the dimensions of the output and the desired resolution. You'll see this same code used below where <code rend="inline">ncols</code> is set directly because we want to show the output from 11 clusters instead.</p>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_17" corresp="code_clustering-visualizing-word-embeddings_17.txt" lang="language-python" rend="block"/></ab>
 <p>With four DDCs and four clusters we have 16 plots in total. While the C-TF/IDF plots are not in and of themselves conclusive with respect to the assignment of any <emph>one</emph> thesis, they do help us to get to grips with the aggregate differences; for documents in each DDC2 class, we're looking at <emph>how</emph> the vocabularies in the documents that were 'misclustered' with documents from another DDC2 differ from the vocabulary of the set that were 'correctly' clustered (which we define here as the modal cluster). This allows you to see how their contents (as viewed through the lens of TF/IDF) differ from the main cluster into which documents with their DDC were clustered.</p>
-<figure><desc>Figure 5. 'Misclassified' theses from the History of the Ancient World (to c.499) DDC</desc><graphic url="or-en-clustering-visualizing-word-embeddings-5.png" alt="TF/IDF wordcloud showing the most distinctive terms for documents assigned to a cluster dominated by theses from a group other than the document's own expert-assigned 'History of the Ancient World' DDC."/></figure>
-<figure><desc>Figure 6. 'Misclassified' theses from the History DDC</desc><graphic url="or-en-clustering-visualizing-word-embeddings-6.png" alt="TF/IDF wordcloud showing the most distinctive terms for documents assigned to a cluster dominated by theses from a group other than the document's own expert-assigned 'History' DDC"/></figure>
+<figure><desc>Figure 5. 'Misclassified' theses from the History of the Ancient World (to c.499) DDC</desc><graphic url="or-en-clustering-visualizing-word-embeddings-5.png"/></figure>
+<figure><desc>Figure 6. 'Misclassified' theses from the History DDC</desc><graphic url="or-en-clustering-visualizing-word-embeddings-6.png"/></figure>
 <p>For instance, from what we can see of the two History DDCs it's reasonable to infer that this analysis is picking up on a difference in vocabulary between History as a discipline concerned with objects and sites, and as one more focussed on issues of power, work, politics and empire.  We can also see that History theses clustered with Linguistics seem to have an educational component, while those clustered with Philosophy contain terms associated with Greek philosophy (History of the Ancient World (to c.499)) and with more seventeenth and eighteenth century topics (History). </p>
-<figure><desc>Figure 7. 'Misclassified' theses from the Linguistics DDC</desc><graphic url="or-en-clustering-visualizing-word-embeddings-7.png" alt="TF/IDF wordcloud showing the most distinctive terms for documents assigned to a cluster dominated by theses from a group other than the document's own expert-assigned 'Linguistics' DDC"/></figure>
-<figure><desc>Figure 8. 'Misclassified' theses from the Philosophy DDC</desc><graphic url="or-en-clustering-visualizing-word-embeddings-8.png" alt="TF/IDF wordcloud showing the most distinctive terms for documents assigned to a cluster dominated by theses from a group other than the document's own expert-assigned 'Philosophy' DDC"/></figure>
+<figure><desc>Figure 7. 'Misclassified' theses from the Linguistics DDC</desc><graphic url="or-en-clustering-visualizing-word-embeddings-7.png"/></figure>
+<figure><desc>Figure 8. 'Misclassified' theses from the Philosophy DDC</desc><graphic url="or-en-clustering-visualizing-word-embeddings-8.png"/></figure>
 <p>It is easier to interpret these visualizations with the more 'substantially' misclustered Philosophy and Linguistics theses. Linguistics clustered with Philosophy shows a stress on terms and concepts that we might (naively, perhaps) associate with philosophical concerns, while the reverse process shows concern with semantics, grammars, and utterances. Both DDCs also have a significant number grouped under the History cluster, with the keywords suggesting strong links to theological/religious topics. Conversely, the small number of Philosphy and Linguistics theses clustered with the history DDCs indicate a strong separation between these topics and so the apparent 'significance' of words such as 'bulgarian' and 'scandinavian' (Linguistics), and 'mozambique' or 'habitus' (Philosophy) in the TF/IDF plot should be taken with a grain of salt as they're not unlikely to be significant from a statistical standpoint.</p>
 <p>Clearly, to make a determination as to whether any <emph>one</emph> thesis was assigned to the 'wrong' DDC would require deeper engagement with the content itself. Looking past the institution, department and key words, what does this thesis seem to be <emph>about</emph>? One way of thinking about these results is that they <emph>would</emph> enable (theoretically, at least) just such a level of effort to be allocated; having developed a classification scheme for documents (PhDs or otherwise), the position of a new document relative to other, already classified documents, could be assessed such that only those falling near the margins of a class are checked by a human, while those near the core are classed automatically by a NLP application.</p>
 <p>As we drill further down into the DDCs classes (e.g. to the 3rd level), we would expect to encounter many more 'misclassified' theses &#8212; it's not just that NLP-based clustering might struggle with the subtleties further down the hierarchy, but that the classification scheme itself becomes unstable. We would reasonably expect <emph>humans</emph> to struggle to allocate a new thesis on, say, 'the history of U.S. trade policy towards formerly Spanish colonies in South America' to one of these categories: </p>
-<blockquote>
+<quote>
 <p>'History of North America', 'Canada', 'Mexico, Central America, West Indies, Bermuda', 'United States', 'Northeastern United States (New England and Middle Atlantic states)', 'Southeastern United States (South Atlantic states)', 'South central United States', 'North central United States', 'Western United States', 'Great Basin and Pacific Slope region of United States', 'History of South America', 'Brazil', 'Argentina', 'Chile', 'Bolivia', 'Peru', 'Colombia and Ecuador', 'Venezuela', 'Guiana', 'Paraguay and Uruguay'</p>
-</blockquote>
+</quote>
 </div><div type="3"><head>11 Clusters</head>
-<p>Finally, you can also give the computational process greater importance, instead using the DDC as support for labelling the resulting clusters. To select an 'optimal' number of clusters you can use a <link target="/en/lessons/clustering-with-scikit-learn-in-python#3-dimensionality-reduction-using-pca">scree plot</link> (the code for this is available in <link target="https://nbviewer.org/github/programminghistorian/jekyll/blob/gh-pages/assets/clustering-visualizing-word-embeddings/clustering-visualizing-word-embeddings.ipynb">GitHub</link>), though expert opinion is just as defensible in such cases. The combination of the scree plot and <link target="https://kneed.readthedocs.io/en/stable/"><code type="inline">kneed</code></link> utility pointed to a clustering in the range of 10&#8212;15, so we opted for 11 clusters and assigned each cluster the name of its <emph>dominant</emph> DDC group.</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_18" type="block" corresp="code_clustering-visualizing-word-embeddings_18.txt"/></pre>
+<p>Finally, you can also give the computational process greater importance, instead using the DDC as support for labelling the resulting clusters. To select an 'optimal' number of clusters you can use a <ref target="/en/lessons/clustering-with-scikit-learn-in-python#3-dimensionality-reduction-using-pca">scree plot</ref> (the code for this is available in <ref target="https://nbviewer.org/github/programminghistorian/jekyll/blob/gh-pages/assets/clustering-visualizing-word-embeddings/clustering-visualizing-word-embeddings.ipynb">GitHub</ref>), though expert opinion is just as defensible in such cases. The combination of the scree plot and <ref target="https://kneed.readthedocs.io/en/stable/"><code rend="inline">kneed</code></ref> utility pointed to a clustering in the range of 10&#8212;15, so we opted for 11 clusters and assigned each cluster the name of its <emph>dominant</emph> DDC group.</p>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_18" corresp="code_clustering-visualizing-word-embeddings_18.txt" lang="language-python" rend="block"/></ab>
 <p>Followed again by:</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_19" type="block" corresp="code_clustering-visualizing-word-embeddings_19.txt"/></pre>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_19" corresp="code_clustering-visualizing-word-embeddings_19.txt" lang="language-python" rend="block"/></ab>
 <p>In this case, this automated approach yields more than one cluster with the same dominant DDC, not least because none of these DDCs has much detail below the second level: History dominates in six clusters each, Linguistics in three, and Philosophy in two. The word clouds give a <emph>sense</emph> of how these clusters differ in terms of their content. The results are quite compelling, with each cluster seeming to relate to a thematically distinct area of research within the overarching discipline or domain. </p>
 <p>Hierarchical clustering allows for unbalanced clusters to emerge more naturally from the data even where it's difficult to see clear 'breaks' in the semantic space. History Cluster 6 is significantly larger than the other five clusters in that group, but it remains quite straightforward to conceive of how that cluster's vocabulary differs from the others. In this light,  the Hierarchical Clustering delivers improved results over more commonly-used techniques such as <emph>k</emph>-means, which performs especially poorly on data with non-linear <emph>structure</emph>. </p>
-<figure><desc>Figure 9. TF/IDF word clouds for 11-cluster classification (name from dominant DDC3 group)</desc><graphic url="or-en-clustering-visualizing-word-embeddings-9.png" alt="TF/IDF Wordclouds for the 'optimal' eleven clusters found in the data; these have been given a name based on the dominant DDC3 group."/></figure>
-<p>The code for doing this word cloud flexibly is a bit more complicated since you need to know how many plots you're going to produce, and then you have to allocate them to a grid of <code type="inline">nrows</code> by <code type="inline">ncols</code>:</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_20" type="block" corresp="code_clustering-visualizing-word-embeddings_20.txt"/></pre>
-<p>That specification then interacts with the dots-per-inch (<code type="inline">dpi</code>) and figure size to generate axis widths and heights for each plot:</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_21" type="block" corresp="code_clustering-visualizing-word-embeddings_21.txt"/></pre>
-<p>You are now ready to perform class-based TF/IDF analysis. This involves combining all of the terms (here: tokens) for each cluster into a single, very long list. So, one list for each cluster or class (<code type="inline">docs_per_class</code>), and we can then use a <code type="inline">CounterVectorizer</code> and the class-based TF/IDF Vectorizer to generate the output <code type="inline">ctfidf</code>.</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_22" type="block" corresp="code_clustering-visualizing-word-embeddings_22.txt"/></pre>
-<p><code type="inline">ctfidf</code> is a sparse array (i.e. many rows, potentially many columns, many containing zeroes) with one column per class, and one row per word. The cells represent the weight (or importance) of each word to that class. So if you want to compare how significant a word is across classes you can read across the columns, and if you want to know the most important words to a class you can sort the rows.</p>
-<pre><code class="language-python" xml:id="code_clustering-visualizing-word-embeddings_23" type="block" corresp="code_clustering-visualizing-word-embeddings_23.txt"/></pre>
+<figure><desc>Figure 9. TF/IDF word clouds for 11-cluster classification (name from dominant DDC3 group)</desc><graphic url="or-en-clustering-visualizing-word-embeddings-9.png"/></figure>
+<p>The code for doing this word cloud flexibly is a bit more complicated since you need to know how many plots you're going to produce, and then you have to allocate them to a grid of <code rend="inline">nrows</code> by <code rend="inline">ncols</code>:</p>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_20" corresp="code_clustering-visualizing-word-embeddings_20.txt" lang="language-python" rend="block"/></ab>
+<p>That specification then interacts with the dots-per-inch (<code rend="inline">dpi</code>) and figure size to generate axis widths and heights for each plot:</p>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_21" corresp="code_clustering-visualizing-word-embeddings_21.txt" lang="language-python" rend="block"/></ab>
+<p>You are now ready to perform class-based TF/IDF analysis. This involves combining all of the terms (here: tokens) for each cluster into a single, very long list. So, one list for each cluster or class (<code rend="inline">docs_per_class</code>), and we can then use a <code rend="inline">CounterVectorizer</code> and the class-based TF/IDF Vectorizer to generate the output <code rend="inline">ctfidf</code>.</p>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_22" corresp="code_clustering-visualizing-word-embeddings_22.txt" lang="language-python" rend="block"/></ab>
+<p><code rend="inline">ctfidf</code> is a sparse array (i.e. many rows, potentially many columns, many containing zeroes) with one column per class, and one row per word. The cells represent the weight (or importance) of each word to that class. So if you want to compare how significant a word is across classes you can read across the columns, and if you want to know the most important words to a class you can sort the rows.</p>
+<ab><code xml:id="code_clustering-visualizing-word-embeddings_23" corresp="code_clustering-visualizing-word-embeddings_23.txt" lang="language-python" rend="block"/></ab>
 </div><div type="3"><head>Comparing clustering algorithms</head>
 <p>Of course, Hierarchical Clustering is just one technique amongst many, and it's certain that other algorithmic approaches will perform better &#8212; or worse &#8212; depending on the context and application. We've advanced an analytical reason for using this technique, rooted in our conceptualisation of the 'semantic space' of doctoral research. If, for instance, you were seeking to identify disciplinary cores and to distinguish these from more peripheral/interdisciplinary work, then something like DBSCAN or OPTICS might be a better choice. It all depends on what you want to know! </p>
-<p>Below are the results of four lightly-tuned clustering algorithms, the code for which can be found in <link target="https://nbviewer.org/github/programminghistorian/jekyll/blob/gh-pages/assets/clustering-visualizing-word-embeddings/clustering-visualizing-word-embeddings.ipynb">the Notebook</link>. While they all pick up the same cores (at a relatively low number of clusters), there are clear differences at the margins in terms of what is considered part of the cluster. These differences <emph>matter</emph> as you scale the size of the corpus and, fundamentally, this is the challenge posed by large corpora; the programming historian (or social scientist or linguist) needs to approach their problem with a sense of how different algorithms embody different conceptualisations of the analytical domain &#8212; this is seldom taught explicitly and often only learned when encountering a data set on which 'tried and trusted' approaches simply don't work.</p>
-<figure><desc>Figure 10. Comparison with Alternative Clustering Algorithms</desc><graphic url="or-en-clustering-visualizing-word-embeddings-10.png" alt="Comparison of clustering results obtained using other algorithms provided to highlight how the choice of algorithm can impact the results obtained and stress the need to select one that reflects the objectives of the analysis."/></figure>
+<p>Below are the results of four lightly-tuned clustering algorithms, the code for which can be found in <ref target="https://nbviewer.org/github/programminghistorian/jekyll/blob/gh-pages/assets/clustering-visualizing-word-embeddings/clustering-visualizing-word-embeddings.ipynb">the Notebook</ref>. While they all pick up the same cores (at a relatively low number of clusters), there are clear differences at the margins in terms of what is considered part of the cluster. These differences <emph>matter</emph> as you scale the size of the corpus and, fundamentally, this is the challenge posed by large corpora; the programming historian (or social scientist or linguist) needs to approach their problem with a sense of how different algorithms embody different conceptualisations of the analytical domain &#8212; this is seldom taught explicitly and often only learned when encountering a data set on which 'tried and trusted' approaches simply don't work.</p>
+<figure><desc>Figure 10. Comparison with Alternative Clustering Algorithms</desc><graphic url="or-en-clustering-visualizing-word-embeddings-10.png"/></figure>
 </div></div>
       <div type="2"><head>Summary</head>
 <p>We hope that this tutorial has illustrated some of the potential power of combining the word2vec algorithm with the UMAP dimensionality reduction approach. In our work with the British Library, we expect these outputs to advance both our own research and the mission of the BL in a few ways:</p>
-<ol>
-<li><hi rend="bold">Filling in missing metadata</hi>: because of the way the data was created, records in the BL's EThOS data may lack both DDC values and keywords. The WE+UMAP approach allows us to <emph>suggest</emph> what those missing values might be! We can, for instance, use the dominant DDC from an unlabelled observation's cluster to assign the DDC, and the class- or document-based TF/IDF, to suggest keywords.</li>
-<li><hi rend="bold">Suggesting similar works</hi>: the BL's current search tool uses stemming and simple pattern matching to search for works matching the user's query. While using singular terms to retrieve related documents is not as straightforward as one might imagine, asking the computer to find documents similar to <emph>a selected target</emph> (<emph>i.e.</emph> find me similar dissertations) would significantly enhance the utility of the resource to researchers in all disciplines.</li>
-<li><hi rend="bold">Examining the spread of knowledge</hi>: although we have not made use of the publication date and institutional fields in this lesson, we are exploring this metadata in conjunction with word2vec and other models to study links between how and where new ideas arise, and how and when they spread geographically within disciplines. Our expectation is that this research will show significant disciplinary and geographical variation &#8212; even within the U.K. &#8212; and we hope to start reporting our findings in the near future.</li>
-</ol>
+<list type="ordered">
+<item><hi rend="bold">Filling in missing metadata</hi>: because of the way the data was created, records in the BL's EThOS data may lack both DDC values and keywords. The WE+UMAP approach allows us to <emph>suggest</emph> what those missing values might be! We can, for instance, use the dominant DDC from an unlabelled observation's cluster to assign the DDC, and the class- or document-based TF/IDF, to suggest keywords.</item>
+<item><hi rend="bold">Suggesting similar works</hi>: the BL's current search tool uses stemming and simple pattern matching to search for works matching the user's query. While using singular terms to retrieve related documents is not as straightforward as one might imagine, asking the computer to find documents similar to <emph>a selected target</emph> (<emph>i.e.</emph> find me similar dissertations) would significantly enhance the utility of the resource to researchers in all disciplines.</item>
+<item><hi rend="bold">Examining the spread of knowledge</hi>: although we have not made use of the publication date and institutional fields in this lesson, we are exploring this metadata in conjunction with word2vec and other models to study links between how and where new ideas arise, and how and when they spread geographically within disciplines. Our expectation is that this research will show significant disciplinary and geographical variation &#8212; even within the U.K. &#8212; and we hope to start reporting our findings in the near future.</item>
+</list>
 </div>
       <div type="2"><head>Bibliography &amp; Other Readings</head>
 <div type="3"><head>Other Relevant Tutorials</head>
-<ul>
-<li><link target="/en/lessons/jupyter-notebooks">Introduction to Jupyter Notebooks</link></li>
-<li><link target="/en/lessons/installing-python-modules-pip">Installing Python Modules with <code type="inline">pip</code></link></li>
-<li><link target="/en/lessons/corpus-analysis-with-antconc">Corpus Analysis with Antconc</link></li>
-<li><link target="/en/lessons/analyzing-documents-with-tfidf">Analyzing Documents with TF-IDF</link></li>
-<li><link target="/en/lessons/keywords-in-context-using-n-grams">Keywords in Context (Using <emph>n</emph>-grams) with Python</link></li>
-</ul>
+<list type="unordered">
+<item><ref target="/en/lessons/jupyter-notebooks">Introduction to Jupyter Notebooks</ref></item>
+<item><ref target="/en/lessons/installing-python-modules-pip">Installing Python Modules with <code rend="inline">pip</code></ref></item>
+<item><ref target="/en/lessons/corpus-analysis-with-antconc">Corpus Analysis with Antconc</ref></item>
+<item><ref target="/en/lessons/analyzing-documents-with-tfidf">Analyzing Documents with TF-IDF</ref></item>
+<item><ref target="/en/lessons/keywords-in-context-using-n-grams">Keywords in Context (Using <emph>n</emph>-grams) with Python</ref></item>
+</list>
 </div><div type="3"><head>Bibliography</head>
-<ul>
-<li>British Library (2015), <emph>Living Knowledge</emph>, British Library <link target="https://perma.cc/V2C4-HGJN">https://www.bl.uk/britishlibrary/~/media/bl/global/projects/living-knowledge/documents/living-knowledge-the-british-library-2015-2023.pdf</link>.</li>
-<li>Mikolov, T. and Yih, S. W. and Zweig, G. (2013), &#8220;Linguistic Regularities in Continuous Space Word Representations&#8221;, <emph>Proceedings of the 2013 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (NAACL-HLT-2013)</emph>, <link target="https://perma.cc/P2P6-GEZ2">https://www.microsoft.com/en-us/research/publication/linguistic-regularities-in-continuous-space-word-representations/</link>.</li>
-<li>Milligan. G. W. (1981), &#8220;<link target="https://doi.org/10.1207/s15327906mbr1603_7">A Review Of Monte Carlo Tests Of Cluster Analysis</link>&#8221;, <emph>Multivariate Behavioral Research</emph>, 16:3, 379-407.</li>
-<li>Tobler, W. R. (1970), &#8220;A computer movie simulating urban growth in the Detroit region&#8221;, <emph>Economic Geography</emph>, 46:234-240.</li>
-<li>Hashimoto, T. B. and Alvarez-Melis, D. and  Jaakkola, T. S. (2016), &#8220;<link target="https://aclanthology.org/Q16-1020">Word Embeddings as Metric Recovery in Semantic Spaces</link>&#8221;, <emph>Transactions of the Association for Computational Linguistics</emph>, 4:273&#8211;286.</li>
-<li>Tshitoyan, V. and Dagdelen, J. and Weston, L. and Dunn, A. and Rong, Z. and Kononova, O. and Persson, K. A. and Ceder, G. and Jain, A. (2019), &#8220;<link target="https://perma.cc/Y2SK-UQX7">Unsupervised word embeddings capture latent knowledge from materials science literature</link>&#8221;, <emph>Nature</emph> 571:95-98.</li>
-</ul>
+<list type="unordered">
+<item>British Library (2015), <emph>Living Knowledge</emph>, British Library <ref target="https://perma.cc/V2C4-HGJN">https://www.bl.uk/britishlibrary/~/media/bl/global/projects/living-knowledge/documents/living-knowledge-the-british-library-2015-2023.pdf</ref>.</item>
+<item>Mikolov, T. and Yih, S. W. and Zweig, G. (2013), &#8220;Linguistic Regularities in Continuous Space Word Representations&#8221;, <emph>Proceedings of the 2013 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (NAACL-HLT-2013)</emph>, <ref target="https://perma.cc/P2P6-GEZ2">https://www.microsoft.com/en-us/research/publication/linguistic-regularities-in-continuous-space-word-representations/</ref>.</item>
+<item>Milligan. G. W. (1981), &#8220;<ref target="https://doi.org/10.1207/s15327906mbr1603_7">A Review Of Monte Carlo Tests Of Cluster Analysis</ref>&#8221;, <emph>Multivariate Behavioral Research</emph>, 16:3, 379-407.</item>
+<item>Tobler, W. R. (1970), &#8220;A computer movie simulating urban growth in the Detroit region&#8221;, <emph>Economic Geography</emph>, 46:234-240.</item>
+<item>Hashimoto, T. B. and Alvarez-Melis, D. and  Jaakkola, T. S. (2016), &#8220;<ref target="https://aclanthology.org/Q16-1020">Word Embeddings as Metric Recovery in Semantic Spaces</ref>&#8221;, <emph>Transactions of the Association for Computational Linguistics</emph>, 4:273&#8211;286.</item>
+<item>Tshitoyan, V. and Dagdelen, J. and Weston, L. and Dunn, A. and Rong, Z. and Kononova, O. and Persson, K. A. and Ceder, G. and Jain, A. (2019), &#8220;<ref target="https://perma.cc/Y2SK-UQX7">Unsupervised word embeddings capture latent knowledge from materials science literature</ref>&#8221;, <emph>Nature</emph> 571:95-98.</item>
+</list>
 </div></div>
       <div type="2"><head>Notes</head>
-<p><note id="1"> A <link target="https://www.docker.com/">Docker</link> image is also available and instructions for using it can be found <link target="https://perma.cc/3JN9-JZN2">on Jonathan Reades's GitHub</link>.</note></p>
+<p><ref type="footnotemark" target="#note_1"/> : A <ref target="https://www.docker.com/">Docker</ref> image is also available and instructions for using it can be found <ref target="https://perma.cc/3JN9-JZN2">on Jonathan Reades's GitHub</ref>.</p>
 </div>
     </body>
   </text>

@@ -3,99 +3,99 @@
  <fileDesc>
   <titleStmt>
    <title>De HTML para Lista de Palavras (parte 2)</title>
-  <author type="original_author"><persName>William J. Turkel</persName><persName>Adam Crymble</persName></author><editor type="reviewers"><persName>Jim Clifford</persName><persName>Frederik Elwert</persName></editor><author type="translators">Felipe Lamarca</author><editor type="translation-reviewers"><persName>Daniel Bonatto Seco</persName><persName>Diana Rebelo Rodriguez</persName></editor><editor type="editors">Miriam Posner</editor></titleStmt>
+  <author role="original_author"><persName>William J. Turkel</persName><persName>Adam Crymble</persName></author><editor role="reviewers"><persName>Jim Clifford</persName><persName>Frederik Elwert</persName></editor><author role="translators">Felipe Lamarca</author><editor role="translation-reviewers"><persName>Daniel Bonatto Seco</persName><persName>Diana Rebelo Rodriguez</persName></editor><editor role="editors">Miriam Posner</editor></titleStmt>
   <publicationStmt>
    <idno type="doi">10.46430/phpt0028</idno><date type="published">07/17/2012</date><date type="translated">10/27/2022</date><p>Lesson reviewed and published in Programming Historian.</p>
   </publicationStmt>
   <sourceDesc>
   <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#from-html-to-list-of-words-2"/>.</p><p>There are other translations: <ref target="#du-html-a-une-liste-de-mots-2 #de-html-a-lista-de-palabras-2"/></p></sourceDesc>
  </fileDesc>
- <profileDesc><abstract><p>Nesta li&#231;&#227;o aprender&#225; os comandos de Python necess&#225;rios para implementar a segunda parte do algoritmo iniciado na li&#231;&#227;o 'De HTML para Lista de Palavras (parte 1)'.</p></abstract><textClass><keyword xml:lang="en">python</keyword></textClass></profileDesc>
+ <profileDesc><abstract><p>Nesta li&#231;&#227;o aprender&#225; os comandos de Python necess&#225;rios para implementar a segunda parte do algoritmo iniciado na li&#231;&#227;o 'De HTML para Lista de Palavras (parte 1)'.</p></abstract><textClass><keywords><term xml:lang="en">python</term></keywords></textClass></profileDesc>
 </teiHeader>
   <text xml:lang="pt">
     <body>
       <div type="2"><head>Objetivos da Li&#231;&#227;o</head>
-<p>Nesta li&#231;&#227;o aprender&#225; os comandos de Python necess&#225;rios para implementar a segunda parte do algoritmo iniciado na li&#231;&#227;o <link target="/pt/licoes/HTML-lista-palavras-1">De HTML para Lista de Palavras (parte 1)</link>. A primeira metade do algoritmo obt&#233;m o conte&#250;do de uma p&#225;gina HTML e salva apenas o conte&#250;do entre a primeira tag <code type="inline">&lt;p&gt;</code> e a &#250;ltima tag <code type="inline">&lt;br/&gt;</code>. A segunda metade do algoritmo faz o seguinte: </p>
-<ul>
-<li>Verifica cada caractere na string <emph>pageContents</emph>, um por um</li>
-<li>Se o caractere for um colchete angular esquerdo (&lt;), estamos dentro de uma tag e deve-se ignorar os caracteres subsequentes</li>
-<li>Se o caractere for um colchete angular direito (&gt;), estamos deixando a tag e deve-se ignorar este caractere, mas verificar cada um dos caracteres subsequentes</li>
-<li>Se n&#227;o estivermos dentro de uma tag, adiciona-se cada caractere a uma nova vari&#225;vel: <emph>text</emph></li>
-<li>Separa a string de texto em uma lista de palavras individuais, que podem ser manipuladas posteriormente.</li>
-</ul>
+<p>Nesta li&#231;&#227;o aprender&#225; os comandos de Python necess&#225;rios para implementar a segunda parte do algoritmo iniciado na li&#231;&#227;o <ref target="/pt/licoes/HTML-lista-palavras-1">De HTML para Lista de Palavras (parte 1)</ref>. A primeira metade do algoritmo obt&#233;m o conte&#250;do de uma p&#225;gina HTML e salva apenas o conte&#250;do entre a primeira tag <code rend="inline">&lt;p&gt;</code> e a &#250;ltima tag <code rend="inline">&lt;br/&gt;</code>. A segunda metade do algoritmo faz o seguinte: </p>
+<list type="unordered">
+<item>Verifica cada caractere na string <emph>pageContents</emph>, um por um</item>
+<item>Se o caractere for um colchete angular esquerdo (&lt;), estamos dentro de uma tag e deve-se ignorar os caracteres subsequentes</item>
+<item>Se o caractere for um colchete angular direito (&gt;), estamos deixando a tag e deve-se ignorar este caractere, mas verificar cada um dos caracteres subsequentes</item>
+<item>Se n&#227;o estivermos dentro de uma tag, adiciona-se cada caractere a uma nova vari&#225;vel: <emph>text</emph></item>
+<item>Separa a string de texto em uma lista de palavras individuais, que podem ser manipuladas posteriormente.</item>
+</list>
 <div type="3"><head>Ficheiros Necess&#225;rios para esta Li&#231;&#227;o</head>
-<ul>
-<li><code type="inline">obo.py</code></li>
-<li><code type="inline">trial-content.py</code></li>
-</ul>
-<p>Caso n&#227;o possua estes ficheiros, pode fazer o download do python-lessons2.zip, um ficheiro (<link target="/assets/python-lessons2.zip">zip</link>) da &#250;ltima li&#231;&#227;o.</p>
+<list type="unordered">
+<item><code rend="inline">obo.py</code></item>
+<item><code rend="inline">trial-content.py</code></item>
+</list>
+<p>Caso n&#227;o possua estes ficheiros, pode fazer o download do python-lessons2.zip, um ficheiro (<ref target="/assets/python-lessons2.zip">zip</ref>) da &#250;ltima li&#231;&#227;o.</p>
 </div></div>
       <div type="2"><head>Repeti&#231;&#227;o e Testagem em Python</head>
 <p>O pr&#243;ximo passo na implementa&#231;&#227;o do nosso algoritmo &#233; verificar cada caractere na string <emph>pageContents</emph>, um por um, e decidir se o caractere pertence &#224; marca&#231;&#227;o HTML ou ao conte&#250;do da transcri&#231;&#227;o do julgamento. Antes de poder fazer isso, ser&#225; necess&#225;rio aprender algumas t&#233;cnicas de repeti&#231;&#227;o de tarefas e de testagem de condi&#231;&#245;es.</p>
 <div type="3"><head>Repeti&#231;&#227;o (Looping)</head>
-<p>Como muitas linguagens de programa&#231;&#227;o, Python inclui alguns mecanismos de repeti&#231;&#227;o (<emph>looping</emph>). O que desejamos usar nesse caso &#233; chamado <code type="inline">for</code> <emph>loop</emph>. A vers&#227;o abaixo solicita que o interpretador fa&#231;a algo a cada caractere na string chamada <emph>pageContents</emph>. A vari&#225;vel <emph>char</emph> (de <emph>character</emph>) conter&#225; cada caractere de <emph>pageContents</emph> sucessivamente. N&#243;s demos &#224; vari&#225;vel o nome <emph>char</emph>; isso n&#227;o possui nenhum significado especial e poderia ter sido nomeado <emph>jingles</emph> ou <emph>k</emph> se desejasse. A codifica&#231;&#227;o de cores do Komodo Edit pode ser usada como um guia para decidir se uma palavra &#233; uma vari&#225;vel com um nome fornecido pelo usu&#225;rio (como '<emph>char</emph>') ou um nome definido pelo Python e que serve um prop&#243;sito espec&#237;fico (como <code type="inline">for</code>). &#201; sempre uma boa ideia nomear as vari&#225;veis com nomes que oferecem alguma informa&#231;&#227;o a respeito do que elas cont&#234;m. Isso tornar&#225; muito mais f&#225;cil de entender um programa que n&#227;o v&#234; h&#225; algum tempo. Com isso em mente, '<emph>jingles</emph>' provavelmente n&#227;o &#233; uma op&#231;&#227;o muito boa para um nome de vari&#225;vel nesse caso.</p>
-<pre><code class="language-python" xml:id="code_HTML-lista-palavras-2_0" type="block" corresp="code_HTML-lista-palavras-2_0.txt"/></pre>
+<p>Como muitas linguagens de programa&#231;&#227;o, Python inclui alguns mecanismos de repeti&#231;&#227;o (<emph>looping</emph>). O que desejamos usar nesse caso &#233; chamado <code rend="inline">for</code> <emph>loop</emph>. A vers&#227;o abaixo solicita que o interpretador fa&#231;a algo a cada caractere na string chamada <emph>pageContents</emph>. A vari&#225;vel <emph>char</emph> (de <emph>character</emph>) conter&#225; cada caractere de <emph>pageContents</emph> sucessivamente. N&#243;s demos &#224; vari&#225;vel o nome <emph>char</emph>; isso n&#227;o possui nenhum significado especial e poderia ter sido nomeado <emph>jingles</emph> ou <emph>k</emph> se desejasse. A codifica&#231;&#227;o de cores do Komodo Edit pode ser usada como um guia para decidir se uma palavra &#233; uma vari&#225;vel com um nome fornecido pelo usu&#225;rio (como '<emph>char</emph>') ou um nome definido pelo Python e que serve um prop&#243;sito espec&#237;fico (como <code rend="inline">for</code>). &#201; sempre uma boa ideia nomear as vari&#225;veis com nomes que oferecem alguma informa&#231;&#227;o a respeito do que elas cont&#234;m. Isso tornar&#225; muito mais f&#225;cil de entender um programa que n&#227;o v&#234; h&#225; algum tempo. Com isso em mente, '<emph>jingles</emph>' provavelmente n&#227;o &#233; uma op&#231;&#227;o muito boa para um nome de vari&#225;vel nesse caso.</p>
+<ab><code xml:id="code_HTML-lista-palavras-2_0" corresp="code_HTML-lista-palavras-2_0.txt" lang="language-python" rend="block"/></ab>
 </div><div type="3"><head>Testagem (Branching)</head>
-<p>Em seguida, voc&#234; precisa de uma maneira de testar o conte&#250;do de uma string para decidir que a&#231;&#227;o tomar de acordo com este teste. Mais uma vez, como muitas linguagens de programa&#231;&#227;o, Python inclui alguns mecanismos de testagem (<code type="inline">branching</code>). O que desejamos usar aqui se chama condi&#231;&#227;o <code type="inline">if</code>. A vers&#227;o abaixo testa se uma string chamada <emph>char</emph> consiste em um colchete angular esquerdo. Como mencionamos anteriormente, indenta&#231;&#227;o (isto &#233;, o recuo no texto) &#233; importante em Python. Se o c&#243;digo est&#225; indentado, o Python ir&#225; execut&#225;-lo quando a condi&#231;&#227;o for verdadeira.</p>
+<p>Em seguida, voc&#234; precisa de uma maneira de testar o conte&#250;do de uma string para decidir que a&#231;&#227;o tomar de acordo com este teste. Mais uma vez, como muitas linguagens de programa&#231;&#227;o, Python inclui alguns mecanismos de testagem (<code rend="inline">branching</code>). O que desejamos usar aqui se chama condi&#231;&#227;o <code rend="inline">if</code>. A vers&#227;o abaixo testa se uma string chamada <emph>char</emph> consiste em um colchete angular esquerdo. Como mencionamos anteriormente, indenta&#231;&#227;o (isto &#233;, o recuo no texto) &#233; importante em Python. Se o c&#243;digo est&#225; indentado, o Python ir&#225; execut&#225;-lo quando a condi&#231;&#227;o for verdadeira.</p>
 <p>Note que o Python usa um sinal de igual &#250;nico (=) para atribui&#231;&#227;o, isto &#233;, para definir que a uma coisa vai ser atribu&#237;da o valor de outra. Para testar <emph>igualdade</emph>, use dois sinais de igual (==). Programadores iniciantes &#224;s vezes confundem os dois.</p>
-<pre><code class="language-python" xml:id="code_HTML-lista-palavras-2_1" type="block" corresp="code_HTML-lista-palavras-2_1.txt"/></pre>
-<p>Uma forma mais geral da condi&#231;&#227;o <code type="inline">if</code> permite que especifique o que fazer no caso da sua condi&#231;&#227;o de teste ser falsa.</p>
-<pre><code class="language-python" xml:id="code_HTML-lista-palavras-2_2" type="block" corresp="code_HTML-lista-palavras-2_2.txt"/></pre>
-<p>Em Python tem a op&#231;&#227;o de fazer mais testes depois do primeiro usando uma condi&#231;&#227;o <code type="inline">elif</code> (uma abrevia&#231;&#227;o de <code type="inline">else if</code>).</p>
-<pre><code class="language-python" xml:id="code_HTML-lista-palavras-2_3" type="block" corresp="code_HTML-lista-palavras-2_3.txt"/></pre>
+<ab><code xml:id="code_HTML-lista-palavras-2_1" corresp="code_HTML-lista-palavras-2_1.txt" lang="language-python" rend="block"/></ab>
+<p>Uma forma mais geral da condi&#231;&#227;o <code rend="inline">if</code> permite que especifique o que fazer no caso da sua condi&#231;&#227;o de teste ser falsa.</p>
+<ab><code xml:id="code_HTML-lista-palavras-2_2" corresp="code_HTML-lista-palavras-2_2.txt" lang="language-python" rend="block"/></ab>
+<p>Em Python tem a op&#231;&#227;o de fazer mais testes depois do primeiro usando uma condi&#231;&#227;o <code rend="inline">elif</code> (uma abrevia&#231;&#227;o de <code rend="inline">else if</code>).</p>
+<ab><code xml:id="code_HTML-lista-palavras-2_3" corresp="code_HTML-lista-palavras-2_3.txt" lang="language-python" rend="block"/></ab>
 </div></div>
       <div type="2"><head>Use o Algoritmo para Remover a Marca&#231;&#227;o HTML</head>
 <p>Agora j&#225; sabe o suficiente para implementar a segunda parte do algoritmo: remover todas as tags HTML. Nessa parte do algoritmo queremos:</p>
-<ul>
-<li>Verificar cada caractere na string <emph>pageContents</emph>, um por um</li>
-<li>Se o caractere for um colchete angular esquerdo (&lt;), estamos dentro de uma tag e devemos ignorar os caracteres subsequentes</li>
-<li>Se o caractere for um colchete angular direito (&gt;), estamos deixando a tag; devemos ignorar este caractere, mas verificar cada um dos caracteres subsequentes</li>
-<li>Se n&#227;o estivermos dentro de uma tag, adicionamos cada caractere a uma nova vari&#225;vel: <emph>text</emph></li>
-</ul>
-<p>Para fazer isso, voc&#234; usar&#225; uma repeti&#231;&#227;o (<emph>loop</emph>) <code type="inline">for</code> para olhar cada caractere sucessivamente na string. Depois voc&#234; utilizar&#225; uma condi&#231;&#227;o <code type="inline">if</code> / <code type="inline">elif</code>para testar se um caractere &#233; parte da marca&#231;&#227;o HTML ou parte do conte&#250;do e, finalmente, ir&#225; inserir os caracteres de conte&#250;do na string <emph>text</emph>. Como controlaremos se estamos ou n&#227;o dentro de uma tag? Podemos usar uma vari&#225;vel inteira, que ser&#225; 1 (verdadeiro ou <emph>true</emph>) se o caractere na ocasi&#227;o estiver dentro de uma tag e 0 (falso ou <emph>false</emph>) se ele n&#227;o estiver (no exemplo abaixo, nomeamos a vari&#225;vel como <emph>inside</emph>).</p>
+<list type="unordered">
+<item>Verificar cada caractere na string <emph>pageContents</emph>, um por um</item>
+<item>Se o caractere for um colchete angular esquerdo (&lt;), estamos dentro de uma tag e devemos ignorar os caracteres subsequentes</item>
+<item>Se o caractere for um colchete angular direito (&gt;), estamos deixando a tag; devemos ignorar este caractere, mas verificar cada um dos caracteres subsequentes</item>
+<item>Se n&#227;o estivermos dentro de uma tag, adicionamos cada caractere a uma nova vari&#225;vel: <emph>text</emph></item>
+</list>
+<p>Para fazer isso, voc&#234; usar&#225; uma repeti&#231;&#227;o (<emph>loop</emph>) <code rend="inline">for</code> para olhar cada caractere sucessivamente na string. Depois voc&#234; utilizar&#225; uma condi&#231;&#227;o <code rend="inline">if</code> / <code rend="inline">elif</code>para testar se um caractere &#233; parte da marca&#231;&#227;o HTML ou parte do conte&#250;do e, finalmente, ir&#225; inserir os caracteres de conte&#250;do na string <emph>text</emph>. Como controlaremos se estamos ou n&#227;o dentro de uma tag? Podemos usar uma vari&#225;vel inteira, que ser&#225; 1 (verdadeiro ou <emph>true</emph>) se o caractere na ocasi&#227;o estiver dentro de uma tag e 0 (falso ou <emph>false</emph>) se ele n&#227;o estiver (no exemplo abaixo, nomeamos a vari&#225;vel como <emph>inside</emph>).</p>
 <div type="3"><head>A Fun&#231;&#227;o stripTags</head>
-<p>Ao juntar tudo, a vers&#227;o final da fun&#231;&#227;o &#233; mostrada abaixo. Note que estamos expandindo a fun&#231;&#227;o <emph>stripTags</emph> criada acima. Tenha a certeza de que, ao substituir a vers&#227;o antiga da fun&#231;&#227;o <emph>stripTags</emph> no <code type="inline">obo.py</code> pela nova, estar&#225; mantendo a indenta&#231;&#227;o como foi mostrada.</p>
+<p>Ao juntar tudo, a vers&#227;o final da fun&#231;&#227;o &#233; mostrada abaixo. Note que estamos expandindo a fun&#231;&#227;o <emph>stripTags</emph> criada acima. Tenha a certeza de que, ao substituir a vers&#227;o antiga da fun&#231;&#227;o <emph>stripTags</emph> no <code rend="inline">obo.py</code> pela nova, estar&#225; mantendo a indenta&#231;&#227;o como foi mostrada.</p>
 <p>Sua fun&#231;&#227;o pode parecer um pouco diferente, mas, contanto que funcione, n&#227;o h&#225; problema. Se optou por experimentar por conta pr&#243;pria, vale a pena testar tamb&#233;m a nossa vers&#227;o para garantir que o seu programa faz exatamente o que o nosso faz.</p>
-<pre><code class="language-python" xml:id="code_HTML-lista-palavras-2_4" type="block" corresp="code_HTML-lista-palavras-2_4.txt"/></pre>
-<p>H&#225; dois conceitos novos de Python nesse novo c&#243;digo: <code type="inline">continue</code> e <code type="inline">return</code>.</p>
-<p>A instru&#231;&#227;o <code type="inline">continue</code> do Python informa ao interpretador para voltar ao topo do <emph>loop</emph> delimitador. Dessa forma, se estamos processando caracteres dentro de um par de colchetes angulares, queremos ir para o pr&#243;ximo caractere da string <emph>pageContents</emph> sem adicionar nada &#224; nossa vari&#225;vel <emph>text</emph>. </p>
-<p>Nos nossos exemplos anteriores, usamos <code type="inline">print</code> extensivamente. Isso mostra o resultado do nosso programa na tela para o usu&#225;rio ler. Por vezes, no entanto, queremos permitir que uma parte do programa envie informa&#231;&#227;o para outra parte. Quando uma fun&#231;&#227;o termina de ser executada, ela pode retornar um valor para o c&#243;digo que a chamou. Se cham&#225;ssemos <emph>stripTags</emph> usando outro programa, far&#237;amos assim:</p>
-<pre><code class="language-python" xml:id="code_HTML-lista-palavras-2_5" type="block" corresp="code_HTML-lista-palavras-2_5.txt"/></pre>
-<p>Ao utilizar <code type="inline">return</code>, fomos capazes de salvar o resultado da fun&#231;&#227;o <emph>stripTags</emph> diretamente em uma vari&#225;vel que chamamos de 'theResult', que podemos ent&#227;o usar para retomar o processamento conforme necess&#225;rio usando um c&#243;digo adicional.</p>
+<ab><code xml:id="code_HTML-lista-palavras-2_4" corresp="code_HTML-lista-palavras-2_4.txt" lang="language-python" rend="block"/></ab>
+<p>H&#225; dois conceitos novos de Python nesse novo c&#243;digo: <code rend="inline">continue</code> e <code rend="inline">return</code>.</p>
+<p>A instru&#231;&#227;o <code rend="inline">continue</code> do Python informa ao interpretador para voltar ao topo do <emph>loop</emph> delimitador. Dessa forma, se estamos processando caracteres dentro de um par de colchetes angulares, queremos ir para o pr&#243;ximo caractere da string <emph>pageContents</emph> sem adicionar nada &#224; nossa vari&#225;vel <emph>text</emph>. </p>
+<p>Nos nossos exemplos anteriores, usamos <code rend="inline">print</code> extensivamente. Isso mostra o resultado do nosso programa na tela para o usu&#225;rio ler. Por vezes, no entanto, queremos permitir que uma parte do programa envie informa&#231;&#227;o para outra parte. Quando uma fun&#231;&#227;o termina de ser executada, ela pode retornar um valor para o c&#243;digo que a chamou. Se cham&#225;ssemos <emph>stripTags</emph> usando outro programa, far&#237;amos assim:</p>
+<ab><code xml:id="code_HTML-lista-palavras-2_5" corresp="code_HTML-lista-palavras-2_5.txt" lang="language-python" rend="block"/></ab>
+<p>Ao utilizar <code rend="inline">return</code>, fomos capazes de salvar o resultado da fun&#231;&#227;o <emph>stripTags</emph> diretamente em uma vari&#225;vel que chamamos de 'theResult', que podemos ent&#227;o usar para retomar o processamento conforme necess&#225;rio usando um c&#243;digo adicional.</p>
 <p>Note que no nosso exemplo com <emph>stripTags</emph> do in&#237;cio dessa subse&#231;&#227;o, o valor que queremos retornar agora n&#227;o &#233; <emph>pageContents</emph>, mas sim o conte&#250;do que teve a marca&#231;&#227;o HTML removida.</p>
-<p>Para testar a nossa nova fun&#231;&#227;o <emph>stripTags</emph>, pode executar <code type="inline">trial-content.py</code> novamente. Uma vez que redefinimos <emph>stripTags</emph>, o programa <code type="inline">trial-content.py</code> agora faz algo diferente (e mais pr&#243;ximo do que desejamos). Antes de continuar, garanta que entendeu porque o comportamento de <code type="inline">trial-content.py</code> muda ainda que tenhamos alterado somente o <code type="inline">obo.py</code>.</p>
+<p>Para testar a nossa nova fun&#231;&#227;o <emph>stripTags</emph>, pode executar <code rend="inline">trial-content.py</code> novamente. Uma vez que redefinimos <emph>stripTags</emph>, o programa <code rend="inline">trial-content.py</code> agora faz algo diferente (e mais pr&#243;ximo do que desejamos). Antes de continuar, garanta que entendeu porque o comportamento de <code rend="inline">trial-content.py</code> muda ainda que tenhamos alterado somente o <code rend="inline">obo.py</code>.</p>
 </div></div>
       <div type="2"><head>Listas em Python</head>
-<p>Agora que temos a habilidade de extrair texto bruto das p&#225;ginas da web, provavelmente desejar&#225; obter esse texto em um formato que seja f&#225;cil de processar. At&#233; agora, quando precisou armazenar informa&#231;&#245;es em programas Python, geralmente usou strings. Houve algumas exce&#231;&#245;es, no entanto. Na fun&#231;&#227;o <emph>stripTags</emph>, tamb&#233;m fez uso de um n&#250;mero inteiro (<link target="https://perma.cc/JLD8-Z58G">integer</link>) nomeado <emph>inside</emph> para armazenar 1 quando estivesse processando uma tag e 0 quando n&#227;o fosse o caso. Aten&#231;&#227;o que pode executar opera&#231;&#245;es matem&#225;ticas com inteiros, mas n&#227;o pode armazenar fra&#231;&#245;es ou n&#250;meros decimais em vari&#225;veis inteiras.</p>
-<pre><code class="language-python" xml:id="code_HTML-lista-palavras-2_6" type="block" corresp="code_HTML-lista-palavras-2_6.txt"/></pre>
-<p>E sempre que precisou ler ou gravar em um ficheiro, usou um <link target="https://pt.wikipedia.org/wiki/Handle_(inform%C3%A1tica)"><emph>file handle</emph></link> especial, como <emph>f</emph> no exemplo abaixo.</p>
-<pre><code class="language-python" xml:id="code_HTML-lista-palavras-2_7" type="block" corresp="code_HTML-lista-palavras-2_7.txt"/></pre>
-<p>Um dos <link target="https://perma.cc/4577-CE4Q">tipos</link> de objeto mais &#250;teis que o Python oferece, no entanto, &#233; a <emph>lista</emph>, uma cole&#231;&#227;o ordenada de outros objetos (inclusive, potencialmente, outras listas). Converter uma string em uma lista de caracteres ou palavras &#233; simples. Digite ou copie o c&#243;digo a seguir no seu editor de texto para verificar duas formas de atingir esse objetivo. Guarde o ficheiro como <code type="inline">string-para-lista.py</code> e execute-o. Compare as duas listas que s&#227;o exibidas no painel da Sa&#237;da de Comando e veja se consegue descobrir como o c&#243;digo funciona.</p>
-<pre><code class="language-python" xml:id="code_HTML-lista-palavras-2_8" type="block" corresp="code_HTML-lista-palavras-2_8.txt"/></pre>
-<p>A primeira rotina utiliza um <code type="inline">for</code> <emph>loop</emph> para percorrer cada caractere na string <emph>s1</emph> e anexa o caractere ao final de <emph>charlist</emph>. A segunda rotina faz uso da opera&#231;&#227;o <emph>split</emph> (dividir) para separar a string <emph>s2</emph> sempre que houver um espa&#231;o em branco (espa&#231;os, tabula&#231;&#245;es, <link target="https://perma.cc/T7DA-RG2L">retornos de carro</link> e caracteres semelhantes). Na verdade, &#233; uma certa simplica&#231;&#227;o referir-se aos objetos da segunda lista como palavras. Tente mudar <emph>s2</emph> no programa acima para 'oi mundo!' e execute-o novamente. O que aconteceu com o ponto de exclama&#231;&#227;o? Note que precisar&#225; quardar as suas altera&#231;&#245;es antes de usar <emph>Run Python</emph> novamente.</p>
+<p>Agora que temos a habilidade de extrair texto bruto das p&#225;ginas da web, provavelmente desejar&#225; obter esse texto em um formato que seja f&#225;cil de processar. At&#233; agora, quando precisou armazenar informa&#231;&#245;es em programas Python, geralmente usou strings. Houve algumas exce&#231;&#245;es, no entanto. Na fun&#231;&#227;o <emph>stripTags</emph>, tamb&#233;m fez uso de um n&#250;mero inteiro (<ref target="https://perma.cc/JLD8-Z58G">integer</ref>) nomeado <emph>inside</emph> para armazenar 1 quando estivesse processando uma tag e 0 quando n&#227;o fosse o caso. Aten&#231;&#227;o que pode executar opera&#231;&#245;es matem&#225;ticas com inteiros, mas n&#227;o pode armazenar fra&#231;&#245;es ou n&#250;meros decimais em vari&#225;veis inteiras.</p>
+<ab><code xml:id="code_HTML-lista-palavras-2_6" corresp="code_HTML-lista-palavras-2_6.txt" lang="language-python" rend="block"/></ab>
+<p>E sempre que precisou ler ou gravar em um ficheiro, usou um <ref target="https://pt.wikipedia.org/wiki/Handle_(inform%C3%A1tica)"><emph>file handle</emph></ref> especial, como <emph>f</emph> no exemplo abaixo.</p>
+<ab><code xml:id="code_HTML-lista-palavras-2_7" corresp="code_HTML-lista-palavras-2_7.txt" lang="language-python" rend="block"/></ab>
+<p>Um dos <ref target="https://perma.cc/4577-CE4Q">tipos</ref> de objeto mais &#250;teis que o Python oferece, no entanto, &#233; a <emph>lista</emph>, uma cole&#231;&#227;o ordenada de outros objetos (inclusive, potencialmente, outras listas). Converter uma string em uma lista de caracteres ou palavras &#233; simples. Digite ou copie o c&#243;digo a seguir no seu editor de texto para verificar duas formas de atingir esse objetivo. Guarde o ficheiro como <code rend="inline">string-para-lista.py</code> e execute-o. Compare as duas listas que s&#227;o exibidas no painel da Sa&#237;da de Comando e veja se consegue descobrir como o c&#243;digo funciona.</p>
+<ab><code xml:id="code_HTML-lista-palavras-2_8" corresp="code_HTML-lista-palavras-2_8.txt" lang="language-python" rend="block"/></ab>
+<p>A primeira rotina utiliza um <code rend="inline">for</code> <emph>loop</emph> para percorrer cada caractere na string <emph>s1</emph> e anexa o caractere ao final de <emph>charlist</emph>. A segunda rotina faz uso da opera&#231;&#227;o <emph>split</emph> (dividir) para separar a string <emph>s2</emph> sempre que houver um espa&#231;o em branco (espa&#231;os, tabula&#231;&#245;es, <ref target="https://perma.cc/T7DA-RG2L">retornos de carro</ref> e caracteres semelhantes). Na verdade, &#233; uma certa simplica&#231;&#227;o referir-se aos objetos da segunda lista como palavras. Tente mudar <emph>s2</emph> no programa acima para 'oi mundo!' e execute-o novamente. O que aconteceu com o ponto de exclama&#231;&#227;o? Note que precisar&#225; quardar as suas altera&#231;&#245;es antes de usar <emph>Run Python</emph> novamente.</p>
 <p>Considerando tudo o que aprendeu at&#233; aqui, agora &#233; capaz de abrir uma URL, fazer o download de uma p&#225;gina web e armazen&#225;-la numa string, remover o HTML e depois dividir o texto em uma lista de palavras. Tente executar o programa a seguir.</p>
-<pre><code class="language-python" xml:id="code_HTML-lista-palavras-2_9" type="block" corresp="code_HTML-lista-palavras-2_9.txt"/></pre>
+<ab><code xml:id="code_HTML-lista-palavras-2_9" corresp="code_HTML-lista-palavras-2_9.txt" lang="language-python" rend="block"/></ab>
 <p>Deve obter algo como o seguinte.</p>
-<pre><code class="language-python" xml:id="code_HTML-lista-palavras-2_10" type="block" corresp="code_HTML-lista-palavras-2_10.txt"/></pre>
+<ab><code xml:id="code_HTML-lista-palavras-2_10" corresp="code_HTML-lista-palavras-2_10.txt" lang="language-python" rend="block"/></ab>
 <p>Simplesmente ter uma lista de palavras ainda n&#227;o &#233; muito vantajoso. Como seres humanos, temos a capacidade de ler. No entanto, estamos chegando muito mais perto de uma representa&#231;&#227;o que os seus programas podem processar.</p>
 </div>
       <div type="2"><head>Leituras Sugeridas</head>
-<ul>
-<li>
-Lutz, <emph>Learning Python</emph><ul>
-<li>Ch. 7: Strings</li>
-<li>Ch. 8: Lists and Dictionaries</li>
-<li>Ch. 10: Introducing Python Statements</li>
-<li>Ch. 15: Function Basics</li>
-</ul>
-</li>
-</ul>
+<list type="unordered">
+<item>
+Lutz, <emph>Learning Python</emph><list type="unordered">
+<item>Ch. 7: Strings</item>
+<item>Ch. 8: Lists and Dictionaries</item>
+<item>Ch. 10: Introducing Python Statements</item>
+<item>Ch. 15: Function Basics</item>
+</list>
+</item>
+</list>
 </div>
       <div type="2"><head>Sincroniza&#231;&#227;o de C&#243;digo</head>
 <p>Para acompanhar li&#231;&#245;es futuras, &#233; importante ter os ficheiros e programas corretos no seu diret&#243;rio &#8220;programming-historian&#8221;. No final de cada li&#231;&#227;o, &#233; poss&#237;vel fazer o download do ficheiro zip &#8220;programming-historian&#8221; para ter a certeza de que o ficheiro correto est&#225; a ser utilizado. Observe que removemos os ficheiros desnecess&#225;rios das li&#231;&#245;es anteriores. O seu diret&#243;rio pode conter mais ficheiros e n&#227;o h&#225; problema!</p>
-<ul>
-<li>python-lessons3.zip (<link target="/assets/python-lessons3.zip">zip sync</link>)</li>
-</ul>
+<list type="unordered">
+<item>python-lessons3.zip (<ref target="/assets/python-lessons3.zip">zip sync</ref>)</item>
+</list>
 </div>
     </body>
   </text>

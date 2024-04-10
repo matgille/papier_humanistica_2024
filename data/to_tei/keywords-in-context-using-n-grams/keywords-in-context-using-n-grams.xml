@@ -3,7 +3,7 @@
  <fileDesc>
   <titleStmt>
    <title>Keywords in Context (Using n-grams) with Python</title>
-  <author type="original_author"><persName>William J. Turkel</persName><persName>Adam Crymble</persName></author><editor type="reviewers"><persName>Jim Clifford</persName><persName>Frederik Elwert</persName></editor><editor type="editors">Miriam Posner</editor></titleStmt>
+  <author role="original_author"><persName>William J. Turkel</persName><persName>Adam Crymble</persName></author><editor role="reviewers"><persName>Jim Clifford</persName><persName>Frederik Elwert</persName></editor><editor role="editors">Miriam Posner</editor></titleStmt>
   <publicationStmt>
    <idno type="doi">10.46430/phen0010</idno><date type="published">07/17/2012</date><p>Lesson reviewed and published in Programming Historian.</p>
   </publicationStmt>
@@ -11,13 +11,13 @@
   <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#palabras-clave-en-contexto-n-grams #palavras-chave-contexto-usando-n-grams-python"/></p></sourceDesc>
  </fileDesc>
  <profileDesc><abstract><p>This lesson takes the frequency pairs collected in "Counting Frequencies" and outputs them in HTML.
-</p></abstract><textClass><keyword xml:lang="en">python</keyword></textClass></profileDesc>
+</p></abstract><textClass><keywords><term xml:lang="en">python</term></keywords></textClass></profileDesc>
 </teiHeader>
   <text xml:lang="en">
     <body>
       <div type="2"><head>Lesson Goals</head>
-<p>Like in <link target="/lessons/output-data-as-html-file">Output Data as HTML File</link>, this lesson takes the frequency
-pairs collected in <link target="/lessons/counting-frequencies">Counting Frequencies</link> and outputs them in HTML.
+<p>Like in <ref target="/lessons/output-data-as-html-file">Output Data as HTML File</ref>, this lesson takes the frequency
+pairs collected in <ref target="/lessons/counting-frequencies">Counting Frequencies</ref> and outputs them in HTML.
 This time the focus is on keywords in context (KWIC) which creates
 n-grams from the original document content &#8211; in this case a trial
 transcript from the <emph>Old Bailey Online</emph>. You can use your program to
@@ -26,7 +26,7 @@ keyword, along with the words to the left and right of it, making it
 easy to see at a glance how the keyword is used.</p>
 <p>Once the KWICs have been created, they are then wrapped in HTML and sent
 to the browser where they can be viewed. This reinforces what was
-learned in <link target="output-data-as-html-file">Output Data as HTML File</link>, opting for a slightly
+learned in <ref target="output-data-as-html-file">Output Data as HTML File</ref>, opting for a slightly
 different output.</p>
 <p>At the end of this lesson, you will be able to extract all possible
 n-grams from the text. In the next lesson, you will be learn how to
@@ -34,11 +34,11 @@ output all of the n-grams of a given keyword in a document downloaded
 from the Internet, and display them clearly in your browser window.</p>
 </div>
       <div type="2"><head>Files Needed For This Lesson</head>
-<ul>
-<li><code type="inline">obo.py</code></li>
-</ul>
+<list type="unordered">
+<item><code rend="inline">obo.py</code></item>
+</list>
 <p>If you do not have these files from the previous lesson, you can
-download programming-historian-7, a <link target="/assets/python-lessons7.zip">zip file from the previous lesson</link></p>
+download programming-historian-7, a <ref target="/assets/python-lessons7.zip">zip file from the previous lesson</ref></p>
 </div>
       <div type="2"><head>From Text to N-Grams to KWIC</head>
 <p>Now that you know how to harvest the textual content of a web page
@@ -57,7 +57,7 @@ abbreviated as KWIC). For example, if the string in question were "it
 was the best of times it was the worst of times it was the age of wisdom
 it was the age of foolishness" then a 7-gram for the keyword "wisdom"
 would be:</p>
-<pre><code xml:id="code_keywords-in-context-using-n-grams_0" type="block" corresp="code_keywords-in-context-using-n-grams_0.txt"/></pre>
+<ab><code xml:id="code_keywords-in-context-using-n-grams_0" corresp="code_keywords-in-context-using-n-grams_0.txt" rend="block"/></ab>
 <p>An n-gram could contain any type of linguistic unit you like. For
 historians you are most likely to use characters as in the bigram "qu"
 or words as in the trigram "the dog barked"; however, you could also use
@@ -72,16 +72,16 @@ that it can be viewed in Firefox and added easily to Zotero.</p>
 <p>Since we want to work with words as opposed to characters or phonemes,
 it will be much easier to create n-grams using a list of words rather
 than strings. As you already know, Python can easily turn a string into
-a list using the <code type="inline">split</code> operation. Once split it becomes simple to
+a list using the <code rend="inline">split</code> operation. Once split it becomes simple to
 retrieve a subsequence of adjacent words in the list by using a <emph>slice</emph>,
 represented as two indexes separated by a colon. This was introduced
-when working with strings in <link target="/lessons/manipulating-strings-in-python">Manipulating Strings in Python</link>.</p>
-<pre><code class="language-python" xml:id="code_keywords-in-context-using-n-grams_1" type="block" corresp="code_keywords-in-context-using-n-grams_1.txt"/></pre>
+when working with strings in <ref target="/lessons/manipulating-strings-in-python">Manipulating Strings in Python</ref>.</p>
+<ab><code xml:id="code_keywords-in-context-using-n-grams_1" corresp="code_keywords-in-context-using-n-grams_1.txt" lang="language-python" rend="block"/></ab>
 <p>However, we can also use this technique to take a predetermined number
 of neighbouring words from the list with very little effort. Study the
 following examples, which you can try out in a Python Shell.</p>
-<pre><code class="language-python" xml:id="code_keywords-in-context-using-n-grams_2" type="block" corresp="code_keywords-in-context-using-n-grams_2.txt"/></pre>
-<p>In these examples we have used the <code type="inline">slice</code> method to return parts of our
+<ab><code xml:id="code_keywords-in-context-using-n-grams_2" corresp="code_keywords-in-context-using-n-grams_2.txt" lang="language-python" rend="block"/></ab>
+<p>In these examples we have used the <code rend="inline">slice</code> method to return parts of our
 list. Note that there are two sides to the colon in a slice. If the
 right of the colon is left blank as in the last example above, the
 program knows to automatically continue to the end &#8211; in this case, to
@@ -89,18 +89,18 @@ the end of the list. The second last example above shows that we can
 start at the beginning by leaving the space before the colon empty. This
 is a handy shortcut available to keep your code shorter.</p>
 <p>You can also use variables to represent the index positions. Used in
-conjunction with a <code type="inline">for</code> loop, you could easily create every possible
+conjunction with a <code rend="inline">for</code> loop, you could easily create every possible
 n-gram of your list. The following example returns all 5-grams of our
 string from the example above.</p>
-<pre><code class="language-python" xml:id="code_keywords-in-context-using-n-grams_3" type="block" corresp="code_keywords-in-context-using-n-grams_3.txt"/></pre>
+<ab><code xml:id="code_keywords-in-context-using-n-grams_3" corresp="code_keywords-in-context-using-n-grams_3.txt" lang="language-python" rend="block"/></ab>
 <p>Keeping with our modular approach, we will create a function and save it
-to the <code type="inline">obo.py</code> module that can create n-grams for us. Study and type or
+to the <code rend="inline">obo.py</code> module that can create n-grams for us. Study and type or
 copy the following code:</p>
-<pre><code class="language-python" xml:id="code_keywords-in-context-using-n-grams_4" type="block" corresp="code_keywords-in-context-using-n-grams_4.txt"/></pre>
+<ab><code xml:id="code_keywords-in-context-using-n-grams_4" corresp="code_keywords-in-context-using-n-grams_4.txt" lang="language-python" rend="block"/></ab>
 <p>This function may look a little confusing as there is a lot going on
 here in not very much code. It uses a <emph>list comprehension</emph> to keep the
 code compact. The following example does exactly the same thing:</p>
-<pre><code class="language-python" xml:id="code_keywords-in-context-using-n-grams_5" type="block" corresp="code_keywords-in-context-using-n-grams_5.txt"/></pre>
+<ab><code xml:id="code_keywords-in-context-using-n-grams_5" corresp="code_keywords-in-context-using-n-grams_5.txt" lang="language-python" rend="block"/></ab>
 <p>Use whichever makes most sense to you.</p>
 <p>A concept that may still be confusing to you are the two function
 arguments. Notice that our function has two variable names in the
@@ -111,8 +111,8 @@ these arguments there is not enough information to do the calculations.
 In this case, the two pieces of information are the list of words you
 want to turn into n-grams (wordlist), and the number of words you want
 in each n-gram (n). For the function to work it needs both, so you call
-it in like this (save the following as <code type="inline">useGetNGrams.py</code> and run):</p>
-<pre><code class="language-python" xml:id="code_keywords-in-context-using-n-grams_6" type="block" corresp="code_keywords-in-context-using-n-grams_6.txt"/></pre>
+it in like this (save the following as <code rend="inline">useGetNGrams.py</code> and run):</p>
+<ab><code xml:id="code_keywords-in-context-using-n-grams_6" corresp="code_keywords-in-context-using-n-grams_6.txt" lang="language-python" rend="block"/></ab>
 <p>Notice that the arguments you enter do not have to have the same names
 as the arguments named in the function declaration. Python knows to use
 <emph>allMyWords</emph> everywhere in the function that <emph>wordlist</emph> appears, since this
@@ -125,12 +125,12 @@ or any other variable type sent as an argument.</p>
 <p>You can also use a Python shell to play around with the code to get a
 better understanding of how it works. Paste the function declaration for
 <emph>getNGrams</emph> (either of the two functions above) into your Python shell.</p>
-<pre><code class="language-python" xml:id="code_keywords-in-context-using-n-grams_7" type="block" corresp="code_keywords-in-context-using-n-grams_7.txt"/></pre>
+<ab><code xml:id="code_keywords-in-context-using-n-grams_7" corresp="code_keywords-in-context-using-n-grams_7.txt" lang="language-python" rend="block"/></ab>
 <p>There are two concepts that we see in this example of which you need to
 be aware. Firstly, because our function expects a list of words rather
 than a string, we have to convert the strings into lists before our
 function can handle them. We could have done this by adding another line
-of code above the function call, but instead we used the <code type="inline">split</code> method
+of code above the function call, but instead we used the <code rend="inline">split</code> method
 directly in the function argument as a bit of a shortcut.</p>
 <p>Secondly, why did the first example return an empty list rather than the
 n-grams we were after? In <emph>test1</emph>, we have tried to ask for an n-gram that
@@ -148,12 +148,12 @@ n-grams that are of interest to us.</p>
 right files and programs in your "programming-historian" directory. At
 the end of each chapter you can download the "programming-historian" zip
 file to make sure you have the correct code. If you are following along
-with the Mac / Linux version you may have to open the <code type="inline">obo.py</code> file and
+with the Mac / Linux version you may have to open the <code rend="inline">obo.py</code> file and
 change "file:///Users/username/Desktop/programming-historian/" to the
 path to the directory on your own computer.</p>
-<ul>
-<li>python-lessons8.py (<link target="/assets/python-lessons8.zip">zip sync</link>)</li>
-</ul>
+<list type="unordered">
+<item>python-lessons8.py (<ref target="/assets/python-lessons8.zip">zip sync</ref>)</item>
+</list>
 </div>
     </body>
   </text>
