@@ -5,9 +5,35 @@ import re
 import yaml
 from marko.ext.gfm import gfm
 
-tei_ns = "https://tei-c.org/ns/1-0/"
+tei_ns = "http://www.tei-c.org/ns/1.0"
 ns_decl = {"tei": tei_ns}
 
+
+def create_new_node(dictionnary:dict, target_node:str, target_attr:tuple, parent_node:ET._Element, sourceKey:str):
+    """
+    This function updates the XML tree according with a given JSON dict.
+    :param dictionnary: 
+    :param NodeName: 
+    :param target_node: 
+    :param target_attr: 
+    :param parent_node: 
+    :param sourceKey: 
+    :return: 
+    """
+    tgt = ET.Element(target_node)
+    try:
+        if dictionnary[sourceKey] and len(dictionnary[sourceKey]) == 1:
+            tgt.text = dictionnary[sourceKey][0]
+        else:
+            if dictionnary[sourceKey]:
+                for author in dictionnary[sourceKey]:
+                    Name_Node = ET.Element("persName")
+                    Name_Node.text = author
+                    tgt.append(Name_Node)
+        parent_node.append(tgt)
+        tgt.set(target_attr[0], target_attr[1])
+    except KeyError:
+        print(f"Error")
 
 def pop_element(tree, element_name):
     for element in tree.xpath(f"//{element_name}"):
@@ -43,7 +69,6 @@ def xmlify(path):
     :param path: path to the md file
     :return: None; creates a TEI file
     """
-    # TODO: get back to endnotes
     
     language = re.search(r"/(es|fr|en|pt)/", path).groups()[0]
     
@@ -54,17 +79,128 @@ def xmlify(path):
     lesson_name = path.split("/")[-1].replace(".md", "")
     
     ## Metadata management; yaml-xml conversion
+    minimal_teiHeader = """<teiHeader>
+ <fileDesc>
+  <titleStmt>
+   <title/>
+  </titleStmt>
+  <publicationStmt>
+   <p>Lesson reviewed and published in Programming Historian.</p>
+  </publicationStmt>
+  <sourceDesc>
+  </sourceDesc>
+ </fileDesc>
+ <profileDesc/>
+</teiHeader>
+    """
     metadata_as_yaml = as_text.split("---")[1]
     python_dict=yaml.load(metadata_as_yaml,Loader=yaml.SafeLoader)
-    metadata = ET.Element("metadata")
-    for key, values in python_dict.items():
-        new_element = ET.Element(key)
-        if type(values) is list:
-            new_element.text = ",".join(values)
-        else:
-            new_element.text = str(values)
-        metadata.append(new_element)
-    metadata_as_xml = ET.tostring(metadata, pretty_print=True, encoding='utf8').decode()
+    print(python_dict)
+    new_metadata = ET.fromstring(minimal_teiHeader)
+    title_node = new_metadata.xpath("//title")[0]
+    title_node.text = python_dict['title']
+    titleStmt = new_metadata.xpath("//titleStmt")[0]
+    
+    publicationStmt =  new_metadata.xpath("//publicationStmt")[0]
+    date = ET.Element("date")
+    date.set("type", "published")
+    try:
+        date.text = python_dict['date'].strftime('%m/%d/%Y')
+        publicationStmt.insert(0, date)
+    except KeyError:
+        pass
+    
+
+    try:
+        date = ET.Element("date")
+        date.set("type", "translated")
+        date.text = python_dict['translation_date'].strftime('%m/%d/%Y')
+        publicationStmt.insert(1, date)
+    except KeyError:
+        pass
+    
+    
+    
+    try:
+        doi = python_dict['doi']
+        idno = ET.Element("idno")
+        idno.set("type", "doi")
+        idno.text = doi
+        publicationStmt.insert(0, idno)
+    except KeyError:
+        pass
+    
+    
+    profileDesc =  new_metadata.xpath("//profileDesc")[0]
+    try:
+        abstract = ET.Element("abstract")
+        p_element = ET.Element("p")
+        p_element.text = python_dict["abstract"]
+        abstract.append(p_element)
+        profileDesc.append(abstract)
+    except KeyError:
+        pass
+
+    try:
+        textClass = ET.Element("textClass")
+        topics = python_dict["topics"]
+        for topic in topics:
+            keyword = ET.Element("keyword")
+            keyword.set("{http://www.w3.org/XML/1998/namespace}lang", "en")
+            keyword.text = topic
+            textClass.append(keyword)
+        profileDesc.append(textClass)
+    except KeyError:
+        pass
+    
+    
+    sourceDesc = new_metadata.xpath("//sourceDesc")[0]
+    try:
+        python_dict['original']
+        new_p_text = f"<p>Born digital, in a markdown format. Original file: <ref type='original_file' target='#{python_dict['original']}'/>.</p>"
+    except KeyError:
+        new_p_text = f"<p>Born digital, in a markdown format. This lesson is original.</p>"
+    as_node = ET.fromstring(new_p_text)
+    sourceDesc.append(as_node)
+    
+    
+    
+
+    create_new_node(dictionnary=python_dict,
+                    target_node="author",
+                    target_attr=("type", "original_author"),
+                    parent_node=titleStmt,
+                    sourceKey='authors')
+
+    create_new_node(dictionnary=python_dict, 
+                    target_node="editor", 
+                    target_attr=("type","reviewers"),
+                    parent_node=titleStmt,
+                    sourceKey='reviewers')
+    
+    create_new_node(dictionnary=python_dict,
+                    target_node="author",
+                    target_attr=("type", "translators"),
+                    parent_node=titleStmt,
+                    sourceKey='translator')
+
+
+    create_new_node(dictionnary=python_dict, 
+                    target_node="editor", 
+                    target_attr=("type","translation-reviewers"),
+                    parent_node=titleStmt,
+                    sourceKey='translation-reviewer')
+
+
+    
+    
+    create_new_node(dictionnary=python_dict, 
+                    target_node="editor", 
+                    target_attr=("type","editors"),
+                    parent_node=titleStmt,
+                    sourceKey='editors')
+    
+    metadata_as_xml = ET.tostring(new_metadata, pretty_print=True, encoding='utf8').decode()
     # We remove the metadata from the text file
     transformed = as_text.replace(metadata_as_yaml, "")
     ## Metadata management
@@ -150,6 +286,7 @@ def xmlify(path):
             all_nodes = lesson_as_xml_tree.xpath(f"descendant::h{section_level}")
             for heading in all_nodes:
                 heading.tag = f"h{str(section_level - difference)}"
+                # heading.tag = f"h{str(section_level)}"
         
     
     # TODO: structure coherence check
@@ -219,7 +356,8 @@ def xmlify(path):
     # see https://stackoverflow.com/a/51660868
     root.tag = "TEI"
     root.set('xmlns', tei_ns)
-    root.insert(0, ET.fromstring(metadata_as_xml))
+    root.set("xml:id", lesson_name.split("/")[-1].split(".")[0])
+    root.insert(0, new_metadata)
     text_element = ET.Element("text")
     body = root.xpath("//body")
     text_element.append(body[0])
@@ -269,6 +407,63 @@ def xmlify(path):
         # TODO: linebreaks in code are removed by lxml. 
         output_file.write(ET.tostring(lesson_as_xml_tree, pretty_print=True).decode('utf-8'))
 
+def link_lessons():
+    """
+    This function parses all the trees and links the original lessons and translations. It adds the information 
+    to the teiHeader
+    :return: None
+    """
+    print("Linking lessons")
+    tei_ns = "http://www.tei-c.org/ns/1.0"
+    ns_decl = {"tei": tei_ns}
+    all_lessons = dict()
+    for lesson in glob.glob("../../data/to_tei/*/*.xml"):
+        as_tree = ET.parse(lesson)
+        id = as_tree.xpath("@xml:id", namespaces=ns_decl)[0]
+        if len(as_tree.xpath("//tei:sourceDesc/descendant::tei:ref", namespaces=ns_decl)) == 0:
+            all_lessons[id] = []
+
+    for lesson in glob.glob("../../data/to_tei/*/*.xml"):
+        as_tree = ET.parse(lesson)
+        id = as_tree.xpath("@xml:id", namespaces=ns_decl)[0]
+        if len(as_tree.xpath("//tei:sourceDesc/descendant::tei:ref", namespaces=ns_decl)) != 0:
+            corresp = as_tree.xpath("//tei:sourceDesc/descendant::tei:ref/@target", namespaces=ns_decl)[0]
+            corresp = corresp.replace("#", "")
+            all_lessons[corresp].append(id)
+    
+    for lesson in glob.glob("../../data/to_tei/*/*.xml"):
+        as_tree = ET.parse(lesson)
+        id = as_tree.xpath("@xml:id", namespaces=ns_decl)[0]
+
+        # Si il s'agit d'une leçon originale.
+        source_desc_p = as_tree.xpath("//tei:sourceDesc/tei:p", namespaces=ns_decl)[0]
+        if id in all_lessons:
+            refs = " ".join(f"#{element}" for element in all_lessons[id])
+            source_desc_p.text = f"{source_desc_p.text} Available translations are the following:"
+            ref_element = ET.Element("ref")
+            ref_element.set("type", "translations")
+            ref_element.set("target", refs)
+            source_desc_p.append(ref_element)
+        else:
+            if any(id in translated for translated in all_lessons.values()):
+                source_desc = as_tree.xpath("//tei:sourceDesc", namespaces=ns_decl)[0]
+                new_p = ET.Element("p")
+                correct_index = [index for index, translated in enumerate(all_lessons.values()) if id in translated][0]
+                corresponding_lessons = " ".join([f"#{element}" for element in list(all_lessons.values())[correct_index] if element != id])
+                new_ref = ET.Element("ref")
+                new_ref.set("target", corresponding_lessons)
+                new_p.text = "There are other translations: "
+                new_p.append(new_ref)
+                source_desc.append(new_p)
+                
+            
+        # Let's serialize the tree.
+        with open(lesson, "w") as output_file:
+            output_file.write(ET.tostring(as_tree, pretty_print=True).decode('utf-8'))
+
+    
+    
+
         
 if __name__ == '__main__':
     
@@ -284,3 +479,5 @@ if __name__ == '__main__':
     for lesson in lessons:
         print(lesson)
         xmlify(lesson)
+    
+    link_lessons()
