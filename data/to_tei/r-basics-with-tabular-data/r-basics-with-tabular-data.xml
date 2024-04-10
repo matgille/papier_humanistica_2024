@@ -1,0 +1,207 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="r-basics-with-tabular-data">
+  <teiHeader>
+ <fileDesc>
+  <titleStmt>
+   <title>R Basics with Tabular Data</title>
+  <author type="original_author">Taryn Dewar</author><editor type="reviewers"><persName>James Baker</persName><persName>John Russell</persName></editor><editor type="editors">Adam Crymble</editor></titleStmt>
+  <publicationStmt>
+   <idno type="doi">10.46430/phen0056</idno><date type="published">09/05/2016</date><p>Lesson reviewed and published in Programming Historian.</p>
+  </publicationStmt>
+  <sourceDesc>
+  <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#analyse-donnees-tabulaires-R #nocoes-basicas-R-dados-tabulares #datos-tabulares-en-r"/></p></sourceDesc>
+ </fileDesc>
+ <profileDesc><abstract><p>This lesson teaches a way to quickly analyze large volumes of tabular data, making research faster and more effective.</p></abstract><textClass><keyword xml:lang="en">data-manipulation</keyword><keyword xml:lang="en">r</keyword></textClass></profileDesc>
+</teiHeader>
+  <text xml:lang="en">
+    <body>
+      <div type="2"><head>Lesson Goals</head>
+<p>As more and more historical records are digitized, having a way to quickly analyze large volumes of tabular data makes research faster and more effective.</p>
+<p><link target="https://www.r-project.org/">R</link> is a programming language with strengths in statistical analyses. As such, it can be used to complete quantitative analysis on historical sources, including but not limited to statistical tests. Because you can repeatedly re-run the same code on the same sources, R lets you analyze data quickly and produces repeatable results. Because you can save your code, R lets you re-purpose or revise functions for future projects, making it a flexible part of your toolkit.</p>
+<p>This tutorial presumes no prior knowledge of R. It will go through some of the basic functions of R and serves as an introduction to the language. It will take you through the installation process, explain some of the tools that you can use in R, as well as explain how to work with data sets while doing research. The tutorial will do so by going through a series of mini-lessons that will show the kinds of sources R works well with and examples of how to do calculations to find information that could be relevant to historical research. The lesson will also cover different input methods for R such as matrices and using CSV files.</p>
+</div>
+      <div type="2"><head>For Whom is this Useful?</head>
+<p>R is ideal for analyzing larger data sets that would take too long to compute manually. Once you understand how to write some of the basic functions and how to import your own data files, you can analyze and visualize the data quickly and efficiently.</p>
+<p>While R is a great tool for tabular data, you may find using other approaches to analyse non-tabular sources (such as newspaper transcriptions) more useful. If you are interested in studying these types of sources, take a look at some of the other great lessons of the <link target="/lessons/">Programming Historian</link>.</p>
+</div>
+      <div type="2"><head>Installing R</head>
+<p>R is a programming language and environment for working with data. It can be run using the R console as well as on the <link target="/lessons/intro-to-bash">command-line</link> or the <link target="https://www.rstudio.com/">R Studio Interface</link>. This tutorial will focus on using the R console. To get started with R, download the program from <link target="https://cran.r-project.org/">The Comprehensive R Archive Network</link>. R is compatible with Linux, Mac, and Windows.</p>
+<p>When you first open the R console, it will open in a window that looks like this:</p>
+<figure><desc>The R console on a Mac.</desc><graphic url="Intro-to-R-1.png"/></figure>
+</div>
+      <div type="2"><head>Using the R Console</head>
+<p>The R console is a great place to start working if you are new to R because it was designed specifically for the language and has features that are specific to R.</p>
+<p>The console is where you will type commands. To clear the initial screen, go to 'Edit' in the menu bar and select 'Clear Console'. This will start you with a fresh page. You can also change the appearance of the console by clicking on the colour wheel at the top of the console on a Mac, or by selecting 'GUI Preferences' in the 'Edit' menu on a PC. You can adjust the background screen colour and the font colours for functions, as well.</p>
+</div>
+      <div type="2"><head>Using Data Sets</head>
+<p>Before working with your own data, it helps to get a sense of how R works by using the built-in data sets. You can search through the data sets by entering <code type="inline">data()</code> into the console. This will bring up the list of all of the available data sets in a separate window. This list includes the titles of all of the different data sets as well as a short description about the information in each one.</p>
+<p>First, you need to load the AirPassengers data set into your R session. Type&#160;<code type="inline">data(AirPassengers)</code>&#160;and hit <emph>Enter</emph><ref type="footnotemark" target="#1"/>. To view the data set, type in <code type="inline">AirPassengers</code> on the next line and hit <emph>Enter</emph> again. This will print a table showing the number of passengers who flew on international airlines between January 1949 and December 1960, in thousands. You should see:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_0" type="block" corresp="code_r-basics-with-tabular-data_0.txt"/></pre>
+<p>You can now use R to answer a number of questions based on this data. For example, what were the most popular months to fly? Was there an increase in international travel over time? You could probably find the answers to such questions simply by scanning this table, but not as quickly as the computer. And what if there were a lot more data?</p>
+</div>
+      <div type="2"><head>Basic Functions</head>
+<p>R can be used to calculate a number of values that might be useful to you while doing research on a data set. For example, you can find the <link target="https://en.wikipedia.org/wiki/Mean">mean</link>, <link target="https://en.wikipedia.org/wiki/Median">median</link>, minimum, and maximum values in a data set. To find the mean and median values in the data set, you can enter <code type="inline">mean(AirPassengers)</code> and <code type="inline">median(AirPassengers)</code>, respectively, into the console. What if you wanted to calculate more than just one value at a time? To produce a summary of the data, enter <code type="inline">summary(AirPassengers)</code> into the console. This will give you the minimum and maximum data points, as well as the mean, median and first and third <link target="https://en.wikipedia.org/wiki/Quartile">quartile</link> values.</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_1" type="block" corresp="code_r-basics-with-tabular-data_1.txt"/></pre>
+<p>Running a summary shows us that the minimum number of passengers between January 1949 and December 1960 was 104,000 and that the maximum number of passengers was 622,000. The mean value shows us that approximately 280,300 people travelled per month during the time the data was collected for. These values can be useful for seeing the degree of variation in number of passengers over time.</p>
+<p>Using the <code type="inline">summary()</code> function is a good way to get an overview of the entire data set, but what if you are interested in a subset of the data, such as a particular year or certain months? You can select different data points (such as a particular month) and ranges (such as a particular year) in R to calculate many different values. For example, you can add the number of passengers for two months together to determine the total number of passengers over that period of time.</p>
+<p>Try adding the first two values from the <code type="inline">AirPassengers</code> data in the console and then hit 'Enter'. You should see two lines that read:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_2" type="block" corresp="code_r-basics-with-tabular-data_2.txt"/></pre>
+<p>This would give you the total number of passengers (in hundreds of thousands) who flew in January and February of 1949.</p>
+<p>R can do more than just simple arithmetic. You can create <link target="https://en.wikipedia.org/wiki/Mathematical_object">objects</link>, or <link target="https://en.wikipedia.org/wiki/Variable_(computer_science)">variables</link>, to represent numbers and <link target="https://en.wikipedia.org/wiki/Expression_(computer_science)">expressions</link>. For example, you could name the January 1949 value a variable such as <code type="inline">Jan1949</code>. Type <code type="inline">Jan1949&lt;- 112</code> into the console and then <code type="inline">Jan1949</code> on the next line. The <code type="inline">&lt;-</code> notation assigns the value <code type="inline">112</code> to the variable <code type="inline">Jan1949</code>. You should see:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_3" type="block" corresp="code_r-basics-with-tabular-data_3.txt"/></pre>
+<p>R is case sensitive, so be careful that you use the same notation when you use the variables you have assigned (or named) in other actions. See Rasmus B&#229;&#229;th's article, <link target="https://journal.r-project.org/archive/2012-2/RJournal_2012-2_Baaaath.pdf">The State of Naming Conventions in R</link>, for more information on how to best name variables.</p>
+<p>To remove a variable from the console, type <code type="inline">rm()</code> with the variable you want to get rid of inside the brackets, and press <emph>Enter</emph>. To see all of the variables you have assigned, type <code type="inline">ls()</code> into the console and press <emph>Enter</emph> - this will help you avoid using the same name for multiple variables. This is also important because R stores all of the objects you create in its memory, so even if you cannot see a variable named <code type="inline">x</code> in the console, it may have been created before and you could accidentally overwrite it when assigning another variable.</p>
+<p>Here is the list of variables we have created so far:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_4" type="block" corresp="code_r-basics-with-tabular-data_4.txt"/></pre>
+<p>We have the <code type="inline">AirPassengers</code> variable and the <code type="inline">Jan1949</code> variable. If we remove the <code type="inline">Jan1949</code> variable and retype <code type="inline">ls()</code>, we will see:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_5" type="block" corresp="code_r-basics-with-tabular-data_5.txt"/></pre>
+<p>If at any time you become stuck with a function or cannot fix an error, type <code type="inline">help()</code> into the console to open the help page. You can also find general help by using the 'Help' menu at the top of the console. If you want to change something in the code you have already written, you can re-type the code on a new line. To save time, you can also use the arrow keys on your keyboard to scroll up and down in the console to find the line of code you want to change.</p>
+<p>You can use letters as variables but when you start working with your own data it may be easier to assign names that are more representative of that data. Even with the <code type="inline">AirPassengers</code> data, assigning variables that correlate with specific months or years would make it easier to know exactly which points you are working with.</p>
+<div type="3"><head>Practice</head>
+<p>A. Assign variables for the January 1950 and January 1960 <code type="inline">AirPassengers</code> data points. Add the two variables together on the next line.</p>
+<p>B. Use the variables you just created to find the difference between air travellers in 1960 versus 1950.</p>
+</div><div type="3"><head>Solutions</head>
+<p>A. Assign variables for the January 1950 and January 1960 <code type="inline">AirPassengers</code> data points. Add the two variables together on the next line.</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_6" type="block" corresp="code_r-basics-with-tabular-data_6.txt"/></pre>
+<p>This means that 532,000 people travelled on international flights in January 1950 and January 1960.</p>
+<p>B. Use the variables you just created to find the difference between air travellers in 1960 versus 1950:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_7" type="block" corresp="code_r-basics-with-tabular-data_7.txt"/></pre>
+<p>This means that 302,000 more people travelled on international flights in January 1960 than in January 1950.</p>
+<p>Setting variables for individual data points can be tedious, especially if the names you give them are quite long. However, the process is similar for assigning a range of values to one variable such as all of the data points for one year. We do this by creating lists called 'vectors' using the <code type="inline">c</code> command. <code type="inline">c</code> stands for 'combine' and lets us link numbers together into a common variable. For example, you could create a vector for the AirPassenger data for 1949 called 'Air49':</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_8" type="block" corresp="code_r-basics-with-tabular-data_8.txt"/></pre>
+<p>Each item is accessible using the name of the variable and its index position (starting at 1). In this case, <code type="inline">Air49[2]</code> contains the value that corresponds to February 1949 - <code type="inline">118</code>.</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_9" type="block" corresp="code_r-basics-with-tabular-data_9.txt"/></pre>
+<p>You can create a list of consecutive values using a semicolon. For example:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_10" type="block" corresp="code_r-basics-with-tabular-data_10.txt"/></pre>
+<p>Using this knowledge, you could use the following expression to define a variable for the 1949 <code type="inline">AirPassengers</code> data:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_11" type="block" corresp="code_r-basics-with-tabular-data_11.txt"/></pre>
+<p><code type="inline">Air49</code> selected the first twelve terms in the <code type="inline">AirPassengers</code> data set. This gives you the same result as above, but takes less time and also reduces the chance that a value will be transcribed incorrectly.</p>
+<p>To get the total number of passengers for 1949, you can add all of the terms in the vector together by using the <code type="inline">sum()</code> function:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_12" type="block" corresp="code_r-basics-with-tabular-data_12.txt"/></pre>
+<p>Therefore, the total number of passengers in 1949 was approximately 1,520,000.</p>
+<p>Finally, the 'length()' function makes it possible to discern the number of items in a vector:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_13" type="block" corresp="code_r-basics-with-tabular-data_13.txt"/></pre>
+</div><div type="3"><head>Practice</head>
+<ol>
+<li>Create a variable for the 1950 <code type="inline">AirPassengers</code> data.</li>
+<li>Print out the second term in the 1950 series.</li>
+<li>What is the length of the sequence in Question 2?</li>
+<li>What is the total number of people who flew in 1950?</li>
+</ol>
+</div><div type="3"><head>Solutions</head>
+<ol>
+<li>
+</li>
+</ol>
+<pre><code xml:id="code_r-basics-with-tabular-data_14" type="block" corresp="code_r-basics-with-tabular-data_14.txt"/></pre>
+<ol start="2">
+<li>
+</li>
+</ol>
+<pre><code xml:id="code_r-basics-with-tabular-data_15" type="block" corresp="code_r-basics-with-tabular-data_15.txt"/></pre>
+<ol start="3">
+<li>
+</li>
+</ol>
+<pre><code xml:id="code_r-basics-with-tabular-data_16" type="block" corresp="code_r-basics-with-tabular-data_16.txt"/></pre>
+<ol start="4">
+<li>
+</li>
+</ol>
+<pre><code xml:id="code_r-basics-with-tabular-data_17" type="block" corresp="code_r-basics-with-tabular-data_17.txt"/></pre>
+<p>If you were to create variables for all of the years in the data set, you could then use some of the tools we've looked at to determine the number of people travelling by plane over time. Here is a list of variables for 1949 to 1960, followed by the total number of passengers for each year:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_18" type="block" corresp="code_r-basics-with-tabular-data_18.txt"/></pre>
+<p>From this information, you can see that the number of passengers increased every year. You could go further with this data to determine if there was growing interest in vacations at certain times of year, or even the percentage increase in passengers over time.</p>
+</div></div>
+      <div type="2"><head>Working with Larger Data Sets</head>
+<p>Notice that the above example would not scale well for a large data set - counting through all of the data points to find the right ones would be very tedious. Think about what would happen if you were looking for information for year 96 in a data set with 150 years worth of data.</p>
+<p>You can actually select specific rows or columns of data if the data set is in a certain format. Load the <code type="inline">mtcars</code> data set into the console:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_19" type="block" corresp="code_r-basics-with-tabular-data_19.txt"/></pre>
+<p>This <link target="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html">data set</link> gives an overview of Motor Trend Car Road Tests from the 1974 <emph>Motor Trend</emph> magazine <ref type="footnotemark" target="#2"/>. It has information about how many miles per gallon a car could travel, the number of engine cylinders each car has, horsepower, rear axle ratio, weight, and a number of other features for each model. The data could be used to find out which of these features made each type of car more or less safe for drivers over time.</p>
+<p>You can select columns by entering the name of the data set followed by square brackets and the number of either the row or column of data you are interested in. To sort out the rows and columns, think of <code type="inline">dataset[x,y]</code>, where <code type="inline">dataset</code> is the data you are working with, <code type="inline">x</code> is the row, and <code type="inline">y</code> is the column.</p>
+<p>If you were interested in the first row of information in the <code type="inline">mtcars</code> data set, you would enter the following into the console:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_20" type="block" corresp="code_r-basics-with-tabular-data_20.txt"/></pre>
+<p>To see a column of the data, you could enter:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_21" type="block" corresp="code_r-basics-with-tabular-data_21.txt"/></pre>
+<p>This would show you all of the values under the <code type="inline">cyl</code> category. Most of the car models have either 4, 6, or 8 cylinder engines. You can also select single data points by entering values for both <code type="inline">x</code> and <code type="inline">y</code>:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_22" type="block" corresp="code_r-basics-with-tabular-data_22.txt"/></pre>
+<p>This returns the value in the first row, second column. From here, you could run a summary on one row or column of data without having to count the number of terms in the data set. For example, typing <code type="inline">summary(mtcars[,1])</code> into the console and pressing 'Enter' would give the summary for the miles per gallon the different cars use in the <code type="inline">mtcars</code> data set:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_23" type="block" corresp="code_r-basics-with-tabular-data_23.txt"/></pre>
+<p>The summary indicates that the maximum fuel efficiency was 33.9 miles per gallon, from the Toyota Corolla and the least efficient was the Lincoln Continental which only got 10.4 miles per gallon. We can find the cars that match the value points by looking back at the table. It's much easier to find a specific value than to try to do the math in your head or search through a spreadsheet.</p>
+</div>
+      <div type="2"><head>Matrices</head>
+<p>Now that you have a better understanding of how some of the basic functions in R work, we can look at ways of using those functions on our own data. This includes building <link target="https://en.wikipedia.org/wiki/Matrix_(mathematics)">matrices</link> using small data sets. The benefit of knowing how to construct matrices in R is that if you only have a few data points to work with, you could simply create a matrix instead of a CSV that you would then have to import. One of the simplest ways to build a matrix is to create at least two variables or vectors and then bind them together. For example, let's look at some data from the Old Bailey:</p>
+<figure><desc>The [Old Bailey](https://www.oldbaileyonline.org/) data set for criminal cases in each decade between 1670 and 1800.</desc><graphic url="Intro-to-R-2.png"/></figure>
+<p>The Old Bailey contains statistics and information about criminal cases between 1674 and 1913 that were held by London's Central Criminal Court. If we wanted to look at the total number of theft and violent theft offences for the decades between 1670 and 1710, we could put those numbers into a matrix.</p>
+<p>To do this, let's create the variables <code type="inline">Theft</code> and <code type="inline">ViolentTheft</code> using the totals from each decade as data points:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_24" type="block" corresp="code_r-basics-with-tabular-data_24.txt"/></pre>
+<p>To create a matrix, we can use the <code type="inline">cbind()</code> function (column bind). This binds <code type="inline">Theft</code> and <code type="inline">ViolentTheft</code> together in columns, represented by <code type="inline">Crime</code> below.</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_25" type="block" corresp="code_r-basics-with-tabular-data_25.txt"/></pre>
+<p>You can set a matrix using <code type="inline">rbind()</code> as well. <code type="inline">rbind()</code> binds the data together in rows (row bind). Look at the difference between <code type="inline">Crime</code> and <code type="inline">Crime2</code>:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_26" type="block" corresp="code_r-basics-with-tabular-data_26.txt"/></pre>
+<p>The second matrix could also be created by using the expression <code type="inline">t(Crime)</code>, which creates the inverse of <code type="inline">Crime</code>.</p>
+<p>You can also construct a matrix using the <code type="inline">matrix()</code> function. It lets you turn a string of numbers such as the number of thefts and violent thefts committed into a matrix if you hadn't created separate variables for the data points:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_27" type="block" corresp="code_r-basics-with-tabular-data_27.txt"/></pre>
+<p>The first part of the function is the list of numbers. After that, you can determine how many rows (<code type="inline">nrow=</code>) or columns (<code type="inline">ncol=</code>) the matrix will build.</p>
+<p>The <code type="inline">apply()</code> function allows you to perform the same function on every row or column of a matrix. There are three parts to the apply function: first you have to select the matrix you are using, the terms you want to use, and what function you are performing on a matrix:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_28" type="block" corresp="code_r-basics-with-tabular-data_28.txt"/></pre>
+<p>The above example shows the apply function used on the <code type="inline">Crime</code> matrix to calculate the mean of each row, and so the average number of combined theft and violent theft crimes that were committed in each decade. If you want to find the mean of each column, you would use <code type="inline">2</code> instead of <code type="inline">1</code> inside of the function:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_29" type="block" corresp="code_r-basics-with-tabular-data_29.txt"/></pre>
+<p>This shows you the average number of theft crimes and then violent theft crimes between decades.</p>
+<div type="3"><head>Practice</head>
+<ol>
+<li>Create a matrix with two columns using the following data from the <emph>Breaking Peace</emph> and <emph>Killing</emph> crimes between 1710 and 1730 from the Old Bailey chart above: <code type="inline">c(2,3,3,44,51,17)</code></li>
+<li>Use the <code type="inline">cbind()</code> function to join <code type="inline">BreakingPeace &lt;- c(2,3,3)</code> and <code type="inline">Killing &lt;- c(44,51,17)</code> together.</li>
+<li>Calculate the mean of each column for the above matrix using the <code type="inline">apply()</code> function.</li>
+</ol>
+</div></div>
+      <div type="2"><head>Solutions</head>
+<ol>
+<li>
+</li>
+</ol>
+<pre><code xml:id="code_r-basics-with-tabular-data_30" type="block" corresp="code_r-basics-with-tabular-data_30.txt"/></pre>
+<ol start="2">
+<li>
+</li>
+</ol>
+<pre><code xml:id="code_r-basics-with-tabular-data_31" type="block" corresp="code_r-basics-with-tabular-data_31.txt"/></pre>
+<ol start="3">
+<li>
+</li>
+</ol>
+<pre><code xml:id="code_r-basics-with-tabular-data_32" type="block" corresp="code_r-basics-with-tabular-data_32.txt"/></pre>
+<p>Using matrices can be useful when you are working with small amounts of data. However, it isn't always the best option because a matrix can be hard to read. Sometimes it is easier to create your own file using a spreadsheet programme such as Excel or Open Office to ensure that all of the information you want to study is organized and import that file into R.</p>
+</div>
+      <div type="2"><head>Loading Your Own Data Sets into R</head>
+<p>Now that you have practiced with simple data, you're probably ready to try working with your own. Your data are likely in a spreadsheet. So how can you work with this data in R? There are a few different ways you can do this. The first is to load an Excel spreadsheet directly into R. Another way is to import a CSV or TXT file into R.</p>
+<p>To directly load an Excel file into the R console, you first have to install the <code type="inline">readxl</code> package. To do this, type <code type="inline">install.packages("readxl")</code> into the console and press <emph>Enter</emph>. You may have to check that the package is loaded into the console by going into the 'Packages &amp; Data' tab in the menu bar, selecting 'Package Manager', and then clicking the box beside the <code type="inline">readxl</code> package. From there, you can select a file and load it into R. Below is an example of what loading a simple Excel file might look like:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_33" type="block" corresp="code_r-basics-with-tabular-data_33.txt"/></pre>
+<p>After the <code type="inline">read_excel</code> command, you are entering the name of the file you are selecting. The numbers below correspond to the data in the sample spreadsheet I used. Notice how the rows are numbered and my columns are labelled as I had them in the original spreadsheet.</p>
+<p>When you are loading data into R, make sure that the file you are accessing is within the directory on your computer that you are working from. To check this, you can type <code type="inline">dir()</code> into the console or <code type="inline">getwd()</code>. You can change the directory if needed by going under the 'Miscellaneous' tab in the title bar on your screen and then selecting what you want to set as the directory for R. If you don't do this R will not be able to find the file properly.</p>
+<p>Another way to load data into R is to use a CSV file. A <link target="https://en.wikipedia.org/wiki/Comma-separated_values">CSV</link> (comma separated value) file will show the values in rows and columns and separates those values with a comma. You can save any document you create in Excel as a .csv file and then load it into R. To use a CSV file in R, assign a name to the file using the <code type="inline">&lt;-</code> command and then type <code type="inline">read.csv(file="file-name.csv",header=TRUE,sep=",")</code> into the console. <code type="inline">file-name</code> tells R which file to select, while setting the header to <code type="inline">TRUE</code> says that the first row are headings and not variables. <code type="inline">sep</code> means that there is a comma between every number and line.</p>
+<p>Normally, a CSV could have quite a bit of information in it. To start though, try creating a CSV file in Excel using the Old Bailey data we were using for the matrices. Set up columns for the dates between 1710 and 1730 as well as the number of Breaking the Peace and Killing crimes recorded for those decades. Save the file as "OldBailey.csv" and try loading it into R using the above steps. You will see:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_34" type="block" corresp="code_r-basics-with-tabular-data_34.txt"/></pre>
+<p>Now you could access the data in R and do any calculations to help you study the data. The CSV files can also be much more complex than this example, so any data set you were working with in your own study could also be opened in R.</p>
+<p>TXT (or text files) can be imported into R in a similar way. Using the command <code type="inline">read.table()</code>, you can load text files into R, following the same syntax as in the example above.</p>
+</div>
+      <div type="2"><head>Saving Data in R</head>
+<p>Now that you've loaded data into R and know a few ways to work with the data, what happens if you want to save it to another format? The <code type="inline">write.xlsx()</code> function allows you to do just that - taking data from R and saving it into an Excel file. Try writing the <emph>Old Bailey</emph> file into an Excel file. First you will need to load the package and then you can create the file after creating a variable for the <emph>Old Bailey</emph> data:</p>
+<pre><code xml:id="code_r-basics-with-tabular-data_35" type="block" corresp="code_r-basics-with-tabular-data_35.txt"/></pre>
+</div>
+      <div type="2"><head>Summary and Next Steps</head>
+<p>This tutorial has explored the basics of using R to work with tabular research data. R can be a very useful tool for humanities and social science research because the data analysis is reproducible and allows you to analyze data quickly without having to set up a complicated system. Now that you know a few of the basics of R, you can explore some of the other functions of the program, including statistical computations, producing graphs, and creating your own functions.</p>
+<p>For more information on R, visit the <link target="https://cran.r-project.org/doc/manuals/r-release/R-intro.html">R Manual</link>.</p>
+<p>There are also a number of other R tutorials online including:</p>
+<ul>
+<li><link target="http://web.archive.org/web/20191015004305/https://www.nceas.ucsb.edu/files/scicomp/Dloads/RProgramming/BestFirstRTutorial.pdf">R: A self-learn tutorial</link> - this tutorial goes through a series of functions and provides exercises to practice skills.</li>
+<li><link target="https://www.datacamp.com/courses/free-introduction-to-r">DataCamp Introduction to R</link> - this is a free online course that gives you feedback on your code to help identify errors and learn how to write code more efficiently.</li>
+</ul>
+<p>Finally, a great resource for digital historians is Lincoln Mullen's <link target="http://dh-r.lincolnmullen.com/">Digital History Methods in R</link>. It is a draft of a book written specifically on how to use R for digital history work.</p>
+</div>
+      <div type="2"><head>Endnotes</head>
+<p><note id="1"> Box, G. E. P., Jenkins, G. M. and Reinsel, G. C. (1976) Time Series Analysis, Forecasting and Control. Third Edition. Holden-Day. Series G.</note>
+<note id="2"> Henderson and Velleman (1981), Building multiple regression models interactively. Biometrics, 37, 391&#208;411.</note></p>
+</div>
+    </body>
+  </text>
+</TEI>

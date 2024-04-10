@@ -1,0 +1,170 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="cleaning-ocrd-text-with-regular-expressions">
+  <teiHeader>
+ <fileDesc>
+  <titleStmt>
+   <title>Cleaning OCR&#8217;d text with Regular Expressions</title>
+  <author type="original_author">Laura Turner O'Hara</author><editor type="editors">Fred Gibbs</editor></titleStmt>
+  <publicationStmt>
+   <idno type="doi">10.46430/phen0024</idno><date type="published">05/22/2013</date><p>Lesson reviewed and published in Programming Historian.</p>
+  </publicationStmt>
+  <sourceDesc>
+  <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target=""/></p></sourceDesc>
+ </fileDesc>
+ <profileDesc><abstract><p>Optical Character Recognition (OCR)&#8212;the conversion of scanned images to machine-encoded text&#8212;has proven a godsend for historical research. This lesson will help you clean up OCR'd text to make it more usable.</p></abstract><textClass><keyword xml:lang="en">data-manipulation</keyword></textClass></profileDesc>
+</teiHeader>
+  <text xml:lang="en">
+    <body>
+      <div type="2"><head>Introduction</head>
+<p>Optical Character Recognition (OCR)&#8212;the conversion of scanned images to
+machine-encoded text&#8212;has proven a godsend for historical research. This
+process allows texts to be searchable on one hand and more easily parsed
+and mined on the other. But we&#8217;ve all noticed that the OCR for historic
+texts is far from perfect. Old type faces and formats make for unique
+OCR. Take for example, this page from the <emph>Congressional Directory</emph> from
+the 50th Congress (1887). The PDF scan downloaded from <link title="Source for Legal and Government-based documents" target="http://home.heinonline.org/">HeinOnline</link>
+looks organized:</p>
+<figure><desc>This is a screenshot of the PDF page.</desc><graphic url="cd_pdf.png"/></figure>
+<p>However, the OCR layer (downloaded as a text file*) shows that the
+machine-encoded text is not nearly as neat:</p>
+<figure><desc>This is a screenshot of the OCR.</desc><graphic url="cd_txt.png"/></figure>
+<blockquote>
+<p>Note: If you do not have the option to download a text file, you can
+use the <link title="PDF Miner Module" target="http://www.unixuser.org/~euske/python/pdfminer/index.html">pdfminer</link> module to extract text from the pdf.</p>
+</blockquote>
+<p>Since I want to use this to map the Washington residences for Members of
+these late 19th-century Congresses, how might I make this data more
+useable?</p>
+<p>The answer is Regular Expressions or &#8220;regex.&#8221; Here&#8217;s what regex did for
+me. Though this is not a &#8220;real&#8221; CSV file (the commas are not quite
+right), it can be easily viewed in Excel and prepped for geocoding. Much
+better than the text file from above, right?</p>
+<pre><code class="language-text" xml:id="code_cleaning-ocrd-text-with-regular-expressions_0" type="block" corresp="code_cleaning-ocrd-text-with-regular-expressions_0.txt"/></pre>
+</div>
+      <div type="2"><head>Regular Expressions (Regex)</head>
+<p>Regex is not a programming language. Rather it follows a syntax used in
+many different languages, employing a series of characters to find
+and/or replace precise patterns in texts. For example, using this sample
+text:</p>
+<pre><code xml:id="code_cleaning-ocrd-text-with-regular-expressions_1" type="block" corresp="code_cleaning-ocrd-text-with-regular-expressions_1.txt"/></pre>
+<p>1. You could isolate all the capital letters (L, O, C, R, G) with this
+regex:</p>
+<pre><code xml:id="code_cleaning-ocrd-text-with-regular-expressions_2" type="block" corresp="code_cleaning-ocrd-text-with-regular-expressions_2.txt"/></pre>
+<p>2. You could isolate the first capital letter (L) with this regex:</p>
+<pre><code xml:id="code_cleaning-ocrd-text-with-regular-expressions_3" type="block" corresp="code_cleaning-ocrd-text-with-regular-expressions_3.txt"/></pre>
+<p>3. You could isolate all characters BUT the capital letters with this
+regex:</p>
+<pre><code xml:id="code_cleaning-ocrd-text-with-regular-expressions_4" type="block" corresp="code_cleaning-ocrd-text-with-regular-expressions_4.txt"/></pre>
+<p>4. You could isolate the acronym &#8220;OCR&#8221; with this regex:</p>
+<pre><code xml:id="code_cleaning-ocrd-text-with-regular-expressions_5" type="block" corresp="code_cleaning-ocrd-text-with-regular-expressions_5.txt"/></pre>
+<p>5. You could isolate the punctuation using this regex:</p>
+<pre><code xml:id="code_cleaning-ocrd-text-with-regular-expressions_6" type="block" corresp="code_cleaning-ocrd-text-with-regular-expressions_6.txt"/></pre>
+<p>6. You could isolate all the punctuation, spaces, and numbers this way:</p>
+<pre><code xml:id="code_cleaning-ocrd-text-with-regular-expressions_7" type="block" corresp="code_cleaning-ocrd-text-with-regular-expressions_7.txt"/></pre>
+<p>The character set is not that large, but the patterns can get
+complicated. Moreover, different characters can mean different things
+depending on their placement. Take for example, the difference between
+example 2 and example 3 above. In example 2, the caret (^) means
+isolate the pattern at the beginning of the line or document. However,
+when you put the caret inside the character class (demarcated by <code type="inline">[]</code>) it
+means &#8220;except&#8221; these sets of characters.</p>
+<p>The best way to understand Regular Expressions is to learn what the
+characters do in different positions and practice, practice, practice.
+And since experimentation is best way to learn, I suggest using a regex
+tester tool and experiment with the syntax. For Mac users, I had a lot
+of luck with the <link title="Patterns App for RegEx Experimentation" target="http://krillapps.com/patterns/">Patterns App</link> (Mac Store $2.99), which allowed me
+to see what the regular expressions were doing in real time. It also
+comes with a built-in cheat sheet for the symbols, but I actually found
+this generic (meaning it works across languages) <link title="Reg Ex Cheat Sheet" target="https://cheatography.com/davechild/cheat-sheets/regular-expressions/">cheat sheet</link> more
+comprehensive.</p>
+</div>
+      <div type="2"><head>Python and Regex</head>
+<p>In this tutorial, I use the Regular Expressions Python module to extract
+a &#8220;cleaner&#8221; version of the <emph>Congressional Directory</emph> text file. Though
+the <link title="Re Module Documentation" target="http://docs.python.org/2/library/re.html">documentation</link> for this module is fairly comprehensive, beginners
+will have more luck with the simpler <link title="Reuglar Expressions HOWTO" target="http://docs.python.org/2/howto/regex.html#regex-howto">Regular Expression HOWTO
+documentation</link>.</p>
+<div type="3"><head>Two things to note before you get started</head>
+<ul>
+<li>From what I&#8217;ve observed, Python is <emph>not</emph> the most efficient way to
+use Regular Expressions if you have to clean a single document.
+Command Line programs like <link title="GNU's sed editor" target="http://www.gnu.org/software/sed/">sed</link> or <link title="GNU's grep editor" target="http://www.gnu.org/software/grep/">grep</link> appear to be more
+efficient for this process. (I will leave it to the better grep/sed
+users to create tutorials on those tools.) I use Python for several
+reasons: 1) I understand the syntax best; 2) I appreciate seeing
+each step written out in a single file so I can easily backtrack
+mistakes; and 3) I want a program I could use over and over again,
+since I am cleaning multiple pages from the <emph>Congressional
+Directory</emph>.</li>
+<li>The OCR in this document is far from consistent (within a single
+page or across multiple pages). Thus, the results of this cleaning
+tutorial are not perfect. <hi rend="bold">My goal is to let regex do the heavy
+lifting and export a document in my chosen format that is <emph>more</emph>
+organized than the document with which I started.</hi> This
+significantly reduces, but does not eliminate, any hand-cleaning I
+might need to do before geocoding the address data.</li>
+</ul>
+</div><div type="3"><head>My example Python File</head>
+<p>Here&#8217;s the Python file that I used to created to clean my document:</p>
+<pre><code class="language-python" xml:id="code_cleaning-ocrd-text-with-regular-expressions_8" type="block" corresp="code_cleaning-ocrd-text-with-regular-expressions_8.txt"/></pre>
+<p>I&#8217;ve commented it pretty extensively, so I will explain why I structured
+the code the way I did. I will also demonstrate a different way to
+format long regular expressions for better legibility.</p>
+<ul>
+<li><hi rend="bold">Lines 16-22</hi> &#8211; Notice in my original text file that my data is
+all on lines with multiple dashes. This code effectively isolates
+those lines. I use the <link title="Explanation of re.search() function" target="http://docs.python.org/2/library/re.html#re.search">re.search()</link> function to find all lines
+with multiple dashes. The &#8220;if&#8221; statement on line 20 only works with
+the lines with dashes in the rest of the code. (This eliminates all
+introductory text and the rows of page numbers that follow the data
+I want.)</li>
+<li><hi rend="bold">Lines 23-40</hi> &#8211; This is the long process by which I eliminate all
+of the extraneous punctuation and put the pieces of my data (last
+name, first name, home post office, washington address) into
+different fields for a csv document. I use the <link title="Explanation of re.sub() function" target="http://docs.python.org/2/library/re.html#re.sub">re.sub()</link>
+function, which substitutes pattern with another character. I
+comment extensively here, so you can see what each piece does. This
+may not be the most efficient way of doing this, but by doing this
+piece by piece, I could check my work as I went. As I built loop, I
+checked each step by printing the variable in the command line. So,
+for example, after line 24 (when I eliminate the dashes), I would
+add &#8220;print nodash&#8221; (inside the if loop) before I ran the file in the
+command line. I checked each step to make sure my patterns were only
+changing the things I wanted and not changing things I did <emph>not</emph>
+want changed.</li>
+<li><hi rend="bold">Lines 41-46</hi> - I used a slightly different method here. The OCR
+in the text file separated some names with a period (for example,
+Chace.Jonathan vs. Chase,Jonathan). I wanted to isolate the periods
+that came up in this pattern and change those periods to commas. So
+I searched for the pattern <code type="inline">^([A-Z][a-z]+\.)</code>, which looks at the
+beginning of a line (^) and finds a pattern with one capital
+letter, multiple lowercase letters and a period. After I had
+isolated that pattern, I substitute the period those lines that fit
+the pattern with a comma.</li>
+</ul>
+</div><div type="3"><head>Using Verbose Mode</head>
+<p>Most regular expressions are difficult to read. But lines 39 and 40 look
+<emph>especially</emph> bad. How might you clarify these patterns for people who
+might look at your code (or for yourself when you are staring at them at
+2:00 AM someday)? You can use the module&#8217;s <link title="Explanation of re.verbose mode" target="http://docs.python.org/2/library/re.html#re.VERBOSE">verbose mode</link>. By putting
+your patterns in verbose mode, python ignores white space and the #
+character, so you can split the patterns across multiple lines and
+comment each piece. <emph><hi rend="bold">Keep in mind that, because it ignores spaces, if
+spaces are part of your pattern, you need to escape them with a
+backslash (\). Also note that re.VERBOSE and re.X are the same
+thing.</hi></emph></p>
+<p>Here are lines 39 and 40 in verbose mode:</p>
+<pre><code class="language-python" xml:id="code_cleaning-ocrd-text-with-regular-expressions_9" type="block" corresp="code_cleaning-ocrd-text-with-regular-expressions_9.txt"/></pre>
+<p>In above example, I use the <link title="Explanation of re.compile() function" target="http://docs.python.org/2/library/re.html#re.compile">re.compile()</link> function to save the
+pattern for future use. So, adjusting my full python code to use verbose
+mode would look like the following. Note that I define my verbose
+patterns on lines 17-39 and store them in variables (ne_pattern and
+nw_pattern). I use them in my loop on lines 65 and 66.</p>
+<pre><code class="language-python" xml:id="code_cleaning-ocrd-text-with-regular-expressions_10" type="block" corresp="code_cleaning-ocrd-text-with-regular-expressions_10.txt"/></pre>
+<p>In conclusion, I will note that this is not for the faint of heart.
+Regular Expressions are powerful. Yes, they are powerful enough to
+completely destroy your data. So practice on copies and take it one itty
+bitty step at a time.</p>
+</div></div>
+    </body>
+  </text>
+</TEI>

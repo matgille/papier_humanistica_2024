@@ -1,0 +1,171 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="georreferenciar-qgis">
+  <teiHeader>
+ <fileDesc>
+  <titleStmt>
+   <title>Georreferenciar con QGIS 2.0
+</title>
+  <author type="original_author"><persName>Jim Clifford</persName><persName>Josh MacFadyen</persName><persName>Daniel Macfarlane</persName></author><editor type="reviewers"><persName>Finn Arne J&#248;rgensen</persName><persName>Peter Webster</persName><persName>Abby Schreiber</persName></editor><author type="translators">Lorena Campuzano</author><editor type="translation-reviewers"><persName>Jairo Melo</persName><persName>Camilo Murcia Galindo</persName></editor><editor type="editors">Adam Crymble</editor></titleStmt>
+  <publicationStmt>
+   <idno type="doi">10.46430/phes0047</idno><date type="published">12/13/2013</date><date type="translated">06/05/2020</date><p>Lesson reviewed and published in Programming Historian.</p>
+  </publicationStmt>
+  <sourceDesc>
+  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#georeferencing-qgis"/>.</p><p>There are other translations: <ref target="#georreferenciamento-qgis"/></p></sourceDesc>
+ </fileDesc>
+ <profileDesc><abstract><p>En esta lecci&#243;n aprender&#225;s c&#243;mo georreferenciar mapas hist&#243;ricos para que puedan a&#241;adirse a un SIG (Sistema de Informaci&#243;n Geogr&#225;fica) como una capa r&#225;ster.</p></abstract><textClass><keyword xml:lang="en">mapping</keyword><keyword xml:lang="en">data-visualization</keyword></textClass></profileDesc>
+</teiHeader>
+  <text xml:lang="es">
+    <body>
+      <div type="2"><head>Objetivos de la lecci&#243;n</head>
+<p>En esta lecci&#243;n aprender&#225;s c&#243;mo georreferenciar mapas hist&#243;ricos para que puedan a&#241;adirse a un SIG (Sistema de Informaci&#243;n Geogr&#225;fica) como una capa r&#225;ster. La georreferenciaci&#243;n es una herramienta necesaria para digitalizar los datos que se encuentran en los mapas de papel. Adem&#225;s, como los historiadores trabajamos sobre todo en un reino de papel, la georreferenciaci&#243;n es una de las herramientas que m&#225;s utilizamos. La t&#233;cnica consiste en utilizar una serie de puntos de control para vincular a objetos bidimensionales, como un mapa en papel, las coordenadas reales necesarias para que se realice la alineaci&#243;n con las caracter&#237;sticas tridimensionales de la tierra en un programa SIG (en <link target="/es/lecciones/intro-a-google-maps-y-google-earth">Introducci&#243;n a Google Maps y Google Earth</link> vemos un 'overlay', que es una especie de atajo para la georreferenciaci&#243;n en Google Earth).</p>
+<p>Georreferenciar un mapa hist&#243;rico requiere un conocimiento de la geograf&#237;a e historia del lugar que est&#225;s estudiando para as&#237; asegurar precisi&#243;n. Los paisajes construidos y naturales se transforman con el tiempo, por lo cual es importante verificar si la localizaci&#243;n de los puntos de control --sean casas, intersecciones o pueblos-- se ha mantenido constante. Introducir puntos de control en un SIG es f&#225;cil, pero detr&#225;s de bambalinas, la georreferenciaci&#243;n utiliza procesos complejos de transformaci&#243;n y compresi&#243;n. Estos se utilizan para corregir las distorsiones e inexactitudes que se encuentran en muchos mapas hist&#243;ricos y estirarlos para que quepan dentro de coordenadas geogr&#225;ficas. En cartograf&#237;a esto se conoce como <emph><link target="http://en.wikipedia.org/wiki/Rubbersheeting">rubber-sheeting</link></emph> porque se trata al mapa como si estuviera hecho de caucho (<emph>rubber</emph> en ingl&#233;s) y a los puntos de control como si fueran tachuelas "clavando" el documento hist&#243;rico en una superficie tridimensional como el globo terr&#225;nqueo.   </p>
+</div>
+      <div type="2"><head>Para empezar</head>
+<p>Antes de empezar a georreferenciar en Quantum GIS, necesitamos activar unos <emph>Complementos</emph>. En la barra de herramientas ve a <emph>"Complementos -&gt;Administrar e instalar complementos"</emph></p>
+<figure><desc>Figura 1</desc><graphic url="geo110.png"/></figure>
+<p>Se abrir&#225; un cuadro de di&#225;logo llamado <emph>Administrador de complementos</emph>. Despl&#225;zate hasta <emph>"Georreferenciador GDAL"</emph> y activa la casilla que est&#225; a su lado y haz clic en OK.</p>
+<figure><desc>Figura 2</desc><graphic url="geo210.png"/></figure>
+<ul>
+<li>
+<p>En este momento necesitas cerrar y volver a abrir QGIS. Para el prop&#243;sito de este ejemplo y mantener las cosas lo m&#225;s simple posible, no cargues de nuevo tu proyecto. Comienza uno diferente.</p>
+</li>
+<li>
+<p>Configura el <emph>[Sistema de Referencia de Coordenadas][]</emph> (SRC) correctamente (ver <link target="/lessons/qgis-layers">Installing QGIS 2.0 and adding Layers</link> para recordar c&#243;mo hacerlo).</p>
+</li>
+<li>
+<p>Guarda este nuevo proyecto (en el men&#250; <emph>Proyecto</emph>, selecciona <emph>"Guardar"</emph>) y n&#243;mbralo 'georreferenciar.'</p>
+</li>
+<li>
+<p>A&#241;ade la capa <emph>'coastline_polygon'</emph> (ver <link target="/lessons/qgis-layers">Installing QGIS 2.0 and adding Layers</link> para recordar c&#243;mo).</p>
+</li>
+</ul>
+</div>
+      <div type="2"><head>Abre las capas de GIS necesarias</head>
+<p>Para el estudio de caso de la Isla del Pr&#237;ncipe Eduardo (conocida por sus siglas en ingl&#233;s como PEI), usaremos las fronteras de la municipalidad como puntos de control debido a que estas fronteras se establecieron en 1764 por Samuel Holland, est&#225;n identificadas en la mayor&#237;a de los mapas de PEI y han cambiado muy poco desde que fueron creadas.</p>
+<p><emph>Descargar lot_township_polygon:</emph></p>
+<p>Este es el shapefile (archivo de entidades vectoriales) que contiene la capa de vectores actuales que usaremos para georreferenciar el mapa hist&#243;rico.  N&#243;tese que las municipalidades no ten&#237;an nombres en 1764, sin embargo, ten&#237;an n&#250;meros asignados a cada lote, raz&#243;n por la cual son referidos como "Lots" en PEI. De ah&#237; que el archivo se llame 'lot_township_polygon'.</p>
+<ul>
+<li>Navegua al siguiente enlace, acepta la licencia de uso y descargua 'lot_township_polygon'  (En algunas ocasiones te preguntar&#225;n tu nombre y correo electr&#243;nico antes de poder descargar el archivo).</li>
+</ul>
+<p><link target="http://www.gov.pe.ca/gis/license_agreement.php3?name=lot_town&amp;file_format=SHP">http://www.gov.pe.ca/gis/license_agreement.php3?name=lot_town&amp;file_format=SHP</link></p>
+<ul>
+<li>Despu&#233;s de descargar el archivo llamado 'lot \ _township \ _polygon', mu&#233;velo a una carpeta que puedas encontrar despu&#233;s y descomprime el archivo. (Recuerda mantener los archivos juntos ya que todos son necesarios para abrir esta capa en tu SIG)</li>
+</ul>
+<figure><desc>Figure 3</desc><graphic url="geo310.png"/></figure>
+<p><emph>A&#241;adir lot_township_polygon to QGIS:</emph></p>
+<ul>
+<li>
+<p>En la barra de herramientas ve a <emph>"Capa"</emph>, escoje <emph>"A&#241;adir capa vectorial"</emph> (alternativamente, el mismo &#237;cono que se ve al lado de <emph>"A&#241;adir capa vectorial"</emph> tambi&#233;n se puede seleccionar desde la barra de herramientas).</p>
+</li>
+<li>
+<p>Haz clic en <emph>"Explorar"</emph>. Navegua a tu archivo descomprimido y selecciona el archivo 'lot \ _township \ _polygon.shp'</p>
+</li>
+<li>
+<p>Haz clic en <emph>"Abrir"</emph></p>
+</li>
+</ul>
+<figure><desc>Figure 4</desc><graphic url="geo41.png"/></figure>
+<p>Para m&#225;s informaci&#243;n sobre a&#241;adir y visualizar capas ver <link target="/lessons/qgis-layers">Installing QGIS 2.0 and adding Layers</link>.</p>
+<figure><desc>Figure 5</desc><graphic url="geo51.png"/></figure>
+</div>
+      <div type="2"><head>Abrir la herramienta para georreferenciar (Georeferencer Tool)</head>
+<p>"Georreferenciador" ahora est&#225; disponible en el men&#250; "R&#225;ster" en la barra de herramientas. Selecci&#243;nalo.</p>
+<figure><desc>Figure 6</desc><graphic url="geo61.png"/></figure>
+<p><emph>A&#241;adir tu mapa hist&#243;rico:</emph></p>
+<ul>
+<li>En la ventana resultante, haz clic en "Abrir r&#225;ster" en la izquierda arriba,  (el cual luce similar a "Abrir capa r&#225;ster").</li>
+</ul>
+<figure><desc>Figure 7</desc><graphic url="geo71.png"/></figure>
+<ul>
+<li>Busca el archivo 'PEI_LakeMap1863.jpg' en tu computador y selecciona "Abrir" (el archivo [puede descargarse aqu&#237;][] o en su locaci&#243;n original en la web <link target="https://web.archive.org/web/20180922004858/http://www.islandimagined.ca:80/fedora/repository/imagined:208687">Island Imagined</link>)</li>
+<li>El programa te pedir&#225; definir el sistema coordenado de la capa. Busca en "Filtro" el n&#250;mero '2291&#8242;, y luego en el cuadro debajo de &#233;ste selecciona 'NAD83(CSRS98) / Prince Edward &#8230;'</li>
+</ul>
+<p>El resultado lucir&#225; as&#237;:</p>
+<figure><desc>Figure 8</desc><graphic url="geo81.png"/></figure>
+<p><emph>A&#241;adir puntos de control</emph></p>
+<p>Planifica previamente los lugares que vas a utilizar como puntos de control antes de los pasos que siguen. Es mucho m&#225;s f&#225;cil navegar con anterioridad el mapa hist&#243;rico para as&#237; hacerse a una idea de los mejores puntos a utilizar y tenerlos en cuenta para usarlos posteriormente. Algunas sugerencias para escoger los puntos de referencia:</p>
+<ul>
+<li>&#191;<hi rend="bold">Cu&#225;ntos</hi> puntos necesitas? Usualmente, entre m&#225;s puntos asignes, m&#225;s preciso ser&#225; tu mapa georeferenciado. Dos puntos de control le indicar&#225;n al GIS que rote y escale el mapa en torno a ellos, pero para hacer <emph>rubbersheeting</emph> necesitas a&#241;adir m&#225;s puntos.</li>
+<li>&#191;<hi rend="bold">D&#243;nde</hi> debes poner los puntos de control? Selecciona puntos en &#225;reas lo m&#225;s cerca posible de las cuatro esquinas de tu mapa para que estas &#225;reas externas no se omitan del <emph>rubbersheeting</emph>.</li>
+<li>Selecciona puntos adicionales cercanos al &#225;rea de tu inter&#233;s. Todo aquello que se encuentre entre las cuatro esquinas de control puede georreferenciarse sin problema, pero si te preocupa la precisi&#243;n de un lugar en particular, aseg&#250;rate de seleccionar puntos de control adicionales en esa zona.</li>
+<li>Selecciona puntos de control en el medio de intersecciones y caminos, porque los bordes de los caminos cambian con el tiempo a medida que se hacen mejoras a las v&#237;as.</li>
+<li>Verifica que tus puntos de control no hayan cambiado de ubicaci&#243;n a lo largo del tiempo. Las carreteras fueron redirigidas a menudo, del mismo modo casas y edificios fueron trasladados &#161;especialmente [en las provincias atl&#225;nticas de Canad&#225;]{.underline}!</li>
+</ul>
+<p><emph>A&#241;adir el primer punto de control:</emph></p>
+<p><hi rend="bold">Primero</hi>, navega a la ubicaci&#243;n de tu primer punto de control en el <hi rend="bold">mapa hist&#243;rico</hi>.</p>
+<ul>
+<li>Haz clic en "Acercar zum" en la barra de herramientas o magnifica el punto con la rueda del mouse.</li>
+</ul>
+<figure><desc>Figure 9</desc><graphic url="geo91.png"/></figure>
+<ul>
+<li>
+<p>Acercate y magnifica un punto que puedas reconocer tanto en tu mapa impreso como en tu SIG.</p>
+</li>
+<li>
+<p>Haz clic  en "A&#241;adir punto" en la barra de herramientas.</p>
+</li>
+</ul>
+<figure><desc>Figure 10</desc><graphic url="geo101.png"/></figure>
+<ul>
+<li>Haz clic en el lugar del mapa impreso que puedas localizar en tu SIG (es decir, el punto de control). La ventana de georreferenciaci&#243;n se minimizar&#225; autom&#225;ticamente. Si no lo hace (algunas versiones tienen un problema con este complemento), hazlo manualmente.  </li>
+<li>Si no es posible hacerlo manualmente, al hacer clic en el punto del mapa en el georreferenciador se abre una ventana que solicita "Introducir las coordenadas del mapa". Para proseguir seg&#250;n las indicaciones de este tutorial es necesario seleccionar el bot&#243;n "A partir del lienzo del mapa", entonces la ventana se cerrar&#225; autom&#225;ticamente y ser&#225; posible continuar.</li>
+<li>Haz clic en el lugar del SIG que coincida con el punto de control del mapa impreso.</li>
+</ul>
+<figure><desc>Figure 11</desc><graphic url="geo111.png"/></figure>
+<ul>
+<li>En esta etapa identificamos un problema en los l&#237;mites de los lotes. Hab&#237;amos planeado usar la ubicaci&#243;n donde el l&#237;mite sur del lote 1, en el extremo oeste de la provincia, contiene un pliege abrupto cerca del centro de la masa terrestre. Sin embargo, se observa que no todos estos quiebres abruptos en los l&#237;mites de los lotes coincid&#237;an con el mapa hist&#243;rico. Es posible que los l&#237;mites de los lotes hayan cambiado algo en los 250 a&#241;os desde que se establecieron, por lo que es mejor elegir el punto del que se est&#225; m&#225;s seguro. En este caso, el pliegue abrupto entre el Lote 2 y el Lote 3 estaba bien (ver flecha roja en la figura). Fue el l&#237;mite de los lotes 3 y 4 el que ha cambiado. La discrepancia entre los l&#237;mites de los lotes 1 y 2 muestra la necesidad de insertar m&#225;s puntos de control para realizar correctamente el rubbersheeting en este parcialmente distorsionado mapa de 1863 para que coincida con la capa de la provincia en el GIS.</li>
+</ul>
+<figure><desc>Figure 12</desc><graphic url="geo121.png"/></figure>
+<p><emph>A&#241;adir al menos otro punto de control m&#225;s:</emph></p>
+<ul>
+<li>Vuelve a la ventana "Georreferenciador" y repite los pasos de '* A&#241;adir tu primer punto de control *' arriba para a&#241;adir puntos de control adicionales.</li>
+<li>Agrega un punto cerca del lado opuesto de tu mapa impreso (cuanto m&#225;s separados est&#233;n los puntos de control, m&#225;s exacto ser&#225; el proceso de georreferenciaci&#243;n) y otro cerca de Charlottetown.</li>
+<li>Vuelve a la ventana "Georreferenciador". Deber&#237;as ver tres puntos rojos en el mapa impreso y tres registros en la Tabla de PCT (Puntos de Control sobre el Terreno) en la parte inferior de la ventana (en rojo en la siguiente imagen).</li>
+</ul>
+<figure><desc>Figure 13</desc><graphic url="geo131.png"/></figure>
+<p><emph>Determinar la configuraci&#243;n de la transformaci&#243;n:</emph></p>
+<p>Antes de que hagas clic en "Comenzar" e inicie el proceso autom&#225;tico de georeferenciaci&#243;n, debes especificarle a QGIS d&#243;nde guardar el archivo (el cual ser&#225; una imagen r&#225;ster), c&#243;mo el programa debe interpretar sus puntos de control y c&#243;mo debe comprimir la imagen.  </p>
+<ul>
+<li>Haz clic en "Configuraci&#243;n de la transformaci&#243;n"</li>
+</ul>
+<figure><desc>Figure 14</desc><graphic url="geo141.png"/></figure>
+<p>La mayor&#237;a de las opciones de configuraci&#243;n pueden dejarse como est&#233;n predeterminadas: "Tipo de transformaci&#243;n lineal", "Vecino m&#225;s pr&#243;ximo como m&#233;todo de remuestreo" y "Compresi&#243;n LZW". (El [archivo de referenciaci&#243;n][] no es necesario, a menos que desees georreferenciar la misma imagen otra vez en otro SIG o si alguien m&#225;s necesita georreferenciar la imagen y no tiene acceso a tu informaci&#243;n SIG, sistema de referencia de coordenadas, etc.) El SER de destino no es importante, pero podr&#237;as usar esta funci&#243;n para darle al nuevo r&#225;ster un sistema de referencia diferente.</p>
+<ul>
+<li>Asigna una carpeta para tu nuevo archivo de r&#225;ster georreferenciado. <link target="http://en.wikipedia.org/wiki/Tagged_Image_File_Format">Tif</link> [] es el formato predeterminado para los r&#225;steres georeferenciados en QGIS.</li>
+<li>Ten en cuenta que un archivo Tif va a ser mucho m&#225;s grande que su mapa original, incluso con compresi&#243;n LZW, as&#237; que aseg&#250;rate de tener suficiente espacio si est&#225;s utilizando un disco externo o USB. (<emph>Advertencia:</emph> El archivo TIF producido a partir de este 6.8 Mb .jpg ser&#225; de <hi rend="bold">m&#225;s de 1 GB</hi> una vez georeferenciado. Una forma de controlar el tama&#241;o del archivo raster georreferenciado manteniendo una resoluci&#243;n lo suficientemente alta para la legibilidad consiste en  recortar &#250;nicamente el &#225;rea del mapa necesaria para el proyecto. En este caso, tambi&#233;n est&#225; disponible una opci&#243;n de menor resoluci&#243;n del repositorio de mapas en l&#237;nea <link target="https://web.archive.org/web/20180922004858/http://www.islandimagined.ca:80/fedora/repository/imagined:208687">Island Imagined</link> []).</li>
+<li>Deja la resoluci&#243;n del mapa georeferenciado en el valor predeterminado.</li>
+<li>Puedes seleccionar &#8216;Usar 0 para transparencia cuando sea necesario&#8217; para eliminar espacios negros alrededor de los bordes del mapa, pero no es necesario, aunque puedes experimentar cuando consideres conveniente.</li>
+<li>Aseg&#250;rate de que est&#233; seleccionado 'Cargar en QGIS'. Esto agregar&#225; autom&#225;ticamente el nuevo archivo a la tabla de contenido de tu SIG para que no tenga que ir a buscar el archivo Tif m&#225;s tarde.</li>
+</ul>
+<figure><desc>Figure 15</desc><graphic url="geo151.png"/></figure>
+</div>
+      <div type="2"><head>&#161;Georreferenciar!</head>
+<ul>
+<li>Haz clic en "Comenzar georreferenciado" en la barra de herramientas ( al lado de "Abrir r&#225;ster"). Esto inicia el proceso de georreferenciaci&#243;n.</li>
+</ul>
+<figure><desc>Figure 16</desc><graphic url="geo161.png"/></figure>
+<figure><desc>Figure 17</desc><graphic url="geo171.png"/></figure>
+<ul>
+<li>Se abrir&#225; una ventana pidiendo que definas SRC. Selecciona "2291" y presiona "Aceptar".</li>
+</ul>
+<figure><desc>Figure 18</desc><graphic url="geo181.png"/></figure>
+<p><emph>Explorar tu mapa:</emph></p>
+<ul>
+<li>Arrastra la nueva capa 'PEI_LakeMap1863_modified' al final de tu "Lista de contenidos" (debajo de la capa 'lot_township_polygon')</li>
+</ul>
+<figure><desc>Figure 19</desc><graphic url="geo191.png"/></figure>
+<ul>
+<li>Cambia el relleno de la capa 'lot_township_polygon'  a "sin relleno" seleccionando la pesta&#241;a Capa, opci&#243;n" Propiedades" y haciendo clic en "Capas de s&#237;mbolos". Oprime OK.</li>
+</ul>
+<figure><desc>Figure 20</desc><graphic url="geo201.png"/></figure>
+<ul>
+<li>Ahora deber&#237;as ver la capa SIG moderna con el mapa hist&#243;rico de fondo.</li>
+</ul>
+<figure><desc>Figure 21</desc><graphic url="geo211.png"/></figure>
+<p>Ahora que tienes el mapa georreferenciado en tu SIG, puedes explorar la capa, ajustar la transparencia, el contraste y el brillo, y nuevamente [Crear nuevas capas de vectores en QGIS] [] para digitalizar parte de la informaci&#243;n hist&#243;rica que has creado. Por ejemplo, este mapa georreferenciado de PEI muestra las ubicaciones de todas las casas en 1863, incluido el nombre del jefe de hogar. Al asignar puntos en el mapa, puedes ingresar la ubicaci&#243;n de las casas y los nombres de propietario para luego analizar o compartir esa nueva capa geoespacial como un <emph>shapefile.</emph></p>
+<p>Al digitalizar vectores lineales como carreteras o costas, puedes comparar la ubicaci&#243;n de estas caracter&#237;sticas con otros datos hist&#243;ricos, o simplemente compararlos visualmente con la capa 'lot_township_polygon' en este SIG.</p>
+<p>En procesos m&#225;s avanzados, puedes incluso cubrir esta imagen georreferenciada con un DEM (modelo de elevaci&#243;n digital) para darle un juego de sombras que indiquen altura ("hillshade") o un efecto 3D y realizar un sobrevuelo ("fly-over") a los hogares del PEI en el siglo XIX.</p>
+<p><emph>Este tutorial es parte de <link target="http://geospatialhistorian.wordpress.com/">Geospatial Historian</link>.</emph></p>
+</div>
+    </body>
+  </text>
+</TEI>

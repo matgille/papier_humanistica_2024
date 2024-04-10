@@ -1,0 +1,164 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="introduction-map-warper">
+  <teiHeader>
+ <fileDesc>
+  <titleStmt>
+   <title>Introduction to Map Warper</title>
+  <author type="original_author"><persName>Anthony Pic&#243;n Rodr&#237;guez</persName><persName>Miguel Cuadros</persName></author><editor type="reviewers"><persName>Jos&#233; Luis Losada</persName><persName>Riva Quiroga</persName></editor><author type="translators"><persName>Lorena Gauthereau</persName><persName>Erica Hayes</persName><persName>Mia Partlow</persName></author><editor type="translation-reviewers"><persName>Joshua G. Ortiz Baco</persName><persName>Adriana C&#225;sarez</persName></editor><editor type="editors">Antonio Rojas Castro</editor></titleStmt>
+  <publicationStmt>
+   <idno type="doi">10.46430/phen0106</idno><date type="published">11/17/2021</date><date type="translated">10/24/2022</date><p>Lesson reviewed and published in Programming Historian.</p>
+  </publicationStmt>
+  <sourceDesc>
+  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#introduccion-map-warper"/>.</p><p>There are other translations: <ref target=""/></p></sourceDesc>
+ </fileDesc>
+ <profileDesc><abstract><p>This lesson introduces basic use of Map Warper for historical maps. It guides you from upload to export, demonstrating methods for georeferencing and producing visualizations.</p></abstract><textClass><keyword xml:lang="en">mapping</keyword><keyword xml:lang="en">data-visualization</keyword></textClass></profileDesc>
+</teiHeader>
+  <text xml:lang="en">
+    <body>
+      <div type="2"><head>Map Warper Tool</head>
+<p>Developed by Tim Waters, <link target="https://perma.cc/SK6Z-7Y3G">Map Warper</link> is an open-source georeferencing service, written in <link target="https://perma.cc/Y2TG-6PP7">Ruby on Rails</link>; the application lets users upload scanned maps and georeference them against <link target="https://perma.cc/52L2-Q9W8">OpenStreetMap</link>. It allows the georeferencing and visualization of geographic areas without the need to install software. The tool is implemented in various digital projects across the world and used by many professionals who are not necessarily experts in the field of cartography.</p>
+<p>Map Warper was designed to georeference historical maps (world maps, portolan charts, nautical charts, topographic charts, architectural blueprints, geographical charts), aerial photographs, and other cartographic materials contained in cultural heritage collections. In this sense, the tool allows the user to generate georeferenced materials for working on desktop rasters or online (<link target="https://perma.cc/W2B8-QD4U">Map Server</link>) in order to link to geographic information systems (<link target="https://perma.cc/KCH9-596K">QGIS</link>, <link target="https://perma.cc/YQ6S-62BA">JOSM</link>, <link target="https://perma.cc/CK4T-CJPR">ArcGIS</link>, <link target="https://perma.cc/EE7T-FZ2B">Google Earth</link>, <link target="https://worldmap.maps.arcgis.com/home/index.html">WorldMap</link>, and others). The tool&#8217;s collaborative settings also help to decentralize and streamline georeferencing processes, cataloging and visualization.</p>
+<p>Thanks to these characteristics, the tool is useful for researchers, professors, and students, as well as for institutions that are developing digitization, visualization, and cartographic experimentation processes for their collections or for the development of spatial humanities, such as the <link target="https://perma.cc/DEH4-X32Z">New York Public Library</link>, <link target="https://perma.cc/S7JC-URCN">Library of Congress</link>, <link target="https://perma.cc/3AVU-YQKC">David Rumsey Map Collection</link>, and the <link target="https://perma.cc/9MNH-KY3Q">British Library</link>.<ref type="footnotemark" target="#1"/></p>
+</div>
+      <div type="2"><head>Lesson Goals</head>
+<p>Global trends have been profoundly marked by technological development and a marked epistemological shift that focuses on spatiality, which, in turn, has influenced the fields of social sciences and humanities. Technology has expanded research and visualization possibilities, thereby changing the ways we can think about and interpret the past. As a result, Map Warper is both product and producer of these technological relationships that generate and expand new interpretations.</p>
+<p><link target="https://perma.cc/8BHH-QWVV">Georeferencing</link> is the process of assigning geographic coordinates to a scanned map or raster image. Many historians georeference maps to study how places have changed over time. In this lesson, we will take you through the steps to align geographic coordinates to a scanned historical map and show you how to export your georeferenced map.</p>
+<p>This lesson was conceived as the first component of a larger module oriented toward the usage of digital tools for georeferencing, vectorization, extraction, organization, and experimentation with geographic data in archival bibliography and cartography digitized by different institutes (archives, libraries, museums).</p>
+<p>In this tutorial you will georeference an 1860 map of <link target="https://perma.cc/UC5M-4GNY">North Carolina and South Carolina</link> from the David Rumsey Map Collection.<ref type="footnotemark" target="#2"/> There is an export button above the map. Click the export button to download the image of the map. The file will download as a .zip file, which includes a .jpg file of the map and a metadata .txt file. When clicking on the export button, we recommend downloading one of the largest files to ensure you have the highest resolution of the map. Once you have uncompressed the .zip file, save the .jpg to your computer as <code type="inline">NC_SC.jpg</code>.</p>
+<p>Before you begin georeferencing a scanned map, it is important to understand the locations depicted on the map, as well as the historic context of the map&#8217;s creation. Not all historic maps are good candidates for georeferencing. The map must include enough information to allow the user to confidently assign latitude and longitude coordinates or align it with a Geographic Information Systems (GIS) map using physical features. Often, you will need to research the location of historic places and features that no longer exist, and make an informed decision to identify their proper placement. Some maps may not have enough geographic information, and may become so warped when georeferenced that they become illegible or inaccurate.</p>
+<figure><desc>Figure 1: A map too warped to be used effectively.</desc><graphic url="mapwarper_warped.png" alt="A historical map warped into an irregular quadrilateral shape, and overlaid onto a larger-scale contemporary map"/></figure>
+<p>The <link target="https://perma.cc/LD2A-88X9">scale</link>, resolution, and <link target="https://perma.cc/CYD5-CCQM">projection</link> of a scanned map are also important considerations when choosing a historic map to georeference. Small scale maps are generally not well-suited for highly detailed georeferencing and may cause problems with representing exact feature locations. When selecting or scanning a historic map for georeferencing, it is best to use a map that has been scanned at a high resolution (300 dpi or greater), so that you can easily see the features on the map when zooming in and out. It is also best practice to use the same projection as the historic map in order to minimize distortion. Georeferencing a map in the wrong projection can create a mismatch between the historical and current maps, stretching the lines, shapes, and the distance between objects. Map Warper does not provide an option to re-project your map data; if you are unable to achieve a legible map, or if you are measuring distance, you may need to use a more advanced GIS software, such as QGIS which will allow you to specify the map projections. For more details on best practices for georeferencing, see <link target="https://perma.cc/GF85-4YF6">Esri&#8217;s list of recommendations</link>.</p>
+<p>Some guiding questions to ask are:</p>
+<ul>
+<li>What location is represented in the historical map/cartographic image?</li>
+<li>What were some of the changes that have taken place since it was created?</li>
+<li>Do you recognize any current geographical reference points?</li>
+<li>What is the correct orientation of the image?</li>
+</ul>
+<p>In this tutorial, you will work with Map Warper to create a georeferenced historical map, then overlay it on a modern base map in order to publish and interact with it on the web.</p>
+<p>This tutorial complements other <emph>Programming Historian</emph> lessons that reference the use of GIS for spatial analysis: <link target="/en/lessons/georeferencing-qgis">Georeferencing in QGIS 2.0</link> and <link target="/en/lessons/googlemaps-googleearth">Intro to Google Maps and Google Earth</link>. In addition to learning the necessary technical steps for georeferencing historical maps, this lesson will serve as an introduction to the study of cultural heritage cartography and their potential in historical research.</p>
+</div>
+      <div type="2"><head>Getting Started</head>
+<div type="3"><head>Create an Account</head>
+<p>Using your favorite browser, navigate to <link target="https://mapwarper.net">https://mapwarper.net</link> and click on the "Create Account" tab in the upper right hand corner of the window. You can choose to log in using your Facebook, OpenstreetMap or GitHub account to facilitate the registration process.</p>
+<figure><desc>Figure 2. Create Account.</desc><graphic url="account.gif" alt="Animated gif demonstrating the clicks required to create an account from Map Warper's homepage"/></figure>
+</div><div type="3"><head>Upload Map</head>
+<p>On the Home page, click the green button labeled "Upload Map" to import your scanned map to Map Warper directly from your local file or linked from an online repository via a corresponding URL. During this step you can also start adding metadata to the material you will georeference.</p>
+<p>Toward the bottom of the screen, click on the Choose File button under "Upload an image file." Navigate to the <code type="inline">NC_SC.jpg</code> map that you downloaded to your computer and click Create.</p>
+<p class="alert alert-info" style="alert alert-info">
+Note: Every filename in Map Warper must be unique, so you will need to give the image a new file name once you have downloaded the map to your computer, such as `NC_SC_Map_yourlastname.jpg`.
+</p>
+</div><div type="3"><head>Edit</head>
+<p>The next screen asks for descriptive information that will make the map easier to find (also known as <link target="https://perma.cc/966P-PQ7L">metadata</link>). The metadata field is also accessible via the Metadata tab. While only the Title field is required, it is generally best practice to provide as much information as possible, so other users can learn more about the source of your scanned map you are georeferencing. Fill in the metadata based on the information provided to you about the historical map that you&#8217;re working with. For the North Carolina and South Carolina map, you can find the map&#8217;s metadata beside the map on the <link target="https://perma.cc/UC5M-4GNY">David Rumsey Map Collection&#8217;s website</link>. Due to the collaborative and collective nature of Map Warper, we recommend that you include the following metadata:</p>
+<ul>
+<li><hi rend="bold">Title:</hi> Title and registration number. This organizes the information to make it easier to find the map in its original repository.</li>
+<li><hi rend="bold">Description:</hi> Reference for the cartographic image.</li>
+<li><hi rend="bold">Issue Year:</hi> Year in which the map was created or published.</li>
+<li><hi rend="bold">Tags:</hi> 3-5 keywords that describe the map.</li>
+<li><hi rend="bold">Subject Area:</hi> Typology for the cartographic material.</li>
+<li><hi rend="bold">Source:</hi> URL for the document source.</li>
+<li><hi rend="bold">Place of publication:</hi> Location where the document was published or created.</li>
+<li><hi rend="bold">Scale:</hi> Numerical scale.</li>
+<li><hi rend="bold">Metadata Projection:</hi> Cartographic projection.</li>
+</ul>
+</div></div>
+      <div type="2"><head>Georeferencing your map with Map Warper</head>
+<p>You will start by uploading a map and georeferencing it using Map Warper. Map Warper has a variety of export options, including <link target="https://perma.cc/PSX7-UN4J">WMS</link> URL, <link target="https://perma.cc/P3KF-97L7">Tiles</link>, <link target="https://perma.cc/5QLD-8HG5">GeoTIFF</link> or <link target="https://perma.cc/6QEN-YTHS">KML</link> file. If you would like to display your georeferenced map online, see the <emph>Programming Historian</emph> tutorial <link target="/en/lessons/displaying-georeferenced-map-knightlab-storymap-js">Displaying a Georeferenced Map in Story Map JS</link>.</p>
+<div type="3"><head>Map Visualization</head>
+<p>This tab will display a visualization of the attached georeferenced map or cartographic document. The navigation tools provided include the option to zoom in and move around the map.</p>
+<p>Users may find it helpful to identify the types of points to georeference (urban and natural locations, jurisdictions, roads, etc.) as well as the different resources that can be used to cross-reference and to supplement the information provided (statistics, governmental reports, personal documents, or even cartographic images created before or after the one used for this visualization). These considerations can be very useful for research development, since the digital visualization should help to facilitate the critical interpretation of the material. This is especially evident in the use of maps that contain cultural heritage information (for example, trade routes, shifting borders, natural resources, etc.).</p>
+<p>The interface is organized into the following tabs:</p>
+<ul>
+<li><hi rend="bold">Show:</hi> displays only your map image</li>
+<li><hi rend="bold">Edit:</hi> allows you to edit the descriptive text (metadata)</li>
+<li><hi rend="bold">Rectify:</hi> used for the georeferencing itself</li>
+<li><hi rend="bold">Align:</hi> a useful tool if you are stitching together multiple maps</li>
+<li><hi rend="bold">Preview:</hi> shows your map overlaid on a modern base map</li>
+<li><hi rend="bold">Export:</hi> gives you a variety of export options and formats</li>
+</ul>
+<figure><desc>Figure 3. Map Warper interface.</desc><graphic url="mapwarper_showmap.png" alt="Screenshot of Map Warper's interface, with the Show, Edit, Rectify, Align, Preview and Export tabs at upper left. In the center of the interface is a scanned historical map, depicting North Carolina and South Carolina divided into counties and coloured variously in pink, green and pale yellow"/></figure>
+</div><div type="3"><head>Georeference your map</head>
+<p>In this section, you will georeference the uploaded map. Click on the "Rectify" tab; here you will find two windows: on the left is the uploaded map; on the right is the OpenStreetMap base map (this is the layer that provides the reference points for your uploaded map image). Below these windows, you will find the "Control Panel," which allows you to fine-tune your control points, and check their level of accuracy.</p>
+<p><img src="/images/introduccion-map-warper/layer_switcher_maximize.png" alt="Layer icon"/><hi rend="bold">Layer</hi> allows you to select a base layer from either OpenStreetMap or Mapbox Satellite. It also includes the <hi rend="bold">Overlay</hi> function that allows you to superimpose your working map image (the North Carolina and South Carolina example or your own image) after confirming the georeference.</p>
+<p><img src="/images/introduccion-map-warper/addcustombasemap.png" alt="basemap icon"/><hi rend="bold">Add Custom Basemap</hi> in the right box allows you to add another custom base layer in <link target="https://perma.cc/AN6Z-XALE">XYZ Tiles format</link> (such as OpenStreetMap, Google Maps, Bing, <link target="https://perma.cc/WGZ9-HQ5U">CARTO</link>, <link target="https://perma.cc/DC2E-9PAM">ESRI</link>, <link target="https://perma.cc/7VLS-9LZZ">Stamen</link>, and other layers).</p>
+<p>You can also add the following georeferenced basemaps from Map Warper:</p>
+<pre><code xml:id="code_introduction-map-warper_0" type="block" corresp="code_introduction-map-warper_0.txt"/></pre>
+<p><img src="/images/introduccion-map-warper/add_control_point.gif" alt="Control point icon"/><hi rend="bold">Add control point</hi>, available in both boxes, allows you to add control points that associate points on the uploaded or selected map to the predetermined base layer.</p>
+<p><img src="/images/introduccion-map-warper/move_control_point.gif" alt="Move control point icon"/><hi rend="bold">Move Control Point</hi> permits you to move or relocate the control points and add them to both windows.</p>
+<p><img src="/images/introduccion-map-warper/move_around_map.gif" alt="Move around map icon"/><hi rend="bold">Move Around Map</hi> lets you explore the maps in both windows without having to assign or move any control points. This is helpful for verifying the assigned control points.</p>
+<p>The lock between the two windows helps guide the assignment and movement of the control points. <img src="/images/introduccion-map-warper/Zoom_lock.png" alt="Zoom lock icon"/>The <hi rend="bold">Zoom lock</hi> option allows you to zoom in on the maps in both windows simultaneously. This is useful to place and verify the control points. Clicking on the lock again will unlock it. <img src="/images/introduccion-map-warper/lock_open.png" alt="Pan icon"/>The <hi rend="bold">Pan</hi> function allows you to pan to different sections of the images, separately.</p>
+<p><hi rend="bold">Keyboard shortcuts</hi> provides quick access to the following:</p>
+<ul>
+<li><hi rend="bold">p</hi>: Keyboard activates <hi rend="bold">Add Control Point</hi> <img src="/images/introduccion-map-warper/add_control_point.gif" alt="Add control point icon"/></li>
+<li><hi rend="bold">d</hi>: Keyboard activates  <hi rend="bold">Move Control Point</hi> <img src="/images/introduccion-map-warper/move_control_point.gif" alt="Move control point icon"/></li>
+<li><hi rend="bold">m</hi>: Keyboard activates  <hi rend="bold">Move Around Map</hi> <img src="/images/introduccion-map-warper/move_around_map.gif" alt="Move around map icon"/></li>
+<li><hi rend="bold">q</hi>: Keyboard adds a control point in your cursor location.</li>
+<li><hi rend="bold">a</hi>: Keyboard adds a control point in your cursor location in both windows.</li>
+<li><hi rend="bold">Enter</hi>: Keyboard replaces the <hi rend="bold">Add Control Point</hi> mouse click to confirm the position of the pin.</li>
+</ul>
+<p>Clicking on <hi rend="bold">Control Points</hi> in the Control Panel displays a table with the location values (X, Y coordinates and latitude, longitude) for the control points that you have assigned. You can delete points here or edit latitude and longitude.</p>
+<p>This table also includes a section that defines the geometric error value, caused by the georeferencing of the historic map document. This calculates the error value of each point according to a weighted average, and classifies the error in blue (low error), yellow (some error), or red (significant error). See the note about the way the <link target="https://perma.cc/73LU-GHG5">Root Mean Square error</link> is calculated, below.</p>
+<p>Download the points as a CSV file (comma separated values) by selecting the option under Ground Control Points. This file is useful for importing data into other applications. This file can also be a form of digital preservation for processing the archival map&#8217;s georeferenced data.</p>
+<p>By clicking on <hi rend="bold">Add Control Point Manually</hi> you can add a control point with X, Y coordinates and on the original image to the base map layer with longitude and latitude. If you know the geographic coordinates, this can facilitate aligning control points on the base layer with higher accuracy.</p>
+<p><hi rend="bold">Add Control Points from CSV</hi> allows you to upload a .csv file to automate the georeferencing process. The first row must contain the Control Points table headers. The proceeding rows should contain data for the X, Y coordinates for the image (<code type="inline">X,Y</code>) and the destination (<code type="inline">Lon,Lat</code>), separated by commas.</p>
+<p>The following .csv example contains four columns, labeled &#8216;x&#8217;, &#8216;y&#8217;, &#8216;lon&#8217; and &#8216;lat&#8217; in four rows, including the headings. This is the same file as the one downloaded using the <img src="/images/introduccion-map-warper/csvicon.png" alt="csv icon"/> CSV icon button.</p>
+<pre><code xml:id="code_introduction-map-warper_1" type="block" corresp="code_introduction-map-warper_1.txt"/></pre>
+</div><div type="3"><head>Practice</head>
+<p>1. Click on the Rectify tab.<br/>
+2. Take a moment to move the map on the right to the North Carolina and South Carolina region. The arrows at the top of the screen move the map slightly to the north, south, east, and west, and are useful when you need to make small adjustments to the map. You can zoom in and out with the slider or with your trackpad/mouse. To move around a map, click the hand icon.<br/>
+3. Once you feel comfortable moving around the maps, select your first control point. Start from the historic map and choose a location &#8212;for example, a city&#8212; that will be relatively easy to find.<br/>
+4. Then, click the green control point marker on the modern map and find the same location to match them up.  </p>
+<pre><code xml:id="code_introduction-map-warper_2" type="block" corresp="code_introduction-map-warper_2.txt"/></pre>
+<p>5. If you do not click the Add Control Point button, the next time you click on a map, the control point you've added will move. This functionality gives you the flexibility to adjust your points while adding them, but can be confusing if you don&#8217;t realize that your point has moved because you didn&#8217;t click Add Control Point.</p>
+<p>6. Add at least 4 or 5 points. Spreading the points out across your historic map and focusing on state borders, rivers, county lines, and major cities is a good strategy. If you need to delete a control point, click on "Control Points" in the Control Panel below the map.</p>
+<pre><code xml:id="code_introduction-map-warper_3" type="block" corresp="code_introduction-map-warper_3.txt"/></pre>
+<p>7. Selecting Control Points will display all of the points you have added, and allow you to delete any points that you want to re-do. You can also change latitude and longitude points manually.</p>
+<pre><code xml:id="code_introduction-map-warper_4" type="block" corresp="code_introduction-map-warper_4.txt"/></pre>
+<p class="alert alert-info" style="alert alert-info">
+Note: You will see there is an Error value for each control point. Map Warper uses a Root Mean Square (RMS) error calculation to evaluate the transformation of the different control points. The RMS error provides a rough guide to how consistent your control points are to one another with reference to the map&#8217;s transformation, and it assesses how distorted your map will be. High RMS error values indicate that your control points are less consistent with one another, while a low RMS error value indicates more consistency and reduced distortion. It is generally recommended that you keep your error values low and replace or remove control points with high values. While the RMS error provides a good way to assess the transformation&#8217;s accuracy, you should always re-evaluate how well your scanned map matches up to the GIS modern map. For more information about RMS errors, please see Esri&#8217;s section on interpreting the root mean square error in their <link target="https://perma.cc/L4VD-VPVV">Overview of georeferencing</link>.
+</p>
+<p>8. When you have enough points and think they are well-distributed across your historic map, click Warp Image! at the bottom of the page. Georeferencing maps takes practice. You may find that your rectified map creates an unreadable, warped map. We encourage you to try steps 7-9 again, taking into account best practices for georeferencing mentioned above, such as identifying major cities, roads, streams, and rivers that you can identify with confidence.</p>
+<pre><code xml:id="code_introduction-map-warper_5" type="block" corresp="code_introduction-map-warper_5.txt"/></pre>
+<p>9. You will now see the map layered on top of the OpenStreetMap.</p>
+<pre><code xml:id="code_introduction-map-warper_6" type="block" corresp="code_introduction-map-warper_6.txt"/></pre>
+<p>10. You can choose to view a satellite image base map or the regular OpenStreetMap layer we&#8217;ve been using.</p>
+<pre><code xml:id="code_introduction-map-warper_7" type="block" corresp="code_introduction-map-warper_7.txt"/></pre>
+<p>11. Click the Preview tab for a larger view of the georeferenced map. Changing the transparency using the slider can give you a sense of how accurate your georeferencing has been applied.</p>
+<pre><code xml:id="code_introduction-map-warper_8" type="block" corresp="code_introduction-map-warper_8.txt"/></pre>
+</div><div type="3"><head>Cropping</head>
+<p>The <hi rend="bold">Crop</hi> tab allows you to crop a section of the uploaded map. This is useful for dividing maps into composites. The display window integrates the following actions:  </p>
+<ul>
+<li><img src="/images/introduccion-map-warper/move_around_map.gif" alt="Move around map icon"/>:  <hi rend="bold">Move around Map</hi></li>
+<li><img src="/images/introduccion-map-warper/Draw_new_polygon.gif" alt="Polygon icon"/>: <hi rend="bold">Draw new polygon to mask</hi></li>
+<li><img src="/images/introduccion-map-warper/delete_polygon.gif" alt="Delete a polygon icon"/>:  <hi rend="bold">Delete a polygon</hi></li>
+</ul>
+<p>Draw around the area you wish you keep. Then to apply the mask to the map, click "Mask Map!"</p>
+</div><div type="3"><head>Align</head>
+<p>The <hi rend="bold">Align</hi> tab allows you to organize several maps into a mosaic. This tool is good for connecting fragmented maps, aerial photographs, and other fragmented cartographic documents. Click "align map" to align the images.</p>
+</div><div type="3"><head>Preview</head>
+<p>This tab allows you to visualize the results of your work in the <hi rend="bold">Rectify</hi> step. This is useful to continue the georeferencing step.  The display window also integrates the same tools: move, zoom, transparency, and <hi rend="bold">layer</hi> <img src="/images/introduccion-map-warper/layer_switcher_maximize.png" alt="Layer icon"/>.</p>
+</div></div>
+      <div type="2"><head>Visualization</head>
+<div type="3"><head>Export your map</head>
+<p>The <hi rend="bold">Export</hi> tab allows you to export the georeferenced map in different standard formats for GIS visualization platforms. The exportable formats are grouped into three categories:</p>
+<ul>
+<li><hi rend="bold">Images:</hi> GeoTiff, rectified PNG. These formats aggregate geographic coordinates and a projection system onto the cartographic document, allowing the georeferenced document to be linked to a GIS application.  This format is recommended for working on computers without a stable Internet connection or no connection.</li>
+<li><hi rend="bold">Map Services:</hi> KML, WMS, Tiles. These geographic formats are similar to those of Images, but they can only be used on computers with an Internet connection.</li>
+<li><hi rend="bold">Ground Control Points:</hi> CSV. This category allows the downloading of the Control Points table created in the "Rectify" step. The table groups the control points between the raster image (historic map document) with the OpenStreetMap vectoral map. That is, it associates the X, Y coordinates with longitude, latitude, respectively.</li>
+</ul>
+<p>The georeferenced image can have different functions/behaviours due to the projection, the coordinate system, the ellipsoid, and the datum used by the corresponding GIS platform.</p>
+<p>You are now ready to export your map. Click the <hi rend="bold">Export</hi> tab. Under the <hi rend="bold">Map Services</hi>, copy and paste the Tiles URL and save this link to be used later in the <link target="/en/lessons/displaying-georeferenced-map-knightlab-storymap-js">Displaying a Georeferenced Maps in Story Map JS</link> <emph>Programming Historian</emph> lesson. Here is an example of how the URL is formatted:</p>
+<pre><code xml:id="code_introduction-map-warper_9" type="block" corresp="code_introduction-map-warper_9.txt"/></pre>
+</div><div type="3"><head>Activity</head>
+<p>The <hi rend="bold">Activity</hi> tab maintains a summary of changes made to the map. The activity log includes the following fields: Time, User, Map, Activity summary, Version, and Further details. Any Map Warper user can monitor the changes to the map. Additionally, the <img src="/images/introduccion-map-warper/rss.png" alt="RSS feed icon"/> "RSS Feed" allows the user to download general information about all changes in .rss format.</p>
+</div><div type="3"><head>Comments</head>
+<p>The <hi rend="bold">Comments</hi> tab allows users to aggregate comments about the map. This is an open channel that allows others to communicate with the user who shared the cartographic material. It is also a useful place to enrich the description and cataloging of the uploaded map. Make sure to click <hi rend="bold">add comment</hi> to save.</p>
+</div></div>
+      <div type="2"><head>Final considerations</head>
+<p>The technical steps learned in this lesson are useful not only for georeferencing historical maps, but also for reflecting on the distinct spatial relations between place, history, and subjects. It is also useful for connecting the digital map to data from other primary sources (official documents, statistics, photographs, testimonies, etc.). In this sense, the lesson is an introduction to the possibilities of the use of this type of material, the historical perspectives of the social dimensions that are represented in the georeferenced object, and that will continue to stimulate the field of spatial humanities.</p>
+<div type="3"><head>Endnotes</head>
+<p><note id="1"> Spanish-language resources include Biblioteca Nacional de Colombia&#8217;s Mapoteca Digital, <link target="https://perma.cc/6JX8-AVYP">Cartograf&#237;a de Bogot&#225;</link> de la Universidad Nacional de Colombia, and <link target="https://perma.cc/2YM7-7DJ5">Paisajes coloniales: redibujando los territorios andinos en el siglo XVII</link> de la Universidad de los Andes (Colombia).</note>
+<note id="2"> The original Spanish tutorial uses a 1933 coffee map of the Republic of Colombia from Mapoteca Digital de la Biblioteca Nacional de Colombia, published by the Federaci&#243;n Nacional de Cafeteros de Colombia (National Federation Colombian Coffee Growers). This lesson substitutes the map in order to provide English-speaking users with a map with  geographical locations in English.</note></p>
+</div></div>
+    </body>
+  </text>
+</TEI>

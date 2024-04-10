@@ -1,0 +1,552 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="downloading-multiple-records-using-query-strings">
+  <teiHeader>
+ <fileDesc>
+  <titleStmt>
+   <title>Downloading Multiple Records Using Query Strings</title>
+  <author type="original_author">Adam Crymble</author><editor type="reviewers"><persName>Luke Bergmann</persName><persName>Sharon Howard</persName><persName>Frederik Elwert</persName></editor><editor type="editors">Fred Gibbs</editor></titleStmt>
+  <publicationStmt>
+   <idno type="doi">10.46430/phen0005</idno><date type="published">11/11/2012</date><p>Lesson reviewed and published in Programming Historian.</p>
+  </publicationStmt>
+  <sourceDesc>
+  <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#download-multiplos-registros-query-strings #descarga-multiples-registros-usando-cadenas-de-consulta"/></p></sourceDesc>
+ </fileDesc>
+ <profileDesc><abstract><p>Downloading a single record from a website is easy, but downloading many records at a time &#8211; an increasingly frequent need for a historian &#8211; is much more efficient using a programming language such as Python. In this lesson, we will write a program that will download a series of records from the Old Bailey Online using custom search criteria, and save them to a directory on our computer.</p></abstract><textClass><keyword xml:lang="en">web-scraping</keyword></textClass></profileDesc>
+</teiHeader>
+  <text xml:lang="en">
+    <body>
+      <div type="2"><head>Module Goals</head>
+<p>Downloading a single record from a website is easy, but downloading many
+records at a time &#8211; an increasingly frequent need for a historian &#8211; is
+much more efficient using a programming language such as Python. In this
+lesson, we will write a program that will download a series of records
+from the <link target="http://www.oldbaileyonline.org/">Old Bailey Online</link> using custom search criteria, and save
+them to a directory on our computer. This process involves interpreting
+and manipulating URL <emph>Query Strings</emph>. In this case, the tutorial will seek
+to download sources that contain references to people of African descent
+that were published in the <emph>Old Bailey Proceedings</emph> between 1700 and 1750.</p>
+<p class="alert alert-warning" style="alert alert-warning">
+The examples in this lesson include historic racialized language that readers may find offensive. The author does not condone the use of this language but has tried to use it in its historic context, recognizing that it is otherwise impossible to find the desired materials of the case study. Anyone teaching with this material is advised to take a sensitive approach towards the language and to apply best practices when teaching about race. The author recommends the many resources from Teaching Tolerance (https://www.tolerance.org); Peggy McIntosh, &#8216;White Privilege: Unpacking the Invisible Knapsack&#8217; *Peace and Freedom Magazine*, (1989), 10-12; Binyavanga Wainaina, &#8216;How to Write About Africa&#8217;, *Granta* (92): 2006.
+</p>
+</div>
+      <div type="2"><head>For Whom is this Useful?</head>
+<p>Automating the process of downloading records from an online database
+will be useful for anyone who works with historical sources that are
+stored online in an orderly and accessible fashion and who wishes to
+save copies of those sources on their own computer. It is particularly
+useful for someone who wants to download many specific records, rather
+than just a handful. If you want to download <emph>all</emph> or <emph>most</emph> of the
+records in a particular database, you may find Ian Milligan&#8217;s tutorial
+on <link target="/lessons/automated-downloading-with-wget">Automated Downloading with WGET</link> more suitable.</p>
+<p>The present tutorial will allow you to download discriminately,
+isolating specific records that meet your needs. Downloading multiple
+sources automatically saves considerable time. What you do with the
+downloaded sources depends on your research goals. You may wish to
+create visualizations or perform various data analysis methods, or
+simply reformat them to make browsing easier. Or, you may just want to
+keep a backup copy so you can access them without Internet access.</p>
+<p>This lesson is for intermediate Python users. If you have not already tried the <link target="/lessons/introduction-and-installation">Python Programming Basics</link> lessons, you may find that a useful starting point.</p>
+</div>
+      <div type="2"><head>Applying our Historical Knowledge</head>
+<p>In this lesson, we are trying to create our own corpus of cases related
+to people of African descent. From <link target="http://www.oldbaileyonline.org/browse.jsp?id=t17800628-33&amp;div=t17800628-33">Benjamin Bowsey&#8217;s case</link> at the Old Bailey in 1780, we might note that &#8220;black&#8221; can be a useful keyword for us to use for locating other
+cases involving defendants of African descent. However, when we search for &#8220;black&#8221; on the Old Bailey website, we
+find it often refers to other uses of the word: black horses, or black
+cloth. The task of disambiguating this use of language will have to wait
+for another lesson. For now, let&#8217;s turn to easier cases. As historians,
+we can probably think of keywords of historic racialised terms related to African descendants that
+would be worth pursuing. The infamous &#8220;n-word&#8221; of course is not useful,
+as this term did not come into regular usage until the mid-nineteenth
+century. Other racialised language such as &#8220;negro&#8221; and &#8220;mulatto&#8221; are however, much more relevant to the
+early eighteenth century. These keywords are less ambiguous than &#8220;black&#8221;
+and are much more likely to be immediate references to people in our
+target demographic. If we try these two terms in separate simple
+searches on the Old Bailey website, we get results like in these
+screenshots:</p>
+<figure><desc>Search results for 'negro' in the Old Bailey Online</desc><graphic url="SearchResultsNegro.png"/></figure>
+<figure><desc>Search results for 'mulatto' in the Old Bailey Online</desc><graphic url="SearchResultsMulatto.png"/></figure>
+<p>After glancing through these search results, it seems clear that these
+are references to people, rather than horses or cloth or other things
+that may be black. We want to download them all to use in our analysis.
+We could, of course, download them one at a time, manually. But let&#8217;s
+find a programmatic way to automate this task.</p>
+</div>
+      <div type="2"><head>The Advanced Search on OBO</head>
+<p>Every website&#8217;s search features work differently. While searches work
+similarly, the intricacies of database searches may not be entirely
+obvious. Therefore it&#8217;s important to think critically about database
+search options and, when available, read the documentation provided on
+the website. Prudent historical researchers always interrogate their
+sources; the procedures behind your search boxes should receive the same
+attention. The Old Bailey Online&#8217;s <link target="http://www.oldbaileyonline.org/forms/formMain.jsp">advanced search form</link> lets you
+refine your searches based on ten different fields including simple
+keywords, a date range, and a crime type. As each website&#8217;s search
+feature is different it always pays to take a moment or two to play with
+and read about the search options available. Since
+we have already done the simple searches for &#8220;negro&#8221; and &#8220;mulatto&#8221;, we
+know there will be results. However, let&#8217;s use the advanced search to
+limit our results to records published in the Old Bailey Proceedings
+trial accounts from 1700 to 1750 only. You can of course change this to
+whatever you like, but this will make the example easier to follow.
+Perform the search shown in the image below. Make sure you tick the
+&#8220;Advanced&#8221; radio button and include the <code type="inline">*</code> wildcards to include
+pluralized entries or those with an extra &#8220;e&#8221; on the end.</p>
+<figure><desc>Old Bailey Advanced Search Example</desc><graphic url="AdvancedSearchExample.png"/></figure>
+<p>Execute the search and then click on the &#8220;Calculate Total&#8221; link to
+see how many entries there are. We now have 13 results (if you have a
+different number go back and make sure you copied the example above
+exactly). What we want to do at this point is download all of these
+trial documents and analyze them further. Again, for only 13 records,
+you might as well download each record manually. But as more and more
+data comes online, it becomes more common to need to download 1,300 or
+even 130,000 records, in which case downloading individual records
+becomes impractical and an understanding of how to automate the process
+becomes that much more valuable. To automate the download process, we
+need to step back and learn how the search URLs are created on the Old
+Bailey website, a method common to many online databases and websites.</p>
+</div>
+      <div type="2"><head>Understanding URL Queries</head>
+<p>Take a look at the URL produced with the last search results page. It
+should look like this:</p>
+<pre><code xml:id="code_downloading-multiple-records-using-query-strings_0" type="block" corresp="code_downloading-multiple-records-using-query-strings_0.txt"/></pre>
+<p>We had a look at URLs in <link target="/lessons/viewing-html-files">Viewing HTML Files</link>, but this looks a lot
+more complex. Although longer, it is actually <emph>not</emph> that much more
+complex. But it is easier to understand by noticing how our search
+criteria get represented in the URL.</p>
+<pre><code xml:id="code_downloading-multiple-records-using-query-strings_1" type="block" corresp="code_downloading-multiple-records-using-query-strings_1.txt"/></pre>
+<p>In this view, we see more clearly our 12 important pieces of information
+that we need to perform our search (one per line). On the first is the
+Old Bailey&#8217;s base website URL, followed by a query: &#8220;?&#8221; (don&#8217;t worry
+about the <code type="inline">gen=1</code> bit; the developers of the Old Bailey Online say that
+it does not do anything.) and a series of 10 <emph>name/value pairs</emph> put
+together with &amp; characters. Together these 10 name/value pairs comprise
+the query string, which tells the search engine what variables to use in
+specific stages of the search. Notice that each name/value pair contains
+both a variable name: toYear, and then assigns that variable a value: 1750.
+This works in exactly the same way as <emph>Function Arguments</emph> by
+passing certain information to specific variables. In this case, the
+most important variable is <code type="inline">_divs_fulltext=</code> which has been given the
+value:</p>
+<pre><code xml:id="code_downloading-multiple-records-using-query-strings_2" type="block" corresp="code_downloading-multiple-records-using-query-strings_2.txt"/></pre>
+<p>This holds the search term we have typed into the search box. The
+program has automatically added a + sign in place of a blank space (URLs
+cannot contain spaces); otherwise that&#8217;s exactly what we&#8217;ve asked the
+Old Bailey site to find for us. The other variables hold values that we
+defined as well. <emph>fromYear</emph> and <emph>toYear</emph> contain our date range. Since no
+year has 99 months as suggested in the <emph>toMonth</emph> variable, we can assume
+this is how the search algorithm ensures all records from that year are
+included. There are no hard and fast rules for figuring out what each
+variable does because the person who built the site gets to name them.
+Often you can make an educated guess. All of the possible search fields
+on the Advanced Search page have their own name/value pair. If you&#8217;d
+like to find out the name of the variable so you can use it, do a new
+search and make sure you put a value in the field in which you are
+interested. After you submit your search, you&#8217;ll see your value and the
+name associated with it as part of the URL of the search results page.
+With the Old Bailey Online, as with many other websites, the search form
+(advanced or not) essentially helps you to construct URLs that tell the
+database what to search for. If you can understand how the search fields
+are represented in the URL &#8211; which is often quite straightforward &#8211; then
+it becomes relatively simple to programmatically construct these URLs
+and thus to automate the process of downloading records.</p>
+<p>Now try changing the &#8220;<hi rend="bold">start=0</hi>&#8221; to &#8220;<hi rend="bold">start=10</hi>&#8221; and hit enter. You
+should now have results 11-13. The &#8220;start&#8221; variable tells the website
+which entry should be shown at the top of the search results list. We
+should be able to use this knowledge to create a series of URLs that
+will allow us to download all 13 files. Let&#8217;s turn to that now.</p>
+</div>
+      <div type="2"><head>Systematically Downloading Files</head>
+<p>In <link target="/lessons/working-with-web-pages">Working with Webpages</link> we learned that Python can download a
+webpage as long as we have the URL. In that lesson we used the URL to
+download the trial transcript of Benjamin Bowsey. In this case, we&#8217;re
+trying to download multiple trial transcripts that meet the search
+criteria we outlined above without having to repeatedly re-run the
+program. Instead, we want a program that will download everything we
+need in one go. At this point we have a URL to a search results page
+that contains the first ten entries of our search. We also know that by
+changing the &#8220;start&#8221; value in the URL we can sequentially call each
+search results page, and ultimately retrieve all of the trial documents
+from them. Of course the research results don&#8217;t give us the trial
+documents themselves, but only links to them. So we need to extract the
+link to the underlying records from the search results. On the Old
+Bailey Online website, the URLs for the individual records (the trial
+transcript files) can be found as links on the search results pages. We
+know that all trial transcript URLs contain a trial id that takes the
+form: &#8220;t&#8221; followed by at least 8 numbers (e.g. t17800628-33). By looking
+for links that contain that pattern, we can identify trial transcript
+URLs. As in previous lessons, let&#8217;s develop an algorithm so that we can
+begin tackling this problem in a manner that a computer can handle. It
+seems this task can be achieved in four steps. We will need to:</p>
+<ul>
+<li>Generate the URLs for each search results page by incrementing the
+&#8220;start&#8221; variable by a fixed amount an appropriate number of times.</li>
+<li>Download each search results page as an HTML file.</li>
+<li>Extract the URLs of each trial transcript (using the trial ID as
+described above) from the search results HTML files.</li>
+<li>Cycle through those extracted URLs to download each trial transcript
+and save it to a directory on our computer</li>
+</ul>
+<p>You&#8217;ll recall that this is fairly similar to the tasks we achieved in
+<link target="/lessons/working-with-web-pages">Working with Webpages</link> and <link target="/lessons/from-html-to-list-of-words-2">From HTML to a List of Words 2</link>. First
+we download, then we parse out the information we&#8217;re after. And in this
+case, we download some more.</p>
+<div type="3"><head>Downloading the search results pages</head>
+<p>First we need to generate the URLs for downloading each search results
+page. We have already got the first one by using the form on the
+website:</p>
+<pre><code xml:id="code_downloading-multiple-records-using-query-strings_3" type="block" corresp="code_downloading-multiple-records-using-query-strings_3.txt"/></pre>
+<p>We could type this URL out twice and alter the &#8216;<emph>start</emph>&#8217; variable to get
+us all 13 entries, but let&#8217;s write a program that would work no matter
+how many search results pages or records we had to download, and no
+matter what we decide to search for. Study this code and then add this
+function to a module named <code type="inline">obo.py</code> (create a file with that name and save it to the directory where you want to do your work). The comments in the code are meant to
+help you decipher the various parts.</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_4" type="block" corresp="code_downloading-multiple-records-using-query-strings_4.txt"/></pre>
+<p>In this function we have split up the various Query String components
+and used Function Arguments so that this function can be reused beyond
+our specific needs right now. When we call this function we will replace
+the arguments with the values we want to search for. We then download
+the search results page in a similar manner as done in <link target="/lessons/working-with-web-pages">Working with
+Webpages</link>. Now, make a new file: <code type="inline">download-searches.py</code> and copy into
+it the following code. Note, the values we have passed as arguments are
+exactly the same as those used in the example above. Feel free to play
+with these to get different results or see how they work.</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_5" type="block" corresp="code_downloading-multiple-records-using-query-strings_5.txt"/></pre>
+<p>When you run this code you should find a new file:
+&#8220;<code type="inline">search-results.html</code>&#8221; in your <code type="inline">programming-historian directory</code>
+containing the first search results page for your search. Check that
+this downloaded properly and then delete the file. We&#8217;re going to adapt
+our program to download the other page containing the other 3 entries at
+the same time so we want to make sure we get both. Let&#8217;s refine our
+<code type="inline">getSearchResults</code> function by adding another function argument called
+&#8220;entries&#8221; so we can tell the program how many pages of search results we
+need to download. We will use the value of entries and some simple math
+to determine how many search results pages there are. This is fairly
+straightforward since we know there are ten trial transcripts listed per
+page. We can calculate the number of search results pages by dividing
+the value of entries by 10. We will save this result to a
+variable named <code type="inline">pageCount</code>. It looks like this:</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_6" type="block" corresp="code_downloading-multiple-records-using-query-strings_6.txt"/></pre>
+<p>However, in cases where the number of entries is not a multiple of 10,
+this will result in a decimal number. You can test this by
+running this code in your Terminal (Mac &amp; Linux) / Python Command Line
+(Windows) and printing out the value held in <code type="inline">pageCount</code>. (Note, from here
+on, we will use the word Terminal to refer to this program).</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_7" type="block" corresp="code_downloading-multiple-records-using-query-strings_7.txt"/></pre>
+<p>We know the page count should be 2 (one page containing entries 1-10, and one
+page containing entries 11-13). Since we always want the next higher integer,
+we can round up the result of the division.</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_8" type="block" corresp="code_downloading-multiple-records-using-query-strings_8.txt"/></pre>
+<p>If we add this to our <code type="inline">getSearchResults</code> function just under the
+<emph>startValue = 0</emph> line, our program, the code can now calculate the number
+of pages that need to be downloaded. However, at this stage it will
+still only download the first page since we have only told the
+downloading section of the function to run once. To correct this, we can
+add that downloading code to a for loop which will download once for
+every number in the <code type="inline">pageCount</code> variable. If it reads 1, then it will
+download once; if it reads 5 it will download five times, and so on.
+Immediately after the if statement you have just written, add the
+following line and indent everything down to <code type="inline">f.close</code> one additional
+tab so that it is all enclosed in the for loop:</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_9" type="block" corresp="code_downloading-multiple-records-using-query-strings_9.txt"/></pre>
+<p>Since this is a for loop, all of the code we want to run repeatedly
+needs to be intended as well. You can see if you have done this
+correctly by looking at the finished code example below. This loop takes
+advantage of Python&#8217;s <link target="https://docs.python.org/3/tutorial/controlflow.html#the-range-function">range</link> funciton. To understand this for loop it
+is probably best to think of <code type="inline">pageCount</code> as equal to 2 as it is in the
+example. This two lines of code then means: start running with an
+initial loop value of 1, and each time you run, add 1 more to that
+value. When the loop value is the same as <code type="inline">pageCount</code>, run once more and
+then stop. This is particularly valuable for us because it means we can
+tell our program to run exactly once for each search results page and
+provides a flexible new skill for controlling how many times a for loop
+runs. If you would like to practice with this new and powerful way of
+writing for loops, you can open your Terminal and play around.</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_10" type="block" corresp="code_downloading-multiple-records-using-query-strings_10.txt"/></pre>
+<p>Before we add all of this code together to our <code type="inline">getSearchResults</code>
+function, we have to make two final adjustments. At the end of the for
+loop (but still inside the loop), and after our downloading code has run
+we will need to change the <code type="inline">startValue</code> variable, which is used in
+building the URL of the page we want to download. If we forget to do
+this, our program will repeatedly download the first search results page
+since we are not actually changing anything in the initial URL. The
+<code type="inline">startValue</code> variable, as discussed above, is what controls which search
+results page we want to download. Therefore, we can request the next
+search results page by increasing the value of <code type="inline">startValue</code> by 10 after
+the initial download has completed. If you are not sure where to put
+this line you can peek ahead to the finished code example below.</p>
+<p>Finally, we want to ensure that the name of the file we have downloaded
+is different for each file. Otherwise, each download will save over the
+previous download, leaving us with only a single file of search results.
+To solve this, we can adjust the contents of the <code type="inline">filename</code> variable to
+include the value held in <code type="inline">startValue</code> so that each time we download a new
+page, it gets a different name. Since <code type="inline">startValue</code> is an integer, we will
+have to convert it to a string before we can add it to the filename
+variable. Adjust the line in your program that pertains to the <code type="inline">filename</code>
+variable to looks like this:</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_11" type="block" corresp="code_downloading-multiple-records-using-query-strings_11.txt"/></pre>
+<p>You should now be able to add these new lines of code to your
+getSearchResults function. Recall we have made the following additions:</p>
+<ul>
+<li>Add entries as an additional function argument right after toMonth</li>
+<li>Calculate the number of search results pages and add this
+immediately after the line that begins with startValue = 0 (before
+we build the URL and start downloading)</li>
+<li>Follow this immediately with a for loop that will tell the program
+to run once for each search results page, and indent the rest of the
+code in the function so that it is inside the new loop.</li>
+<li>The last line in the for loop should now increase the value of the
+startValue variable each time the loop runs.</li>
+<li>Adjust the existing filename variable so that each time a search
+results page is downloaded it gives the file a unique name.</li>
+</ul>
+<p>The finished function code in your <code type="inline">obo.py</code> file should look like this:</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_12" type="block" corresp="code_downloading-multiple-records-using-query-strings_12.txt"/></pre>
+<p>To run this new function, add the extra argument to
+<code type="inline">download-searches.py</code> and run the program again:</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_13" type="block" corresp="code_downloading-multiple-records-using-query-strings_13.txt"/></pre>
+<p>Great! Now we have both search results pages, called
+<code type="inline">search-result0.html</code> and <code type="inline">search-result10.html</code>. But before we move
+onto the next step in the algorithm, let&#8217;s take care of some
+housekeeping. Our <code type="inline">programming-historian</code> directory will quickly become
+unwieldy if we download multiple search results pages and trial
+transcripts. Let&#8217;s have Python make a new directory named after our
+search terms.</p>
+<p>We want to add this new functionality in <code type="inline">getSearchResults</code>, so that our
+search results pages are downloaded to a directory with the same name as
+our search query. This will keep our <code type="inline">programming-historian</code> directory
+more organized. To do this we will create a new directory using the <code type="inline">os</code>
+library, short for &#8220;operating system&#8221;. That library contains a function
+called <code type="inline">makedirs</code>, which, unsurprisingly, makes a new directory. You can
+try this out using the Terminal.</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_14" type="block" corresp="code_downloading-multiple-records-using-query-strings_14.txt"/></pre>
+<p>This program will check to see if your computer already has a directory
+with this name. If not, you should now have a directory called
+<code type="inline">myNewDirectory</code> on your computer. On a Mac this is probably located in
+your <code type="inline">/Users/username/</code> directory, and on Windows you should be able to
+find it in the <code type="inline">Python</code> directory on your computer, the same in which
+you opened your command line program. If this worked you can delete the
+directory from your hard drive, since it was just for practice. Since we
+want to create a new directory named after the query that we input into
+the Old Bailey Online website, we will make direct use of the query
+function argument from the getSearchResults function. To do this, import
+the <code type="inline">os</code> library after the others and then add the
+code you have just written immediately below. Your <code type="inline">getSearchResults</code>
+function should now look like this:</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_15" type="block" corresp="code_downloading-multiple-records-using-query-strings_15.txt"/></pre>
+<p>The last step for this function is to make sure that when we save our
+search results pages, we save them in this new directory. To do this we
+can make a minor adjustment to the filename variable so that the file
+ends up in the right place. There are many ways we can do this, the
+easiest of which is just to append the new directory name plus a slash
+to the name of the file:</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_16" type="block" corresp="code_downloading-multiple-records-using-query-strings_16.txt"/></pre>
+<p>If your computer is running Windows you will need to use a backslash
+instead of a forward slash in the above example. Add the above line to
+your <code type="inline">getSearchResults</code> page in lieu of the current <code type="inline">filename</code> description.</p>
+<p>If you are running Windows, chances are your <code type="inline">downloadSearches.py</code>
+program will now crash when you run it because you are trying to create
+a directory with a * in it. Windows does not like this. To get around
+this problem we can use <link target="https://docs.python.org/3/library/re.html">regular expressions</link> to remove any
+non-Windows-friendly characters. We used regular expressions previously
+in <link target="/lessons/counting-frequencies">Counting Frequencies</link>. To remove non-alpha-numeric characters from
+the query, first import the regular expressions library immediately
+after you have imported the <code type="inline">os</code> library, then use the <code type="inline">re.sub()</code> function
+to create a new string named <code type="inline">cleanQuery</code> that contains only alphanumeric
+characters. You will then have to substitute <code type="inline">cleanQuery</code> as the variable
+used in the <code type="inline">os.path.exists()</code>, <code type="inline">os.makedirs()</code>, and <code type="inline">filename</code> declarations.</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_17" type="block" corresp="code_downloading-multiple-records-using-query-strings_17.txt"/></pre>
+<p>The final version of your function should look like this:</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_18" type="block" corresp="code_downloading-multiple-records-using-query-strings_18.txt"/></pre>
+<p>This time we tell the program to download the trials and put them in the
+new directory rather than our <code type="inline">programming-historian</code> directory. Run
+<code type="inline">download-searches.py</code> once more to ensure this worked and you
+understand how to save files to a particular directory using Python.</p>
+</div><div type="3"><head>Downloading the individual trial entries</head>
+<p>At this stage we have created a function that can download all of the
+search results HTML files from the Old Bailey Online website for an
+advanced search that we have defined, and have done so programmatically.
+Now for the next step in the algorithm: Extract the URLs of each trial
+transcript from the search results HTML files. In the lessons that
+precede this one (eg, <link target="/lessons/working-with-web-pages">Working with Webpages</link>), we have worked with the printer friendly versions of
+the trial transcripts, so we will continue to do so. We know that the
+printer friendly version of Benjamin Bowsey&#8217;s trial is located at the
+URL:</p>
+<pre><code xml:id="code_downloading-multiple-records-using-query-strings_19" type="block" corresp="code_downloading-multiple-records-using-query-strings_19.txt"/></pre>
+<p>In the same way that changing query strings in the URLs yields different
+search results, changing the URL for trial records &#8211; namely substituting
+one trial ID for another &#8211; we will get the transcript for that new
+trial. This means that to find and download the 13 matching files, all
+we need are these trial IDs. Since we know that search results pages on
+websites generally contain a link to the pages described, there is a
+good chance that we can find these links embedded in the HTML code. If
+we can scrape this information from the downloaded search results pages,
+we can then use that information to generate a URL that will allow us to
+download each trial transcript. This is a technique that you can use for
+most search result pages, not just Old Bailey Online! To do this, we
+must first find where the trial IDs are amidst the HTML code in the
+downloaded files, and then determine a way to consistently isolate them
+using code so that no matter which search results page we download from
+the site we are able to find the trial transcripts. First, open
+<code type="inline">search-results0.html</code> in Komodo Edit and have a look for the list of
+the trials. The first entry starts with &#8220;Anne Smith&#8221; so you can use the
+&#8220;find&#8221; feature in Komodo Edit to jump immediately to the right spot.
+Notice Anne&#8217;s name is part of a link:</p>
+<pre><code xml:id="code_downloading-multiple-records-using-query-strings_20" type="block" corresp="code_downloading-multiple-records-using-query-strings_20.txt"/></pre>
+<p>Perfect, the link contains the trial ID! Scroll through the remaining
+entries and you&#8217;ll find the same is true. Lucky for us, the site is well
+formatted and it looks like each link starts with &#8220;browse.jsp?id=&#8221;
+followed by the trial ID and finished with an &amp;, in Anne&#8217;s case:
+&#8220;browse.jsp?id=t17160113-18&amp;&#8221;. We can write a few lines of code that can
+isolate those IDs. Take a look at the following function. This function
+also uses the <code type="inline">os</code> library, in this case to list all of the files
+located in the directory created in the previous section. The <code type="inline">os</code>
+library contains a range of useful functions that mirror the types of
+tasks you would expect to be able to do with your mouse in the Mac
+Finder or Windows such as opening, closing, creating, deleting, and
+moving files and directories, and is a great library to master &#8211; or at
+least familiarize yourself with.</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_21" type="block" corresp="code_downloading-multiple-records-using-query-strings_21.txt"/></pre>
+<p>Create and run a new program called <code type="inline">extract-trial-ids.py</code> with the
+following code. Make sure you input the same value into the query
+argument as you did in the previous example:</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_22" type="block" corresp="code_downloading-multiple-records-using-query-strings_22.txt"/></pre>
+<p>If everything went right, you should see a list containing the names of
+all the files in your new &#8220;mulatto*+negro*&#8221; directory, which at this
+point should be the two search results pages. Ensure this worked before
+moving forward. Since we saved all of the search results pages with a
+filename that includes &#8220;search-results&#8221;, we now want to open each file
+with a name containing &#8220;search-results&#8221;, and extract all trial IDs found
+therein. In this case we know we have 2, but we want our code to be as
+reusable as possible (with reason, of course!) Restricting this action
+to files named &#8220;search-results&#8221; will mean that this program will work as
+intended even if the directory contains many other unrelated files
+because the program will skip over anything with a different name. Add
+the following to your getIndivTrials() function, which will check if
+each file contains &#8220;search-results&#8221; in its name. If it does, the file
+will be opened and the contents saved to a variable named text. That
+text variable will then be parsed looking for the trial ID, which we
+know always follows &#8220;browse.jsp?id=&#8221;. If and when that trial ID is found
+it will be saved to a list and printed to the command output, which
+leaves us with all of the information we need to then write a program
+that will download the desired trials.</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_23" type="block" corresp="code_downloading-multiple-records-using-query-strings_23.txt"/></pre>
+<p>That last line of the for loop may look tricky, but make sure you
+understand it before moving on. The words variable is checked to see if
+it contains the characters &#8220;id=&#8221; (without the quotes), which of course
+refers to a specific trial transcript ID. If it does, we use the slice
+string method to capture only the chunk between <emph>id=</emph> and <emph>&amp;</emph> and append it
+to the url list. If we knew the exact index positions of this substring
+we could have used those numerical values instead. However, by using the
+<emph>find()</emph> string method we have created a much more flexible program. The
+following code does exactly the same thing as that last line in a less
+condensed manner.</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_24" type="block" corresp="code_downloading-multiple-records-using-query-strings_24.txt"/></pre>
+<p>When you re-run <code type="inline">extract-trial-ids.py</code>, you should now see a list of all
+the trial IDs. We can add a couple extra lines to turn these into proper
+URLs and download the whole list to our new directory. We&#8217;ll also use
+the <code type="inline">time</code> library to pause our program for three seconds between
+downloads&#8211; a technique called throttling. It&#8217;s considered good form not
+to pound someone&#8217;s server with many requests per second; and the slight
+delay makes it more likely that all the files will actually download
+rather than <link target="http://www.checkupdown.com/status/E408.html">time out</link>. Add the following code to the end of your
+<code type="inline">getIndivTrials()</code> function. This code will generate the URL of each
+individual page, download the page to your computer, place it in your
+new directory, save the file, and pause for 3 seconds before moving on
+to the next trial. This work is all contained in a for loop, and will
+run once for every trial in your url list.</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_25" type="block" corresp="code_downloading-multiple-records-using-query-strings_25.txt"/></pre>
+<p>If we put this all together into a single function it should look
+something like this. (Note, we&#8217;ve put all the &#8220;import&#8221; calls at the top
+to keep things cleaner).</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_26" type="block" corresp="code_downloading-multiple-records-using-query-strings_26.txt"/></pre>
+<p>Let&#8217;s add the same three-second pause to our <code type="inline">getSearchResults</code> function
+to be kind to the Old Bailey Online servers:</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_27" type="block" corresp="code_downloading-multiple-records-using-query-strings_27.txt"/></pre>
+<p>Finally, call the function in the <code type="inline">download-searches.py</code> program.</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_28" type="block" corresp="code_downloading-multiple-records-using-query-strings_28.txt"/></pre>
+<p>Now, you&#8217;ve created a program that can request and download files from
+the Old Bailey website based on search parameters you define, all
+without visiting the site!</p>
+</div><div type="3"><head>In case a file does not download</head>
+<p>Check to make all thirteen files have downloaded properly. If that&#8217;s the
+case for you, that&#8217;s great! However, there&#8217;s a possibility that this
+program stalled along the way. That&#8217;s because our program, though
+running on your own machine, relies on two factors outside of our
+immediate control: the speed of the Internet, and the response time of
+the Old Bailey Online server at that moment. It&#8217;s one thing to ask
+Python to download a single file, but when we start asking for a file
+every 3 seconds there&#8217;s a greater chance the server will either time out
+or fail to send us the file we are after.</p>
+<p>If we were using a web browser to make these requests, we&#8217;d eventually
+get a message that the &#8220;connection had timed out&#8221; or something of the
+sort. We all see this from time to time. However, our program isn&#8217;t
+built to handle or relay such error messages, so instead you&#8217;ll realize
+it when you discover that the program has not returned the expected
+number of files or just seemingly does nothing. To prevent frustration
+and uncertainty, we want a fail-safe in our program that will attempt to
+download each trial. If for whatever reason it fails, we&#8217;ll make a note
+of it and move on to the next trial.</p>
+<p>To do this, we will make use of the Python <link target="http://docs.python.org/tutorial/errors.html">try / except</link> error
+handling mechanism, as well as a new library: socket. Try and Except are
+a lot like an <emph>if / else</emph> statement. When you ask Python to <emph>try</emph> something,
+it will attempt to run the code; if the code fails to achieve what you
+have defined, it will run the <emph>except</emph> code. This is often used when
+dealing with errors, known as <emph>error handling</emph>. We can use this to our
+advantage by telling our program to attempt downloading a page. If it
+fails, we&#8217;ll ask it to let us know which file failed and then move on.
+To do this we need to use the <code type="inline">socket</code> library, which will allow us to put
+a time limit on a download attempt before moving on. This involves
+altering the <code type="inline">getIndivTrials</code> function.</p>
+<p>First, we need to load the <code type="inline">socket</code> library, which should be done in the
+same way as all of our previous library imports. Then, we need to import
+the <code type="inline">urllib.error</code> library, which allows us to handle download errors.
+We will also need to
+set the default socket timeout length &#8211; how long do we want to try to
+download a page before we give up. This should go immediately after the
+comment that begins with <code type="inline">#download the page</code></p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_29" type="block" corresp="code_downloading-multiple-records-using-query-strings_29.txt"/></pre>
+<p>Then, we need a new python list that will hold all of the urls that
+failed to download. We will call this <code type="inline">failedAttempts</code> and you can insert
+it immediately after the <code type="inline">import</code> instructions:</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_30" type="block" corresp="code_downloading-multiple-records-using-query-strings_30.txt"/></pre>
+<p>Finally, we can add the <emph>try / except</emph> statement, which is added in much
+the same way as an <emph>if / else</emph> statement would be. In this case, we will
+put all of the code designed to download and save the trials in the try
+statement, and in the except statement we will tell the program what we
+want it to do if that should fail. Here, we will append the url that
+failed to download to our new list, <code type="inline">failedAttempts</code></p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_31" type="block" corresp="code_downloading-multiple-records-using-query-strings_31.txt"/></pre>
+<p>Finally, we will tell the program to print the contents of the list to
+the command output so we know which files failed to download. This
+should be added as the last line in the function.</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_32" type="block" corresp="code_downloading-multiple-records-using-query-strings_32.txt"/></pre>
+<p>Now when you run the program, should there be a problem downloading a
+particular file, you will receive a message in the Command Output window
+of Komodo Edit. This message will contain any URLs of files that failed
+to download. If there are only one or two, it&#8217;s probably fastest just to
+visit the pages manually and use the &#8220;Save As&#8221; feature of your browser.
+If you are feeling adventurous, you could modify the program to
+automatically download the remaining files. The final version of your
+<code type="inline">getSearchResults()</code> and <code type="inline">getIndivTrials()</code> functions should now
+look like this:</p>
+<pre><code class="language-python" xml:id="code_downloading-multiple-records-using-query-strings_33" type="block" corresp="code_downloading-multiple-records-using-query-strings_33.txt"/></pre>
+</div></div>
+      <div type="2"><head>Further Reading</head>
+<p>For more advanced users, or to become a more advanced user, you may find
+it worthwhile to read about achieving this same process using
+Application Programming Interfaces (API). A website with an API will
+generally provide instructions on how to request certain documents. It&#8217;s
+a very similar process to what we just did by interpreting the URL Query
+Strings, but without the added detective work required to decipher what
+each variable does. If you are interested in the Old Bailey Online, they
+have recently released an API and the documentation can be quite
+helpful:</p>
+<ul>
+<li>Old Bailey Online API
+(<link target="http://www.oldbaileyonline.org/static/DocAPI.jsp">http://www.oldbaileyonline.org/static/DocAPI.jsp</link>)</li>
+<li>Python Best way to create directory if it doesn&#8217;t exist for file write? (<link target="http://stackoverflow.com/questions/273192/python-best-way-to-create-directory-if-it-doesnt-exist-for-file-write">http://stackoverflow.com/questions/273192/python-best-way-to-create-directory-if-it-doesnt-exist-for-file-write</link>)</li>
+</ul>
+</div>
+    </body>
+  </text>
+</TEI>

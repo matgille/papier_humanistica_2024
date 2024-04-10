@@ -1,0 +1,254 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="analisis-de-corpus-con-antconc">
+  <teiHeader>
+ <fileDesc>
+  <titleStmt>
+   <title>An&#225;lisis de corpus con AntConc</title>
+  <author type="original_author">Heather Froehlich</author><editor type="reviewers"><persName>Nabeel Siddiqui</persName><persName>Rob Sieczkiewicz</persName></editor><author type="translators">Carlos Manuel Var&#243;n Casta&#241;eda</author><editor type="translation-reviewers"><persName>Jennifer Isasi</persName><persName>Antonio Rojas Castro</persName></editor><editor type="editors">Fred Gibbs</editor></titleStmt>
+  <publicationStmt>
+   <idno type="doi">10.46430/phes0032</idno><date type="published">11/24/2015</date><date type="translated">05/04/2018</date><p>Lesson reviewed and published in Programming Historian.</p>
+  </publicationStmt>
+  <sourceDesc>
+  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#corpus-analysis-with-antconc"/>.</p><p>There are other translations: <ref target="#analyse-corpus-antconc"/></p></sourceDesc>
+ </fileDesc>
+ <profileDesc><abstract><p>El an&#225;lisis de corpus permite hacer comparaciones a gran escala entre objetos presentes en los textos; es decir, lo que se conoce como lectura distante.</p></abstract><textClass><keyword xml:lang="en">distant-reading</keyword></textClass></profileDesc>
+</teiHeader>
+  <text xml:lang="es">
+    <body><p class="alert alert-info" style="alert alert-info">
+En 2022, Lauren Anthony sac&#243; AntConc 4.0, una actualizaci&#243;n importante del software AntConc. Aunque casi todas las funciones siguen siendo las mismas, algunas de las pr&#225;cticas que se describen en esta lecci&#243;n han cambiado un poco. Si est&#225;s utilizando una versi&#243;n m&#225;s reciente de AntConc que la que se muestra a continuaci&#243;n, puedes consultar la <link target="https://www.laurenceanthony.net/software/antconc/releases/AntConc403/help.pdf">gu&#237;a de ayuda</link> proporcionada por Laurence Anthony (solo disponible en ingl&#233;s). Este aviso es especialmente relevante para abrir un corpus utilizando la nueva herramienta Corpus Manager (enero de 2022).
+</p>
+<div type="2"><head>Introducci&#243;n</head>
+<p>El an&#225;lisis de corpus es un tipo de an&#225;lisis de textos que permite hacer comparaciones a gran escala entre objetos presentes en los mismos &#8212;esto es, aquello que se conoce como lectura distante&#8212;. Lo anterior hace posible apreciar fen&#243;menos que no necesariamente se hacen visibles cuando leemos. Si, por ejemplo, dispones de una colecci&#243;n de documentos, es posible que desearas encontrar patrones de uso gramatical o frases de aparici&#243;n recurrente en la misma. Tambi&#233;n puede ser que quisieras hallar frases cuya probabilidad de aparici&#243;n fuese m&#225;s alta o m&#225;s baja en la obra de un autor, o bien en un tipo determinado de textos; clases particulares de estructuras gramaticales; o muchos ejemplos de un concepto particular en una gran cantidad de documentos que se encuentran enmarcados en cierto contexto. En este sentido, el an&#225;lisis de corpus resulta muy &#250;til para demostrar hip&#243;tesis sobre textos, o para triangular resultados obtenidos a trav&#233;s de otras metodolog&#237;as de an&#225;lisis textual basadas en herramientas digitales.</p>
+<p>Al finalizar este tutorial, tendr&#225;s la capacidad de:</p>
+<ul>
+<li>Crear o descargar un corpus de textos.</li>
+<li>Realizar una b&#250;squeda de palabras clave en contexto.</li>
+<li>Identificar patrones respecto de una palabra determinada.</li>
+<li>Utilizar criterios de b&#250;squeda m&#225;s espec&#237;ficos.</li>
+<li>Revisar diferencias estad&#237;sticamente significativas entre corpus.</li>
+<li>Efectuar comparaciones multimodales a trav&#233;s de metodolog&#237;as de an&#225;lisis propias de la ling&#252;&#237;stica de corpus.</li>
+</ul>
+<p>Es posible que te hayas acercado a la ejecuci&#243;n de an&#225;lisis como el que se describe aqu&#237; si has realizado alguna de las siguientes tareas:</p>
+<ul>
+<li>B&#250;squeda de todas las apariciones de un t&#233;rmino espec&#237;fico en un archivo PDF o un documento de Microsoft Word&#174;.</li>
+<li>Uso de <link target="http://voyant-tools.org/">Voyant Tools</link> para revisar patrones en un texto.</li>
+<li>Lectura y desarrollo de los tutoriales de introducci&#243;n a Python disponibles en <emph><link target="/es/lecciones/">The Programming Historian</link></emph>.</li>
+</ul>
+<p>En muchos sentidos, <link target="http://voyant-tools.org/">Voyant</link> es una puerta de entrada a la realizaci&#243;n de an&#225;lisis m&#225;s sofisticados y replicables, ya que la naturaleza de tipo &#8220;h&#225;zlo t&#250; mismo&#8221; de los <emph>scripts</emph> en Python o R puede no ser atractiva para todos. <link target="http://www.laurenceanthony.net/software/antconc/">AntConc</link> llena este vac&#237;o en tanto se propone como una aplicaci&#243;n inform&#225;tica independiente para el an&#225;lisis ling&#252;&#237;stico de textos, la cual se encuentra disponible de forma gratuita para los sistemas operativos Windows, Mac OS X y Linux (funciona, por tanto, en m&#250;ltiples plataformas), y es objeto de actualizaciones permanentes por parte de su creador, <link target="http://www.laurenceanthony.net/">Laurence Anthony</link><ref type="footnotemark" target="#1"/>; si bien existen otras aplicaciones para efectuar an&#225;lisis de concordancias ling&#252;&#237;sticas, se resaltan de AntConc las dos cualidades se&#241;aladas (para acceder a recursos adicionales sobre esta tem&#225;tica, v&#233;ase <emph><link target="https://hfroehli.ch/2014/05/11/intro-bibliography-corpus-linguistics/">An Introductory Bibliography to Corpus Linguistics</link></emph>).</p>
+<p>En este tutorial se presentan varias maneras diferentes de acercarse a un corpus de textos. Es importante tener en cuenta que las metodolog&#237;as de ling&#252;&#237;stica de corpus no funcionan en todas las situaciones. Con esto, conforme sigas los pasos propuestos, es conveniente que reflexiones sobre la tarea que est&#233;s realizando y c&#243;mo puede ser de utilidad para responder una pregunta espec&#237;fica en relaci&#243;n con los datos de los que dispongas. En este sentido, si bien la presente lecci&#243;n est&#225; construida bajo la metodolog&#237;a "haz esto y luego esto para lograr <emph>X</emph>", no siempre es necesario seguir en orden estricto los pasos que se muestran aqu&#237;: se brinda en este espacio una s&#237;ntesis general de algunos de los m&#233;todos disponibles para realizar an&#225;lisis de esta naturaleza, en lugar de una receta &#250;nica para el &#233;xito.</p>
+<div type="3"><head>Descargas necesarias para el desarrollo de este tutorial</head>
+<ol>
+<li>
+<p>Programa: <link target="http://www.laurenceanthony.net/software/antconc/">AntConc</link><ref type="footnotemark" target="#2"/>.</p>
+<p>Descomprime el archivo del programa (si fuere necesario) e in&#237;cialo. Las capturas de pantalla presentadas aqu&#237; pueden diferir ligeramente de la versi&#243;n de AntConc que utilices (y del sistema operativo, desde luego), pero los procedimientos son m&#225;s o menos los mismos en todas las plataformas y versiones recientes de la aplicaci&#243;n. Este tutorial fue escrito teniendo como referente una versi&#243;n espec&#237;fica (bastante antigua) de AntConc, en tanto consideramos que resulta m&#225;s f&#225;cil de usar para fines introductorios. Puedes emplear la versi&#243;n m&#225;s reciente para desarrollar el tutorial si lo tienes a bien; pero, si deseas seguir los pasos con la misma informaci&#243;n que presentamos en las capturas de pantalla de esta lecci&#243;n, es necesario que descargues la versi&#243;n espec&#237;fica que empleamos aqu&#237; (<link target="http://www.laurenceanthony.net/software/antconc/releases/AntConc324/">3.2.4</link>).</p>
+</li>
+<li>
+<p>Corpus de prueba: descarga este <link target="/assets/corpus-analysis-with-antconc/antconc_corpus_files.zip">archivo zip de rese&#241;as cinematogr&#225;ficas</link> (escritas en ingl&#233;s).</p>
+</li>
+</ol>
+</div><div type="3"><head>Presentaci&#243;n sint&#233;tica de las tem&#225;ticas abordadas en la lecci&#243;n</head>
+<ul>
+<li>Trabajar con archivos de texto plano</li>
+<li>Interfaz de usuario y carga de corpus en AntConc</li>
+<li>B&#250;squeda de palabras clave en contexto</li>
+<li>B&#250;squeda avanzada de palabras clave en contexto</li>
+<li>Colocaciones y listas de palabras</li>
+<li>Comparaci&#243;n de corpus</li>
+<li>Discusi&#243;n: hacer comparaciones significativas</li>
+<li>Recursos adicionales</li>
+</ul>
+</div><div type="3"><head>Trabajar con archivos de texto plano</head>
+<ul>
+<li>AntConc solo funciona con archivos de texto plano de extensi&#243;n .txt (por ejemplo, "Hamlet.txt"); <hi rend="bold">no puede leer</hi> archivos de extensiones .doc, .docx o .pdf. Por lo tanto, si dispones de documentos de este tipo, deber&#225;s convertirlos en archivos .txt.</li>
+<li>La aplicaci&#243;n tiene la capacidad de trabajar con archivos XML (no te preocupes si los desconoces) guardados con la extensi&#243;n .txt.</li>
+</ul>
+<p>Visita tu portal de noticias favorito y accede a un art&#237;culo (su naturaleza no importa, siempre que se componga mayoritariamente de texto). Luego, selecciona todo el texto (encabezado, pie de p&#225;gina, cuerpo, etc.), haz clic derecho y selecciona &#8220;copiar&#8221;. Despu&#233;s, abre un editor de texto como Bloc de notas (Windows) o TextEdit (Mac OS X) y pega all&#237; el texto que copiaste.</p>
+<p>Existen otros editores de texto de uso gratuito, tales como <link target="http://notepad-plus-plus.org/">Notepad++</link> (Windows) o <link target="http://www.barebones.com/products/textwrangler/">TextWrangler</link> (Mac OS X), que ostentan funciones m&#225;s avanzadas y son particularmente &#250;tiles para hacer una gran cantidad de tareas de limpieza de texto. Con esto &#250;ltimo hacemos referencia a eliminar datos paratextuales tales como el texto <emph>boilerplate</emph> (informaci&#243;n que incluye elementos como el t&#237;tulo de la p&#225;gina, los datos del editor, etc.), el cual aparece de forma reiterada en muchos art&#237;culos. Si, por el contrario, conservas esta informaci&#243;n, los datos se ver&#225;n comprometidos, por cuanto el programa de an&#225;lisis de texto tomar&#225; en cuenta estos t&#233;rminos en recuentos de palabras, an&#225;lisis estad&#237;sticos y relaciones l&#233;xicas. A este respecto podr&#237;as considerar, por ejemplo, la posibilidad de eliminar los encabezados y pies de p&#225;gina est&#225;ndar que aparecen en cada p&#225;gina (v&#233;ase el tutorial <link target="/es/lecciones/limpieza-de-datos-con-OpenRefine">Limpieza de datos con OpenRefine</link> para m&#225;s informaci&#243;n sobre c&#243;mo automatizar esta tarea). Ahora bien, en corpus de menor tama&#241;o podr&#237;a ser m&#225;s conveniente que t&#250; mismo hicieras dicha labor; de esa manera, adquirir&#225;s una mejor percepci&#243;n de tu corpus.</p>
+<ul>
+<li>Guarda el art&#237;culo como un archivo .txt en el escritorio. Cabr&#237;a la posibilidad de que hicieras labores adicionales de limpieza del texto, tales como la remoci&#243;n de los datos del autor (elim&#237;nalos y guarda el archivo nuevamente). Recuerda en este sentido que toda la informaci&#243;n que permanezca en el archivo puede y ser&#225; tomada en cuenta por el programa de an&#225;lisis de texto.</li>
+<li>Ve al escritorio y verifica que puedas encontrar el archivo de texto que guardaste.</li>
+</ul>
+<p>Mediante la ejecuci&#243;n repetida de las tareas anteriores se construye un corpus de archivos de texto plano; esta labor suele implicar el abordaje de asuntos relacionados con muestreo, representatividad y organizaci&#243;n. Recuerda: es <hi rend="bold">necesario</hi> que cada archivo de tu corpus sea de texto plano para que AntConc pueda interpretarlo. A este respecto, se acostumbra nombrar los archivos con la extensi&#243;n .txt para reconocer f&#225;cilmente su naturaleza.</p>
+<p>Como lo supondr&#225;s, crear un corpus significativo puede resultar bastante tedioso si este se compone archivo por archivo, en especial si pretendes analizar un conjunto extenso de documentos. Por lo tanto, es muy com&#250;n hacer <emph>web scraping</emph> (esto es, usar un programa sencillo para tomar archivos de la web de forma automatizada) para construir el corpus; si deseas obtener m&#225;s informaci&#243;n acerca de los conceptos y t&#233;cnicas asociados a dicha labor, consulta las lecciones <link target="/lessons/intro-to-beautiful-soup">Scraping with Beautiful Soup</link> y <link target="/lessons/automated-downloading-with-wget">Automatic Downloading with wget</link>, disponibles en <emph>The Programming Historian</emph>. Para efectos de este tutorial, en lugar de componer el corpus documento por documento, vamos a utilizar uno ya existente, compuesto por rese&#241;as cinematogr&#225;ficas y tomado del <link target="http://www.nltk.org/">Natural Language Processing Toolkit</link> (NLTK). Este corpus se compone de 2000 rese&#241;as, organizadas por su car&#225;cter &#8212;positivo o negativo&#8212;; abordaremos aqu&#237; un peque&#241;o subconjunto de ellas (200 de cada categor&#237;a).</p>
+<p>La construcci&#243;n de corpus es un campo de estudio en s&#237; mismo. Para m&#225;s informaci&#243;n sobre este t&#243;pico, sugerimos consultar "<link target="https://academic.oup.com/dsh/article-abstract/8/4/243/928942">Representativeness in Corpus Design</link>", Literary and Linguistic Computing, 8 (4): 243-257; y <emph><link target="http://www.amazon.com/Developing-Linguistic-Corpora-Practice-Guides/dp/1842172050/ref=sr_1_1">Developing Linguistic Corpora: a Guide to Good Practice</link></emph><ref type="footnotemark" target="#3"/>.</p>
+</div><div type="3"><head>Primeros pasos con AntConc: interfaz de usuario y carga de corpus en la aplicaci&#243;n</head>
+<p>Al iniciarse, AntConc se ver&#225; como en la siguiente imagen:</p>
+<figure><desc>Ventana principal de AntConc</desc><graphic url="antconc1.png"/></figure>
+<p>En el costado izquierdo de la pantalla principal hay un cuadro que enlista todos los archivos cargados del corpus, el cual usaremos m&#225;s adelante.</p>
+<p>La parte superior de la aplicaci&#243;n consta de 7 pesta&#241;as:</p>
+<ul>
+<li><hi rend="bold"><emph>Concordance</emph> (concordancia):</hi> muestra lo que se conoce como <emph>keyword in context view</emph> (vista de palabras clave en contexto [KWIC, por sus iniciales en ingl&#233;s]), cuyos resultados se obtienen mediante la barra de b&#250;squeda.</li>
+<li><hi rend="bold"><emph>Concordance Plot</emph> (mapa de concordancia):</hi> presenta una visualizaci&#243;n muy sencilla de los resultados de la b&#250;squeda de palabras clave en contexto. Las apariciones del t&#233;rmino buscado se representar&#225;n como peque&#241;as l&#237;neas negras dentro de un rect&#225;ngulo que representa la extensi&#243;n total de cada archivo analizado.</li>
+<li><hi rend="bold"><emph>File View</emph> (vista de archivo):</hi> brinda una vista del archivo completo en la que se resaltan las apariciones del t&#233;rmino buscado, con lo cual se obtiene una visi&#243;n m&#225;s amplia del contexto en el que este aparece.</li>
+<li><hi rend="bold"><emph>Clusters</emph> (cl&#250;steres):</hi> muestra palabras que aparecen juntas muy frecuentemente.</li>
+<li><hi rend="bold"><emph>Collocates</emph> (colocaciones)</hi>: mientras que la pesta&#241;a anterior muestra palabras que <emph>definitivamente</emph> aparecen juntas en el corpus, esta presenta aquellas que tienen una alta probabilidad de estarlo.</li>
+<li><hi rend="bold"><emph>Word List</emph> (lista de palabras):</hi> muestra todas las palabras del corpus.</li>
+<li><hi rend="bold"><emph>Keyword List</emph> (lista de palabras clave):</hi> presenta los resultados de comparaciones entre dos corpus.</li>
+</ul>
+<p>Dado su car&#225;cter introductorio, este tutorial solo brinda una mirada superficial a lo que se puede hacer con AntConc. En consecuencia, solo nos concentraremos aqu&#237; en las funciones de las pesta&#241;as <emph>Concordance</emph>, <emph>Collocates</emph>, <emph>Keywords</emph> y <emph>Word List</emph>.</p>
+<div type="4"><head>Carga de corpus</head>
+<p>Tal como sucede con cualquier otro programa inform&#225;tico, comenzaremos por ir a  &#8220;File&#8221; &#8211; &#8220;Open&#8221; (&#8220;Archivo&#8221; &#8211; Abrir); pero en lugar de abrir solo <hi rend="bold">un</hi> archivo, haremos lo propio con la carpeta que contiene todos los documentos que constituyen el corpus. AntConc permite abrir directorios completos; en consecuencia, si ya tienes conocimiento y te sientes c&#243;modo trabajando de esta manera, puedes abrir la carpeta &#8220;All reviews&#8221; ("Todas las rese&#241;as") y pasar directamente a la secci&#243;n de an&#225;lisis de este tutorial <ref type="footnotemark" target="#4"/>.</p>
+<figure><desc>Apertura de una carpeta.</desc><graphic url="open-file-21.png"/></figure>
+<ul>
+<li>Recuerda que guardamos los archivos en el escritorio; dir&#237;gete entonces a esa ubicaci&#243;n en el men&#250; desplegable.</li>
+</ul>
+<figure><desc>Apertura de una carpeta localizada en el escritorio.</desc><graphic url="files-on-desktop-open.png"/></figure>
+<ul>
+<li>Una vez en el escritorio, elige la carpeta &#8220;movie reviews from ntlk&#8221; ("rese&#241;as cienmatogr&#225;ficas del ntlk"):</li>
+</ul>
+<figure><desc>Localizaci&#243;n de la carpeta *movie reviews from nltk*</desc><graphic url="browse-for-directory-inside-folder.png"/></figure>
+<ul>
+<li>Ahora, selecciona la carpeta &#8220;Negative reviews&#8221; ("Rese&#241;as negativas") y haz clic en &#8220;OK&#8221;. Hecho esto, deber&#237;an cargarse 200 archivos de texto en la columna izquierda del programa &#8212;conf&#237;rmalo mediante la casilla &#8220;Total No.&#8221;&#8212;.</li>
+</ul>
+<figure><desc>Carga de la carpeta *Negative Reviews*.</desc><graphic url="open-negative-reviews.png"/></figure>
+<ul>
+<li>Repite el mismo proceso para cargar la carpeta "Positive Reviews" ("Rese&#241;as positivas"). Con esto, deber&#237;as tener 400 textos en la columna "Corpus Files".</li>
+</ul>
+<figure><desc>Carga de la carpeta *Positive Reviews*.</desc><graphic url="positive-reviews.png"/></figure>
+<figure><desc>Conjunto completo de rese&#241;as cargadas en el programa.</desc><graphic url="all-reviews-loaded.png"/></figure>
+</div></div></div><div type="2"><head>B&#250;squeda de palabras clave en contexto</head>
+<div type="3"><head>Comenzar con una b&#250;squeda b&#225;sica</head>
+<p>Una de las labores en las cuales se destacan las herramientas de an&#225;lisis de corpus como AntConc radica en encontrar patrones en el uso de la lengua que nos resulta dif&#237;cil identificar como lectores. Nos es complicado rastrear palabras peque&#241;as y en apariencia poco importantes, tales como 'yo', '&#233;l', 'ella', 'un' y 'es' porque son muy comunes, pero los computadores son muy buenos para realizar esta labor. Estos t&#233;rminos, que en ling&#252;&#237;stica reciben el nombre de palabras funcionales &#8212;se conocen como palabras vac&#237;as (<emph>stopwords</emph>) en el &#225;mbito de las humanidades digitales&#8212;, suelen constituir indicadores estil&#237;sticos muy claros en materias de autor&#237;a y g&#233;nero en los textos. En consecuencia, tales palabras pueden ser t&#233;rminos de b&#250;squeda bastante potentes por s&#237; solos, o bien combinados con t&#233;rminos que se relacionen en mayor medida con el contenido (<emph>content-driven terms</emph>), lo cual ayuda al investigador a identificar patrones que tal vez no haya detectado previamente.</p>
+<p>En la pesta&#241;a <emph>Concordance</emph>, escribe la palabra 'the' en el cuadro de b&#250;squeda ubicado en la parte inferior y haz clic en &#8220;Start&#8221;. Acto seguido, el programa mostrar&#225; cada una de las apariciones de dicho t&#233;rmino en el corpus de rese&#241;as cinematogr&#225;ficas, as&#237; como el contexto en el que estas se presentan. Esto recibe el nombre de "visor de palabras clave en contexto" (<emph>keywords in context viewer</emph>).</p>
+<figure><desc>*The* es una palabra com&#250;n en la lengua inglesa.</desc><graphic url="the-thinking.png"/></figure>
+<p>La palabra buscada aparece 14.618 veces en el corpus seg&#250;n la casilla <emph>Concordance Hits</emph>, que se encuentra en la parte inferior de la pesta&#241;a.</p>
+<p>Como se indic&#243; anteriormente, la lista KWIC resulta una buena forma de comenzar a buscar patrones. Aunque la cantidad de informaci&#243;n suministrada con la b&#250;squeda es a&#250;n muy grande, &#191;qu&#233; tipo de palabras aparecen cerca de 'the'?</p>
+<p>Ahora, prueba a hacer una b&#250;squeda del t&#233;rmino 'a'; tanto este &#250;ltimo como 'the' son art&#237;culos en la lengua inglesa, pero el primero es definido y el segundo indefinido; y los resultados arrojados por la b&#250;squeda ilustrar&#225;n esa diferencia.</p>
+<p>Llegados a este punto, ya debes estar familiarizado con las l&#237;neas de texto que componen la vista KWIC. Ahora, realiza una nueva b&#250;squeda, esta vez de la palabra 'shot': los resultados mostrar&#225;n las apariciones del t&#233;rmino tanto en la funci&#243;n sint&#225;ctica de sustantivo (por ejemplo, &#8220;line up the shot&#8221;) como en la de verbo conjugado (por ejemplo, "this scene was shot carefully").</p>
+<p>&#191;Qu&#233; ves? Entendemos que esta puede ser una forma de identificar patrones dif&#237;cil de intepretar. Intenta presionar el bot&#243;n amarillo &#8220;Sort&#8221; (clasificar): &#191;qu&#233; sucede al hacerlo?</p>
+<figure><desc>Palabras que aparecen junto a *shot*.</desc><graphic url="sorting-shot-1l1r.png"/></figure>
+<p>Puedes ajustar la forma en que AntConc ordena la informaci&#243;n encontrada si cambias los par&#225;metros que en la imagen anterior aparecen encerrados en el c&#237;rculo de color rojo: L corresponde a izquierda (<emph>left</emph>) y R a derecha (<emph>right</emph>); lo anterior puede extenderse hasta 5 posiciones en cualquier direcci&#243;n. Los valores por defecto de la aplicaci&#243;n son 1 izquierda (1L), 2 derecha (2R), 3 derecha (3R); pero puedes alterarlos, por ejemplo, a 3 izquierda (3L), 2 izquierda (2L), 1 derecha (1R) (en aras de obtener frases o trigramas que finalicen con el t&#233;rmino buscado) si haces clic en las flechas hacia arriba y abajo que se encuentran junto a los par&#225;metros. Si no deseas realizar este tipo de clasificaci&#243;n, puedes omitirla (dejar los valores predeterminados 1L, 2R y 3R) o dejar todos los par&#225;metros con el valor 0. Cabe la posibilidad de generar clasificaciones menos lineales, como 4L, 3R, 5R, que arrojar&#237;an como resultado mucha m&#225;s informaci&#243;n del contexto. El programa puede tardar un poco en mostrar este tipo de clasificaciones, por lo que sugerimos tener paciencia al efectuarlas. Si no est&#225;s seguro de cu&#225;les ser&#225;n los resultados arrojados por la b&#250;squeda, haz clic en "Sort" para ver qu&#233; ocurre y efect&#250;a los ajustes a los que haya lugar seg&#250;n tus necesidades.</p>
+</div><div type="3"><head>Operadores de b&#250;squeda</head>
+<div type="4"><head>Operador * (comod&#237;n)</head>
+<p>El operador * (que sirve para buscar 0 o m&#225;s caracteres) puede ayudar a encontrar las formas de sustantivos en singular y plural, por ejemplo.</p>
+<p><hi rend="bold">Tarea:</hi> busca _qualit*_ y ordena los resultados. &#191;Qu&#233; tiende a preceder y seguir a las palabras 'quality' y 'qualities'? Una pista: son vocablos diferentes con contextos de uso distintos; identifica patrones de uso mediante la b&#250;squeda KWIC.</p>
+<p>Para obtener una lista completa de los operadores comod&#237;n disponibles y su funci&#243;n, revisa "Global Settings" &#8211; "Wildcard Settings".</p>
+<figure><desc>Configuraci&#243;n de operadores de b&#250;squeda.</desc><graphic url="wildcard-settings.png"/></figure>
+<p>Para conocer la diferencia entre los operadores * y ?, busca <emph>th*n</emph> y luego <emph>th?n</emph>. Estas dos b&#250;squedas, que a simple vista parecieran muy similares, arrojan resultados distintos.</p>
+<p>El operador <emph>?</emph> es m&#225;s espec&#237;fico que *, as&#237;:</p>
+<p><emph>wom?n</emph> &#8211; 'women' y 'woman'.</p>
+<p><emph>m?n</emph> &#8211; 'man', 'men' y 'min'.</p>
+<p>Una b&#250;squeda de <emph>m*n</emph>, en cambio, no es &#250;til porque se obtendr&#225;n resultados que incluir&#225;n 'mean', 'melon', etc.</p>
+<p><hi rend="bold">Tarea:</hi> compara los resultados de las b&#250;squedas de <emph>wom?n</emph> y <emph>m?n</emph>.</p>
+<ul>
+<li>
+<p>Ordena los resultados de cada b&#250;squeda de manera que arrojen datos significativos (por ejemplo, configurar los par&#225;metros de la b&#250;squeda en 0, 1L y 2L)</p>
+</li>
+<li>
+<p>Haz clic en "File" &#8211; "Save Output to Text File" y guarda el archivo (no olvides agregar la extensi&#243;n .txt al nombre del mismo).</p>
+</li>
+</ul>
+<blockquote>
+<p>Sugerencia: durante la exploraci&#243;n en tu investigaci&#243;n, generar&#225;s muchos documentos como este para efectos de consulta. Es conveniente, por tanto, nombrar los archivos de tal manera que se describa lo que estos contienen (por ejemplo, &#8220;wom?n-results.txt&#8221; en lugar de &#8220;antconc-results.txt&#8221;).</p>
+</blockquote>
+<figure><desc>Opci&#243;n *Save output as text file*.</desc><graphic url="save-output-as-text-file.png"/></figure>
+<figure><desc>Cuadro de di&#225;logo *Save As*.</desc><graphic url="save-as.png"/></figure>
+<p>Con lo anterior, puedes abrir el archivo de texto plano generado por el programa en un editor de texto; es posible que debas ampliar la ventana de la aplicaci&#243;n para que este sea legible.</p>
+<figure><desc>Archivo de resultados de b&#250;squeda KWIC exportado por Antconc, tal como se muestra en un editor de texto.</desc><graphic url="results.png"/></figure>
+<p>Realiza el proceso anterior con los resultados de las dos b&#250;squedas y compara los archivos de texto generados. &#191;Qu&#233; fen&#243;menos puedes ver?</p>
+</div><div type="4"><head>Operador | ("o")</head>
+<p><hi rend="bold">Tarea:</hi> busca <emph>she|he</emph>.</p>
+<p>Ahora, busca las dos palabras anteriores por separado: &#191;cu&#225;ntas veces aparece 'she' en comparaci&#243;n con 'he'?</p>
+<p>La palabra 'she' (ella) aparece en mucha menor cantidad que 'he' (&#233;l). &#191;Por qu&#233;? &#161;Esa es una pregunta de investigaci&#243;n! Una buena manera de ampliar este cuestionamiento podr&#237;a radicar en ordenar la b&#250;squeda anterior para identificar patrones de uso de las palabras en cuesti&#243;n, y revisar si las mismas est&#225;n seguidas de alg&#250;n verbo en particular.</p>
+<p><hi rend="bold">Tarea:</hi> a modo de pr&#225;ctica, busca una palabra que te interese, ordena los resultados de formas diferentes, usa los operadores comod&#237;n y exporta los datos obtenidos como archivos de texto plano. He aqu&#237; un interrogante orientador: &#191;qu&#233; tipo de patrones puedes observar? &#191;Puedes explicarlos?</p>
+</div></div><div type="3"><head>Colocaciones y listas de palabras</head>
+<p>Despu&#233;s de haber analizado las l&#237;neas de resultados de la vista KWIC en busca de patrones, &#191;no te gustar&#237;a que hubiera una forma de que el computador te brindara una lista de palabras que aparecen m&#225;s frecuentemente con la palabra clave buscada?</p>
+<p>Buenas noticias: existe una manera de obtener esta informaci&#243;n en AntConc; est&#225; disponible en la pesta&#241;a <emph>Collocates</emph> (colocaciones). Al hacer clic en la misma, aparecer&#225; un mensaje por medio del cual la aplicaci&#243;n dir&#225; que necesita crear una lista de palabras. Haz clic en "OK" y el programa lo har&#225; autom&#225;ticamente.</p>
+<blockquote>
+<p>Nota: solo recibir&#225;s este aviso cuando no hayas creado una lista de palabras.</p>
+</blockquote>
+<figure><desc>Mensaje de advertencia para indicar la necesidad de generar una lista de palabras.</desc><graphic url="wordlistwarning.png"/></figure>
+<p>Ahora, intenta generar la lista de colocaciones para el t&#233;rmino 'she'.</p>
+<p>Los resultados sin clasificar parecer&#225;n comenzar con palabras funcionales (palabras con las que se construyen frases) y luego pasar&#225;n a palabras de contenido (t&#233;rminos que dan sentido al texto): las primeras son <link target="http://www.wordfrequency.info/free.asp">las m&#225;s frecuentes en ingl&#233;s</link>, en tanto funcionan mayormente como elementos para construir frases. Versiones m&#225;s recientes de AntConc suelen incluir el t&#233;rmino buscado como primer resultado, posiblemente porque est&#225; presente en el texto y se quiere hallar palabras que puedan aparecer junto a &#233;l.</p>
+<p>Algunas personas podr&#237;an tener la intenci&#243;n de prescindir de esta clase de palabras mediante el uso de una lista de palabras funcionales (esta es una labor com&#250;n cuando se hace modelado de t&#243;picos). Desde nuestra &#243;ptica, no promovemos esta pr&#225;ctica porque los computadores se destacan, justamente, en la identificaci&#243;n de palabras con alta frecuencia de aparici&#243;n; tal como se expres&#243; anteriormente, tendemos a pasarlas por alto. Los computadores &#8212;y en especial las aplicaciones como AntConc&#8212;, pueden mostrar d&#243;nde aparecen o no estas palabras, y esa informaci&#243;n puede ser de inter&#233;s, especialmente en colecciones de texto de gran envergadura (como se vio con las b&#250;squedas de 'a', 'she' y 'he').</p>
+<p>No obstante, en el caso de la lengua inglesa, la frecuencia de aparici&#243;n de la letra 's' en el corpus tambi&#233;n puede ser bastante alta, en tanto representa el posesivo <emph>&#700;s</emph> (la aplicaci&#243;n no toma en cuenta el ap&#243;strofo), pero AntConc la toma como otra palabra. Asimismo, la forma <emph>&#700;t</emph> puede aparecer junto al verbo 'do' por cuanto conforman la contracci&#243;n <emph>don&#700;t</emph>; la alta frecuencia de su aparici&#243;n conjunta los convierte en colocaciones altamente probables.</p>
+<p><hi rend="bold">Tarea:</hi> genera la lista de colocaciones para las b&#250;squedas de <emph>m?n</emph> y <emph>wom?n</emph>. Ahora, ord&#233;nalas de acuerdo con su frecuencia de aparici&#243;n respecto del par&#225;metro 1L.
+Los resultados muestran lo que, en teor&#237;a, hace que un hombre (<emph>man</emph>) o una mujer (<emph>woman</emph>) sea &#8220;digno de mostrarse en el cine&#8221;:</p>
+<ul>
+<li>las mujeres deben ser "bellas" (beautiful), "sofisticadas" (<emph>sophisticated</emph>) o estar "embarazadas" (<emph>pregnant</emph>).</li>
+<li>Los hombres tienen que estar, en cierto modo, fuera de lo com&#250;n: deben ser "santos" (<emph>holy</emph>), "negros" (<emph>black</emph>) o "viejos" (<emph>old</emph>).</li>
+</ul>
+<p>Lo anterior no alude directamente a las pel&#237;culas, sino a la forma como se escribe sobre ellas en las rese&#241;as, y puede llevar a cuestionamientos m&#225;s sutiles, tales como "&#191;de qu&#233; manera se describen los roles de las mujeres en las comedias rom&#225;nticas en las rese&#241;as escritas por hombres frente a las escritas por mujeres?"</p>
+</div><div type="3"><head>Comparaci&#243;n de corpus</head>
+<p>Uno de los tipos de an&#225;lisis m&#225;s potentes radica en comparar el corpus propio con uno de referencia m&#225;s extenso.</p>
+<p>Para este ejercicio, hemos tomado rese&#241;as de filmes en los que Steven Spielberg ha estado involucrado (como director o productor). Podemos compararlos con un corpus de referencia de pel&#237;culas de toda una gama de directores.</p>
+<p>Aseg&#250;rate de pensar cuidadosamente sobre las caracter&#237;sticas que podr&#237;a tener un corpus de referencia para tu propia investigaci&#243;n (por ejemplo, un estudio del lenguaje de Agatha Christie en sus &#250;ltimos a&#241;os funcionar&#237;a muy bien como un corpus de an&#225;lisis para compararlo con un corpus de referencia de todas sus novelas). Recuerda que, como lo expresamos anteriormente, la construcci&#243;n del corpus es un subcampo en s&#237; mismo.</p>
+<ul>
+<li>Dir&#237;gete a "Settings" &#8211; "Tool preferences" &#8211; "Keyword List".</li>
+<li>Aseg&#250;rate de que la casilla de verificaci&#243;n "Use raw files" est&#233; seleccionada en el men&#250; "Reference Corpus".</li>
+<li>Haz clic en el bot&#243;n "Add Directory" y selecciona la carpeta que contiene los archivos del corpus de referencia.</li>
+<li>Verifica que dispongas de la lista completa de archivos en el listado que se mostrar&#225;.</li>
+</ul>
+<figure><desc>Carga de un corpus de referencia.</desc><graphic url="adding-a-reference-corpus.png"/></figure>
+<ul>
+<li>Haz clic en el bot&#243;n "Load" y espera que el programa cargue los archivos; una vez la casilla de verificaci&#243;n "Loaded" est&#233; marcada, haz clic en "Apply".</li>
+</ul>
+<p>Existe la posibilidad de intercambiar los roles del corpus de referencia y los archivos principales (es decir, dar al primero la funci&#243;n de los segundos y viceversa) por medio del bot&#243;n "Swap Ref/Main Files"; en este punto vale la pena experimentar con esta opci&#243;n y comparar los resultados obtenidos.</p>
+<blockquote>
+<p>Si est&#225;s utilizando una versi&#243;n m&#225;s reciente del programa, el bot&#243;n anterior puede llamarse "Swap with Target Files". Adicionalmente, cualesquiera sean los datos que vayas a utilizar como corpus de referencia, aseg&#250;rate de que estos se carguen correctamente en AntConc (esto es, haz clic en el bot&#243;n "Load" cada vez que cargues o intercambies un corpus).</p>
+</blockquote>
+<ul>
+<li>Dir&#237;gete a la pesta&#241;a "Keyword list" y una vez all&#237;, presiona el bot&#243;n "Start" (sin escribir nada en la casilla de b&#250;squeda). Si intercambiaste el corpus de referencia con los archivos objeto del an&#225;lisis, el programa anunciar&#225; la necesidad de crear una nueva lista de palabras antes de generar la lista de palabras clave. Esta se compondr&#225; de aquellos t&#233;rminos que resulten mucho m&#225;s "inusuales" &#8212;de aparici&#243;n menos probable en terminos estad&#237;sticos&#8212; en el corpus que se est&#225; viendo <emph>vs.</emph> el de referencia.</li>
+</ul>
+<blockquote>
+<p><emph>Keyness</emph> (calidad de la palabra clave): corresponde a la frecuencia de aparici&#243;n de una palabra en el texto cuando se la compara con su frecuencia en un corpus de referencia, "de tal suerte que la probabilidad estad&#237;stica, calculada mediante un procedimiento determinado, es menor o igual que el valor <emph>p</emph> especificado por el usuario" (informaci&#243;n tomada de <link target="http://www.lexically.net/downloads/version6/HTML/index.html?keyness_definition.htm">este sitio</link>). Para profundizar sobre los detalles estad&#237;sticos de este t&#243;pico, sugerimos revisar la secci&#243;n sobre el mismo en la p&#225;gina 7 del <link target="http://www.laurenceanthony.net/software/antconc/releases/AntConc335/help.pdf">archivo <emph>Readme</emph> de AntConc</link>.</p>
+</blockquote>
+<p>&#191;Cu&#225;les son nuestras palabras clave?</p>
+<figure><desc>Spielberg *vs.* rese&#241;as cinematogr&#225;ficas.</desc><graphic url="spielberg-vs-movie-reviews.png"/></figure>
+</div></div><div type="2"><head>Discusi&#243;n: hacer comparaciones significativas</head>
+<p>Es importante tener en cuenta que la forma en que se organicen los archivos de texto para la investigaci&#243;n tendr&#225; efectos en el tipo de interrogantes que puedan surgir de los mismos, as&#237; como en los resultados que se obtengan del an&#225;lisis. A este respecto, recuerda que la comparaci&#243;n realizada aqu&#237; entre rese&#241;as negativas y positivas es extremadamente simple; si se quisiere, podr&#237;an efectuarse comparaciones adicionales con otros subconjuntos de rese&#241;as, lo cual dar&#237;a pie a la formulaci&#243;n de interrogantes muy distintos.</p>
+<p>As&#237; entonces, los archivos que se dispongan en el corpus determinar&#225;n los resultados obtenidos. Reiteramos que los temas de representatividad y muestreo son muy relevantes en este sentido: no siempre es necesario o ideal utilizar todo un conjunto de datos, incluso si se dispone de &#233;l. En este punto, realmente cabe preguntarse por la manera como estos m&#233;todos de an&#225;lisis textual ayudan a generar preguntas de investigaci&#243;n.</p>
+<p>Si se piensa, por ejemplo, en el funcionamiento de las rese&#241;as cinematogr&#225;ficas en tanto g&#233;nero discursivo, puede dirigirse la atenci&#243;n hacia oposiciones como las siguientes:</p>
+<ul>
+<li>Rese&#241;as cinematogr&#225;ficas <emph>vs.</emph> rese&#241;as musicales</li>
+<li>Rese&#241;as cinematogr&#225;ficas <emph>vs.</emph> rese&#241;as de libros</li>
+<li>Rese&#241;as cinematogr&#225;ficas <emph>vs.</emph> noticias deportivas</li>
+<li>Rese&#241;as cinematogr&#225;ficas <emph>vs.</emph> noticias en general</li>
+</ul>
+<p>Cada una de estas comparaciones aportar&#225; informaci&#243;n distinta y puede derivar en preguntas de investigaci&#243;n diferentes, tales como:</p>
+<ul>
+<li>
+<p>&#191;En qu&#233; difieren las rese&#241;as cinematogr&#225;ficas de otros tipos de rese&#241;as de productos medi&#225;ticos?</p>
+</li>
+<li>
+<p>&#191;En qu&#233; se diferencian las rese&#241;as cinematogr&#225;ficas de otros tipos de escritos susceptibles de publicarse?</p>
+</li>
+<li>
+<p>&#191;C&#243;mo se comparan las rese&#241;as de pel&#237;culas con otros g&#233;neros de escritura, tales como la cr&#243;nica deportiva?</p>
+</li>
+<li>
+<p>&#191;Qu&#233; tienen en com&#250;n las rese&#241;as cinematogr&#225;ficas y las musicales?</p>
+</li>
+</ul>
+<p>Desde luego, puede darse la vuelta a estos cuestionamientos para generar nuevas preguntas:</p>
+<ul>
+<li>
+<p>&#191;En qu&#233; se diferencian las rese&#241;as bibliogr&#225;ficas de las cinematogr&#225;ficas?</p>
+</li>
+<li>
+<p>&#191;En qu&#233; difieren las rese&#241;as musicales de las cinematogr&#225;ficas?</p>
+</li>
+<li>
+<p>&#191;Qu&#233; tienen en com&#250;n los art&#237;culos que se publican en la prensa escrita?</p>
+</li>
+<li>
+<p>&#191;En qu&#233; se asemejan las rese&#241;as cinematogr&#225;ficas a otros tipos de escritos susceptibles de publicarse?</p>
+</li>
+</ul>
+<p>En s&#237;ntesis, vale la pena pensar en:</p>
+<ul>
+<li>Por qu&#233; se quiere comparar dos corpus.</li>
+<li>Qu&#233; tipo de consultas da lugar a preguntas de investigaci&#243;n significativas.</li>
+<li>Principios de construcci&#243;n de corpus: muestreo y capacidad de asegurar que se obtengan datos representativos.</li>
+</ul>
+<div type="3"><head>Recursos adicionales</head>
+<p><emph><link target="http://hfroehlich.wordpress.com/2014/05/11/intro-bibliography-corpus-linguistics/">A Short Bibliography on Corpus Linguistics</link></emph></p>
+<p><link target="http://hfroehli.ch/workshops/getting-started-with-antconc/">Una versi&#243;n m&#225;s sencilla de este tutorial, concebida para usuarios con pocos conocimientos de computaci&#243;n</link> (en ingl&#233;s).</p>
+<p><emph><link target="https://rua.ua.es/dspace/bitstream/10045/43959/4/grac.pdf">Gu&#237;a r&#225;pida de an&#225;lisis de corpus con AntConc</link></emph>, publicada por la Universidad de Alicante (2015).</p>
+</div></div><div type="2"><head>Notas de traducci&#243;n</head>
+<p><note id="1"> Investigador y docente de la Universidad de Waseda (Jap&#243;n).</note>
+<note id="2"> La interfaz del programa solo est&#225; disponible en ingl&#233;s.</note>
+<note id="3"> Dos materiales en espa&#241;ol pueden ser de utilidad si se desea profundizar en esta t&#233;m&#225;tica: de un lado, la conferencia <emph><link target="https://www.youtube.com/watch?v=bvTigjPhZco">Aproximaci&#243;n al concepto de representatividad de corpus</link></emph>; y de otro, la obra <emph><link target="http://elies.rediris.es/elies18/">Explotaci&#243;n de los c&#243;rpora textuales informatizados para la creaci&#243;n de bases de datos terminol&#243;gicas basadas en el conocimiento</link></emph>.</note>
+<note id="4"> Si se requiere trabajar con corpus en cuyos textos se emplean caracteres especiales (como es el caso de los documentos escritos en lengua espa&#241;ola), es imperativo prestar atenci&#243;n a la codificaci&#243;n con la cual se guardaron los archivos que los componen. Por defecto, AntConc est&#225; configurado para operar con documentos de texto plano con codificaci&#243;n Unicode (UTF-8). As&#237; entonces, es preciso verificar en el editor de texto que estos se hayan guardado atendiendo a lo anterior, o bien cambiar los par&#225;metros de importaci&#243;n de archivos en el programa seg&#250;n las necesidades (por ejemplo, trabajar con archivos codificados en ANSI).</note></p>
+</div></body>
+  </text>
+</TEI>

@@ -1,0 +1,478 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="descarga-multiples-registros-usando-cadenas-de-consulta">
+  <teiHeader>
+ <fileDesc>
+  <titleStmt>
+   <title>Descargar m&#250;ltiples registros mediante cadenas de consulta</title>
+  <author type="original_author">Adam Crymble</author><editor type="reviewers"><persName>Luke Bergmann</persName><persName>Sharon Howard</persName></editor><author type="translators">V&#237;ctor Gayol</author><editor type="translation-reviewers"><persName>Jos&#233; Antonio Motilla</persName><persName>Nicol&#225;s Vaughan</persName></editor><editor type="editors">Fred Gibbs</editor></titleStmt>
+  <publicationStmt>
+   <idno type="doi">10.46430/phes0059</idno><date type="published">11/11/2012</date><date type="translated">07/30/2022</date><p>Lesson reviewed and published in Programming Historian.</p>
+  </publicationStmt>
+  <sourceDesc>
+  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#downloading-multiple-records-using-query-strings"/>.</p><p>There are other translations: <ref target="#download-multiplos-registros-query-strings"/></p></sourceDesc>
+ </fileDesc>
+ <profileDesc><abstract><p>Descargar un solo registro de un sitio web es f&#225;cil, aunque la descarga de muchos registros a la vez &#8211;una necesidad cada vez m&#225;s frecuente&#8211; es mucho m&#225;s eficiente utilizando un lenguaje de programaci&#243;n como Python. En esta lecci&#243;n escribiremos un programa que descargar&#225; una serie de registros del Old Bailey Online usando criterios de b&#250;squeda personalizada y los guardar&#225; en un directorio de nuestro equipo.</p></abstract><textClass><keyword xml:lang="en">web-scraping</keyword><keyword xml:lang="en">python</keyword></textClass></profileDesc>
+</teiHeader>
+  <text xml:lang="es">
+    <body>
+      <div type="2"><head>Objetivos del m&#243;dulo</head>
+<p>Descargar un solo registro de un sitio web es f&#225;cil, aunque la descarga de muchos registros a la vez &#8212;una necesidad cada vez m&#225;s frecuente para personas de humanidades&#8212; es mucho m&#225;s eficiente si se utiliza un lenguaje de programaci&#243;n como Python.
+En esta lecci&#243;n escribiremos un programa para descargar una serie de registros del <link target="https://www.oldbaileyonline.org/">Old Bailey Online</link> (<emph>OBO</emph>) utilizando criterios de b&#250;squeda personalizados y luego guardarlos en un directorio de nuestro computador.<ref type="footnotemark" target="#1"/>
+Este proceso conlleva la interpretaci&#243;n y manipulaci&#243;n de <emph>cadenas de consulta</emph> (<emph>query strings</emph>, en ingl&#233;s) en la URL.
+En este caso, el programa tratar&#225; de descargar fuentes que contengan referencias a personas de ascendencia africana, publicadas en el <emph>Old Bailey Proceedings</emph> entre 1700 y 1750.</p>
+</div>
+      <div type="2"><head>&#191;Para qui&#233;n es &#250;til esto?</head>
+<p>Automatizar el proceso de descarga de registros de una base de datos en l&#237;nea ser&#225; &#250;til para cualquier persona que trabaje con fuentes hist&#243;ricas almacenadas en l&#237;nea de manera ordenada y accesible, y que desea guardar copias de esas fuentes en su propio computador.
+Es particularmente &#250;til para quien quiera descargar muchos registros espec&#237;ficos, en lugar de solo unos cuantos.
+Si deseas descargar <emph>todos</emph> o <emph>la mayor&#237;a</emph> de los registros de una base de datos determinada, el tutorial de Ian Milligan sobre <link target="/es/lecciones/descarga-automatizada-con-wget">Descarga automatizada con Wget</link> puede ser m&#225;s adecuado.</p>
+<p>El presente tutorial te permitir&#225; descargar registros espec&#237;ficos de manera selectiva, aislando aquellos que satisfagan tus necesidades.
+La descarga autom&#225;tica de varias fuentes ahorra un tiempo considerable.
+Lo que hagas con las fuentes descargadas depende de tus objetivos de investigaci&#243;n.
+Es posible que quieras crear visualizaciones, aplicar diversos m&#233;todos de an&#225;lisis de datos o simplemente reformatearlos para facilitar la navegaci&#243;n.
+O quiz&#225; solo desees guardar una copia de seguridad para acceder a ellos cuando no tengas acceso a Internet.</p>
+<p>Esta lecci&#243;n est&#225; dirigida a usuarios intermedios de Python.
+Si a&#250;n no has revisado las lecciones de <link target="/es/lecciones/introduccion-e-instalacion">Programaci&#243;n b&#225;sica en Python</link>, puedes encontrar en ellas un punto de partida &#250;til.</p>
+</div>
+      <div type="2"><head>C&#243;mo aplicar nuestro conocimiento hist&#243;rico</head>
+<p>En esta lecci&#243;n crearemos nuestro propio corpus de casos relacionados con personas de ascendencia africana.
+A partir del <link target="https://www.oldbaileyonline.org/browse.jsp?id=t17800628-33&amp;div=t17800628-33">caso de Benjamin Bowsey</link> en el <emph>OBO</emph> en 1780, notamos que la voz "<emph>black</emph>"<ref type="footnotemark" target="#2"/> es una palabra clave &#250;til para localizar otros casos que involucren a acusados de ascendencia africana.
+Sin embargo, cuando buscamos "<emph>black</emph>" en el sitio web del <emph>OBO</emph>, encontramos que a menudo se refiere a otros usos de la palabra: caballos negros, tela negra, etc.
+La tarea de desambiguar este uso del lenguaje tendr&#225; que esperar a otra lecci&#243;n.
+Por ahora vayamos a los casos m&#225;s f&#225;ciles.
+Como historiadores e historiadoras, probablemente podamos pensar en palabras clave relacionadas con los descendientes de africanos que valdr&#237;a la pena explorar.
+La infame <emph>n-word</emph><ref type="footnotemark" target="#3"/> no es &#250;til, por supuesto, ya que ese t&#233;rmino no entr&#243; en uso regular sino hasta mediados del siglo XIX.
+Pero <emph>negro</emph> y <emph>mulatto</emph> eran voces muy utilizadas a principios del siglo XVIII.
+Estas palabras clave son menos ambiguas que "<emph>black</emph>" y es mucho m&#225;s probable que sean referencias inmediatas a personas de nuestro grupo demogr&#225;fico objetivo.
+Si intentamos buscar por separado estos dos t&#233;rminos en el sitio web del <emph>OBO</emph>, obtenemos resultados como en estas capturas de pantalla:</p>
+<figure><desc>Resultados de b&#250;squeda para 'negro' en el OBO</desc><graphic url="SearchResultsNegro.png"/></figure>
+<figure><desc>Resultados de b&#250;squeda para 'mulatto' en el OBO</desc><graphic url="SearchResultsMulatto.png"/></figure>
+<p>Despu&#233;s de analizar estos resultados, resulta evidente que se trata de referencias a personas y no a caballos, ropa u otras cosas que pueden ser de color negro.
+Queremos tener todos estos registros en nuestro computador para usarlos en nuestro an&#225;lisis as&#237; que podr&#237;amos descargarlos manualmente uno por uno.
+Pero encontremos una manera program&#225;tica de automatizar esta tarea.</p>
+</div>
+      <div type="2"><head>La b&#250;squeda avanzada en el <emph>OBO</emph></head>
+<p>Las caracter&#237;sticas de b&#250;squeda de cada sitio web funcionan de manera diferente.
+Si bien las b&#250;squedas funcionan de manera similar, la complejidad en la que est&#225;n estructuradas las b&#250;squedas en bases de datos pueden no ser del todo obvias.
+Por lo tanto, es importante pensar cr&#237;ticamente sobre las opciones de b&#250;squeda en la base de datos y leer la documentaci&#243;n proporcionada en el sitio web, cuando esta est&#233; disponible.
+El historiador o historiadora prudente siempre critica sus fuentes, por lo que los procedimientos que hay detr&#225;s de las casillas de b&#250;squeda deben recibir la misma atenci&#243;n de nuestra parte.
+El <link target="https://www.oldbaileyonline.org/forms/formMain.jsp">formulario de b&#250;squeda avanzada</link> del <emph>OBO</emph> te permite refinar tus b&#250;squedas en diez campos diferentes, incluyendo palabras clave simples, un rango de fechas y un tipo de delito.
+Como la funci&#243;n de b&#250;squeda de cada sitio web es diferente, siempre vale la pena tomarse un tiempo para experimentar con ella y leer acerca de las opciones disponibles.
+Como ya hemos hecho una b&#250;squeda simple de los t&#233;rminos "<emph>negro</emph>" y "<emph>mulatto</emph>", sabemos que obtendremos resultados.
+Usaremos la b&#250;squeda avanzada para limitar nuestros resultados a los registros de procesos judiciales publicados en los <emph>Old Bailey Proceedings</emph> entre 1700 y 1750 solamente.
+Desde luego, puedes ajustar la b&#250;squeda como quieras; pero si sigues el ejemplo aqu&#237; presentado, ser&#225; m&#225;s f&#225;cil comprender la lecci&#243;n.
+Ejecuta la b&#250;squeda que se muestra en la imagen de abajo.
+Aseg&#250;rate de marcar el bot&#243;n de opci&#243;n <emph>Advanced</emph> ("Avanzado") y usa los comodines <code type="inline">*</code> para incluir entradas en plural o aquellas con una &#8220;e&#8221; adicional al final.</p>
+<figure><desc>Ejemplo de b&#250;squeda avanzada en el OBO</desc><graphic url="AdvancedSearchExample.png"/></figure>
+<p>Realiza la b&#250;squeda y luego haz clic en el enlace <emph>Calculate total</emph> ("Calcular el total") para ver cu&#225;ntas entradas hay.
+Debe haber 13 resultados (si tienes un n&#250;mero diferente, vuelve atr&#225;s y aseg&#250;rate de haber copiado exactamente el ejemplo anterior).
+Vamos a descargar estas transcripciones de procesos judiciales para analizarlas m&#225;s a fondo.
+Por supuesto, puedes descargar cada uno de los 13 registros manualmente.
+Sin embargo, a medida queb m&#225;s datos est&#225;n disponibles en l&#237;nea, ser&#225; necesario manejar descargas de 1,300 o incluso 130,000 registros.
+La descarga de registros individuales resulta poco pr&#225;ctica y saber c&#243;mo automatizar el proceso es una herramienta muy valiosa.
+Para automatizar el proceso de descarga debemos retroceder y aprender c&#243;mo se crean las URLs de b&#250;squeda en el sitio web del <emph>OBO</emph>, un m&#233;todo com&#250;n en muchas bases de datos y sitios web en l&#237;nea.</p>
+</div>
+      <div type="2"><head>Comprender las consultas en URLs</head>
+<p>Echa un vistazo a la URL producida con la &#250;ltima p&#225;gina de resultados de b&#250;squeda. Debe tener un aspecto como este:</p>
+<pre><code class="language-xml" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_0" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_0.txt"/></pre>
+<p>Ya hemos estudiado las URLs en la lecci&#243;n <link target="/es/lecciones/ver-archivos-html">Para entender p&#225;ginas web y HTML</link>
+y este parece mucho m&#225;s complicado.
+Pero, aunque es m&#225;s largo, en realidad <emph>no</emph> es mucho m&#225;s complejo.
+Es sencillo entenderlo al observar c&#243;mo se representan nuestros criterios de b&#250;squeda en la URL:</p>
+<pre><code class="language-xml" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_1" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_1.txt"/></pre>
+<p>Aqu&#237; observamos m&#225;s claramente los 12 datos que necesitamos para realizar nuestra b&#250;squeda (uno en cada l&#237;nea).
+Tenemos la URL del sitio web del <emph>OBO</emph> seguido de una consulta (introducida por el car&#225;cter <code type="inline">?</code>),
+seguida de 11 <emph>pares nombre/valor</emph> acompa&#241;ados cada uno del car&#225;cter <code type="inline">&amp;</code>.
+Cada par contiene el nombre de una variable de servidor (por ejemplo, <code type="inline">toYear</code>),<ref type="footnotemark" target="#4"/>
+unido con el signo de asignaci&#243;n <code type="inline">=</code>
+al valor de dicha variable (en nuestro ejemplo, <code type="inline">1750</code>).
+Finalmente, el car&#225;cter '&amp;' le indica al servidor que a continuaci&#243;n siguen m&#225;s pares nombre/valor en la URL.
+Todo esto forma la cadena de consulta que le dice al motor de b&#250;squeda qu&#233; variables utilizar en etapas espec&#237;ficas de la b&#250;squeda.</p>
+<p>En nuestro caso, la variable de servidor m&#225;s importante de la cadena de consulta es <code type="inline">_divs_fulltext</code>, a la que se le ha dado el valor <code type="inline">mulatto*+negro*</code>.
+Este valor contiene el t&#233;rmino de consulta que hemos escrito en el cuadro de b&#250;squeda.
+(La aplicaci&#243;n web ha agregado autom&#225;ticamente un signo <code type="inline">+</code> en lugar de un espacio en blanco ya que las URLs no pueden contener espacios.)
+Esto es exactamente lo que le hemos pedido al buscador del <emph>OBO</emph> que nos encuentre.</p>
+<p>Las otras variables de servidor tienen valores que tambi&#233;n establecimos en la caja de b&#250;squeda.
+<code type="inline">fromYear</code> y <code type="inline">toYear</code> contienen nuestro intervalo de fechas.
+Nota que en nuestro ejemplo el valor de <code type="inline">toMonth</code> es 99.
+Como ning&#250;n a&#241;o tiene 99 meses,
+podemos conjeturar que as&#237; es como el algoritmo de b&#250;squeda garantiza que se incluyan todos los registros de un mismo a&#241;o.
+No hay reglas estrictas para determinar qu&#233; hace cada variable porque las personas que construyeron el sitio les han asignado un nombre arbitrario.
+A menudo podemos hacer una conjetura basada en nuestra experiencia y conocimiento.</p>
+<p>Todos los campos de b&#250;squeda posibles en la p&#225;gina de b&#250;squeda avanzada tienen su propio par de nombre/valor.
+Si deseas averiguar el nombre de la variable de servidor para poder usarla, busca de nuevo y aseg&#250;rate de poner un valor en el campo de tu inter&#233;s.
+Despu&#233;s de enviar tu b&#250;squeda, ver&#225;s el valor y el nombre asociado a &#233;l como parte de la URL de la p&#225;gina de resultados.
+Con el <emph>OBO</emph>, al igual que con muchos otros sitios web, el formulario de b&#250;squeda te ayuda esencialmente a construir URLs que le indiquen a la base de datos qu&#233; debe buscar.
+Si comprendes c&#243;mo se representan los campos de b&#250;squeda en la URL, lo que a menudo es bastante sencillo, entonces es relativamente f&#225;cil construir las URLs mediante programaci&#243;n y, por lo tanto, automatizar el proceso de descarga de registros.</p>
+<p>Entre las variables de servidor hay una que ser&#225; importante en nuestra b&#250;squeda program&#225;tica.
+La variable <code type="inline">start</code> le indica al servidor en cu&#225;l n&#250;mero de registro debe iniciar la p&#225;gina de resultados.
+Por ejemplo, si cambias <code type="inline">start=0</code> por <code type="inline">start=10</code> en la URL y presionas enter,
+deber&#225;s obtener los resultados del 11 al 13.
+Y si la cambias por <code type="inline">start=5</code>, obtendr&#225;s del 6 al 13.
+Ser&#237;a ideal que pudi&#233;ramos elegir mostrar todos los resultados en una sola p&#225;gina,
+pues ello facilitar&#225; su procesamiento;
+pero la aplicaci&#243;n web del <emph>OBO</emph> despliega los resultados en p&#225;ginas de 10 registros cada una.</p>
+<p>Ahora aprovecharemos este conocimiento para crear una serie de URLs que nos permitir&#225; descargar los 13 archivos.</p>
+</div>
+      <div type="2"><head>Descarga sistem&#225;tica de archivos</head>
+<p>En <link target="/es/lecciones/trabajar-con-paginas-web">Descargar p&#225;ginas web con Python</link> aprendimos que Python puede descargar una p&#225;gina web siempre que tengamos la URL.
+En dicha lecci&#243;n usamos la URL para descargar la <link target="https://www.oldbaileyonline.org/browse.jsp?id=t17800628-33&amp;div=t17800628-33">transcripci&#243;n del proceso de Benjamin Bowsey</link>.
+En la presente lecci&#243;n estamos intentando descargar varias transcripciones de procesos judiciales que cumplan con los criterios de b&#250;squeda que describimos anteriormente, sin tener que volver a ejecutar el programa repetidamente.
+As&#237; pues, queremos un programa que descargue todo lo que necesitamos de una sola vez.
+En este punto, tenemos la URL de una p&#225;gina de resultados de b&#250;squeda que contiene las diez primeras entradas de nuestra consulta.
+Tambi&#233;n sabemos que al modificar el valor de la variable <code type="inline">start</code> en la URL, podemos llamar secuencialmente cada p&#225;gina de resultados de b&#250;squeda y as&#237; al fin recuperar todos los registros de procesos judiciales.
+Por supuesto, las p&#225;ginas de resultados no nos dan los los registros de los procesos judiciales sino enlaces a ellos.
+As&#237; que necesitamos extraer el enlace a los registros contenidos en los resultados de b&#250;squeda.
+En el sitio web del <emph>OBO</emph>, los de los registros individuales (los archivos de transcripci&#243;n de los procesos judiciales) se pueden encontrar como enlaces en las p&#225;ginas de resultados de b&#250;squeda.
+Sabemos que todas las URLs de transcripciones contienen una identificaci&#243;n formada por una <code type="inline">t</code> seguida de al menos 8 n&#250;meros (por ejemplo, <code type="inline">t17800628-33</code>).
+Al buscar los enlaces que contengan ese patr&#243;n, podemos identificar las URLs de las transcripciones de los procesos judiciales.
+Al igual que en las lecciones anteriores, desarrollaremos un algoritmo para abordar el problema de tal manera que el computador lo pueda manejar.
+Al parecer, esta tarea se puede lograr en cuatro pasos.
+Necesitaremos:</p>
+<ol>
+<li>Generar las URLs para cada p&#225;gina de resultados de b&#250;squeda incrementando en una cantidad fija la variable de servidor <code type="inline">start</code> por un n&#250;mero apropiado de veces.</li>
+<li>Descargar cada p&#225;gina de resultados de b&#250;squeda como un archivo HTML.</li>
+<li>Extraer las URLs de cada procesos judiciales (utilizando la ID de proceso, como se describi&#243; anteriormente) contenidos en los archivos HTML de los resultados de la consulta.</li>
+<li>Recorrer esos URLs extra&#237;dos para descargar cada transcripci&#243;n de prueba y guardarlas en una carpeta en nuestro computador.</li>
+</ol>
+<p>Recordar&#225;s que esto es bastante similar a las tareas que realizamos en <link target="/es/lecciones/trabajar-con-paginas-web">Descargar p&#225;ginas web con Python</link> y <link target="/es/lecciones/de-html-a-lista-de-palabras-2">De HTML a lista de palabras (parte 2)</link>.
+Primero descargamos y luego analizamos la informaci&#243;n que buscamos;
+y, en el presente caso, descargamos un poco m&#225;s.</p>
+<div type="3"><head>Descargar las p&#225;ginas de resultados de consulta</head>
+<p>Primero necesitamos generar las URLs para descargar cada p&#225;gina de resultados de consulta.
+Ya tenemos el primero utilizando el formulario en el sitio web:</p>
+<pre><code class="language-xml" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_2" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_2.txt"/></pre>
+<p>Escribamos un programa que funcione sin importar cu&#225;ntas p&#225;ginas de resultados de b&#250;squeda o registros tengamos que descargar, y sin importar qu&#233; decidamos buscar.
+Estudia el siguiente c&#243;digo y luego agrega esta funci&#243;n a un m&#243;dulo llamado <code type="inline">obo.py</code> (crea un archivo con ese nombre y gu&#225;rdalo en el directorio donde deseas hacer tu trabajo).
+Los comentarios en el c&#243;digo (las l&#237;neas que empiezan con un <code type="inline">#</code>) est&#225;n destinados a ayudarte a descifrar las distintas partes.</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_3" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_3.txt"/></pre>
+<p>En esta funci&#243;n hemos dividido los diversos componentes de la <emph>cadena de consulta</emph> y hemos utilizado <emph>argumentos de funci&#243;n</emph> para que pueda reutilizarse m&#225;s all&#225; de nuestras necesidades espec&#237;ficas del momento.
+Cuando llamamos esta funci&#243;n, reemplazamos los argumentos con los valores que queremos buscar.
+Luego, descargamos la p&#225;gina de resultados de b&#250;squeda de una manera similar a como se hace en <link target="/es/lecciones/trabajar-con-paginas-web">Descargar p&#225;ginas web con Python</link>.
+La l&#237;nea que hemos marcado con &#9312; crea el archivo <code type="inline">resultado_consulta.html</code>, asegur&#225;ndonos de estar usando la codificaci&#243;n de caracteres <link target="https://es.wikipedia.org/wiki/UTF-8">UTF-8</link>.
+Y la l&#237;nea &#9313; guarda en dicho archivo el valor de la variable <code type="inline">contenido_web</code>, tambi&#233;n asegur&#225;ndose de usar esa misma codificaci&#243;n.
+(No necesitas cerrar expl&#237;citamente el archivo con la instrucci&#243;n <code type="inline">close</code>, ya que el bloque <code type="inline">with</code> se encarga de ello.)</p>
+<p>Ahora crea un nuevo programa de Python llamado <code type="inline">descarga_consultas.py</code>
+y copia en &#233;l el siguiente c&#243;digo.
+Ten en cuenta que los valores que hemos utilizado como argumentos son exactamente los mismos del ejemplo anterior.
+Si&#233;ntete libre de jugar con estos para obtener diferentes resultados o ver c&#243;mo funcionan.</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_4" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_4.txt"/></pre>
+<p>Cuando ejecutes este programa
+(con <code type="inline">python3 descarga_consultas.py</code> desde el terminal, o desde tu editor de c&#243;digo preferido),
+encontrar&#225;s un nuevo archivo llamado <code type="inline">resultado_consulta.html</code> en tu carpeta de trabajo.
+Este archivo contiene la primera p&#225;gina de los resultados de b&#250;squeda.
+Comprueba que se haya descargado correctamente y luego b&#243;rralo, pues ya no lo necesitaremos.
+Vamos a adaptar nuestro programa para descargar la otra p&#225;gina que contiene las otras 3 entradas al mismo tiempo, por lo que debemos asegurarnos de obtener ambas.</p>
+<p>Refinemos ahora nuestra funci&#243;n de Python <code type="inline">obtener_resultados_consulta</code>.
+Primero agregaremos otro argumento de funci&#243;n llamado <code type="inline">entradas</code>
+para que podamos decirle al programa cu&#225;ntas p&#225;ginas de resultados necesitamos descargar.
+Usaremos el valor de las entradas y algunos c&#225;lculos matem&#225;ticos simples para determinar cu&#225;ntas p&#225;ginas de resultados de b&#250;squeda hay.
+Esto es bastante sencillo ya que sabemos que en el <emph>OBO</emph> hay 10 transcripciones enumeradas por p&#225;gina.
+Podemos calcular el n&#250;mero de p&#225;ginas de resultados dividiendo el valor de las entradas por 10.
+Guardaremos este resultado en una variable entera llamada <code type="inline">contar_paginas</code>.
+Ser&#225; algo como lo siguiente:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_5" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_5.txt"/></pre>
+<p>Debido a que en Python 3 el operador <code type="inline">//</code> es de divisi&#243;n entera, y por lo tanto redondea hacia el menor n&#250;mero entero el resultado de la divisi&#243;n, el valor de <code type="inline">contar_palabras</code> siempre ser&#225; un n&#250;mero entero.
+Prueba lo siguiente ejecutando el siguiente c&#243;digo en <link target="https://docs.python.org/es/3/tutorial/interpreter.html">el int&#233;rprete REPL de Python</link> en tu terminal (en Mac y Linux),
+o en cmd o PowerShell (en Windows).
+(Nota, de aqu&#237; en adelante, usaremos la palabra "terminal" para referirnos al int&#233;rprete de l&#237;nea de comandos.)</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_6" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_6.txt"/></pre>
+<p>Ahora bien, lo que queremos obtener es "2":
+una p&#225;gina que contiene las entradas 1 a 10, y otra que contiene las entradas 11 a 13.
+Pero dado que hay un residuo en esta operaci&#243;n (de 3 en este caso, aunque no importa cu&#225;l sea), los &#250;ltimos 3 resultados no se descargar&#225;n ya que solo capturaremos 1 p&#225;gina de 10 resultados.
+Para solucionar este problema utilizaremos el operador <link target="https://docs.python.org/3.10/library/operator.html?highlight=modulo">modulo</link> (<code type="inline">%</code>), que divide el primer valor por el segundo y nos devuelve el residuo.
+As&#237;, si el residuo es mayor que 0, sabemos que hay una p&#225;gina adicional de resultados y necesitamos aumentar el valor de la variable de Python <code type="inline">contar_paginas</code> en una unidad.
+El c&#243;digo ahora deber&#237;a verse as&#237;:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_7" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_7.txt"/></pre>
+<p>Si agregamos este c&#243;digo a nuestra funci&#243;n <code type="inline">obtener_resultados_consulta</code>, justo debajo de la l&#237;nea <code type="inline">start_value = 0</code>, nuestro programa podr&#225; calcular el n&#250;mero de p&#225;ginas que deben descargarse.
+Sin embargo, en esta etapa solo se descargar&#225; la primera p&#225;gina, ya que hemos indicado, en la secci&#243;n de la funci&#243;n de descarga, que se ejecute solamente una vez.
+Para corregirlo, debemos encerrar en un bucle <code type="inline">for</code> el c&#243;digo de descarga que trabajar&#225; una vez por cada n&#250;mero que se indique en la variable de Python <code type="inline">contar_paginas</code>.
+Si el valor de dicha variable es 1, entonces descargar&#225; una vez; si obtiene 5 descargar&#225; cinco veces, y as&#237; sucesivamente.
+(El valor de <code type="inline">pagina</code> ir&#225; aumentando en cada iteraci&#243;n de bucle <code type="inline">for</code>: 1, 2, 3, etc. hasta una unidad menos que el valor de <code type="inline">contar_p&#225;ginas</code>)
+Inmediatamente despu&#233;s de la l&#237;nea que contiene la expresi&#243;n <code type="inline">contar_paginas += 1</code>, que acabas de escribir, agrega la siguiente l&#237;nea y todo lo que est&#225; debajo de la l&#237;nea que contiene <code type="inline">f.write(contenido_web.decode('utf-8'))</code> (cuida de sangrar a la derecha todo el c&#243;digo para que este se incluya en el bucle <code type="inline">for</code>):</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_8" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_8.txt"/></pre>
+<p>Dado que este es un bucle <code type="inline">for</code>, debemos planear bien todo el c&#243;digo que queremos ejecutar repetidamente ah&#237;.
+Puedes saber si lo has hecho correctamente al ver el ejemplo del c&#243;digo terminado a continuaci&#243;n.
+Este bucle aprovecha la funci&#243;n <link target="https://docs.python.org/3.10/library/stdtypes.html">range</link> ("rango") de Python.
+Para entender esto, es mejor pensar que la variable de Python <code type="inline">contar_paginas</code> es igual a 2 como se muestra en el ejemplo.
+Estas dos l&#237;neas de c&#243;digo significan:
+"Comienza a ejecutarlo con un valor de bucle inicial de 0, y cada vez que ejecutes agrega 1 m&#225;s a ese valor. Cuando el valor del bucle es el mismo que <code type="inline">contar_paginas</code>, ejecuta una vez m&#225;s y luego para."<ref type="footnotemark" target="#5"/>
+Esto es particularmente valioso en nuestro caso, porque podemos decirle a nuestro programa que se ejecute exactamente una vez para cada p&#225;gina de resultados, lo que proporciona una nueva habilidad flexible para controlar cu&#225;ntas veces se ejecuta el bucle <code type="inline">for</code>.
+Si deseas practicar con esta nueva y poderosa forma de escribir bucles, puedes abrir tu terminal y jugar con el REPL de Python:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_9" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_9.txt"/></pre>
+<p>Ahora bien, antes de agregar todo este c&#243;digo a nuestra funci&#243;n <code type="inline">obtener_resultados_consulta</code>, tenemos que hacer dos ajustes.
+Primero, al final del bucle <code type="inline">for</code> (pero a&#250;n dentro del bucle) y despu&#233;s de que se haya ejecutado nuestro c&#243;digo de descarga, necesitaremos modificar la variable de servidor <code type="inline">startValue</code> en la URL de la p&#225;gina que queremos descargar.
+(Esto lo hacemos modificando la variable de Python correspondiente <code type="inline">start_value</code>, que es la que nuestro programa usa para general el valor de la variable de servidor <code type="inline">startValue</code> en la URL.)
+Si no lo hacemos, nuestro programa descargar&#225; repetidamente la primera p&#225;gina de resultados pues no estamos cambiando nada en la URL inicial.<br/>
+Por lo tanto, podemos solicitar la siguiente p&#225;gina de resultados de b&#250;squeda aumentando su valor en 10, una vez que se haya completado la descarga inicial.
+Si no sabes exactamente d&#243;nde colocar esta l&#237;nea, puedes echar un vistazo al ejemplo de c&#243;digo terminado, m&#225;s abajo.</p>
+<p>Segundo, debemos asegurarnos de que el nombre del archivo con los datos que hemos descargado sea diferente para cada p&#225;gina registrada.
+De lo contrario, cada descarga se guardar&#225; sobrescribiendo la descarga anterior, lo que nos dejar&#225; con un solo archivo de resultados.
+Para resolver esto, debemos ajustar el contenido de la variable <code type="inline">nombre_archivo</code> para incluir el valor contenido en la variable <code type="inline">pagina</code>.
+As&#237;, cada vez que descarguemos una nueva p&#225;gina, obtendremos un nombre diferente:
+<code type="inline">resultado_consulta0.html</code>, <code type="inline">resultado_consulta1.html</code>, <code type="inline">resultado_consulta2.html</code> y as&#237; sucesivamente.
+Como <code type="inline">pagina</code> contiene un n&#250;mero entero, tendremos que convertir su valor en una cadena (con la funci&#243;n <code type="inline">str()</code> de Python) antes de poder agregarlo a la variable de cadena <code type="inline">nombre_archivo</code>.
+(De lo contrario obtendremos un error, pues el operador <code type="inline">+</code>, usado como concatenador, requiere necesariamente datos de tipo de cadena, no de tipo num&#233;rico.)
+Ajusta la l&#237;nea en tu programa que pertenece a la variable <code type="inline">nombre_archivo</code> para que se vea as&#237;:<ref type="footnotemark" target="#6"/></p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_10" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_10.txt"/></pre>
+<p>Ahora ya puedes agregar estas nuevas l&#237;neas de c&#243;digo a tu funci&#243;n <code type="inline">obtener_resultados_consulta</code>.
+Recordemos que hasta el momento hemos a&#241;adido lo siguiente:</p>
+<ol>
+<li>agregamos la variable de Python <code type="inline">entradas</code> como un argumento de funci&#243;n adicional justo despu&#233;s de <code type="inline">to_month</code>;</li>
+<li>calculamos el n&#250;mero de p&#225;ginas de resultados e incluimos esto inmediatamente despu&#233;s de la l&#237;nea que comienza con <code type="inline">start_value = 0</code> (antes de crear la URL y comenzar a descargar);</li>
+<li>inmediatamente despu&#233;s de esto a&#241;adimos un bucle <code type="inline">for</code>, que le indicar&#225; al programa que se ejecute una vez para cada p&#225;gina de resultados de b&#250;squeda (es importante sangrar a la derecha el resto del c&#243;digo de la funci&#243;n para que quede dentro del nuevo bucle);</li>
+<li>ajustamos la variable <code type="inline">nombre_archivo</code> existente para que cada vez que se descargue una p&#225;gina de resultados se le d&#233; un nombre &#250;nico al archivo; y</li>
+<li>finalmente, en la &#250;ltima l&#237;nea del bloque de <code type="inline">for</code> aumentamos el valor de la variable de Python <code type="inline">start_value</code> (en 10 unidades) cada vez que se ejecute el bucle.</li>
+</ol>
+<p>Ahora bien, antes de proseguir, hagamos una &#250;ltima cosa.
+Nota que en el c&#243;digo de la funci&#243;n <code type="inline">obtener_resultados_consulta</code> la variable de Python <code type="inline">entradas</code>, que contiene el n&#250;mero de registros que han de ser obtenidos, est&#225; predefinida con un valor fijo (13 en nuestro ejemplo).
+Como queremos que nuestra funci&#243;n sea m&#225;s flexible y no est&#233; necesariamente atada a un n&#250;mero predeterminado de registros, vamos incluir un argumento o par&#225;metro adicional en nuestra definici&#243;n de funci&#243;n: <code type="inline">entradas</code>. Lo a&#241;adiremos al final de la lista de argumentos: <code type="inline">def obtener_resultados_consulta(..., entradas)</code>.
+As&#237; las cosas, el c&#243;digo de la funci&#243;n terminada en el archivo <code type="inline">obo.py</code> deber&#225; verse de la siguiente manera:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_11" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_11.txt"/></pre>
+<p>Como hemos a&#241;adido la variable <code type="inline">entradas</code> en la definici&#243;n de la funci&#243;n, debemos a&#241;adir un argumento adicional cuando la llamemos en el programa <code type="inline">descarga_consultas.py</code>:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_12" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_12.txt"/></pre>
+<p>&#161;Estupendo!
+Corre el programa y ver&#225;s que ahora tenemos dos p&#225;ginas de resultados de b&#250;squeda:
+<code type="inline">resultado_consulta0.html</code> y <code type="inline">resultado_consulta1.html</code>.
+Pero antes de avanzar al siguiente paso en el algoritmo, vamos a ocuparnos de algunas tareas de limpieza. Nuestra carpeta de trabajo se volver&#225; dif&#237;cil de manejar si descargamos varias p&#225;ginas de resultados y transcripciones de procesos judiciales en ella.
+Por lo tanto, con Python crearemos un nuevo directorio con el nombre de nuestros t&#233;rminos de b&#250;squeda.</p>
+<p>Queremos a&#241;adir esta nueva funcionalidad en <code type="inline">obtener_resultados_consulta</code>, para que nuestras p&#225;ginas de resultados de b&#250;squeda se descarguen en un directorio con el mismo nombre que nuestra consulta de b&#250;squeda.
+Esto mantendr&#225; nuestro directorio de trabajo m&#225;s organizado.
+Para ello crearemos un nuevo directorio utilizando el m&#243;dulo de Python <code type="inline">os</code>, (abreviatura de <emph>operating system</emph>, "sistema operativo").
+Esa biblioteca contiene una funci&#243;n llamada <code type="inline">makedirs</code> cuya funci&#243;n es crear un nuevo directorio.
+Puedes probar esto usando el REPL de Python.</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_13" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_13.txt"/></pre>
+<p>Este c&#243;digo verifica si tu computador ya tiene un directorio con este nombre.
+Si no lo ten&#237;as, ahora deber&#225;s tener un directorio llamado <code type="inline">mi_directorio_nuevo</code>.
+(El directorio se crear&#225; como subdirectorio del directorio donde hayas llamado originalmente al REPL de Python.)
+Si esto funciona, puedes eliminar el directorio de tu disco duro, ya que esto fue solo para practicar.
+Como queremos crear un nuevo directorio con el nombre de la consulta que ingresamos en el sitio web del <emph>OBO</emph>, haremos uso directamente del argumento de funci&#243;n <code type="inline">consulta</code> en la funci&#243;n <code type="inline">obtener_resultados_consulta</code>.
+Para hacer esto, importa el m&#243;dulo <code type="inline">os</code> (debajo de las otra instrucci&#243;n de importaci&#243;n, <code type="inline">from urllib.request import urlopen</code>).</p>
+<p>Ahora bien, como estamos usando los caracteres <code type="inline">*</code> y <code type="inline">+</code> en nuestra b&#250;squeda en el <emph>OBO</emph>, y como estos tienen una significaci&#243;n importante en el modo como los sistemas operativos navegan los directorios, es conveniente que los reemplacemos por otros m&#225;s seguros antes de crear nuestro directorio.
+Usaremos <link target="https://es.wikipedia.org/wiki/Expresi%C3%B3n_regular">expresiones regulares</link> en <link target="https://docs.python.org/3.10/library/re.html">Python</link> para excluir del nombre de directorio todos los caracteres que no sean alfanum&#233;ricos.
+Python dispone del potente m&#243;dulo <code type="inline">re</code> (que deberemos importar al inicio del archivo <code type="inline">obo.py</code>, debajo de las otras instrucciones de importaci&#243;n) para ello.
+Nuestro c&#243;digo "seguro" ser&#225; entonces el siguiente:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_14" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_14.txt"/></pre>
+<p>En la primera l&#237;nea, la funci&#243;n <code type="inline">re.sub</code> busca la expresi&#243;n regular <code type="inline">\W</code> (que significa: "cualquier car&#225;cter <emph>no</emph> alfanum&#233;rico") en el valor de la variable <code type="inline">consulta</code> y lo reemplaza por la cadena vac&#237;a <code type="inline">''</code>, es decir, lo elimina.<ref type="footnotemark" target="#7"/>
+El resultado de este reemplazo se almacena en la variable <code type="inline">directorio</code>.
+(Es importante que recordemos, en todo caso, que el valor que nuestro programa pasar&#225; a la variable de servidor en la URL a&#250;n contiene los caracteres <code type="inline">*</code> y <code type="inline">+</code>.
+Este reemplazo solo es para el nombre del directorio.)</p>
+<p>As&#237; las cosas, la funci&#243;n <code type="inline">obtener_resultados_consulta</code> deber&#225; quedar as&#237;:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_15" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_15.txt"/></pre>
+<p>Muy bien.
+Ahora debemos asegurarnos de que guardemos nuestras p&#225;ginas de resultados de b&#250;squeda en este nuevo directorio.
+Podemos hacerlo de muchas maneras, pero la m&#225;s sencilla es agregar el nuevo nombre del directorio m&#225;s una barra al nombre del archivo (en la variable <code type="inline">nombre_archivo</code>):</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_16" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_16.txt"/></pre>
+<p>Nota, sin embargo, que este c&#243;digo solo funcionar&#225; adecuadamente en MacOS y en Linux,
+no en Windows, pues este usa la barra invertida <code type="inline">\</code> para demarcar rutas de directorio.
+Para asegurarnos de que funcione tambi&#233;n en Windows, usaremos la funci&#243;n <code type="inline">os.path.join</code> de Python.
+Esta funci&#243;n une adecuadamente las rutas, teniendo en cuenta el sistema operativo donde se corre el programa.
+Arriba en <code type="inline">obo.py</code> la importaremos as&#237;:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_17" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_17.txt"/></pre>
+<p>(la importaremos como <code type="inline">pjoin</code> porque de lo contrario habr&#237;a una colisi&#243;n con la funci&#243;n de concatenaci&#243;n <code type="inline">join</code>, que es m&#225;s fundamental en Python).</p>
+<p>La l&#237;nea modificada ser&#225; entonces esta:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_18" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_18.txt"/></pre>
+<p>As&#237; pues, el c&#243;digo completo del programa <code type="inline">obo.py</code> deber&#225; quedar as&#237;:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_19" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_19.txt"/></pre>
+<p>Ejecuta el programa <code type="inline">descarga_consultas.py</code> una vez m&#225;s para asegurarte de que funcione
+y entiendas c&#243;mo guardar archivos en un directorio particular usando Python.</p>
+</div><div type="3"><head>Descargar las entradas individuales de los procesos judiciales</head>
+<p>A estas alturas hemos creado una funci&#243;n capaz de descargar todos los archivos HTML con los resultados de consulta del sitio web del <emph>OBO</emph>, para realizar la b&#250;squeda avanzada que hemos definido.
+Todo esto lo hemos hecho usando Python.
+Para el siguiente paso del algoritmo, debemos extraer las URLs de cada proceso judicial de los archivos HTML.
+En las lecciones que preceden a esta (por ejemplo, <link target="/es/lecciones/trabajar-con-paginas-web">Descargar p&#225;ginas web con Python</link>),
+hemos trabajado con versiones para impresi&#243;n (<emph>printer friendly</emph>) de los procesos judiciales,
+por lo que continuaremos haci&#233;ndolo as&#237; aqu&#237;.
+Sabemos que la versi&#243;n para impresi&#243;n del proceso judicial contra Benjamin Bowsey se encuentra en la URL:</p>
+<pre><code class="language-xml" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_20" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_20.txt"/></pre>
+<p>As&#237; como al cambiar las cadenas de consulta en las URLs se producen resultados de b&#250;squeda diferentes, as&#237; tambi&#233;n al cambiar la URL por registros de procesos judiciales &#8212;es decir, sustituyendo la ID de un proceso judicial por otra&#8212;, obtendremos la transcripci&#243;n de otro proceso.
+(En este caso, la ID del proceso judicial se pasa con la variable de servidor <code type="inline">div</code>, cuyo valor en el caso del ejemplo es <code type="inline">t17800628-33</code>.)
+Esto significa que para descargar los 13 archivos coincidentes, todo lo que necesitamos son las IDs de los procesos judiciales.
+Como sabemos que las p&#225;ginas de resultados de b&#250;squeda en los sitios web generalmente contienen un enlace a las p&#225;ginas descritas, es muy probable que podamos encontrar estos enlaces, incrustados en el c&#243;digo HTML.
+Si en otras lecciones pudimos eliminar esta informaci&#243;n de la p&#225;gina que descargamos, ahora podemos usar esa misma informaci&#243;n para generar una URL que nos permita descargar cada transcripci&#243;n del proceso judicial.
+Esta t&#233;cnica de <link target="https://es.wikipedia.org/wiki/Web_scraping"><emph>web scraping</emph></link> se puede usar en la mayor&#237;a de las p&#225;ginas de resultados de b&#250;squeda, no solo la del <emph>OBO</emph>.
+Para hacerlo, primero deberemos encontrar d&#243;nde est&#225;n las IDs de cada proceso judicial en medio del c&#243;digo HTML de los archivos descargados.
+Luego determinaremos una forma de aislarlos consistentemente usando Python,
+de modo que siempre podamos encontrar las transcripciones de los procesos judiciales,
+sin importar qu&#233; p&#225;gina de resultados de b&#250;squeda descarguemos del sitio.</p>
+<p>Abre el documento <code type="inline">resultado_consulta0.html</code> en tu editor de c&#243;digo y dale un vistazo a la lista de los procesos judiciales.
+La primera entrada comenzar&#225; con las palabras "Anne Smith", por lo que puedes usar la herramienta de b&#250;squeda de texto de tu editor de c&#243;digo para ir inmediatamente al lugar correcto.
+F&#237;jate que el nombre "Anne" est&#225; en el contenido de un enlace (un elemento de <code type="inline">&lt;a&gt;</code> de HTML):</p>
+<pre><code class="language-html" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_21" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_21.txt"/></pre>
+<p>En el lenguaje HTML, el destino de un enlace (el <link target="https://es.wikipedia.org/wiki/Elemento_HTML">elemento</link> <code type="inline">&lt;a&gt;</code>) se especifica en el valor del <link target="https://es.wikipedia.org/wiki/Atributo_HTML">atributo</link> <code type="inline">href</code>,
+que en este caso es:</p>
+<pre><code class="language-html" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_22" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_22.txt"/></pre>
+<p>Saber esto es magn&#237;fico, pues podemos ver que el enlace contiene la ID del proceso judicial: <code type="inline">t17160113-18</code>.
+&#161;Excelente!
+Despl&#225;zate por las entradas restantes y encontrar&#225;s lo mismo en todas ellas.
+Por suerte para nosotros, el sitio est&#225; bien construido y parece que cada enlace comienza con <code type="inline">browse.jsp?id=</code>,
+seguido de la ID del proceso judicial, luego un <code type="inline">&amp;</code> y luego el resto de variables de servidor.
+En el caso de Anne Smith: <code type="inline">browse.jsp?id=t17160113-18&amp;</code>.</p>
+<p>Vamos entonces a escribir unas l&#237;neas de c&#243;digo que capturen estas IDs.
+Las pondremos al final de nuestro programa de Python <code type="inline">obo.py</code>.
+Echa un vistazo al c&#243;digo de la funci&#243;n <code type="inline">obtener_procesos_individuales</code> a continuaci&#243;n.
+Esta funci&#243;n tambi&#233;n utiliza el m&#243;dulo <link target="https://docs.python.org/es/3/library/os.path.html">os</link> de Python, en este caso para enumerar el contenido del directorio que creamos en la secci&#243;n anterior.
+(Este m&#243;dulo contiene una gama de funciones &#250;tiles que reflejan los tipos de tareas que podr&#237;as realizar con tu rat&#243;n en el Finder de Mac o el Explorador de Windows, como abrir, cerrar, crear, eliminar y mover archivos y directorios.
+Es un m&#243;dulo magn&#237;fico que deber&#237;amos dominar o, al menos, familiarizarnos con &#233;l.)</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_23" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_23.txt"/></pre>
+<p>Ahora crea y ejecuta un nuevo programa de Python llamado <code type="inline">extraer_id_proceso.py</code> con el siguiente c&#243;digo:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_24" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_24.txt"/></pre>
+<p>Aseg&#250;rate de introducir el mismo valor en el argumento de consulta como en el ejemplo anterior (<code type="inline">mulatto*+negro*</code>).
+Si todo sale bien, Python imprimir&#225; una lista con los nombres de todos los archivos que est&#225;n en la nueva carpeta, algo como:</p>
+<pre><code class="language-sh" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_25" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_25.txt"/></pre>
+<p>Por ahora deber&#225;n ser solamente las dos p&#225;ginas con los resultados de b&#250;squeda.
+Aseg&#250;rate de que esto funcione antes de seguir adelante.
+Dado que hemos guardado todas las p&#225;ginas de resultados usando nombres de archivo que contienen la expresi&#243;n <code type="inline">resultado_consulta</code>, podemos abrir cada uno de ellos y extraer todas las IDs de los procesos judiciales que se encuentran en &#233;l.
+En este caso, sabemos que solo hay dos, aunque queremos que nuestro c&#243;digo sea lo m&#225;s flexible posible, desde luego.
+Al restringir esta acci&#243;n exclusivamente a los archivos cuyos nombres contienen la expresi&#243;n <code type="inline">resultado_consulta</code>, nuestro programa funcionar&#225; como lo esperamos, incluso si el directorio contiene muchos otros archivos no relacionados porque el programa saltar&#225; cualquier cosa con un nombre diferente.</p>
+<p>Agrega el siguiente c&#243;digo a la funci&#243;n <code type="inline">obtener_procesos_individuales</code> (en el programa <code type="inline">obo.py</code>).
+El c&#243;digo pasar&#225; por cada archivo contenido en el directorio creado anteriormente
+y comprobar&#225; si su nombre contiene la expresi&#243;n <code type="inline">resultado_consulta</code>.
+En caso positivo, el archivo se abrir&#225; y los contenidos se guardar&#225;n en una variable llamada <code type="inline">texto</code>.
+El contenido de dicha variable se analizar&#225; luego para aislar la ID del proceso judicial,
+que sabemos que siempre est&#225; ubicada a la derecha de la expresi&#243;n <code type="inline">browse.jsp?id=</code> en la URL.
+Cuando el programa encuentre la ID del proceso judicial, se guardar&#225; en una lista de Python y se imprimir&#225; en pantalla.</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_26" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_26.txt"/></pre>
+<p>Este c&#243;digo puede parecer algo complicado a primera vista, pero vamos a desmenuzarlo y ver&#225;s que no es tan dif&#237;cil.
+Las l&#237;neas &#9312; y &#9315; usan el operador de continencia <code type="inline">in</code> de Python, en este caso entre cadenas.
+La expresi&#243;n:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_27" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_27.txt"/></pre>
+<p>es verdadera solo si <code type="inline">&lt;cadena1&gt;</code> es una subcadena de <code type="inline">&lt;cadena2&gt;</code>,
+es decir, si los caracteres de la primera cadena est&#225;n contenidos, en el mismo orden, en la segunda cadena.
+Por ejemplo, lo siguiente es verdadero:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_28" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_28.txt"/></pre>
+<p>pero esto es falso:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_29" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_29.txt"/></pre>
+<p>En ese sentido, lo que las l&#237;neas &#9312; y &#9315; hace es verificar que estemos seleccionando el archivo apropiado (seg&#250;n nuestra convenci&#243;n de denominaci&#243;n), en el primer caso; y si la "palabra" que estamos procesando contiene la expresi&#243;n <code type="inline">browse.jsp?id=</code>, en el segundo.</p>
+<p>Veamos ahora la importancia de esa expresi&#243;n, para lo cual pasemos al bucle <code type="inline">for</code> en &#9314;.
+Este bucle iterar&#225; por cada una de las "palabras" del documento HTML que estamos procesando.
+La l&#237;nea &#9313; ha guardado una lista enorme de palabras en la variable <code type="inline">texto</code>.
+Python ha partido todo el archivo con la funci&#243;n <code type="inline">split</code>, cuyo argumento es un espacio en blanco (<code type="inline">' '</code>).
+Esto quiere decir que Python separar&#225; todo el documento donde haya espacios.
+Estas ser&#225;n nuestras "palabras", si se nos permite la expresi&#243;n:
+<code type="inline">Anne</code>, <code type="inline">Smith</code>, <code type="inline">href="browse.jsp?id=t17160113-18&amp;amp;div=t17160113-18&amp;amp;terms=mulatto*_negro*#highlight"&gt;</code>, etc.
+Nuestro <code type="inline">for</code> pasar&#225; por cada una de ellas.
+Como vimos, la l&#237;nea &#9315; examinar&#225; si la expresi&#243;n <code type="inline">browse.jsp?id=</code> est&#225; contenida en la "palabra".
+Es decir, determinar&#225; si ah&#237; es donde est&#225; guardada la ID del proceso judicial que estamos buscando.</p>
+<p>Si esto es el caso, en la l&#237;nea &#9316; aislaremos la parte de la expresi&#243;n capturada en la palabra, la ID.
+Para esto usamos un grupo de captura de expresiones regulares, que se indican entre par&#233;ntesis.
+Miremos en el documento HTML una de estas "palabras" que nos interesan:</p>
+<pre><code class="language-xml" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_30" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_30.txt"/></pre>
+<p>Subrayemos la parte que nos interesa &#250;nicamente:</p>
+<pre><code class="language-xml" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_31" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_31.txt"/></pre>
+<p>Nuestro grupo de captura tomar&#225; el texto que va desde <code type="inline">id=</code> hasta el primer <code type="inline">&amp;</code> (excluy&#233;ndolos en el texto capturado).
+Eso es justo lo que significa la expresi&#243;n regular <code type="inline">id=(.+?)&amp;</code>.
+En efecto, <code type="inline">.+?</code> significa:
+captura cualquier car&#225;cter (<code type="inline">.</code>) una o m&#225;s veces (<code type="inline">+</code>),
+pero hazlo <link target="https://docs.python.org/es/3/howto/regex.html#repeating-things">sin codicia</link> (<code type="inline">?</code>),
+es decir, det&#233;n la b&#250;squeda apenas encuentres el primer <code type="inline">&amp;</code>;
+y finalmente guarda el texto hallado en un grupo de captura (<code type="inline">(</code>, <code type="inline">)</code>).
+Python enumera secuencialmente los grupos de captura.
+En nuestra expresi&#243;n regular solo hay un grupo; por lo tanto, ser&#225; el grupo 1.
+La l&#237;nea &#9317; guarda el contenido de ese grupo &#8212;nuestra ID&#8212; en la variable <code type="inline">url</code>.
+Finalmente, la l&#237;nea &#9318; la a&#241;ade como un &#237;tem adicional en nuestra lista <code type="inline">urls</code>, que luego aprovecharemos.</p>
+<p>Cuando vuelvas a ejecutar el programa <code type="inline">extraer_id_procesos.py</code>, ver&#225;s una lista de todas las ID de los procesos judiciales.
+Podemos agregar un par de l&#237;neas adicionales para convertirlas en URLs adecuadas y descargar la lista completa en nuestro nuevo directorio.
+Asimismo, usaremos el m&#243;dulo <code type="inline">time</code> de Python para pausar nuestro programa durante tres segundos entre las descargas.
+Esta t&#233;cnica es llamada "regulaci&#243;n" o "limitaci&#243;n" (<emph>throttling</emph>, en ingl&#233;s).
+Se considera una buena forma de no golpear el servidor de alguien con muchas solicitudes por segundo;
+y el ligero retraso hace que sea m&#225;s probable que todos los archivos se descarguen antes de agotar nuestro tiempo de conexi&#243;n (v&#233;ase <link target="https://www.checkupdown.com/status/E408.html">time out</link>).
+Elimina la l&#237;nea que dice <code type="inline">print(urls)</code> y pon en su lugar el c&#243;digo de abajo (ten en cuenta que quede sangrado exactamente donde estaba esa l&#237;nea).
+Agrega el siguiente c&#243;digo al final de la funci&#243;n <code type="inline">obtener_procesos_individuales</code>, luego de la l&#237;nea que tiene <code type="inline">urls.append(url)</code>.
+Este c&#243;digo generar&#225; la URL de cada p&#225;gina individual, la descargar&#225; en tu computador en directorio ya creado,
+guardar&#225; el archivo y se detendr&#225; durante 3 segundos antes de pasar al siguiente proceso judicial.
+Todo lo siguiente est&#225; contenido en un bucle <code type="inline">for</code> que se ejecutar&#225; una vez por cada proceso en tu lista de URLs.</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_32" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_32.txt"/></pre>
+<p>(Nota que en la instrucci&#243;n <code type="inline">with open</code> usamos la variable <code type="inline">f2</code> en lugar de <code type="inline">f</code>.
+Eso es porque todo este c&#243;digo est&#225; incluido en bloque <code type="inline">with open</code> abierto,
+que ya ha definido la variable <code type="inline">f</code>.)</p>
+<p>Si juntamos todo en una sola funci&#243;n, deber&#237;a verse algo como lo que sigue.
+Hemos a&#241;adido tambi&#233;n un par de <code type="inline">print</code>s para ir viendo c&#243;mo avanza nuestro programa:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_33" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_33.txt"/></pre>
+<p>Ahora agreguemos la misma pausa de tres segundos a nuestra funci&#243;n <code type="inline">obtener_resultados_consulta</code> para ser amables con los servidores del <emph>OBO</emph>:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_34" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_34.txt"/></pre>
+<p>Finalmente, llama a la funci&#243;n desde el programa <code type="inline">descarga_consultas.py</code>.</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_35" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_35.txt"/></pre>
+<p>Has creado un programa que puede solicitar y descargar archivos del sitio web del <emph>OBO</emph>,
+seg&#250;n los par&#225;metros de b&#250;squeda que definiste, &#161;todo sin visitar manualmente el sitio!</p>
+</div><div type="3"><head>Si los archivos no se descargan</head>
+<p>Comprueba que los 13 archivos se hayan descargado correctamente.
+&#193;brelos en tu navegador web y verifica que est&#233;n bien.
+Si es as&#237;, &#161;genial!
+Sin embargo, existe la posibilidad de que el programa se atore en el proceso.
+Esto se debe a que, aunque el programa se ejecute en nuestra propia m&#225;quina, se basa en dos factores que est&#225;n fuera de nuestro control inmediato:
+la velocidad de Internet y el tiempo de respuesta del servidor del <emph>OBO</emph> en ese momento.
+Una cosa es pedirle a Python que descargue un solo archivo;
+pero cuando le pedimos que descargue un archivo cada 3 segundos,
+existe una gran probabilidad de que el servidor agote el tiempo de conexi&#243;n o no nos env&#237;e el archivo que buscamos.</p>
+<p>Si estuvi&#233;ramos usando un navegador web para hacer estas solicitudes, eventualmente recibir&#237;amos un mensaje diciendo:
+"La conexi&#243;n se ha agotado" o algo por el estilo.
+Todos vemos esto de vez en cuando.
+Sin embargo, nuestro programa no est&#225; dise&#241;ado para manejar o transmitir dichos mensajes de error.
+En su lugar, te dar&#225;s cuenta de que algo malo pasa, cuando descubras que el programa no ha devuelto el n&#250;mero esperado de archivos o que simplemente no hace nada.
+Para evitar la frustraci&#243;n y la incertidumbre, queremos un programa a prueba de fallas que intente descargar cada proceso judicial.
+Si por alguna raz&#243;n falla, lo anotaremos y pasaremos al siguiente proceso.</p>
+<p>Para hacer esto, haremos uso del mecanismo de manejo de errores y excepciones (<emph>try/except</emph>) de Python (ver <link target="https://docs.python.org/es/3/tutorial/errors.html">errores y excepciones</link>),
+as&#237; como otro m&#243;dulo de Python <code type="inline">socket</code>.
+<code type="inline">try/except</code> se parece mucho a una declaraci&#243;n <code type="inline">if/else</code>.
+Cuando le pides a Python que <emph>pruebe</emph> algo (<code type="inline">try</code>), intentar&#225; ejecutar el c&#243;digo.
+Si el c&#243;digo no logra hacer lo que se ha definido, ejecutar&#225; el c&#243;digo <code type="inline">except</code>.
+Esto se conoce como <emph>manejo de errores</emph> y se usa con mucha frecuencia.
+Podemos tomar ventaja de esto dici&#233;ndole a nuestro programa que intente descargar una p&#225;gina.
+Si esto falla, le pediremos que nos informe qu&#233; archivo no se pudo descartar y luego seguiremos adelante.
+Para esto necesitamos usar el m&#243;dulo <code type="inline">socket</code>, que nos permitir&#225; poner un l&#237;mite de tiempo en un intento de descarga antes de continuar. Esto implica alterar la funci&#243;n <code type="inline">obtener_procesos_individuales</code>.</p>
+<p>Primero debemos importar el m&#243;dulo <code type="inline">socket</code>, lo que debe hacerse de la misma manera que todas nuestras importaciones de m&#243;dulos anteriores.
+Tambi&#233;n tendremos que establecer la duraci&#243;n predeterminada del tiempo de espera de <code type="inline">socket</code>:
+cu&#225;nto tiempo intentaremos descargar una p&#225;gina antes de darnos por vencidos.
+Esto debe escribirse inmediatamente despu&#233;s del comentario <code type="inline"># descarga la p&#225;gina</code></p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_36" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_36.txt"/></pre>
+<p>A continuaci&#243;n, agregaremos la declaraci&#243;n <code type="inline">try/except</code>.
+En este caso, pondremos todo el c&#243;digo dise&#241;ado para descargar y guardar los procesos judiciales en la declaraci&#243;n <code type="inline">try</code>, y en la declaraci&#243;n <code type="inline">except</code> le diremos al programa lo que queremos que haga si eso falla.
+Aunque podr&#237;amos dejar la l&#237;nea de la excepci&#243;n de manera gen&#233;rica (simplemente con un <code type="inline">except:</code>),
+<link target="https://peps.python.org/pep-0008/#programming-recommendations">Python recomienda</link>
+especificar el tipo de excepci&#243;n ocurrida.
+Para ello usamos <code type="inline">except OSError as msg:</code>.
+Esto nos dice que la excepci&#243;n es de tipo <link target="https://docs.python.org/es/3/library/exceptions.html#OSError"><code type="inline">OSError</code></link> y guardar&#225; los detalles en la variable <code type="inline">msg</code>.</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_37" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_37.txt"/></pre>
+<p>Si surge un problema al descargar un determinado archivo, recibir&#225;s un mensaje en el terminal.
+Si solo hay uno o dos archivos no descargados, probablemente sea m&#225;s r&#225;pido visitar las p&#225;ginas manualmente y usar la funci&#243;n "Guardar como..." de tu navegador.
+Pero si tienes esp&#237;ritu de aventura puedes modificar el programa para descargar autom&#225;ticamente los archivos restantes.</p>
+<p>El archivo <code type="inline">obo.py</code> terminado deber&#225; verse como esto:</p>
+<pre><code class="language-python" xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_38" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_38.txt"/></pre>
+</div></div>
+      <div type="2"><head>Pr&#243;ximos pasos: usar una interfaz de programaci&#243;n de aplicaciones (API)</head>
+<p>Para usuarias/os m&#225;s avanzadas/os, o para adquirir m&#225;s destreza, vale la pena leer acerca de c&#243;mo lograr este mismo proceso utilizando las <link target="https://es.wikipedia.org/wiki/Interfaz_de_programaci%C3%B3n_de_aplicaciones">interfaces de programaci&#243;n de aplicaciones (API)</link>.
+Un sitio web con una API generalmente proporcionar&#225; instrucciones sobre c&#243;mo solicitar ciertos documentos.
+Es un proceso muy similar al que acabamos de hacer interpretando las cadenas de consulta de URL, pero sin el trabajo adicional de detective que hicimos para descifrar el comportamiento de cada variable.
+Si tienes inter&#233;s en el <emph>OBO</emph>, el sitio cuenta con <link target="https://www.oldbaileyonline.org/static/DocAPI.jsp">una buena API y su documentaci&#243;n es muy &#250;til</link>.</p>
+</div>
+      <div type="2"><head>Notas</head>
+<p><note id="1"> El <link target="https://es.wikipedia.org/wiki/Old_Bailey">Tribunal Penal Central de Inglaterra y Gales</link> es conocido tambi&#233;n como el <emph>OBO</emph>, por la calle en la que est&#225; ubicada en Londres. El sitio web del <link target="https://www.oldbaileyonline.org"><emph>OBO</emph></link> contiene los registros judiciales de dicho tribunal desde 1674 hasta* 1913. (N. de T.)</note></p>
+<p><note id="2"> Hemos dejado los t&#233;rminos de b&#250;squeda en ingl&#233;s, ya que son los que arrojan resultados en la p&#225;gina web de <emph>Old Bailey Online</emph>. (N. de T.)</note></p>
+<p><note id="3"> El eufemismo "n-word" se refiere a una de las palabras m&#225;s ofensivas que existe en lengua inglesa para designar a los afrodescendientes. Puede verse una explicaci&#243;n [aqu&#237;]<link target="https://www.wordreference.com/es/translation.asp?tranword=nigger">aqu&#237;</link>. (N. de T.)</note></p>
+<p><note id="4"> Aqu&#237; usaremos el t&#233;rmino "<hi rend="bold">variable de servidor</hi>" para <emph>las variables que se asignan en un URL</emph> y que son procesados por el servidor (PhP, Ruby on Rails, Flask, etc.).</note>
+En el caso del <emph>OBO</emph>, los nombres de estas siguen la convenci&#243;n del <link target="https://es.wikipedia.org/wiki/Camel_case">camelCase o letra de caja camello</link>; por ejemplo: <code type="inline">fromYear</code>, <code type="inline">toYear</code>, <code type="inline">fromMonth</code>, <code type="inline">toMonth</code>, etc.
+Por el contrario, llamaremos simplemente "<hi rend="bold">variables</hi>" a las variables de Python.
+<link target="https://peps.python.org/pep-0008/">La convenci&#243;n de Python</link> es <emph>no</emph> usar camelCase para sus nombres sino usar guiones bajos <code type="inline">_</code> para mejorar la legibilidad; en nuestro caso, <code type="inline">from_year</code>, <code type="inline">to_year</code>, <code type="inline">from_month</code>, <code type="inline">to_month</code>, etc.</p>
+<p><note id="5"> La funci&#243;n <code type="inline">range</code> de Python crea una <link target="https://docs.python.org/3/library/stdtypes.html#typesseq-range">secuencia inmutable de n&#250;meros</link> que puede ser usada como iterador en un bucle <code type="inline">for</code>.</note>
+<code type="inline">range</code> toma un argumento obligatorio: el valor de parada. Este valor siempre es <emph>una unidad menor que</emph> el valor de parada.
+El valor inicial de la secuencia es por defecto 0.
+As&#237;, por ejemplo, <code type="inline">range(3)</code> crear&#225; la siguiente secuencia inmutable: <code type="inline">0, 1, 2</code>, puesto que 2 es una unidad menor que el valor de parada 3.
+<code type="inline">range</code> tambi&#233;n puede tomar un valor inicial distinto como <emph>primer</emph> argumento de funci&#243;n (aunque es opcional).
+Por ejemplo, <code type="inline">range(1, 3)</code> crear&#225; la secuencia: <code type="inline">1, 2</code>.
+Es por esto que en el ejemplo del c&#243;digo de la lecci&#243;n necesitamos la expresi&#243;n <code type="inline">range(1, contar_paginas + 1)</code>.
+Esta expresi&#243;n crea una secuencia que empieza en 1 y se detiene <emph>e incluye</emph> el valor de la variable <code type="inline">contar_paginas</code>.
+Por ejemplo, si <code type="inline">contar_paginas</code> es 3, la expresi&#243;n <code type="inline">range(1, contar_paginas + 1)</code> equivaldr&#225; a <code type="inline">range(1, 4)</code>, que en efecto crear&#225; la secuencia <code type="inline">1, 2, 3</code>.
+Por lo tanto, el bucle <code type="inline">for pagina in range(1, contar_paginas + 1)</code> iterar&#225; tres veces: una vez por cada p&#225;gina de resultados.</p>
+<p><note id="6"> M&#225;s adelante, en la funci&#243;n <code type="inline">obtener_procesos_individuales</code>, procesaremos una a una las p&#225;ginas descargadas, buscando las URLs de los procesos judiciales en la <emph>OBO</emph>.</note>
+Ser&#225; importante que los procesemos en el mismo orden en que los descargamos: <code type="inline">resultado_consulta0.html</code>, <code type="inline">resultado_consulta1.html</code>, <code type="inline">resultado_consulta2.html</code>, etc.
+Cuando lleguemos a <code type="inline">resultado_consulta10.html</code> nos encontraremos con un problema.
+Como el orden de procesamiento de archivos ocurre por orden alfab&#233;tico (pues as&#237; se ordenan por defecto en los directorios),
+<code type="inline">resultado_consulta10.html</code> ser&#225; procesado luego de <code type="inline">resultado_consulta1.html</code> y antes de <code type="inline">resultado_consulta2.html</code>.
+Para el ejemplo de esta lecci&#243;n eso no ser&#225; un problema, porque solo tenemos dos p&#225;ginas de consulta (dado que hay 13 registros).
+Si quisi&#233;ramos blindar nuestro c&#243;digo para b&#250;squedas con m&#225;s de 99 registros, debemos asegurarnos de que el orden de procesamiento sea el correcto.
+Una forma sencilla de hacerlo as&#237;:</p>
+<pre><code xml:id="code_descarga-multiples-registros-usando-cadenas-de-consulta_39" type="block" corresp="code_descarga-multiples-registros-usando-cadenas-de-consulta_39.txt"/></pre>
+<p><note id="7"> La <code type="inline">r</code> en la expresi&#243;n <code type="inline">r'\W'</code> establece que <code type="inline">'\W'</code> es una "cadena cruda" (<emph>raw string</emph>), lo que facilita en general el trabajo con expresiones regulares. Al respecto v&#233;asen <link target="https://docs.python.org/3/library/re.html">https://docs.python.org/3/library/re.html</link> y <link target="https://blog.devgenius.io/beauty-of-raw-strings-in-python-fa627d674cbf">https://blog.devgenius.io/beauty-of-raw-strings-in-python-fa627d674cbf</link></note></p>
+</div>
+    </body>
+  </text>
+</TEI>

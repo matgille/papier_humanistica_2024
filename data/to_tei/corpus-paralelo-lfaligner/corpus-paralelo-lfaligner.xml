@@ -1,0 +1,191 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="corpus-paralelo-lfaligner">
+  <teiHeader>
+ <fileDesc>
+  <titleStmt>
+   <title>Creaci&#243;n de corpus paralelo con LF Aligner
+</title>
+  <author type="original_author">Armando Luza</author><editor type="reviewers"><persName>Antonio Rojas Castro</persName><persName>Ignacio Rodr&#237;guez</persName></editor><editor type="editors">Maria Jos&#233; Afanador-Llach</editor></titleStmt>
+  <publicationStmt>
+   <idno type="doi">10.46430/phes0044</idno><date type="published">04/01/2019</date><p>Lesson reviewed and published in Programming Historian.</p>
+  </publicationStmt>
+  <sourceDesc>
+  <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target=""/></p></sourceDesc>
+ </fileDesc>
+ <profileDesc><abstract><p>Esta lecci&#243;n ense&#241;a a crear corpus con traducciones a distintas lenguas, de forma que queden perfectamente alineados para una mejor visualizaci&#243;n y consulta.
+</p></abstract><textClass><keyword xml:lang="en">distant-reading</keyword></textClass></profileDesc>
+</teiHeader>
+  <text xml:lang="es">
+    <body><p>Un corpus paralelo o <emph>bitexto</emph> consiste en la recopilaci&#243;n de varias versiones de un texto. En este tutorial aprender&#225;s a alinear el texto original con sus traducciones para poder cotejarlos con facilidad.</p>
+<div type="2"><head>Introducci&#243;n</head>
+<p>LF Aligner es un programa gratuito, basado en un <link target="https://github.com/danielvarga/hunalign">algoritmo de c&#243;digo abierto de alineaci&#243;n de oraciones</link>, que pertenece al conjunto de herramientas digitales llamadas <emph><hi rend="bold">CATs</hi></emph> (<emph>Computer Assisted Translation Tools</emph>, por sus siglas en ingl&#233;s) o herramientas de traducci&#243;n asistida. Principalmente, se usa para la creaci&#243;n de bitextos que facilitan la b&#250;squeda de t&#233;rminos especializados y sus traducciones. Sitios como <link target="https://www.linguee.es/">Linguee</link> utilizan este tipo de herramientas para crear enormes corpus paralelos que el usuario puede consultar f&#225;cilmente. En ciencias sociales y humanidades podemos aprovechar este programa para crear textos que faciliten las tareas de lectura distante y <link target="http://vocabularios.caicyt.gov.ar/portalthes/42/term/134">an&#225;lisis estil&#237;stico</link>. La aplicaci&#243;n puede importar texto de documentos en m&#250;ltiples formatos y de memorias de traducci&#243;n generadas con programas de c&#243;digo libre o privativo. En este tutorial nos centraremos en la importaci&#243;n de texto de fuentes digitales usadas comunmente por los investigadores como p&#225;ginas web o documentos de texto plano, ya que, adem&#225;s, agilizan el proceso de alineaci&#243;n del corpus.</p>
+</div><div type="2"><head>Para este tutorial necesitar&#225;s los siguientes materiales y conocimientos:</head>
+<ul>
+<li>El programa <link target="https://sourceforge.net/projects/aligner/">LF Aligner</link>, disponible para Windows (versi&#243;n 4.2), Mac (versi&#243;n 3.12) y Linux (versi&#243;n 3.11). <hi rend="bold">En este tutorial nos centraremos en la versi&#243;n de Windows, que es la m&#225;s reciente. Sin embargo, tambi&#233;n se explicar&#225; c&#243;mo utilizarlo en Mac y en sistemas basados en el kernel de Linux.</hi> La interfaz del programa est&#225; en ingl&#233;s y no cuenta con una versi&#243;n en espa&#241;ol, por lo que se proveen traducciones de algunos elementos que son indispensables para comprender el funcionamiento de LF Aligner.</li>
+<li>Un texto de partida -digitalizado- y por lo menos una traducci&#243;n de este. En este caso, alinearemos distintas traducciones de un documento que desde 1948 gu&#237;a el quehacer y la convivencia humana en todos los &#225;mbitos de la vida p&#250;blica y privada, la <link target="https://es.wikipedia.org/wiki/Declaraci%C3%B3n_Universal_de_los_Derechos_Humanos">Declaraci&#243;n Universal de Derechos Humanos</link>: en <link target="/assets/corpus-paralelo-lfaligner/DDHH_es.txt">espa&#241;ol</link>, <link target="/assets/corpus-paralelo-lfaligner/DDHH_en.txt">ingl&#233;s</link>, <link target="/assets/corpus-paralelo-lfaligner/DDHH_fr.txt">franc&#233;s</link> y <link target="/assets/corpus-paralelo-lfaligner/DDHH_pt.txt">portugu&#233;s</link></li>
+<li>Conocimiento b&#225;sico de las lenguas de traducci&#243;n, ya que en algunos casos tendremos que modificar algunos de los segmentos alineados.</li>
+</ul>
+<p>Adicionalmente, podemos utilizar este programa para alinear distintas versiones de un texto en una misma lengua, lo que es &#250;til para <link target="http://vocabularios.caicyt.gov.ar/portalthes/42/term/136">an&#225;lisis relacional</link>, pero hay otras iniciativas que cumplen mejor con esta tarea como <link target="https://collatex.net/">Collatex</link>.</p>
+<p>Es importante ser sistem&#225;tico con la clasificaci&#243;n de los documentos. El nombre de nuestros archivos txt debe acompa&#241;arse con el c&#243;digo que alude a la lengua del texto. Con ello aseguramos que la informaci&#243;n con la que trabajamos siga convenciones oficiales que ser&#225;n &#250;tiles a la hora de comunicar los resultados de nuestra investigaci&#243;n Para ello nos basaremos en el c&#243;digo <link target="http://utils.mucattu.com/iso_639-1.html">ISO 639-1</link> que identifica a cada lengua con dos letras. As&#237;, el espa&#241;ol se identifica con <emph>es</emph>, el ingl&#233;s con <emph>en</emph>, el franc&#233;s con <emph>fr</emph> y el portugu&#233;s con <emph>pt</emph>.</p>
+<p>Si trabajas con lenguas que no est&#233;n incluidas en ese c&#243;digo, puedes recurrir al c&#243;digo <link target="https://es.wikipedia.org/wiki/ISO_639-3">ISO 639-3</link> que utiliza descriptores de 3 letras y abarca la totalidad de las lenguas del mundo.</p>
+<p>Como resultado final del procesamiento de los textos con LF Aligner obtendr&#225;s algo as&#237;:</p>
+<p>{% include figure.html filename="lfaligner-1.jpg" caption="Resultado del procesamiento de los textos"%}</p>
+</div><div type="2"><head>Instalaci&#243;n y ejecuci&#243;n del programa</head>
+<p>Para comenzar a utilizar el programa, no es necesario instalar ning&#250;n software adicional; solo debes descargar el paquete que ofrece la web oficial, descomprimirlo en una carpeta de tu elecci&#243;n y ejecutar el archivo .exe (Windows), .sh (Linux) o .command (Mac), seg&#250;n corresponda, que se encuentra en el paquete.</p>
+<p>El uso de las versiones para Linux y Mac es id&#233;ntico, salvo en la forma de ejecutar el programa.</p>
+<p><hi rend="bold">En el caso de Mac</hi>, al ejecutar el archivo <emph>.command</emph>, se abrir&#225; una ventana con la terminal que premite continuar con el proceso de alineaci&#243;n.</p>
+<p><hi rend="bold">En el caso de Linux</hi>, necesitar&#225;s abrir, por separado, la terminal disponible en tu distribuci&#243;n de Linux para luego ejecutar el fichero.</p>
+<p>Adem&#225;s, si trabajas en un entorno Linux de 64 bits, necesitar&#225;s instalar algunos paquetes adicionales para que el programa funcione correctamente. Los comandos que debes introducir en la terminal son los siguientes:</p>
+<ol>
+<li>sudo dpkg --add-architecture i386</li>
+<li>sudo apt-get update</li>
+<li>sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386</li>
+</ol>
+<p>Para abrir el programa, adem&#225;s de utilizar los comandos de navegaci&#243;n, una forma sencilla de ejecutar este tipo de archivos consiste en arrastrarlo hasta la ventana de la terminal, soltarlo ah&#237; y luego presionar <emph>entrar</emph>.</p>
+<figure><desc>Ejecuci&#243;n del programa en Linux</desc><graphic url="1a.jpg"/></figure>
+</div><div type="2"><head>Carga de documentos en el programa</head>
+<div type="3"><head>Eligiendo el formato apropiado</head>
+<p>Antes de comenzar a utilizar el programa, debemos extraer la informaci&#243;n que nos interesa y almacenarla en un documento txt. Se recomienda hacer una revisi&#243;n previa de cada texto, por separado, para identificar elementos que podr&#237;an interferir en el proceso de alineaci&#243;n de los textos. Es importante que cada texto tenga una puntuaci&#243;n, cuando menos, consistente, as&#237; como una tabulaci&#243;n regular. En lo posible, las palabras y oraciones deben estar separadas por un solo espacio y los p&#225;rrafos por una cantidad de espacios y marcas de p&#225;rrafo regular.</p>
+<figure><desc>Documentos de texto plano</desc><graphic url="lfaligner-2.jpg"/></figure>
+</div><div type="3"><head>Interfaz de carga</head>
+<p>Al ejecutar el programa, nos mostrar&#225; inmediatamente la interfaz de carga de documentos con las opciones que se describen a continuaci&#243;n:</p>
+<figure><desc>Interfaz de carga: selecci&#243;n de tipo de documentos</desc><graphic url="lfaligner-3.jpg"/></figure>
+<ol>
+<li>txt (UTF-8), rtf, doc o docx: permite importar texto plano o guardado en formatos de procesadores de texto como Microsoft Word y Libreoffice Writter. Es la opci&#243;n m&#225;s com&#250;n, puesto que, por lo general, modificaremos un poco los textos antes de trabajar con ellos.</li>
+<li>pdf o pdf exportado a txt: algunos documentos con formato .pdf permiten exportar todo el texto que contienen a un archivo txt. Por lo general, podremos hacer esto desde el men&#250; de <emph>archivo</emph> de nuestro lector de documentos pdf favorito, con la opci&#243;n <emph>guardar como</emph> y eligiendo el formato txt para guardar.</li>
+<li>Archivo HTML almacenado en nuestro equipo: permite cargar una p&#225;gina descargada y almacenada en nuestro equipo o unidad de almacenamiento port&#225;til. Debemos asegurarnos que dicho sitio web solo contenga el texto que nos interesa, ya que el programa importar&#225; indiscriminadamente todo lo que ese sitio contenga, incluyendo el texto del men&#250; del sitio y de otros enlaces ah&#237; presentes.</li>
+<li>webpage (p&#225;gina web):  permite insertar la direcci&#243;n web en la que se encuentra el texto para cargarlo autom&#225;ticamente. Al igual que con la opci&#243;n anterior, debemos procurar que el sitio solo contenga el texto que nos interesa para asegurar una alineaci&#243;n satisfactoria.</li>
+<li>EU legislation by CELEX number (legislaci&#243;n de la UE seg&#250;n n&#250;mero CELEX): esta opci&#243;n permite ingresar el n&#250;mero identificador de un documento legislativo de la Uni&#243;n Europea para que el programa descargue e importe autom&#225;ticamente los documentos en las lenguas que nos interesan. La numeraci&#243;n CELEX clasifica los documentos seg&#250;n tipo, tema y otros rasgos caracter&#237;sticos.</li>
+<li>European Parliament reports (informes del Parlamento Europeo): permite descargar estos informes seg&#250;n a&#241;o y n&#250;mero, en las lenguas que posteriormente especifiquemos.</li>
+</ol>
+<p>Para efectos de este tutorial, debemos seleccionar la primera opci&#243;n, <emph>txt (UTF-8), rtf, doc o docx</emph>, y presionar el bot&#243;n <emph>next</emph> (siguiente).</p>
+<p><hi rend="bold">Particularides de la interfaz en Linux y Mac</hi>
+En los sistemas Mac y en los basados en Linux el funcionamiento es id&#233;ntico, pero la interfaz se despliega de otra forma. En lugar de abrirse una nueva ventana, el programa muestra sus opciones dentro de la terminal abierta. Para elegir la modalidad de trabajo, debemos introducir, con el teclado, el c&#243;digo asignado a cada funci&#243;n. Las opciones que ofrece esta versi&#243;n son las siguientes:</p>
+<p>t. txt (UTF-8), rtf, doc o docx.</p>
+<p>p. pdf o pdf exportado a txt.</p>
+<p>h. Archivo HTML almacenado en nuestro equipo.</p>
+<p>w. P&#225;gina web.</p>
+<p>c. Legislaci&#243;n de la UE seg&#250;n n&#250;mero CELEX.</p>
+<p>com. Propuestas de la Comisi&#243;n Europea.</p>
+<p>epr. Informes del Parlamento Europeo.</p>
+<p>En este caso, ya que trabajaremos con documentos <emph>txt</emph>, debemos ingresar <emph>t</emph>- y presionar <emph>entrar</emph>.</p>
+<figure><desc>Interfaz de carga en Linux: selecci&#243;n de tipo de documentos</desc><graphic url="3a.jpg"/></figure>
+</div><div type="3"><head>Especificando las lenguas de tus textos</head>
+<figure><desc>Interfaz de selecci&#243;n de lenguas</desc><graphic url="lfaligner-4.jpg"/></figure>
+<p>Las opciones que la interfaz de selecci&#243;n de lenguas ofrece por defecto son las siguientes:</p>
+<ul>
+<li>Cantidad de lenguas</li>
+<li>Lengua 1</li>
+<li>Lengua 2</li>
+</ul>
+<p>LF Aligner puede alinear hasta 11 documentos de forma simult&#225;nea. Por defecto, ofrece la opci&#243;n de comenzar con el par ling&#252;&#237;stico ingl&#233;s-h&#250;ngaro, pero podemos cambiar la opci&#243;n que presenta por defecto si editamos el archivo LF_aligner_setup.txt que se encuentra en la carpeta del software.</p>
+<figure><desc>Configuraci&#243;n por defecto: ingl&#233;s y h&#250;ngaro</desc><graphic url="lfaligner-5.jpg"/></figure>
+<figure><desc>Aqu&#237; se ha modificado el par a espa&#241;ol-ingl&#233;s</desc><graphic url="lfaligner-6.jpg"/></figure>
+<p>De momento, regresemos a la interfaz por defecto. En nuestro caso, alinearemos cuatro textos, por lo que en la opci&#243;n <emph>Number of languages</emph> (cantidad de lenguas) debemos cambiar la cantidad de 2 a 4.</p>
+<p>Del mismo modo, debemos especificar cu&#225;l ser&#225; el texto principal o de partida que servir&#225; como eje para el cotejo. Sin embargo, puedes cambiar el orden de las lenguas, si as&#237; lo deseas, luego de alinear los textos. Si trabajas con muchas lenguas y quieres cotejar traducciones respecto de una lengua en espec&#237;fico, colocar el texto fuente en una posici&#243;n central (y no a la extrema izquierda) podr&#237;a ser &#250;til. De momento, posicionaremos el texto en espa&#241;ol en la primera columna de nuestro bitexto. En la opci&#243;n <emph>Language 1</emph> (lengua 1) cambiaremos la lengua a espa&#241;ol (<emph>Spanish</emph>). Debemos hacer lo mismo con las lenguas 2 (<emph>English</emph>), 3 (<emph>French</emph>) y 4 (<emph>Portuguese</emph>). Una vez lista esta configuraci&#243;n, presiona el bot&#243;n <emph>next</emph> (siguiente).</p>
+<figure><desc>Interfaz de selecci&#243;n de lenguas con la configuraci&#243;n deseada</desc><graphic url="lfaligner-7.jpg"/></figure>
+<p><hi rend="bold">C&#243;mo especificar las lenguas de los textos en las versiones de Linux y Mac</hi>
+Como vimos anteriormente, las opciones se despliegan como texto dentro de la terminal. Debemos introducir con el teclado el n&#250;mero de lenguas (m&#237;nimo: 2; m&#225;ximo: 11) y la combinaci&#243;n que deseamos, seg&#250;n el c&#243;digo de dos letras que cada lengua tiene (en nuestro caso: <emph>es</emph>, <emph>en</emph>, <emph>fr</emph> y <emph>pt</emph>).</p>
+<figure><desc>Interfaz de selecci&#243;n de lenguas en Linux</desc><graphic url="4a.jpg"/></figure>
+</div><div type="3"><head>Cargando los documentos</head>
+<p>Los documentos se cargan uno a uno. Presiona el bot&#243;n <emph>Browse</emph> (explorar) junto a la etiqueta de cada lengua para buscar el documento correspondiente. Es importante separar los archivos en una carpeta f&#225;cil de localizar y que se use exclusivamente para almacenar los documentos que queremos integrar en nuestro corpus paralelo.</p>
+<figure><desc>Interfaz de carga de documentos</desc><graphic url="lfaligner-8.jpg"/></figure>
+<p>Podemos observar que cada archivo est&#225; debidamente nombrado, con c&#243;digo de dos letras, seg&#250;n lengua. Al cargar todos los archivos, la interfaz se ver&#225; as&#237;:</p>
+<p>{% include figure.html filename="lfaligner-9.jpg" %}</p>
+<p>Presiona el bot&#243;n <emph>next</emph> (siguiente) para que el software proceda con la alineaci&#243;n autom&#225;tica.</p>
+<p><hi rend="bold">Carga de documentos en las versiones de Linux y Mac</hi>
+Conforme lo solicite el programa, arrastraremos cada archivo -uno a la vez, en el orden que establecimos al momento de ingresar las lenguas-, lo soltaremos dentro de la ventana de la terminal y presionaremos <emph>entrar</emph>. Luego de haber cargado el &#250;ltimo documento, el programa comenzar&#225; autom&#225;ticamente con la alineaci&#243;n.</p>
+<figure><desc>Interfaz de carga de documentos en Linux</desc><graphic url="8a.jpg"/></figure>
+<p>Como podemos ver en la imagen, nos pide cada documento seg&#250;n el orden que ingresamos anteriormente. Primero, debemos arrastrar el documento en ingl&#233;s (<emph>en</emph>), despu&#233;s, el documento en espa&#241;ol (<emph>es</emph>), en tercer lugar, el documento en franc&#233;s (<emph>fr</emph>) y, por &#250;ltimo, el documento en portugu&#233;s (<emph>pt</emph>).</p>
+</div></div><div type="2"><head>Resultados de la alineaci&#243;n</head>
+<figure><desc>Resultados del proceso de alineaci&#243;n</desc><graphic url="lfaligner-10.jpg"/></figure>
+<p>Antes de exportar el nuevo documento, el programa nos informar&#225; sobre los resultados del proceso de alineaci&#243;n autom&#225;tica. El algoritmo reconoce segmentos que corresponden a oraciones y organiza todos los textos de ese modo para proceder con la alineaci&#243;n.</p>
+<p>En la imagen mostrada arriba, podemos observar que el texto en espa&#241;ol ten&#237;a originalmente 92 segmentos; el software ha aumentado esta cifra a 99. Este ligero aumento en la cantidad de oraciones corresponde a la descomposici&#243;n de los p&#225;rrafos de cada documento. Del mismo modo, las oraciones de los dem&#225;s textos han sido reorganizadas gracias al algoritmo y, en lo posible, alineadas con los segmentos correspondientes de las traducciones. Este resultado es esperable y se requiere de la intervenci&#243;n del usuario para completar el proceso de alineaci&#243;n. La pr&#225;ctica de esa tarea aporta al an&#225;lisis preliminar del corpus, ya que seremos capaces de notar algunas diferencias estructurales en la composici&#243;n de los textos. Esta leve diferencia entre las distintas versiones puede ser producto de omisiones o adiciones en las traducciones de la obra, o de diferencias sustanciales en las pausas utilizadas en el discurso, es decir, la puntuaci&#243;n.</p>
+<p>Por esta raz&#243;n, la interfaz de resultados ofrece dos opciones (Windows):</p>
+<ol>
+<li><emph>Al parecer, la segmentaci&#243;n fue exitosa, as&#237; que usar&#233; los textos segmentados por oraci&#243;n</emph>: En nuestro caso, esta es la opci&#243;n que debemos escoger. En comparaci&#243;n con nuestro texto de partida, las traducciones tienen solo 2 o 3 segmentos m&#225;s. Como se menciona arriba, explorar los elementos que produjeron este resultado nos ayudan a tener un primer acercamiento a texto, como veremos a continuaci&#243;n.</li>
+<li>Revertir a las versiones segmentadas por p&#225;rrafo: Si las diferencias en la segmentaci&#243;n son muy grandes, tanto de cada texto por separado como entre ellos, podemos recurrir a esta opci&#243;n. Revertir a las versiones segmentadas por p&#225;rrafo tambi&#233;n es &#250;til cuando trabajamos con lenguas que son muy diferentes entre s&#237; o que el algoritmo no soporta de manera oficial. Esto permite continuar con el proceso de alineaci&#243;n, aunque se pierda un poco del potencial de la visualizaci&#243;n.</li>
+</ol>
+<p>Luego de haber tomado una decisi&#243;n al respecto -lo que tambi&#233;n obedecer&#225; a las necesidades de nuestro proyecto de investigaci&#243;n- debemos presionar el bot&#243;n <emph>next</emph> (siguiente) para continuar.</p>
+<p><hi rend="bold">Importante</hi>. Seleccionar la opci&#243;n de <emph>Generate xls in background after review</emph> (crear documento en formato xls despu&#233;s de la revisi&#243;n), para poder exportar nuestro documento perfectamente alineado de manera autom&#225;tica, una vez completada la revisi&#243;n.</p>
+<p><hi rend="bold">Resultados de la alineaci&#243;n en las versiones de Linux y Mac</hi>
+El programa nos informar&#225; sobre los resultados del proceso de alineaci&#243;n, ofreci&#233;ndonos casi las mismas opciones que su contraparte de Windows. La diferencia radica en que aqu&#237; simplemente nos pregunta si queremos revertir a segmentaci&#243;n por p&#225;rrafo o no. Para tomar esta decisi&#243;n, debemos basarnos en el resultado final de la segmentaci&#243;n que se muestra en pantalla:</p>
+<figure><desc>Resultados del proceso de alineaci&#243;n en Linux</desc><graphic url="10a.jpg"/></figure>
+<p>En este caso, la variaci&#243;n en el n&#250;mero de segmentos antes y despu&#233;s de la alineaci&#243;n es m&#237;nima; esto quiere decir que no necesitamos revertir a la separaci&#243;n por p&#225;rrafo y podemos conservar la versi&#243;n alineada a nivel de oraci&#243;n hecha por el programa.</p>
+<p>Para continuar, elegiremos la opci&#243;n <emph>no</emph>, introduciendo una <emph>n</emph> y presionando <emph>entrar</emph>.</p>
+</div><div type="2"><head>Edici&#243;n del bitexto</head>
+<p>Ahora solo falta decidir c&#243;mo revisaremos y editaremos el texto antes de exportarlo. El editor gr&#225;fico de LF Aligner es una herramienta que facilita esta tarea, pero tambi&#233;n podemos exportar el texto inmediatamente y modificarlo con nuestra suite de ofim&#225;tica preferida.</p>
+<p>Las opciones que el software ofrece son las siguientes (Windows):</p>
+<p>{% include figure.html filename="lfaligner-11.jpg" %}</p>
+<ol>
+<li>Usar el editor gr&#225;fico de LF Aligner</li>
+<li>Generar un documento xls y abrirlo para revisar</li>
+<li><hi rend="bold">No revisar</hi>: Escogeremos esta opci&#243;n solo cuando los valores de la segmentaci&#243;n mostrados en la interfaz anterior calcen perfectamente.</li>
+</ol>
+<p>Para este proyecto utilizaremos la herramienta de LF Aligner, por lo que debemos escoger la primera opci&#243;n y presionar <emph>next</emph> (siguiente).</p>
+<p><hi rend="bold">Consideraciones sobre la edici&#243;n del bitexto en las versiones de Linux y Mac</hi>
+Las versiones de Linux (3.11) y Mac (3.12) no cuentan con una interfaz gr&#225;fica propia para la revisi&#243;n del bitexto. Al no existir este elemento, debemos generar y exportar el documento de planilla de c&#225;lculo para revisarlo con un tercer programa. Por esta raz&#243;n, estas versiones ofrecen solo las siguientes opciones:</p>
+<ol>
+<li>No revisar (<emph>n</emph>).</li>
+<li>Abrir el documento .txt con el texto alineado para revisarlo (<emph>t</emph>).</li>
+<li>Crear y abrir un documento .xls con el texto alineado (<emph>x</emph>).</li>
+</ol>
+<p>Lo m&#225;s conveniente para nuestros fines es exportar un documento .xls para editarlo en una hoja de c&#225;lculo. Cada celda de la planilla corresponder&#225; a uno de los segmentos alineados. Seleccionamos, entonces, la tercera opci&#243;n, introduciendo <emph>x</emph> con el teclado y presionando <emph>entrar</emph>.
+En el caso de que seas usuario de Mac o Linux, debes saltarte el siguiente apartado y continuar con las instrucciones para el cierre del programa <hi rend="bold">en Linux y Mac</hi>.</p>
+<div type="3"><head>Interfaz de edici&#243;n del bitexto (solo en Windows)</head>
+<p>Se abrir&#225; una nueva ventana con la interfaz de la herramienta de edici&#243;n de los textos alineados.</p>
+<figure><desc>Herramienta gr&#225;fica de edici&#243;n</desc><graphic url="lfaligner-12.jpg"/></figure>
+<p>La primera columna marca el n&#250;mero de cada segmento y las subsiguientes contienen el texto en las lenguas que ingresamos. Respecto a los segmentos, podemos apreciar que la versi&#243;n en espa&#241;ol contiene uno inexistente en las dem&#225;s traducciones y, por tanto, el software ha creado un segmento vac&#237;o, marcando que no hay correspondencia en las otras lenguas. Esta simple diferencia puede suscitar preguntas relacionadas con el &#225;mbito de la ret&#243;rica contrastiva: &#191;Por qu&#233; las dem&#225;s versiones omiten esta informaci&#243;n? &#191;Acaso en espa&#241;ol se exige la presencia de los datos de adopci&#243;n y proclamaci&#243;n de un documento jur&#237;dico?</p>
+<p>Retomemos la numeraci&#243;n de los segmentos:</p>
+<figure><desc>Segmentos numerados</desc><graphic url="lfaligner-13.jpg"/></figure>
+<p>El software ha hecho calzar el n&#250;mero de segmentos de las traducciones con el de nuestro texto gu&#237;a y, por esa raz&#243;n, es necesario revisar el documento de forma m&#225;s acuciosa, no perdiendo de vista los resultados expuestos en la fase anterior. En este caso, la estructura del texto ha facilitado enormemente la labor, pero, aun as&#237;, es posible encontrar algunos errores como el siguiente:</p>
+<figure><desc>Error en uno de los segmentos</desc><graphic url="lfaligner-14.jpg"/></figure>
+<p>En la columna de la traducci&#243;n portuguesa (a la derecha, resaltada), parte del texto que deber&#237;a de estar en el segmento 11 ha quedado en el segmento 10, presumiblemente por diferencias en la puntuaci&#243;n. El algoritmo no ha reconocido los dos puntos como una marca de t&#233;rmino de la oraci&#243;n y esto ha provocado un desfase en esta versi&#243;n respecto de las otras.</p>
+<p>Para solucionar este problema, debemos recurrir a los comandos representados por los botones de la barra inferior:</p>
+<ol>
+<li><emph>Merge</emph> (fusionar): sirve para combinar el texto de dos segmentos distintos en uno solo.</li>
+<li><emph>Split</emph> (separar): sirve para trasladar una porci&#243;n de texto a otro segmento.</li>
+<li><emph>Shift up</emph> (desplazar hacia arriba): sirve para desplazar todo el texto de un segmento a una celda anterior, desplazando consigo el resto de los segmentos.</li>
+<li><emph>Shift down</emph> (desplazar hacia abajo): sirve para desplazar todo el texto de un segmento a una celda posterior, desplazando consigo el resto de los segmentos.</li>
+</ol>
+<p>En este caso, debemos usar el comando <emph>Split</emph> para desplazar la porci&#243;n de texto que est&#225; fuera de lugar a su casilla correspondiente. Para ello, debemos colocar el cursor del teclado en donde inicia el fragmento que deseamos mover y presionar el bot&#243;n correspondiente de la barra inferior.</p>
+<figure><desc>El cursor del teclado est&#225; al comienzo del fragmento que queremos desplazar</desc><graphic url="lfaligner-15.jpg"/></figure>
+<figure><desc>Al presional *split*, obtendremos este resultado</desc><graphic url="lfaligner-16.jpg"/></figure>
+<p>Como todav&#237;a hay una porci&#243;n de texto que debe colocarse en la celda siguiente, repetimos el procedimiento.</p>
+<figure><desc>Presionamos nuevamente *split* al comienzo del fragmento que queremos desplazar</desc><graphic url="lfaligner-17.jpg"/></figure>
+<p>Gracias a nuestra edici&#243;n, el texto de los segmentos 10, 11 y 12 ha quedado perfectamente alineado.</p>
+</div></div><div type="2"><head>Cierre del programa: Windows</head>
+<p>Cuando termines de revisar el documento, escoge la opci&#243;n <emph>save &amp; exit</emph> (guardar y salir) en el men&#250; <emph>file</emph> (archivo).</p>
+<p>{% include figure.html filename="lfaligner-18.jpg" %}</p>
+<p>Tras hacer esto, la herramienta de edici&#243;n se cerrar&#225;. Regresa a la ventana principal del programa para cerrarlo completamente.</p>
+<figure><desc>El programa nos da la opci&#243;n de generar un archivo de memoria de traducci&#243;n</desc><graphic url="lfaligner-19.jpg"/></figure>
+<p>LF Aligner ofrece la opci&#243;n de exportar nuestro documento con formato de memoria de traducci&#243;n (en este caso tmx). Este tipo de archivos sirven exclusivamente para alimentar software de traducci&#243;n asistida, ya sea para creaci&#243;n de bases terminol&#243;gicas personalizadas o para apoyo en las tareas de traducci&#243;n asistida como traducci&#243;n autom&#225;tica de segmentos. Para efectos de este tutorial, no es necesario hacer esto. Escoge la opci&#243;n <emph>no</emph> y presiona <emph>next</emph> (siguiente) para finalizar. Aparecer&#225; una &#250;ltima ventana avis&#225;ndonos que el programa se ha cerrado exitosamente.</p>
+<p><hi rend="bold">Cierre del programa en Linux y Mac</hi>
+Justo despu&#233;s de crear el archivo xls, el cual se abrir&#225; inmediatamente, el programa preguntar&#225; si deseamos crear un archivo de memoria de traducci&#243;n. Seleccionamos "no", introduciendo <emph>n</emph> y presionando <emph>entrar</emph>. El software mostrar&#225; un &#250;ltimo mensaje, indic&#225;ndonos que el proceso ha finalizado. Basta con presionar <emph>entrar</emph> una vez m&#225;s para terminar el programa. Luego de esto podemos cerrar la terminal sin ning&#250;n problema.</p>
+</div><div type="2"><head>Ubicaci&#243;n del documento alineado</head>
+<p>Si seguiste las indicaciones anteriores sobre el nombramiento y almacenamiento de los textos, te ser&#225; muy f&#225;cil encontrar el documento. Abre la carpeta en cuesti&#243;n. Ah&#237; ver&#225;s una nueva carpeta cuyo nombre comienza con la palabra <emph>align</emph>. Dentro de ella encontrar&#225;s los documentos individuales en formato txt que corresponden al texto segmentado por el software y un archivo de planilla de datos (formato xls) que contiene el texto alineado y editado por nosotros.</p>
+<figure><desc>El archivo exportado en formato xls aparecer&#225; en la carpeta correspondiente</desc><graphic url="lfaligner-20.jpg"/></figure>
+<p>Tambi&#233;n puedes <link target="/assets/corpus-paralelo-lfaligner/align_2018.08.03_14.09.46/DDHH_es-es-en-fr-pt.xls"><hi rend="bold">descargar</hi></link> el documento alineado y explorarlo para aprender m&#225;s sobre el funcionamiento de este software.</p>
+</div><div type="2"><head>Visualizaci&#243;n y b&#250;squedas simples</head>
+<p>Si deseamos editar el documento de formas que la herramienta gr&#225;fica de LF Aligner no cubre, recomendamos abrirlo con un paquete de ofim&#225;tica potente como <link target="https://es.libreoffice.org/descarga/libreoffice-estable/">Libreoffice</link>; su aplicaci&#243;n <emph>Calc</emph> es un excelente procesador de hojas de c&#225;lculo. No obstante, como ya nos dimos por satisfechos con nuestro trabajo de revisi&#243;n anterior, exportaremos el archivo en formato <emph>html</emph> para poder hacer b&#250;squedas de manera sencilla en el documento, desde nuestro navegador web. Escoge <emph>guardar como</emph>, en el men&#250; <emph>archivo</emph> y elige <emph>html</emph> como formato de guardado. La herramienta de b&#250;squeda de texto de un navegador como Google Chrome (<emph>ctrl+f</emph>) bastar&#225; para hacer consultas sencillas.</p>
+<figure><desc>B&#250;squeda simple con el navegador Google Chrome</desc><graphic url="lfaligner-21.jpg"/></figure>
+<p>Tambi&#233;n puedes guardar, por separado, las versiones reci&#233;n alineadas en documentos de texto plano (txt) y usar un visualizador sencillo de traducciones paralelas como <link target="http://www.laurenceanthony.net/software/antpconc/">AntPConc</link>.</p>
+<p>Sobre la base de la imagen anterior, podemos plantear algunas preguntas que podr&#237;an ser &#250;tiles para nuestra investigaci&#243;n; tanto en la fase preliminar de un proyecto, en la cual no se tiene claridad sobre lo que se quiere observar, como en una fase avanzada, en la que hacemos b&#250;squedas motivadas por preguntas y criterios previamente establecidos. El tutorial sobre <link target="/es/lecciones/analisis-de-corpus-con-antconc">AntConc</link> alojado en este sitio profundiza m&#225;s en el concepto de lectura distante.</p>
+<p>Como vemos con el ejemplo de <emph>persona</emph> -b&#250;squeda basada en una lectura exploratoria del texto- tanto las similitudes como las diferencias en las traducciones del t&#233;rmino son reveladoras; por un lado, permiten conocer sus distintas traducciones y, por otro, permiten describir y comprender la naturaleza de las regularidades y variaciones de estas, lo que nos acerca m&#225;s al estudio de las t&#233;cnicas de traducci&#243;n empleadas y las caracter&#237;sticas de cada texto. En otras palabras, visualizar los textos de este modo nos permite observar, cuantificar y calificar los fen&#243;menos discursivos y de traducci&#243;n que pueden encontrarse en el texto.</p>
+</div><div type="2"><head>Referencias bibliogr&#225;ficas</head>
+<ul>
+<li>
+<p>Froehlich, Heather, "An&#225;lisis de corpus con AntConc", traducido por Carlos Manuel Var&#243;n Casta&#241;eda, <emph>The Programming Historian en espa&#241;ol</emph> 3 (2018), <link target="/es/lecciones/analisis-de-corpus-con-antconc">An&#225;lisis de corpus con AntConc</link></p>
+</li>
+<li>
+<p>Luna, R., &#8220;El corpus: herramienta de investigaci&#243;n traductol&#243;gica&#8221;, <emph>Temas de traducci&#243;n</emph>, Lima, Universidad Femenina del Sagrado Coraz&#243;n (2002), pp. 57-72.</p>
+</li>
+<li>
+<p>Tiedemann, J&#246;rg, <emph>Bitext Alignment</emph>, San Rafael CA, Morgan &amp; Claypool (2011).</p>
+</li>
+</ul>
+<p class="alert alert-warning" style="alert alert-warning">
+Este tutorial fue posible gracias al apoyo de la British Academy y fue escrito durante el taller de Programming Historian llevado a cabo en la Universidad de Los Andes en Bogot&#225;, Colombia, 31 de julio - 3 de agosto, 2018.
+</p>
+</div></body>
+  </text>
+</TEI>

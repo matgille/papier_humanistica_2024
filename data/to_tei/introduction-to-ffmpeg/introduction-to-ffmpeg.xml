@@ -1,0 +1,342 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="introduction-to-ffmpeg">
+  <teiHeader>
+ <fileDesc>
+  <titleStmt>
+   <title>Introduction to Audiovisual Transcoding, Editing, and Color Analysis with FFmpeg</title>
+  <author type="original_author">Dave Rodriguez</author><editor type="reviewers"><persName>Tesla Cariani</persName><persName>Josh Romphf</persName></editor><editor type="editors">Brandon Walsh</editor></titleStmt>
+  <publicationStmt>
+   <idno type="doi">10.46430/phen0077</idno><date type="published">12/20/2018</date><p>Lesson reviewed and published in Programming Historian.</p>
+  </publicationStmt>
+  <sourceDesc>
+  <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#introduccion-a-ffmpeg"/></p></sourceDesc>
+ </fileDesc>
+ <profileDesc><abstract><p>This lesson introduces the basic functions of FFmpeg, a free command-line tool used for manipulating and analyzing audiovisual materials.</p></abstract><textClass><keyword xml:lang="en">data-manipulation</keyword><keyword xml:lang="en">data-visualization</keyword></textClass></profileDesc>
+</teiHeader>
+  <text xml:lang="en">
+    <body>
+      <div type="2"><head>Introduction</head>
+<p>The Digital Humanities, as a discipline, have historically focused almost exclusively on the analysis of textual sources through computational methods (Hockey, 2004). However, there is growing interest in the field around using computational methods for the analysis of audiovisual cultural heritage materials as indicated by the creation of the <link target="https://avindhsig.wordpress.com/">Alliance of Digital Humanities Organizations Special Interest Group: Audiovisual Materials in the Digital Humanities</link> and <link target="https://figshare.com/articles/AV_in_DH_State_of_the_Field/5680114">the rise in submissions related to audiovisual topics at the global ADHO conference</link> over the past few years. Newer investigations, such as <link target="https://distantviewing.org/">Distant Viewing TV</link>, also indicate a shift in the field toward projects concerned with using computational techniques to expand the scope of materials digital humanists can investigate. As Erik Champion states, "The DH audience is not always literature-focused or interested in traditional forms of literacy," and applying digital methodologies to the study of audiovisual culture is an exciting and emerging facet of the discipline (Champion, 2017). There are many valuable, free, and open-source tools and resources available to those interested in working with audiovisual materials (for example, the Programming Historian tutorial <link target="/en/lessons/editing-audio-with-audacity">Editing Audio with Audacity</link>), and this tutorial will introduce another: FFmpeg.</p>
+<p><link target="https://www.ffmpeg.org/about.html">FFmpeg</link> is "the leading multimedia framework able to decode, encode, transcode, mux, demux, stream, filter, and play pretty much anything that humans and machines have created" (FFmpeg Website - "About"). Many common software applications and websites use FFmpeg to handle reading and writing audiovisual files, including VLC, Google Chrome, YouTube, <link target="https://trac.ffmpeg.org/wiki/Projects">and many more.</link> In addition to being a software and web-developer tool, FFmpeg can be used at the command-line to perform many common, complex, and important tasks related to audiovisual file management, alteration, and analysis. These kinds of processes, such as editing,  transcoding (re-encoding), or extracting metadata from files, usually require access to other software (such as a non-linear video editor like Adobe Premiere or Final Cut Pro), but FFmpeg allows a user to operate on audiovisual files directly without the use of third-party software or interfaces. As such, knowledge of the framework empowers users to manipulate audiovisual materials to meet their needs with a free, open-source solution that carries much of the functionality of expensive audio and video editing software. This tutorial will provide an introduction to reading and writing FFmpeg commands and walk through a use-case for how the framework can be used in Digital Humanities scholarship (specifically, how FFmpeg can be used to extract and analyze color data from an archival video source).</p>
+</div>
+      <div type="2"><head>Learning Objectives</head>
+<ul>
+<li>Install FFmpeg on your computer or use a demo version in your web browser</li>
+<li>Understand the basic structure and syntax of FFmpeg commands</li>
+<li>
+Execute several useful commands such as:<ul>
+<li>Re-wrapping (change file container) &amp; Transcoding (re-encode files)</li>
+<li>Demuxing (separating audio and video tracks)</li>
+<li>Trimming/Editing files</li>
+<li>File playback with FFplay</li>
+<li>Creating vectorscopes for color data visualization</li>
+<li>Generating color data reports with FFprobe</li>
+</ul>
+</li>
+<li>Introduce outside resources for further exploration and experimentation</li>
+</ul>
+</div>
+      <div type="2"><head>Prerequisites</head>
+<p>Before starting this tutorial, you should be comfortable with locating and using your computer's <link target="https://en.wikipedia.org/wiki/Terminal_(macOS)">Terminal</link> or other command-line interface, as this is where you will be entering and executing FFmpeg commands. If you need instruction on how to access and work at the command-line, I recommend the Program Historian's <link target="/en/lessons/intro-to-bash">Bash tutorial</link> for Mac and Linux users or the <link target="/en/lessons/intro-to-powershell#quick-reference">Windows PowerShell tutorial</link>. Additionally, a basic understanding of audiovisual <link target="https://en.wikipedia.org/wiki/Codec">codecs</link> and <link target="https://en.wikipedia.org/wiki/Digital_container_format">containers</link> will also be useful to understanding what FFmpeg does and how it works. We will provide some additional information and discuss codecs and containers in a bit more detail in the Preliminary Command Examples section of this tutorial.</p>
+<div type="1"><head>Installing FFmpeg</head>
+<p>Installing FFmpeg can be the most difficult part of using FFmpeg. Thankfully, there are some helpful guides and resources available for installing the framework based on your operating system.</p>
+<p class="alert alert-warning" style="alert alert-warning">
+New versions of FFmpeg are released approximately every 6 months. To keep track of these updates, follow FFmpeg on <link target="https://twitter.com/FFmpeg">Twitter</link> or through its website. New versions of FFmpeg usually contain features such as new and updated filters, codec compatibilities, and bug fixes. The syntax of FFmpeg does not change with these updates and old capabilities are rarely removed. To get an idea of what kinds of features come with these updates, you can scroll through previous update announcements in the <link target="https://www.ffmpeg.org/index.html#news">News</link> section of the FFmpeg website.
+</p>
+<h2>For Mac OS Users</h2>
+<p>The simplest option is to use a package manager such as <link target="https://brew.sh/">Homebrew</link>
+to install FFmpeg and ensure it remains in the most up-to-date version. Homebrew is also useful in ensuring that your computer has the necessary dependencies installed to ensure FFMpeg runs properly. To complete this kind of installation, follow these steps:</p>
+<ul>
+<li>
+<p>Install Homebrew following the instructions in the above link</p>
+</li>
+<li>
+<p>You can then run <code type="inline">brew install ffmpeg</code> in your Terminal to initiate a basic installation.</p>
+<ul>
+<li><hi rend="bold">Note</hi>: Generally, it is recommended to install FFMpeg with additional features than what is included in the basic installation. Including additional options will provide access to more of FFmpeg's tools and functionalities. Reto Kromer's <link target="https://avpres.net/FFmpeg/install_Apple.html">Apple installation guide</link> provides a good set of additional options:</li>
+</ul>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_0" type="block" corresp="code_introduction-to-ffmpeg_0.txt"/></pre>
+<ul>
+<li>For an explanation of these additional options, refer to <link target="https://training.ashleyblewer.com/presentations/ffmpeg.html#10">Ashley Blewer's FFmpeg guide</link></li>
+<li>Additionally, you can run <code type="inline">brew options ffmpeg</code> to see what features are or have become available with the current FFmpeg release</li>
+</ul>
+</li>
+<li>
+<p>After installing, it is best practice to update Homebrew and FFmpeg to ensure all dependencies and features are most up-to-date by running:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_1" type="block" corresp="code_introduction-to-ffmpeg_1.txt"/></pre>
+</li>
+<li>
+<p>For more installation options for Mac OS, see the <link target="https://trac.ffmpeg.org/wiki/CompilationGuide/macOS">Mac OS FFmpeg Compilation Guide</link></p>
+</li>
+</ul>
+<h2>For Windows Users</h2>
+<p>Windows users can use the package manager <link target="https://chocolatey.org/">Chocolately</link> to install and maintain FFmpeg. Reto Kromer's <link target="https://avpres.net/FFmpeg/install_Windows.html">Windows installation guide</link> provides all the necessary information to use Chocolately or to install the software from a build.</p>
+<h2>For Linux Users</h2>
+<p><link target="http://linuxbrew.sh/">Linuxbrew</link>, a program similar to Homebrew, can be used to
+install and maintain FFmpeg in Linux. Reto Kromer also provides a helpful <link target="https://avpres.net/FFmpeg/install_Linux.html">Linux installation guide</link>
+that closely resembles the Mac OS installation. Your distribution of Linux may also have its <link target="https://www.linode.com/docs/tools-reference/linux-package-management/">own package manager</link> already installed that include FFmpeg packages available. Depending on your distribution of Linux (Ubuntu, Fedora, Arch Linux, etc.) these builds can vary, so using Linuxbrew could be useful to ensure that the build is the same regardless of which type of Linux you are using.</p>
+<h2>Other Installation Resources</h2>
+<ul>
+<li>
+<link target="https://www.ffmpeg.org/download.html">Download Packages</link><ul>
+<li>FFmpeg allows access to binary files, source code, and static builds for Mac, Windows, and Linux directly through its website, enabling users to build the framework without a package manager. It is likely that only advanced users will want to follow this option.</li>
+</ul>
+</li>
+<li>
+<link target="https://trac.ffmpeg.org/wiki/CompilationGuide">FFmpeg Compilation Guide</link><ul>
+<li>The FFmpeg Wiki page also provides a compendium of guides and strategies for building FFmpeg on your computer.</li>
+</ul>
+</li>
+</ul>
+<h2>Testing the Installation</h2>
+<ul>
+<li>
+<p>To ensure FFmpeg is installed properly, run:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_2" type="block" corresp="code_introduction-to-ffmpeg_2.txt"/></pre>
+</li>
+<li>
+<p>If you see a long output of information, the installation was successful! It should look similar to this:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_3" type="block" corresp="code_introduction-to-ffmpeg_3.txt"/></pre>
+</li>
+<li>
+<p>If you see something like <code type="inline">-bash: ffmpeg: command not found</code> then something has
+gone wrong.</p>
+<ul>
+<li>Note: If you are using a package manager it is unlikely that you will encounter this error message. However, if there is a problem after installing with a package manager, it is likely the issue is with the package manager itself as opposed to FFmpeg. Consult the Troubleshooting sections for <link target="https://docs.brew.sh/Troubleshooting">Homebrew</link>, <link target="https://chocolatey.org/docs/troubleshooting">Chocolatey</link>, or <link target="http://linuxbrew.sh/">Linuxbrew</link> to ensure the package manager is functioning properly on your computer. If you are attempting to install without a package manager and see this error message, cross-reference your method with the FFmpeg Compilation Guide provided above.</li>
+</ul>
+</li>
+</ul>
+<h2>Using FFmpeg in a web browser (without installing)</h2>
+<p>If you do not want to install FFmpeg on your computer but would like to become familiar with using it at the command-line, Brian Grinstead's <link target="https://bgrins.github.io/videoconverter.js/demo/">videoconverter.js</link> provides a way to run FFmpeg commands and learn its basic functions in the web-browser of your choice.</p>
+  <p class="alert alert-warning" style="alert alert-warning">
+  This browser-based interface does not have the functionality to complete the entirety of this tutorial but is useful for learning the basics of FFmpeg commands. Additionally, this resource runs on an older version of FFmpeg and may not contain all the features of the most recent version.
+</p>
+# Basic Structure and Syntax of FFmpeg commands
+Basic FFmepg commands consist of four elements:
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_4" type="block" corresp="code_introduction-to-ffmpeg_4.txt"/></pre>
+<ul>
+<li>A command prompt will begin every FFmpeg command. Depending on the use, this prompt will either be <code type="inline">ffmpeg</code> (changing files), <code type="inline">ffprobe</code> (gathering metadata from files), or <code type="inline">ffplay</code> (playback of files).</li>
+<li>Input files are the files being read, edited, or examined.</li>
+<li>Flags and actions are the things you are telling FFmpeg to do the input files. Most commands will contain multiple flags and actions of various complexity.</li>
+<li>The output file is the new file created by the command or the report generated by an <code type="inline">ffprobe</code> command.</li>
+</ul>
+<p>Written generically, a basic FFmpeg command looks like this:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_5" type="block" corresp="code_introduction-to-ffmpeg_5.txt"/></pre>
+<p class="alert alert-warning" style="alert alert-warning">As with any command-line interface, you will need to write out the filepath of the input and output files depending on location of your working directories. In the examples given in this tutorial, filepaths will not be fully written out and it is assumed that a user has navigated to the working directory containing the input files to execute the commands.</p>
+<p>Next, we will look at some examples of several different commands that use this structure and syntax. These commands will also demonstrate some of FFmpeg's most basic, useful functions and allow us to become more familiar with how digital audiovisual files are constructed.</p>
+</div><div type="1"><head>Getting Started</head>
+<p>For this tutorial, we will be taking an archival film called <link target="https://archive.org/details/4050_Destination_Earth_01_47_33_28"><emph>Destination Earth</emph></link> as our object of study. This film has been made available by the <link target="https://en.wikipedia.org/wiki/Prelinger_Archives">Prelinger Archives</link> collection on the <link target="https://archive.org/">Internet Archive</link>. Released in 1956, this film is a prime example of Cold War-era propaganda produced by the <link target="https://en.wikipedia.org/wiki/American_Petroleum_Institute">American Petroleum Institute</link> and <link target="https://en.wikipedia.org/wiki/John_Sutherland_(producer)">John Sutherland Productions</link> that extols the virtues of capitalism and the American way of life. Utilizing the <link target="https://en.wikipedia.org/wiki/Technicolor">Technicolor</link> process, this science-fiction animated short tells a story of a Martian society living under an oppressive government and their efforts to improve their industrial methods. They send an emissary to Earth who discovers the key to this is oil refining and free-enterprise. We will be using this video to introduce some of the basic functionalities of FFmpeg and analyzing its color properties in relation to its propagandist rhetoric.</p>
+<figure><desc>Destination Earth (1956)</desc><graphic url="destEarth_titlecard.png"/></figure>
+<p>For this tutorial, you will need to:</p>
+<ul>
+<li>Navigate to the <link target="https://archive.org/details/4050_Destination_Earth_01_47_33_28"><emph>Destination Earth</emph></link> page on IA</li>
+<li>Download two video files: the "MPEG4" (file extension <code type="inline">.m4v</code>) and "OGG" (file extension <code type="inline">.ogv</code>) versions of the film</li>
+<li>Save these two video files in the same folder somewhere on your computer. Save them with the file names <code type="inline">destEarth</code> followed by its extension</li>
+</ul>
+<p>Take a few minutes to watch the video and get a sense of its structure, message, and visual motifs before moving on with the next commands.</p>
+</div><div type="1"><head>Preliminary Command Examples</head>
+<h2>Viewing Basic Metadata with FFprobe</h2>
+<p>Before we begin manipulating our <code type="inline">destEarth</code> files, let's use FFmpeg to examine some basic information about the file itself using a simple <code type="inline">ffprobe</code> command. This will help illuminate how digital audiovisual files are constructed and provide a foundation for the rest of the tutorial. Navigate to the file's directory and execute:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_6" type="block" corresp="code_introduction-to-ffmpeg_6.txt"/></pre>
+<p>You will see the file's basic technical metadata printed in the <code type="inline">stdout</code>:</p>
+<figure><desc>The output of a basic `ffprobe` command with destEarth.ogv</desc><graphic url="ffprobe_ogg.png"/></figure>
+<p>The <code type="inline">Input #0</code> line of the reports identifies the <hi rend="bold">container</hi> as <link target="https://en.wikipedia.org/wiki/Ogg">ogg</link>. Containers (also called "wrappers") provide the file with structure for its various streams. Different containers (other common ones include <code type="inline">.mkv</code>, <code type="inline">.avi</code>, and <code type="inline">.flv</code>) have different features and compatibilities with various software. We will examine how and why you might want to change a file's container in the next command.</p>
+<p>The lines <code type="inline">Stream #0:0</code> and <code type="inline">Stream #0:1</code> provide information about the file's streams (i.e. the content you see on screen and hear through your speakers) and identify the <hi rend="bold">codec</hi> of each stream as well. Codecs specify how information is encoded/compressed (written and stored) and decoded/decompressed (played back). Our <code type="inline">.ogv</code> file's video stream (<code type="inline">Stream #0:0</code>) uses the <link target="https://en.wikipedia.org/wiki/Theora">theora</link> codec while the audio stream (<code type="inline">Stream #0:1</code>) uses the <link target="https://en.wikipedia.org/wiki/Vorbis">vorbis</link> codec. These lines also provide important information related to the video stream's colorspace (<code type="inline">yuv420p</code>), resolution (<code type="inline">400x300</code>), and frame-rate (<code type="inline">29.97 fps</code>), in addition to audio information such as sample-rate (<code type="inline">44100 Hz</code>) and bit-rate (<code type="inline">128 kb/s</code>).</p>
+<p>Codecs, to a much greater extent than containers, determine an audiovisual file's quality and compatibility with different software and platforms (other common codecs include <code type="inline">DNxHD</code> and <code type="inline">ProRes</code> for video and <code type="inline">mp3</code> and <code type="inline">FLAC</code> for audio). We will examine how and why you might want to change a file's codec in the next command as well.</p>
+<p>Run another <code type="inline">ffprobe</code> command, this time with the <code type="inline">.m4v</code> file:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_7" type="block" corresp="code_introduction-to-ffmpeg_7.txt"/></pre>
+<p>Again you'll see the basic technical metadata printed to the <code type="inline">stdout</code>:</p>
+<figure><desc>The output of a basic `ffprobe` command with destEarth.m4v</desc><graphic url="ffprobe_mp4.png"/></figure>
+<p>You'll also notice that the report for the <code type="inline">.m4v</code> file contains multiple containers on the <code type="inline">Input #0</code> line like <code type="inline">mov</code> and <code type="inline">m4a</code>. It isn't necessary to get too far into the details for the purposes of this tutorial, but be aware that the <code type="inline">mp4</code> and  <code type="inline">mov</code> containers come in many "flavors" and different file extensions. However, they are all very similar in their technical construction, and as such you may see them grouped together in technical metadata. Similarly, the <code type="inline">ogg</code> file has the extension <code type="inline">.ogv</code>, a "flavor" or variant of the <code type="inline">ogg</code> format.</p>
+<p>Just as in our previous command, the lines <code type="inline">Stream #0:0</code> and <code type="inline">Stream #0:1</code>  identify the codec of each stream. We can see our <code type="inline">.m4v</code> file uses the <link target="https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC">H.264</link> video codec while the audio stream uses the <link target="https://en.wikipedia.org/wiki/Advanced_Audio_Coding">aac</link> codec. Notice that we are given similar metadata to our <code type="inline">.ogv</code> file but some important features related to visual analysis (such as the resolution) are significantly different. Our <code type="inline">.m4v</code> has a much higher resolution (<code type="inline">640x480</code>) and we will therefore use this version of <emph>Destination Earth</emph> as our source video.</p>
+<p>Now that we know more about the technical make-up of our file, we can begin exploring the transformative features and functionalities of FFmpeg (we will use <code type="inline">ffprobe</code> again later in the tutorial to conduct more advanced color metadata extraction).</p>
+<h2>Changing Containers and Codecs (Re-Wrap and Transcode)</h2>
+<p>Depending on your operating system, you may have one or more media players installed. For the purposes of demonstration, let's see what happens if you try to open <code type="inline">destEarth.ogv</code> using the QuickTime media player that comes with Mac OSX:</p>
+<figure><desc>Proprietary media players such as QuickTime are often limited in the kinds of files they can work with.</desc><graphic url="QT_fail.png"/></figure>
+<p>One option when faced with such a message is to simply use another media player. <link target="https://www.videolan.org/vlc/index.html">VLC</link>, which is built with FFmpeg, is an excellent open-source alternative, but simply "using another software" may not always be a viable solution (and you may not always have another version of a file to work with, either). Many popular video editors such as Adobe Premiere, Final Cut Pro, and DaVinci Resolve all have their own limitations on the kinds of formats they are compatible with. Further, different web-platforms and hosting/streaming sites such as Vimeo have <link target="https://help.vimeo.com/hc/en-us/articles/12426043233169-Video-and-audio-compression-guidelines">their own requirements as well.</link> As such, it is important to be able to re-wrap and transcode your files to meet the various specifications for playback, editing, digital publication, and conforming files to standards required by digital preservation or archiving platforms.</p>
+<p class="alert alert-warning" style="alert alert-warning">
+For a complete list of codecs and containers supported by your installation of FFmpeg, run <code type="inline">ffmpeg -codecs</code> and <code type="inline">ffmpeg -formats</code>, respectively, to see the list printed to your <code type="inline">stdout</code>.
+</p>
+<p>As an exercise in learning basic FFmpeg syntax and learning how to transcode between formats, we will begin with our <code type="inline">destEarth.ogv</code> file and write a new file with video encoded to <code type="inline">H.264</code>, audio to <code type="inline">AAC</code>, and wrapped in an <code type="inline">.mp4</code> container, a very common and highly-portable combination of codecs and container that is practically identical to the <code type="inline">.m4v</code> file we originally downloaded. Here is the command you will execute along with an explanation of each part of the syntax:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_8" type="block" corresp="code_introduction-to-ffmpeg_8.txt"/></pre>
+<ul>
+<li><code type="inline">ffmpeg</code> = starts the command</li>
+<li><code type="inline">-i destEarth.ogv</code> = specifies the input file</li>
+<li><code type="inline">-c:v libx264</code> = transcodes the video stream to the H.264 codec</li>
+<li><code type="inline">-c:a aac</code> = transcodes the audio stream to the AAC codec</li>
+<li><code type="inline">destEarth_transcoded.mp4</code> = specifies the output file. Note this is where the new container type is specified.</li>
+</ul>
+<p>If you execute this command as it is written and in the same directory as <code type="inline">destEarth.ogv</code>, you will see a new file called <code type="inline">destEarth_transcoded.mp4</code> appear in the directory. If you are operating in Mac OSX, you will also be able to play this new file with QuickTime. A full exploration of codecs, containers, compatibility, and file extension conventions is beyond the scope of this tutorial, however this preliminary set of examples should give those less familiar with how digital audiovisual files are constructed a baseline set of knowledge that will enable them to complete the rest of the tutorial.</p>
+<h2>Creating Excerpts &amp; Demuxing Audio &amp; Video</h2>
+<p>Now that we have a better understanding of streams, codecs, and containers, let's look at ways FFmpeg can help us work with video materials at a more granular level. For this tutorial, we will examine two discrete sections of <emph>Destination Earth</emph> to compare how color is used in relation to the film's propagandist rhetoric. We will create and prepare these excerpts for analysis using a command that performs two different functions simultaneously:</p>
+<ul>
+<li>First, the command will create two excerpts from <code type="inline">destEarth.m4v</code>.</li>
+<li>
+Second, the command will remove ("demux") the audio components (<code type="inline">Stream #0:1</code>) from these excerpts.<p class="alert alert-warning" style="alert alert-warning">
+  We are removing the audio in the interest of promoting good practice in saving storage space (the audio information is not necessary for color analysis). This will likely be useful if you hope to use this kind of analysis at larger scales. More on scaling color analysis will be provided near the end of the tutorial.
+</p>
+</li>
+</ul>
+<p>The first excerpt we will be making is a sequence near the beginning of the film depicting the difficult conditions and downtrodden life of the Martian society. The following command specifies start and end points of the excerpt, tells FFmpeg to retain all information in the video stream without transcoding anything, and to write our new file without the audio stream:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_9" type="block" corresp="code_introduction-to-ffmpeg_9.txt"/></pre>
+<ul>
+<li><code type="inline">ffmpeg</code> = starts the command</li>
+<li><code type="inline">-i destEarth.m4v</code> = specifies the input file</li>
+<li><code type="inline">-ss 00:01:00</code> = sets start point at 1 minute from start of file</li>
+<li><code type="inline">-to 00:04:45</code> = sets end point to 4 minutes and 45 seconds from start of file</li>
+<li><code type="inline">-c:v copy</code> = copy the video stream directly, without transcoding</li>
+<li><code type="inline">-an</code> = tells FFmpeg to ignore audio stream when writing the output file.</li>
+<li><code type="inline">destEarth_Mars_video.mp4</code> = specifies the output file</li>
+</ul>
+<figure><desc>Life on Mars</desc><graphic url="Mars_screenshot.png"/></figure>
+<p>We will now run a similar command to create an "Earth" excerpt. This portion of the film has a similar sequence depicting the wonders of life on Earth and the richness of its society thanks to free-enterprise capitalism and the use of oil and petroleum products:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_10" type="block" corresp="code_introduction-to-ffmpeg_10.txt"/></pre>
+<figure><desc>Bounty of Earth</desc><graphic url="Earth_screenshot.png"/></figure>
+<p>You should now have two new files in your directory called <code type="inline">destEarth_Mars_video.mp4</code> and <code type="inline">destEarth_Earth_video.mp4</code>. You can test one or both files (or any of the other files in the directory) using the <code type="inline">ffplay</code> feature of FFmpeg as well. Simply run:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_11" type="block" corresp="code_introduction-to-ffmpeg_11.txt"/></pre>
+<p>and/or</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_12" type="block" corresp="code_introduction-to-ffmpeg_12.txt"/></pre>
+<p>You will see a window open and the video will begin at the specified start point, play through once, and then close (in addition, you'll notice there is no sound in your video). You will also notice that <code type="inline">ffplay</code> commands do not require an <code type="inline">-i</code> or an output to be specified because the playback itself is the output.</p>
+<p class="alert alert-warning" style="alert alert-warning">
+<code type="inline">FFplay</code> is a very versatile media player that comes with a number of <link target="https://ffmpeg.org/ffplay.html#Options">options</link> for customizing playback. For example, adding `-loop 0` to the command will loop playback indefinitely.</p>
+<p>We have now created our two excerpts for analysis. If we watch these clips discretely, there appear to be significant, meaningful differences in the way color and color variety are used. In the next part of the tutorial, we will examine and extract data from the video files to quantify and support this hypothesis.</p>
+<h2>Color Data Analysis</h2>
+<p>The use of <link target="https://web.archive.org/web/20180317223950/https://filmcolors.org/2018/03/08/vian/">digital tools to analyze color information</link> in motion pictures is another emerging facet of DH scholarship that overlaps with traditional film studies. The <link target="https://filmcolors.org/">FilmColors</link> project, in particular, at the University of Zurich, interrogates the critical intersection of film's "formal aesthetic features to [the] semantic, historical, and technological aspects" of its production, reception, and dissemination through the use of digital analysis and annotation tools (Flueckiger, 2017). Although there is no standardized method for this kind of investigation at the time of this writing, the <code type="inline">ffprobe</code> command offered below is a powerful tool for extracting information related to color that can be used in computational analysis. First, let's look at another standardized way of representing color information that informs this quantitative, data-driven approach to color analysis.</p>
+<div type="3"><head>Vectorscopes</head>
+<p>For years, video professionals have relied on <link target="https://en.wikipedia.org/wiki/Vectorscope#Video">vectorscopes</link> to view color information in a standardized and easily legible way. A vectorscope plots color information on a circular graticle, and the position of a given plot corresponds to the particular <link target="https://en.wikipedia.org/wiki/Hue">hues</link> found in a video signal. Other factors, like saturation, determine the size of a given plot as well. Below is an example of a vectorscope displaying the color values of SMPTE Bars, which are also pictured.</p>
+<figure><desc>A vectorscope read-out representing standard NTSC SMPTE Bars. Source: Wikimedia Commons</desc><graphic url="vectorscope.png"/></figure>
+<figure><desc>NTSC SMPTE Bars. Source: Wikimedia Commons</desc><graphic url="smpte_bars.png"/></figure>
+<p>FFmpeg can be used to playback and create video files with vectorscopes embedded in them so as to provide a real-time reference for the video's color information. The following <code type="inline">ffplay</code> commands will embed a vectorscope in the lower-right corner of the frame. As the video plays, you will notice the vectorscope plot shift as the on-screen color shifts:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_13" type="block" corresp="code_introduction-to-ffmpeg_13.txt"/></pre>
+<ul>
+<li><code type="inline">ffplay</code> = starts the command</li>
+<li><code type="inline">destEarth_Mars_video.mp4</code> = specifies the input file</li>
+<li><code type="inline">-vf</code> = creates a <link target="https://trac.ffmpeg.org/wiki/FilteringGuide">filter-graph</link> to use for the streams</li>
+<li><code type="inline">"</code> = quotation mark to start the filter-graph. Information inside the quotation marks will specify the parameters of the vectorscope's appearance and position.</li>
+<li><code type="inline">split=2[m][v]</code> = splits the input into two identical outputs called <code type="inline">[m]</code> and <code type="inline">[v]</code></li>
+<li><code type="inline">,</code> = comma signifies another parameter is coming</li>
+<li><code type="inline">[v]vectorscope=b=0.7:m=color3:g=green[v]</code> = assigns the <code type="inline">[v]</code> output the vectorscope filter. The <code type="inline">b</code> flag specifies the vectorscope's background opacity, the <code type="inline">m</code> flag the vectorscope mode, and the <code type="inline">g</code> flag the color of the graticle.</li>
+<li><code type="inline">[m][v]overlay=x=W-w:y=H-h</code> = overlays the vectorscope on top of the video image (the <code type="inline">[m]</code> output) in a certain location determined by x:y coordinates. In this case, the vectorscope will be justified to the lower right corner of the frame.</li>
+<li><code type="inline">"</code> = ends the filter-graph</li>
+</ul>
+<p class="alert alert-warning" style="alert alert-warning">
+For more information on the various options for creating vectorscopes, see <link target="https://ffmpeg.org/ffmpeg-filters.html#vectorscope">the official Documentation</link> and the <link target="https://trac.ffmpeg.org/wiki/Vectorscope">FFmpeg Vectorscope Wiki Page</link>. Additionally, more information on how to position overlays can be found in the <link target="https://ffmpeg.org/ffmpeg-filters.html#overlay-1">FFmpeg overlay filter Documentation</link>.
+</p>
+<figure><desc>Screenshot of FFplay window with embedded vectorscope</desc><graphic url="Mars_screenshot_vector.png"/></figure>
+<p>And for the "Earth" excerpt:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_14" type="block" corresp="code_introduction-to-ffmpeg_14.txt"/></pre>
+<figure><desc>Screenshot of FFplay window with embedded vectorscope</desc><graphic url="Earth_screenshot_vector.png"/></figure>
+<p>We can also adjust this command to write new video files with vectorscopes as well:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_15" type="block" corresp="code_introduction-to-ffmpeg_15.txt"/></pre>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_16" type="block" corresp="code_introduction-to-ffmpeg_16.txt"/></pre>
+<p>Note the slight but important changes in syntax:</p>
+<ul>
+<li>We have added an <code type="inline">-i</code> flag because it is an <code type="inline">ffmpeg</code> command.</li>
+<li>We have specified the output video codec as <link target="https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC">H.264</link> with the flag <code type="inline">-c:v libx264</code> and have left out an option for audio. Although you could add <code type="inline">-c:a copy</code> to copy the audio stream (if there is one in the input file) without transcoding or specify another audio codec here if necessary.</li>
+<li>We have specified the name of the output file.</li>
+</ul>
+<p>Take a few minutes to watch these videos with the vectorscopes embedded in them. Notice how dynamic (or not) the changes are between the "Mars" and "Earth" excerpts. Compare what you see in the vectorscope to your own impressions of the video itself. We might use observations from these vectorscopes to make determinations about which shades of color appear more regularly or intensely in a given source video, or we may compare different formats side-by-side to see how color gets encoded or represented differently based on different codecs, resolutions, etc.</p>
+<p>Although vectorscopes provide a useful, real-time representation of color information, we may want to also access the raw data beneath them. We can then use this data to develop more flexible visualizations that are not dependent on viewing the video file simultaneously and that offer a more quantitative approach to color analysis. In our next commands, we will use <code type="inline">ffprobe</code> to produce a tabular dataset that can be used to create a graph of color data.</p>
+</div><div type="3"><head>Color Data Extraction with FFprobe</head>
+<p>At the beginning of this tutorial, we used an <code type="inline">ffprobe</code> command to view our file's basic metadata printed to the <code type="inline">stdout</code>. In these next examples, we'll use <code type="inline">ffprobe</code> to extract color data from our video excerpts and output this information to <code type="inline">.csv</code> files. Within our <code type="inline">ffprobe</code> command, we are going to use the <code type="inline">signalstats</code> filter to create <code type="inline">.csv</code> reports of median color <link target="https://en.wikipedia.org/wiki/Hue">hue</link> information for each frame in the video stream of <code type="inline">destEarth_Mars_video.mp4</code> and <code type="inline">destEarth_Earth_video.mp4</code>, respectively.</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_17" type="block" corresp="code_introduction-to-ffmpeg_17.txt"/></pre>
+<ul>
+<li><code type="inline">ffprobe</code> = starts the command</li>
+<li><code type="inline">-f lavfi</code> = specifies the <link target="https://ffmpeg.org/ffmpeg-devices.html#lavfi">libavfilter</link> virtual input device as the chosen format. This is necessary when using <code type="inline">signalstats</code> and many filters in more complex FFmpeg commands.</li>
+<li><code type="inline">-i movie=destEarth_Mars_video.mp4</code> = name of input file</li>
+<li><code type="inline">,signalstats</code> = specifies use of the <code type="inline">signalstats</code> filter with the input file</li>
+<li><code type="inline">-show_entries</code> = sets list of entries that will be shown in the report. These are specified by the next options.</li>
+<li><code type="inline">frame=pkt_pts_time</code> = specifies showing each frame with its corresponding <code type="inline">pkt_pts_time</code>, creating a unique entry for each frame of video</li>
+<li><code type="inline">:frame_tags=lavfi.signalstats.HUEMED</code> = creates a tag for each frame that contains the median hue value</li>
+<li><code type="inline">-print_format csv</code> = specifies the format of the metadata report</li>
+<li><code type="inline">&gt; destEarth_Mars_hue.csv</code> = writes a new <code type="inline">.csv</code> file containing the metadata report using <code type="inline">&gt;</code>, a Bash <link target="https://www.gnu.org/software/bash/manual/html_node/Redirections.html">redirection operator</link>. Simply, this operator takes the command the precedes it and "redirects" the output to another location. In this instance, it is writing the output to a new <code type="inline">.csv</code> file. The file extension provided here should also match the format specified by the <code type="inline">print_format</code> flag</li>
+</ul>
+<p>Next, run the same command for the "Earth" excerpt:</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_18" type="block" corresp="code_introduction-to-ffmpeg_18.txt"/></pre>
+<p class="alert alert-warning" style="alert alert-warning">
+For more information about the <code type="inline">signalstats</code> filter and the various metrics that can be extracted from video streams, refer to the FFmpeg's <link target="https://ffmpeg.org/ffmpeg-filters.html#signalstats-1">Filters Documentation</link>.
+</p>
+<p>You should now have two <code type="inline">.csv</code> files in your directory. If you open these in a text editor or spreadsheet program, you will see three columns of data:</p>
+<figure><desc>The first several rows of our Earth excerpt color report in .csv format</desc><graphic url="csv_head.png"/></figure>
+<p>Going from left to right, the first two columns give us information about where we are in the video. The decimal numbers represent fractions of a second that also roughly correspond to the video's time-base of 30fps. As such, each row in our <code type="inline">.csv</code> corresponds to one frame of video. The third column carries a whole number between 0-360, and this value represents the median hue for that frame of video. These numbers are the underlying quantitative data of the vectorscope's plot and correspond to its position (in radians) on the circular graticle. Referencing our vectorscope image from earlier, you can see that starting at the bottom of the circle (0 degrees) and moving left, "greens" are around 38 degrees, "yellows" at 99 degrees, "reds" at 161 degrees, "magentas" at 218 degrees, "blues" at 279 degrees, and "cyans" at 341 degrees. Once you understand these "ranges" of hue, you can get an idea of what the median hue value for a given video frame is just by looking at this numerical value.</p>
+<p>Additionally, It is worth noting that this value extracted by the <code type="inline">signalstats</code> filter is not an absolute or complete measure of an image's color qualities, but simply a meaningful point of reference from which we can explore a data-driven approach to color analysis. Color perception and color theory are <link target="https://colourturn.net/">complex, evolving areas of scholarly investigation</link> that incorporate many different approaches from the humanities, social sciences, and cognitive sciences. As such, we should be mindful that any analytical approach should be taken within the context of these larger discourses and with a collaborative and generative spirit.</p>
+</div><div type="3"><head>Graphing Color Data</head>
+<p>The two <code type="inline">.csv</code> files we created with the previous commands can now be used to create graphs visualizing the data. There are a number of platforms (both proprietary and open-source) that can be used to achieve this such as <link target="https://www.wikihow.com/Create-a-Graph-in-Excel">Microsoft Excel</link>, <link target="https://rawgraphs.io/">RAWGraphs</link>, and/or <link target="https://plot.ly/">plot.ly</link>. An in-depth discussion of how to use any of these platforms is outside the scope of this tutorial, however, the final visualization of the previous commands (below) was created by uploading the <code type="inline">.csv</code> files to plot.ly, an open-source, browser-based service that offers a number of <link target="https://help.plot.ly/tutorials/">tutorials</link> on how to use their platform.</p>
+<figure><desc>Graph including median hue data from both video excerpts</desc><graphic url="Final_Graph_plotly.png"/></figure>
+</div><div type="3"><head>Conclusions</head>
+<p>From looking at the graph, we can see that the Mars and Earth traces have very different dynamic ranges in their median hue values. The Mars trace is very limited and keeps within the red and yellow ranges (roughly between 100 - 160) throughout the majority of the excerpt. This suggests something about the film's use of color as a rhetorical device serving a propagandist message. Remember that this section presents an antipathetic view of the Martian way of life and political system: a uniform, unhappy populace who are dependent on inefficient technology and transportation while being required to observe total obedience to a totalitarian overlord. The film connects this negative experience to a relatively dull color palette of reds and yellows. We should also consider the original target audience of this film, young citizens of the United States in the 1950s, and how they would have likely interpreted these images and uses of color in that historical moment, namely, in the context of increasing geopolitical tensions between the Soviet Union and the United States and its allies in Western Europe. The color red, specifically, was commonly used in print and broadcast media for describing <link target="https://en.wikipedia.org/wiki/Red_Scare">the "threat" of global Communism</link> during this era of world history. Additionally, the choice to render the Martian totalitarian leader with a very similar appearance to iconic Soviet leader <link target="https://en.wikipedia.org/wiki/Joseph_Stalin">Joseph Stalin</link> can be read as an explicit visual and cultural cue to the audience. As such, this depiction of Mars seems to be a thinly-veiled allegorical caricature of life under Communism as perceived by an outside observer and political/ideological opponent, a caricature that employs not only a limited color palette but one that is charged with other cultural references. The use of color both leverages the preconceived biases and associations of its audience and is inherently bound to the film's political argument that Communism is not a viable or desirable system of government.</p>
+<p>Contrasting the limited use of color in our Mars excerpt, the Earth trace covers a much wider dynamic range of hue values. In this passage, the Martian emissary is learning about the wonderful and affluent lifestyle of Earthlings thanks to a capitalist system and exploitation of oil and petroleum products. The sequence emphasizes the material wealth and entrepreneurial freedom offered under a capitalist system using a much greater variety and vivacity of color than in the Mars excerpt. Commercial products and people alike are depicted using the full spectrum of the Technicolor process, creating positive associations between the outputs of the petroleum industry and the well-off lifestyle of those who benefit from it. Like the Mars excerpt, the audience is offered a one-sided caricature of a political system and way of life, but in this section the reductionist portrayal is laudable and prosperous as opposed to bleak and oppressive. As a piece of propaganda, <emph>Destination Earth</emph> relies on these powerful but overly simplistic distinctions between two political systems to influence public opinion and promote the consumption of petroleum products. How color is used (or not used) is an important tool in crafting and driving this message home. Further, once we are able to extract color data and visualize it using simple graphing techniques, we can see that the disparity in dynamic range provides a quantitative measure for linking the technical and aesthetic use of color in this animated film with the propagandist rhetoric put forth by its producers.</p>
+<figure><desc>Oil and American ideals of wealth and prosperity rendered in colorful splendor</desc><graphic url="lovely_oil.png"/></figure>
+</div><div type="3"><head>Scaling Color Analysis with FFprobe</head>
+<p>One of the limits of this methodology is that we are manually generating color reports on only one file at a time. If we wanted to take a <link target="https://distantviewing.org/">distant viewing</link> approach more in-line with traditional DH methodologies, we could employ a Bash script to run our <code type="inline">ffprobe</code> command on all files in a given directory. This is useful if, for example, a researcher was interested in conducting similar analysis on <link target="https://archive.org/details/prelinger&amp;tab=collection?and%5B%5D=john+sutherland&amp;sin=">all the John Sutherland animated films found in the Prelinger Archives collection</link> or another set of archival video material.</p>
+<p>Once you have a set of material to work with saved in one place, you can save the following <link target="https://www.shellscript.sh/loops.html">Bash for loop</link> within the directory and execute it to generate <code type="inline">.csv</code> files containing the same frame-level median hue data we extracted from our excerpts of <emph>Destination Earth</emph>.</p>
+<pre><code class="language-bash" xml:id="code_introduction-to-ffmpeg_19" type="block" corresp="code_introduction-to-ffmpeg_19.txt"/></pre>
+<ul>
+<li>
+<p><code type="inline">for file in *.m4v; do</code> = initiates the for loop. This first line basically tells FFmpeg: "for all files in this directory with the extension <code type="inline">.m4v</code>, perform the following command."</p>
+<ul>
+<li>The <code type="inline">*</code> is a Bash <link target="http://tldp.org/LDP/GNU-Linux-Tools-Summary/html/x11655.htm">wildcard</link> attached to a given file-type and specifies them as the input files.</li>
+<li>The word <code type="inline">file</code> is an arbitrary <link target="http://tldp.org/HOWTO/Bash-Prog-Intro-HOWTO-5.html">variable</link> which will represent each file as it runs through the loop.</li>
+</ul>
+</li>
+<li>
+<p><code type="inline">ffprobe -f lavfi -i movie="$file",signalstats -show_entries frame=pkt_pts_time:frame_tags=lavfi.signalstats.HUEMED -print_format csv &gt; "${file%.m4v}.csv"; done</code> = the same color metadata extraction command we ran on our two excerpts of <emph>Destination Earth</emph>, with some slight alterations to the syntax to account for its use across multiple files in a directory:</p>
+<ul>
+<li><code type="inline">"$file"</code> recalls each variable. The enclosing quotation marks ensures that the original filename is retained.</li>
+<li><code type="inline">&gt; "${file%.m4v}.csv";</code> retains the original filename when writing the output <code type="inline">.csv</code> files. This will ensure the names of the original video files will match their corresponding <code type="inline">.csv</code> reports.</li>
+<li><code type="inline">done</code> = terminates the script once all files in the directory have been looped</li>
+</ul>
+</li>
+</ul>
+<p class="alert alert-warning" style="alert alert-warning">
+You can also use <code type="inline">signalstats</code> to pull other valuable information related to color. Refer to the filter's <link target="https://www.ffmpeg.org/ffprobe-all.html#signalstats-1">documentation</link> for a complete list of visual metrics available.
+</p>
+<p>Once you run this script, you will see each video file in the directory now has a corresponding <code type="inline">.csv</code> file containing the specified dataset.</p>
+</div></div><div type="1"><head>Wrap Up</head>
+<p>In this tutorial, we have learned:</p>
+<ul>
+<li>To install FFmpeg on different operating systems and how to access the framework in the web-browser</li>
+<li>The basic syntax and structure of FFmpeg commands</li>
+<li>To view basic technical metadata of an audiovisual file</li>
+<li>To transform an audiovisual file through transcoding and re-wrapping</li>
+<li>To parse and edit that audiovisual file by demuxing it and creating excerpts</li>
+<li>To playback audiovisual files using <code type="inline">ffplay</code></li>
+<li>To create new video files with embedded vectorscopes</li>
+<li>To export tabular data related to color from a video stream using <code type="inline">ffprobe</code></li>
+<li>To craft a Bash for loop to extract color data information from multiple video files with one command</li>
+</ul>
+<p>At a broader level, this tutorial aspires to provide an informed and enticing introduction to how audiovisual tools and methodologies can be incorporated in Digital Humanities projects and practices. With open and powerful tools like FFmpeg, there is vast potential for expanding the scope of the field to include more rich and complex types of media and analysis than ever before.</p>
+<h2>Further Resources</h2>
+<p>FFmpeg has a large and well-supported community of users across the globe. As such, there are many open-source and free resources for discovering new commands and techniques for working with audio-visual media. Please contact the author with any additions to this list, especially educational resources in Spanish for learning FFmpeg.</p>
+<ul>
+<li>The Official <link target="https://www.ffmpeg.org/ffmpeg.html">FFmpeg Documentation</link></li>
+<li><link target="https://trac.ffmpeg.org/wiki/WikiStart">FFmpeg Wiki</link></li>
+<li><link target="https://amiaopensource.github.io/ffmprovisr/">ffmprovisr</link> from the <link target="https://amianet.org/">Association of Moving Image Archivists</link></li>
+<li>Ashley Blewer's <link target="https://training.ashleyblewer.com/">Audiovisual Preservation Training</link></li>
+<li>Andrew Weaver's <link target="https://github.com/privatezero/NDSR/blob/master/Demystifying_FFmpeg_Slides.pdf">Demystifying FFmpeg</link></li>
+<li>Ben Turkus' <link target="https://docs.google.com/presentation/d/1NuusF948E6-gNTN04Lj0YHcVV9-30PTvkh_7mqyPPv4/present?ueb=true&amp;slide=id.g2974defaca_0_231">FFmpeg Presentation</link></li>
+<li>Reto Kromer's <link target="https://avpres.net/FFmpeg/">FFmpeg Cookbook for Archivists</link></li>
+</ul>
+<h2>Open-Source AV Analysis Tools using FFmpeg</h2>
+<ul>
+<li><link target="https://mediaarea.net/en/MediaInfo">MediaInfo</link></li>
+<li><link target="https://bavc.org/preserve-media/preservation-tools">QC Tools</link></li>
+</ul>
+</div><div type="1"><head>References</head>
+<ul>
+<li>
+<p>Champion, E. (2017) &#8220;Digital Humanities is text heavy, visualization light, and simulation poor,&#8221; Digital Scholarship in the Humanities 32(S1), i25-i32.</p>
+</li>
+<li>
+<p>Flueckiger, B. (2017). "A Digital Humanities Approach to Film Colors". The Moving Image, 17(2), 71-94.</p>
+</li>
+<li>
+<p>Hockey, S. (2004) &#8220;The History of Humanities Computing,&#8221; A Companion to Digital Humanities, ed. Susan Schreibman, Ray Siemens, John Unsworth. Oxford: Blackwell.</p>
+</li>
+</ul>
+<p class="alert alert-warning" style="alert alert-warning">
+ This tutorial was made possible with the support of the British Academy and written during the Programming Historian Workshop at La Universidad de Los Andes in Bogot&#225;, Colombia, 31 July - 3 August, 2018.
+</p>
+</div></div>
+    </body>
+  </text>
+</TEI>
