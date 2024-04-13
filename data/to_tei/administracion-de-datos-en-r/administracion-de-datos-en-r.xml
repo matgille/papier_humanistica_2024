@@ -1,153 +1,291 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="administracion-de-datos-en-r">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Administraci&#243;n de datos en R</title>
-  <author role="original_author">Nabeel Siddiqui</author><editor role="reviewers"><persName>Lauren Tilton</persName><persName>Ryan Deschamps</persName></editor><author role="translators">Jennifer Isasi</author><editor role="translation-reviewers"><persName>Riva Quiroga</persName><persName>Victor Gayol</persName></editor><editor role="editors">Ian Milligan</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phes0031</idno><date type="published">07/31/2017</date><date type="translated">10/10/2018</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#data_wrangling_and_management_in_R"/>.</p><p>There are other translations: <ref target="#manipulacao-transformacao-dados-R"/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Este tutorial explora la manera en que los acad&#233;micos pueden administrar datos de forma ordenada, entender paquetes de R para manipular los datos y llevar a cabo un an&#225;lisis b&#225;sico de datos.</p></abstract><textClass><keywords><term xml:lang="en">data-manipulation</term><term xml:lang="en">data-management</term><term xml:lang="en">distant-reading</term><term xml:lang="en">r</term><term xml:lang="en">data-visualization</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="es">
-    <body>
-      <div type="2"><head>Requisitos</head>
-<p>En esta lecci&#243;n asumimos que tienes cierto conocimiento sobre R. Si no has completado el tutorial de <ref target="/es/lecciones/datos-tabulares-en-r">datos tabulares b&#225;sicos con R</ref>, te recomendamos hacerlo. Saber otro lenguaje de programaci&#243;n tambi&#233;n te ser&#225; &#250;til. Si necesitas un lugar donde empezar, recomendamos trabajar con los excelentes tutoriales sobre <ref target="/es/lecciones/?topic=python">Python</ref> en <emph>The Programming Historian en espa&#241;ol</emph>.</p>
-</div>
-      <div type="2"><head>Objetivos de la lecci&#243;n</head>
-<p>Al final de la lecci&#243;n,</p>
-<list type="ordered">
-<item>sabr&#225;s c&#243;mo trabajar con datos ordenados y su importancia.</item>
-<item>entender&#225;s el paquete <code rend="inline">dplyr</code> y podr&#225;s usarlo para manipular y administrar datos.</item>
-<item>conocer&#225;s la l&#237;nea de operaciones de R y observar&#225;s su utilidad para crear c&#243;digo m&#225;s legible.</item>
-<item>aprender&#225;s las bases del an&#225;lisis exploratorio de datos a trav&#233;s de algunos ejemplos b&#225;sicos de manipulaci&#243;n de datos.</item>
-</list>
-</div>
-      <div type="2"><head>Introducci&#243;n</head>
-<p>Los datos que puedes encontrar disponibles en red raramente est&#225;n en el formato necesario para su an&#225;lisis y necesitar&#225;s manipularlos antes de explorar las preguntas que te interesan. &#161;Esto puede llevar m&#225;s tiempo que el an&#225;lisis! En este tutorial vamos a aprender algunas t&#233;cnicas b&#225;sicas de manipulaci&#243;n, manejo y administraci&#243;n de tus datos en R. M&#225;s espec&#237;ficamente, vamos a seguir la filosof&#237;a de "datos limpios" o <ref target="https://www.jstatsoft.org/article/view/v059i10"><emph>"tidy data"</emph></ref> articulada por Hadley Wickham.</p>
-<p>Seg&#250;n <ref target="http://hadley.nz">Wickham</ref>, los datos est&#225;n "limpios" cuando cumplen tres criterios:</p>
-<list type="ordered">
-<item>Cada observaci&#243;n est&#225; en una fila.</item>
-<item>Cada variable est&#225; en una columna.</item>
-<item>Cada valor tiene su propia celda.</item>
-</list>
-<p>Prestar atenci&#243;n a estos criterios nos permite identificar datos organizados o desorganizados. Tambi&#233;n nos ofrece un esquema est&#225;ndar y un conjunto de herramientas para limpiar alguna de las formas m&#225;s comunes en que un conjunto de datos puede estar "desordenado", como por ejemplo si:</p>
-<list type="unordered">
-<item>los t&#237;tulos de las columnas son valores en vez de nombres de variables.</item>
-<item>hay m&#250;ltiples variables en una columna.</item>
-<item>las variables est&#225;n en las filas y en las columnas.</item>
-<item>hay unidades observacionales de diferente tipo guardadas en la misma tabla.</item>
-<item>una &#250;nica unidad observacional est&#225; guardada en varias tablas.</item>
-</list>
-<p>Tal vez lo m&#225;s importante sea que tener nuestros datos en este formato nos permite usar una colecci&#243;n de paquetes del <ref target="https://www.tidyverse.org">"tidyverse"</ref> que est&#225;n dise&#241;ados para trabajar espec&#237;ficamente con datos limpios. Asegur&#225;ndonos de que nuestros datos de entrada y de salida est&#225;n ordenados, podemos usar un peque&#241;o conjunto de herramientas para resolver un amplio n&#250;mero de preguntas. Adem&#225;s, podemos combinar, manipular y dividir conjuntos de datos ordenados como creamos m&#225;s conveniente.</p>
-<p>En este tutorial nos enfocamos en el paquete <ref target="https://cran.r-project.org/web/packages/dplyr/index.html">dplyr</ref> de tidyverse pero merece la pena mencionar otros que nos encontraremos por el camino:</p>
-<p><ref target="https://magrittr.tidyverse.org"><hi rend="bold">magittr</hi></ref>: Este paquete nos da acceso al el operador <code rend="inline">%&gt;%</code> y hace nuestro c&#243;digo m&#225;s f&#225;cilmente de leer.
-<ref target="https://ggplot2.tidyverse.org"><hi rend="bold">ggplot2</hi></ref>: Este paquete utiliza  <ref target="http://academica-e.unavarra.es/bitstream/handle/2454/15785/Gram%C3%A1tica.pdf?sequence=1">"la gram&#225;tica de gr&#225;ficos"</ref><ref type="footnotemark" target="#note_1"/> para ofrecer una manera f&#225;cil de visualizar nuestros datos.
-<ref target="https://readr.tidyverse.org"><hi rend="bold">readr</hi></ref>: Este paquete da acceso a un m&#233;todo m&#225;s r&#225;pido y racionalizado para importar datos rectangulares (una tabla), como son los archivos CSV (valores separados por comas).
-<ref target="https://tibble.tidyverse.org"><hi rend="bold">tibble</hi></ref>: Este paquete nos permite reconceptualizar el formato <emph>data frame</emph> (marco o tabla de datos) para que sea m&#225;s f&#225;cil trabajar con ellos e imprimirlos.</p>
-<p>Si todav&#237;a no lo has hecho, deber&#237;as instalar y cargar "tidyverse" antes de empezar. Adem&#225;s, aseg&#250;rate de tener la <ref target="https://cran.rstudio.com">versi&#243;n m&#225;s reciente de R</ref> y de la <ref target="https://www.rstudio.com/products/rstudio/download/">plataforma R Studio</ref> correspondientes a tu sistema operativo.</p>
-<p>Copia el siguiente c&#243;digo en R Studio. Para ejecutarlo tienes que marcar las l&#237;neas y clicar Ctrl+Intro (Cmd+Intro en Mac OS):</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_0" corresp="code_administracion-de-datos-en-r_0.txt" rend="block"/></ab>
-</div>
-      <div type="2"><head>Un ejemplo de dplyr en acci&#243;n</head>
-<p>Veamos un ejemplo de c&#243;mo dyplr nos puede ayudar a los historiadores. Vamos a cargar los datos del censo decenal de 1790 a 2010 de Estados Unidos. Descarga los datos haciendo <ref target="/assets/ejemplo_introductorio_estados.csv">click aqu&#237;</ref><ref type="footnotemark" target="#note_2"/> y ponlos en la carpeta que vas a utilizar para trabajar en los ejemplos de este tutorial.</p>
-<p>Como los datos est&#225;n en un archivo CSV, vamos a usar el comando de lectura <code rend="inline">read_csv()</code> en el paquete <ref target="https://cran.r-project.org/web/packages/readr/vignettes/readr.html">readr</ref> de "tidyverse".</p>
-<p>La funci&#243;n <code rend="inline">read_csv</code> (leer archivo de valores separados por comas) toma la ruta del archivo que queremos importar como una variable, as&#237; que aseg&#250;rate de escribirlo correctamente.</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_1" corresp="code_administracion-de-datos-en-r_1.txt" rend="block"/></ab>
-<p>Una vez que importas los datos, ver&#225;s que hay tres columnas: una para la poblaci&#243;n, otra para el a&#241;o y otra para el estado. Estos datos ya est&#225;n en un formato limpio y nos dan multitud de opciones para explorarlos.</p>
-<p>Para el particular, vamos a visualizar el crecimiento de la poblaci&#243;n de California y Nueva York para conocer mejor de la migraci&#243;n del oeste.<ref type="footnotemark" target="#note_3"/> Vamos a usar <code rend="inline">dplyr</code> para filtrar los datos que contienen solo la informaci&#243;n de los estados que nos interesan y ggplot2 para visualizar dichos datos. Este ejercicio es solo un ejemplo para que te hagas una idea de lo que puede hacer <code rend="inline">dplyr</code>, as&#237; que no te preocupes si no entiendes el c&#243;digo en este momento.</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_2" corresp="code_administracion-de-datos-en-r_2.txt" rend="block"/></ab>
-<figure><desc>Gr&#225;fico de la poblaci&#243;n de los estados de California y de Nueva York</desc><graphic url="california_nueva_york_poblacion.png"/></figure>
-<p>Como podemos ver, la poblaci&#243;n de California ha crecido de forma considerable en comparaci&#243;n con la de Nueva York. Aunque este ejemplo pueda parecer obvio si conoces la historia de migraci&#243;n en los Estados Unidos, el c&#243;digo nos ofrece la base sobre la que podemos elaborar multitud de preguntas similares. Por ejemplo, con un cambio r&#225;pido en el c&#243;digo podemos crear un gr&#225;fico similar con dos estados diferentes como Mississippi y Virginia.</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_3" corresp="code_administracion-de-datos-en-r_3.txt" rend="block"/></ab>
-<figure><desc>Gr&#225;fico de la poblaci&#243;n de los estados de Mississippi y de Virginia</desc><graphic url="mississipi_virginia_poblacion.png"/></figure>
-<p>Hacer cambios r&#225;pidos en el c&#243;digo y reanalizar nuestros datos es una parte fundamental del an&#225;lisis exploratorio de datos (AED, o EDA por sus siglas en ingl&#233;s). En vez de tratar de "probar" una hip&#243;tesis, el an&#225;lisis exploratorio de datos nos ayuda a entender nuestros datos mejor y a hacernos preguntas sobre ellos. Para los historiadores el AED ofrece una forma de saber cu&#225;ndo indagar m&#225;s en un tema y cuando dejarlo a un lado, y esto es en el &#225;rea en el que R sobresale.</p>
-</div>
-      <div type="2"><head>L&#237;nea de operaciones</head>
-<p>Antes de ver <code rend="inline">dplyr</code>, tenemos que entender lo que es la l&#237;nea de operaciones <code rend="inline">%&gt;%</code> en R porque la vamos a utilizar mucho en nuestros ejemplos. Como dec&#237;amos, la l&#237;nea de operaciones es parte del paquete  <ref target="https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html">magittr</ref> creado por <ref target="http://stefanbache.dk">Stefan Milton Bache</ref> y <ref target="http://hadley.nz/">Hadley Wickham</ref> y est&#225; incluida en tidyverse. Su nombre es un homenaje al pintor surrealista Rene Magritte y su famosa obra "<ref target="https://historia-arte.com/obras/la-traicion-de-las-imagenes">La traici&#243;n de las im&#225;genes</ref>", que muestra una pipa con las palabras "esto no es una pipa" debajo, en franc&#233;s.</p>
-<p>La l&#237;nea de operaciones te permite pasar lo que est&#225; a su izquierda como la primera variable en una funci&#243;n especificada a la derecha. Aunque pueda parecer extra&#241;o al principio, una vez que lo aprendas ver&#225;s que hace tu c&#243;digo m&#225;s f&#225;cil de leer al evitar declaraciones anidadas. No te preocupes si esto te resulta un poco complicado ahora. Ser&#225; m&#225;s f&#225;cil una vez que trabajemos con ejemplos.</p>
-<p>Digamos que nos interesa saber la ra&#237;z cuadrada del valor de cada poblaci&#243;n y luego queremos sumar todas las ra&#237;ces cuadradas antes de calcular la media. Obviamente, esto no es una medida &#250;til pero demuestra cu&#225;n r&#225;pido puede complicarse la lectura del c&#243;digo de R. Normalmente, anidar&#237;amos las siguientes declaraciones:</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_4" corresp="code_administracion-de-datos-en-r_4.txt" rend="block"/></ab>
-<p>Como ves, con tantos comandos anidados es dif&#237;cil recordar cu&#225;ntos par&#233;ntesis necesitas y hace que el c&#243;digo sea complicado de leer. Para mitigar esto algunas personas crean vectores temporales entre la llamada a cada funci&#243;n.</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_5" corresp="code_administracion-de-datos-en-r_5.txt" rend="block"/></ab>
-<p>Aunque vas a obtener la misma respuesta, esto es mucho m&#225;s legible. Sin embargo, puede llenar tu espacio de trabajo con basura si olvidas borrar los vectores temporales. La l&#237;nea de operaciones hace todo esto por ti. Aqu&#237; est&#225; el mismo c&#243;digo con la l&#237;nea de operador <emph>pipe</emph>:</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_6" corresp="code_administracion-de-datos-en-r_6.txt" rend="block"/></ab>
-<p>Esto es mucho m&#225;s f&#225;cil de leer e incluso lo podr&#237;as hacer m&#225;s claro escribi&#233;ndolo en diferentes l&#237;neas</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_7" corresp="code_administracion-de-datos-en-r_7.txt" rend="block"/></ab>
-<p>Por favor, nota que los vectores o marcos de datos que la l&#237;nea de operaci&#243;n crea son descartados cuando se completa la operaci&#243;n. Si quieres guardarlos, tienes que pasarlos a una nueva variable:</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_8" corresp="code_administracion-de-datos-en-r_8.txt" rend="block"/></ab>
-</div>
-      <div type="2"><head>Necesitamos un nuevo conjunto de datos</head>
-<p>Ahora que entendemos la l&#237;nea de operaciones, estamos preparados para empezar a mirar y administrar otro conjunto de datos. Desafortunadamente, para los historiadores, solo hay unos pocos conjuntos disponibles - &#161;a lo mejor t&#250; nos puedas ayudar a cambiar esto haciendo los tuyos p&#250;blicos! Aqu&#237; contamos con el paquete <ref target="https://cran.r-project.org/web/packages/historydata/index.html">history data</ref> (datos hist&#243;ricos) creado por <ref target="https://lincolnmullen.com">Lincoln Mullen</ref>.</p>
-<p>Vamos a instalar y cargar el paquete:</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_9" corresp="code_administracion-de-datos-en-r_9.txt" rend="block"/></ab>
-<p>Este paquete contiene ejemplos de conjuntos de datos hist&#243;ricos - el ejemplo anterior con datos del censo del EEUU fue tomado de este paquete (y modificado por la traductora). A lo largo de este tutorial, vamos a trabajar con el conjunto de <code rend="inline">early_colleges</code> (primeras_universidades) que contiene datos sobre las universidades fundadas antes de 1848.<ref type="footnotemark" target="#note_4"/> Lo primero que vamos a hacer es cargar los datos y leerlos:</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_10" corresp="code_administracion-de-datos-en-r_10.txt" rend="block"/></ab>
-<p>Como puedes ver, este conjunto de datos contiene el nombre actual de la universidad (<emph>original_name</emph>), la ciudad (<emph>city</emph>) y el estado (<emph>state</emph>) en que fue fundada, la fecha en que se fund&#243; (<emph>established</emph>), y la entidad responsable de su patrocinio (<emph>sponsorship</emph>). Como ya hemos dicho, antes de poder trabajar con un conjunto de datos, es importante pensar en c&#243;mo organizar los datos. Veamos si alguno de estos datos no est&#225; en formato "limpio" (<emph>"tidy"</emph>). &#191;Puedes ver alguna celda que no concuerde con los tres criterio de datos limpios?</p>
-<p>Si piensas que se trata deel patrocinio de Harvard, est&#225;s en lo cierto. Adem&#225;s de se&#241;alar el patrocinio original, tambi&#233;n menciona que cambi&#243; de patrocinador en 1805. Normalmente uno quiere mantener toda la informaci&#243;n posible sobre los datos, pero para prop&#243;sitos de este tutorial, vamos a cambiar la columna para tener solo el patrocinador inicial.</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_11" corresp="code_administracion-de-datos-en-r_11.txt" rend="block"/></ab>
-<p>Ahora que tenemos nuestros datos en formato limpio, podemos formatearlos a trav&#233;s del paquete <code rend="inline">dplyr</code>.</p>
-</div>
-      <div type="2"><head>&#191;Qu&#233; es Dplyr?</head>
-<p><ref target="https://cran.rstudio.com/web/packages/dplyr/vignettes/dplyr.html">Dplyr</ref> es otra parte de tidyverse que proporciona funciones para manipular y transformar tu datos. Dado que nuestros datos van a seguir estando ordenados (<emph>tidy</emph>), solamente necesitamos un conjunto peque&#241;o de herramientas para explorarlo. Compar&#225;ndolo con el R Base, el uso de <code rend="inline">dplyr</code> es m&#225;s r&#225;pido y garantiza que si los datos introducidos (<emph>input</emph>) est&#225;n ordenados los datos que obtendremos (<emph>output</emph>) tambi&#233;n lo estar&#225;n. Quiz&#225;s de manera m&#225;s importante, <code rend="inline">dplyr</code> hace nuestro c&#243;digo f&#225;cil de leer y utiliza "verbos" que son, en su mayor&#237;a, intuitivos (para el hablante de ingl&#233;s). Cada funci&#243;n en <code rend="inline">dplyr</code> corresponde a estos verbos, siendo los cinco principales filtrar (<code rend="inline">filter</code>), seleccionar (<code rend="inline">select</code>), ordenar (<code rend="inline">arrange</code>), mutar (<code rend="inline">mutate</code>) y resumir (<code rend="inline">summarise</code> - con ortograf&#237;a de ingl&#233;s brit&#225;nico- o <code rend="inline">summarize</code> - con ortograf&#237;a de ingl&#233;s de EEUU-). Vamos a ver cada una de ellas para entender su funcionamiento en la pr&#225;ctica.</p>
-<div type="3"><head><code rend="inline">select</code> (seleccionar)</head>
-<p>Si miramos el conjunto <code rend="inline">early_colleges</code> (primeras_universidades), podemos ver que hay muchos "NA" en la columna de nombres originales. NA significa que los datos no est&#225;n disponibles (del ingl&#233;s <emph>not available</emph>), y quiz&#225;s queramos ver nuestros datos sin esta columna. La funci&#243;n <code rend="inline">select()</code> de <code rend="inline">dplyr</code> nos posibilita esto precisamente. Toma el marco de datos que quieres manipular como el primer argumento, seguido de la lista indicando qu&#233; columnas queremos mantener:</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_12" corresp="code_administracion-de-datos-en-r_12.txt" rend="block"/></ab>
-<p>Escribamos tambi&#233;n esto mismo usando la l&#237;nea de operador <code rend="inline">%&gt;%</code>:</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_13" corresp="code_administracion-de-datos-en-r_13.txt" rend="block"/></ab>
-<p>Hacer referencia a cada una de las columnas que queremos mantener para deshacernos de una es un tanto tedioso. Podemos usar el s&#237;mbolo de restar (-) para indicar que queremos descartar una columna, con su nombre.</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_14" corresp="code_administracion-de-datos-en-r_14.txt" rend="block"/></ab>
-</div><div type="3"><head><code rend="inline">filter</code> (filtrar)</head>
-<p>La funci&#243;n <code rend="inline">filter()</code> hace lo mismo que la funci&#243;n <code rend="inline">select</code> pero en vez de escoger el nombre de la columna, la podemos usar para filtrar filas usando un test de requisitos. Por ejemplo, podemos ver todas las universidades que exist&#237;an antes del cambio de siglo:</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_15" corresp="code_administracion-de-datos-en-r_15.txt" rend="block"/></ab>
-</div><div type="3"><head><code rend="inline">mutate</code> (mutar)</head>
-<p>El comando <code rend="inline">mutate</code> nos permite a&#241;adir una columna al conjunto de datos. Ahora mismo, tenemos la ciudad y el estado en dos columnas diferentes. Podemos usar el comando de pegar (<code rend="inline">paste</code>) para combinar dos cadenas de caracteres y especificar un separador. Pong&#225;moslas en una &#250;nica columna llamada "location" (lugar):</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_16" corresp="code_administracion-de-datos-en-r_16.txt" rend="block"/></ab>
-<p>Recuerda que <code rend="inline">dplyr</code> no guarda los datos ni manipula el original. Al contrario, crea marcos de datos temporales en cada paso. Si quieres guardarlos, tienes que crear una variable permanente con <code rend="inline">&lt;-</code>:</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_17" corresp="code_administracion-de-datos-en-r_17.txt" rend="block"/></ab>
-</div><div type="3"><head><code rend="inline">arrange</code>(ordenar)</head>
-<p>La funci&#243;n <code rend="inline">arrange</code> nos permite ordenar nuestras columnas de una nueva forma. Ahora mismo, las universidades est&#225;n organizadas por a&#241;o en orden ascendiente. Pong&#225;moslas en el orden descendiente de fundaci&#243;n desde, en este caso, el fin de la guerra con M&#233;xico en 1848.<ref type="footnotemark" target="#note_5"/></p>
-<ab><code xml:id="code_administracion-de-datos-en-r_18" corresp="code_administracion-de-datos-en-r_18.txt" rend="block"/></ab>
-</div><div type="3"><head><code rend="inline">summarise</code> (resumir)</head>
-<p>La &#250;ltima funci&#243;n clave en <code rend="inline">dplyr</code> es <code rend="inline">summarise()</code> - en ortograf&#237;a brit&#225;nica (con 's') o en estadounidense (con 'z'). <code rend="inline">summarise()</code> toma una funci&#243;n u operaci&#243;n y generalmente se usa para crear un <emph>data frame</emph> que contiene los datos estad&#237;sticos de resumen y que podemos visualizar en forma de gr&#225;fico. Aqu&#237; la vamos a usar para calcular el a&#241;o promedio en que se fundaron las universidades antes de 1848.</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_19" corresp="code_administracion-de-datos-en-r_19.txt" rend="block"/></ab>
-</div></div>
-      <div type="2"><head>Poni&#233;ndolo todo junto</head>
-<p>Ahora que hemos aprendido los cinco verbos principales para <code rend="inline">dplyr</code>, podemos usarlos para crear r&#225;pidas visualizaciones de nuestros datos. Vamos a crear un gr&#225;fico de barras mostrando el n&#250;mero de universidades laicas y religiosas antes de la Guerra de EEUU de 1812<ref type="footnotemark" target="#note_6"/> :</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_20" corresp="code_administracion-de-datos-en-r_20.txt" rend="block"/></ab>
-<p>Primero, se ejecuta la funci&#243;n de filtrado para escoger aquellas universidades establecidas antes de 1812. Luego, en la funci&#243;n <code rend="inline">mutate</code> la funci&#243;n interna <code rend="inline">ifelse</code> (<emph>if...else...</emph> o si...si no...) genera un test de verdadero (TRUE) o falso (FALSE) sobre los valores de la columna "sponsorship" y genera otra columna "es_laica" con los resultados; tal que "si el valor en la columna no es igual a (<code rend="inline">!=</code>) "Secular" a&#241;ade un "no" en la nueva columna, si dice "Secular" a&#241;ade un "si", repitiendo la operaci&#243;n para cada fila, en este caso para cada universidad [N. de la T.].</p>
-<p>Ahora podemos visualizar los datos:</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_21" corresp="code_administracion-de-datos-en-r_21.txt" rend="block"/></ab>
-<figure><desc>N&#250;mero de universidades laicas y religiosas antes de la Guerra de 1812</desc><graphic url="universidades_seculares_antes_1812.png"/></figure>
-<p>De nuevo, haciendo un cambio r&#225;pido en nuestro c&#243;digo, podemos tambi&#233;n mirar el n&#250;mero de universidades laicas y religiosas despu&#233;s del comienzo de la Guerra de 1812:</p>
-<ab><code xml:id="code_administracion-de-datos-en-r_22" corresp="code_administracion-de-datos-en-r_22.txt" rend="block"/></ab>
-<figure><desc>N&#250;mero de universidades laicas y religiosas despu&#233;s de la Guerra de 1812</desc><graphic url="universidades_seculares_despues_1812.png"/></figure>
-</div>
-      <div type="2"><head>Conclusi&#243;n</head>
-<p>Este tutorial deber&#237;a darte una idea de c&#243;mo organizar y manipular tus datos en R. M&#225;s adelante quiz&#225;s quieras visualizar tus datos de alguna otra forma. Te recomiendo que empieces por explorar el paquete <ref target="https://ggplot2.tidyverse.org/">ggplot2</ref> (ver abajo) porque su conjunto de herramientas funciona muy bien con <code rend="inline">dplyr</code>. Adem&#225;s, puede que quieras examinar alguna otra funci&#243;n de las que viene con <code rend="inline">dplyr</code> para mejorar tus habilidades. En todo caso, esto te proporciona una buena base sobre la que construir para abarcar algunos de los problemas comunes que encontrar&#225;s.</p>
-</div>
-      <div type="2"><head>Recursos adicionales en espa&#241;ol</head>
-<list type="unordered">
-<item>
-<p><ref target="https://swcarpentry.github.io/r-novice-gapminder-es/">R para An&#225;lisis Cient&#237;ficos Reproducibles</ref> de Software Carpentry (2018) tiene m&#225;s informaci&#243;n sobre c&#243;mo utilizar <code rend="inline">dplyr</code> para tus datos.</p>
-</item>
-<item>
-<p>Para aprender m&#225;s sobre el paquete 'ggplot2' puedes consultar la secci&#243;n "<ref target="https://cienciadedatos.github.io/r4ds/03-visualize.html">Visualizaci&#243;n de datos</ref>" en el libro <emph>R para Ciencia de Datos</emph> de Hadley Wickham y Garrett Grolemund.</p>
-</item>
-<item>
-<p>Tanto la <emph><ref target="https://www.inei.gob.pe/media/MenuRecursivo/metodologias/libro.pdf">Gu&#237;a  para  la  Presentaci&#243;n  de  Gr&#225;ficos  Estad&#237;sticos</ref>,</emph> del Instituto  Nacional  de Estad&#237;stica e Inform&#225;tica (2009) as&#237; como la <ref target="http://academica-e.unavarra.es/bitstream/handle/2454/15785/Gram%C3%A1tica.pdf?sequence=1"><emph>Gram&#225;tica de las gr&#225;ficas: Pistas para mejorar las representaciones de datos</emph></ref> de Joaqu&#237;n Sevilla Mor&#243;der ofrecen explicaciones de c&#243;mo presentar tus datos y errores a evitar.</p>
-</item>
-</list>
-<p><ref type="footnotemark" target="#note_1"/> : En el tutorial original se hace referencia al libro "<ref target="https://www.springer.com/us/book/9780387245447">The Grammar of Graphics</ref>" (2005) de Wilkinson.</p>
-<p><ref type="footnotemark" target="#note_2"/> : Este listado contiene el censo de la poblaci&#243;n de cada estado desde 1790, es decir, a partir de la formaci&#243;n de los Estados Unidos de Am&#233;rica. De esta manera, el listado comienza con 15 estados (los 13 primeros estados eran ya parte del pa&#237;s desde su <ref target="https://es.wikipedia.org/wiki/Declaraci%C3%B3n_de_Independencia_de_los_Estados_Unidos">independencia en 1776</ref>, pero no se ratific&#243; su admisi&#243;n hasta la <ref target="https://es.wikipedia.org/wiki/Constituci%C3%B3n_de_los_Estados_Unidos">Constituci&#243;n de 1787</ref>), los del noreste y parte del sureste, a los que se van a&#241;adiendo territorios (que luego se convertir&#225;n en estado) a lo largo de los siglos XIX y XX, hasta llegar a la actual divisi&#243;n territorial del pa&#237;s: <ref target="https://es.wikipedia.org/wiki/Anexo:Estados_y_Territorios_de_los_Estados_Unidos#Lista_de_estados">50 estados</ref>, un <ref target="https://es.wikipedia.org/wiki/Anexo:Estados_y_Territorios_de_los_Estados_Unidos#Distrito_Federal">distrito federal</ref> y varios <ref target="https://es.wikipedia.org/wiki/Anexo:Estados_y_Territorios_de_los_Estados_Unidos#Territorios">territorios no incorporados</ref> (Puerto Rico aparece en este censo pero no es un estado como tal, sino un <ref target="https://es.wikipedia.org/wiki/Estado_libre_asociado">estado libre asociado</ref> o territorio). Se han traducido los datos originales (en ingl&#233;s) al espa&#241;ol. [N. de la T.]</p>
-<p><ref type="footnotemark" target="#note_3"/> : <ref target="https://es.wikipedia.org/wiki/Historia_territorial_de_los_Estados_Unidos">La migraci&#243;n hacia el oeste de los Estados Unidos</ref> se dio durante el siglo XIX a partir de la compra de Luisiana (a Francia) y hasta su llegada a la costa Pac&#237;fico, despojando a los norteamericanos nativos de sus tierras mediante la violencia. N&#243;tese, adem&#225;s, que California fue incorporada a los Estados Unidos en 1850, tras su cesi&#243;n por parte de M&#233;xico al finalizar la guerra entre ambos pa&#237;ses (1846-1848) por el <ref target="https://es.wikipedia.org/wiki/Tratado_de_Guadalupe_Hidalgo">Tratado de Guadalupe Hidalgo</ref>.</p>
-<p><ref type="footnotemark" target="#note_4"/> : No traducimos estos conjunto pero, por suerte, los datos son bastante intuitivos al tratarse de nombres propios, ciudades, a&#241;os e iglesias cuyos nombres son cognados entre ingl&#233;s y espa&#241;ol (Anglican por anglicana, Presbyterian por presbiteriana, etc.) [N.de la T.]</p>
-<p><ref type="footnotemark" target="#note_5"/> : La tambi&#233;n llamada <ref target="https://es.wikipedia.org/wiki/Intervenci%C3%B3n_estadounidense_en_M%C3%A9xico">Guerra Mexico-Americana</ref> fue la guerra librada entre los Estados Unidos y M&#233;xico desde 1846 hasta la firma del <ref target="https://es.wikipedia.org/wiki/Tratado_de_Guadalupe_Hidalgo">Tratado de Guadalupe Hidalgo</ref> en 1848 y la <ref target="https://es.wikipedia.org/wiki/Cesi%C3%B3n_mexicana">cesi&#243;n mexicana</ref>.</p>
-<p><ref type="footnotemark" target="#note_6"/> : La <ref target="https://es.wikipedia.org/wiki/Guerra_anglo-estadounidense_de_1812">Guerra de 1812</ref>, o guerra anglo-estadounidense, enfrent&#243; a los EEUU contra el Reino Unido al tratar los primeros de conquistar los territorios coloniales de los segundos. Finaliz&#243; en 1815.</p>
-</div>
-    </body>
-  </text>
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Administración de datos en R</title>
+                <author role="original_author">Nabeel Siddiqui</author>
+                <editor role="reviewers">
+                    <persName>Lauren Tilton</persName>
+                    <persName>Ryan Deschamps</persName>
+                </editor>
+                <author role="translators">Jennifer Isasi</author>
+                <editor role="translation-reviewers">
+                    <persName>Riva Quiroga</persName>
+                    <persName>Victor Gayol</persName>
+                </editor>
+                <editor role="editors">Ian Milligan</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">10/10/2018</date>
+                <idno type="doi">10.46430/phes0031</idno>
+                <date type="published">07/31/2017</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#data_wrangling_and_management_in_R"/>.</p>
+                <p>There are other translations: <ref target="#manipulacao-transformacao-dados-R"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Este tutorial explora la manera en que los académicos pueden administrar datos de forma ordenada, entender paquetes de R para manipular los datos y llevar a cabo un análisis básico de datos.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">data-management</term>
+                    <term xml:lang="en">distant-reading</term>
+                    <term xml:lang="en">r</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="es">
+        <body>
+            <div type="2">
+                <head>Requisitos</head>
+                <p>En esta lección asumimos que tienes cierto conocimiento sobre R. Si no has completado el tutorial de <ref target="/es/lecciones/datos-tabulares-en-r">datos tabulares básicos con R</ref>, te recomendamos hacerlo. Saber otro lenguaje de programación también te será útil. Si necesitas un lugar donde empezar, recomendamos trabajar con los excelentes tutoriales sobre <ref target="/es/lecciones/?topic=python">Python</ref> en <emph>The Programming Historian en español</emph>.</p>
+            </div>
+            <div type="2">
+                <head>Objetivos de la lección</head>
+                <p>Al final de la lección,</p>
+                <list type="ordered">
+                    <item>sabrás cómo trabajar con datos ordenados y su importancia.</item>
+                    <item>entenderás el paquete <code rend="inline">dplyr</code> y podrás usarlo para manipular y administrar datos.</item>
+                    <item>conocerás la línea de operaciones de R y observarás su utilidad para crear código más legible.</item>
+                    <item>aprenderás las bases del análisis exploratorio de datos a través de algunos ejemplos básicos de manipulación de datos.</item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Introducción</head>
+                <p>Los datos que puedes encontrar disponibles en red raramente están en el formato necesario para su análisis y necesitarás manipularlos antes de explorar las preguntas que te interesan. ¡Esto puede llevar más tiempo que el análisis! En este tutorial vamos a aprender algunas técnicas básicas de manipulación, manejo y administración de tus datos en R. Más específicamente, vamos a seguir la filosofía de "datos limpios" o <ref target="https://www.jstatsoft.org/article/view/v059i10">
+                        <emph>"tidy data"</emph>
+                    </ref> articulada por Hadley Wickham.</p>
+                <p>Según <ref target="http://hadley.nz">Wickham</ref>, los datos están "limpios" cuando cumplen tres criterios:</p>
+                <list type="ordered">
+                    <item>Cada observación está en una fila.</item>
+                    <item>Cada variable está en una columna.</item>
+                    <item>Cada valor tiene su propia celda.</item>
+                </list>
+                <p>Prestar atención a estos criterios nos permite identificar datos organizados o desorganizados. También nos ofrece un esquema estándar y un conjunto de herramientas para limpiar alguna de las formas más comunes en que un conjunto de datos puede estar "desordenado", como por ejemplo si:</p>
+                <list type="unordered">
+                    <item>los títulos de las columnas son valores en vez de nombres de variables.</item>
+                    <item>hay múltiples variables en una columna.</item>
+                    <item>las variables están en las filas y en las columnas.</item>
+                    <item>hay unidades observacionales de diferente tipo guardadas en la misma tabla.</item>
+                    <item>una única unidad observacional está guardada en varias tablas.</item>
+                </list>
+                <p>Tal vez lo más importante sea que tener nuestros datos en este formato nos permite usar una colección de paquetes del <ref target="https://www.tidyverse.org">"tidyverse"</ref> que están diseñados para trabajar específicamente con datos limpios. Asegurándonos de que nuestros datos de entrada y de salida están ordenados, podemos usar un pequeño conjunto de herramientas para resolver un amplio número de preguntas. Además, podemos combinar, manipular y dividir conjuntos de datos ordenados como creamos más conveniente.</p>
+                <p>En este tutorial nos enfocamos en el paquete <ref target="https://cran.r-project.org/web/packages/dplyr/index.html">dplyr</ref> de tidyverse pero merece la pena mencionar otros que nos encontraremos por el camino:</p>
+                <p>
+                    <ref target="https://magrittr.tidyverse.org">
+                        <hi rend="bold">magittr</hi>
+                    </ref>: Este paquete nos da acceso al el operador <code rend="inline">%&gt;%</code> y hace nuestro código más fácilmente de leer.
+<ref target="https://ggplot2.tidyverse.org">
+                        <hi rend="bold">ggplot2</hi>
+                    </ref>: Este paquete utiliza  <ref target="http://academica-e.unavarra.es/bitstream/handle/2454/15785/Gram%C3%A1tica.pdf?sequence=1">"la gramática de gráficos"</ref>
+                    <ref type="footnotemark" target="#es_note_1"/> para ofrecer una manera fácil de visualizar nuestros datos.
+<ref target="https://readr.tidyverse.org">
+                        <hi rend="bold">readr</hi>
+                    </ref>: Este paquete da acceso a un método más rápido y racionalizado para importar datos rectangulares (una tabla), como son los archivos CSV (valores separados por comas).
+<ref target="https://tibble.tidyverse.org">
+                        <hi rend="bold">tibble</hi>
+                    </ref>: Este paquete nos permite reconceptualizar el formato <emph>data frame</emph> (marco o tabla de datos) para que sea más fácil trabajar con ellos e imprimirlos.</p>
+                <p>Si todavía no lo has hecho, deberías instalar y cargar "tidyverse" antes de empezar. Además, asegúrate de tener la <ref target="https://cran.rstudio.com">versión más reciente de R</ref> y de la <ref target="https://www.rstudio.com/products/rstudio/download/">plataforma R Studio</ref> correspondientes a tu sistema operativo.</p>
+                <p>Copia el siguiente código en R Studio. Para ejecutarlo tienes que marcar las líneas y clicar Ctrl+Intro (Cmd+Intro en Mac OS):</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_0" corresp="code_administracion-de-datos-en-r_0.txt" rend="block"/>
+                </ab>
+            </div>
+            <div type="2">
+                <head>Un ejemplo de dplyr en acción</head>
+                <p>Veamos un ejemplo de cómo dyplr nos puede ayudar a los historiadores. Vamos a cargar los datos del censo decenal de 1790 a 2010 de Estados Unidos. Descarga los datos haciendo <ref target="/assets/ejemplo_introductorio_estados.csv">click aquí</ref>
+                    <ref type="footnotemark" target="#es_note_2"/> y ponlos en la carpeta que vas a utilizar para trabajar en los ejemplos de este tutorial.</p>
+                <p>Como los datos están en un archivo CSV, vamos a usar el comando de lectura <code rend="inline">read_csv()</code> en el paquete <ref target="https://cran.r-project.org/web/packages/readr/vignettes/readr.html">readr</ref> de "tidyverse".</p>
+                <p>La función <code rend="inline">read_csv</code> (leer archivo de valores separados por comas) toma la ruta del archivo que queremos importar como una variable, así que asegúrate de escribirlo correctamente.</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_1" corresp="code_administracion-de-datos-en-r_1.txt" rend="block"/>
+                </ab>
+                <p>Una vez que importas los datos, verás que hay tres columnas: una para la población, otra para el año y otra para el estado. Estos datos ya están en un formato limpio y nos dan multitud de opciones para explorarlos.</p>
+                <p>Para el particular, vamos a visualizar el crecimiento de la población de California y Nueva York para conocer mejor de la migración del oeste.<ref type="footnotemark" target="#es_note_3"/> Vamos a usar <code rend="inline">dplyr</code> para filtrar los datos que contienen solo la información de los estados que nos interesan y ggplot2 para visualizar dichos datos. Este ejercicio es solo un ejemplo para que te hagas una idea de lo que puede hacer <code rend="inline">dplyr</code>, así que no te preocupes si no entiendes el código en este momento.</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_2" corresp="code_administracion-de-datos-en-r_2.txt" rend="block"/>
+                </ab>
+                <figure>
+                    <desc>Gráfico de la población de los estados de California y de Nueva York</desc>
+                    <graphic url="california_nueva_york_poblacion.png"/>
+                </figure>
+                <p>Como podemos ver, la población de California ha crecido de forma considerable en comparación con la de Nueva York. Aunque este ejemplo pueda parecer obvio si conoces la historia de migración en los Estados Unidos, el código nos ofrece la base sobre la que podemos elaborar multitud de preguntas similares. Por ejemplo, con un cambio rápido en el código podemos crear un gráfico similar con dos estados diferentes como Mississippi y Virginia.</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_3" corresp="code_administracion-de-datos-en-r_3.txt" rend="block"/>
+                </ab>
+                <figure>
+                    <desc>Gráfico de la población de los estados de Mississippi y de Virginia</desc>
+                    <graphic url="mississipi_virginia_poblacion.png"/>
+                </figure>
+                <p>Hacer cambios rápidos en el código y reanalizar nuestros datos es una parte fundamental del análisis exploratorio de datos (AED, o EDA por sus siglas en inglés). En vez de tratar de "probar" una hipótesis, el análisis exploratorio de datos nos ayuda a entender nuestros datos mejor y a hacernos preguntas sobre ellos. Para los historiadores el AED ofrece una forma de saber cuándo indagar más en un tema y cuando dejarlo a un lado, y esto es en el área en el que R sobresale.</p>
+            </div>
+            <div type="2">
+                <head>Línea de operaciones</head>
+                <p>Antes de ver <code rend="inline">dplyr</code>, tenemos que entender lo que es la línea de operaciones <code rend="inline">%&gt;%</code> en R porque la vamos a utilizar mucho en nuestros ejemplos. Como decíamos, la línea de operaciones es parte del paquete  <ref target="https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html">magittr</ref> creado por <ref target="http://stefanbache.dk">Stefan Milton Bache</ref> y <ref target="http://hadley.nz/">Hadley Wickham</ref> y está incluida en tidyverse. Su nombre es un homenaje al pintor surrealista Rene Magritte y su famosa obra "<ref target="https://historia-arte.com/obras/la-traicion-de-las-imagenes">La traición de las imágenes</ref>", que muestra una pipa con las palabras "esto no es una pipa" debajo, en francés.</p>
+                <p>La línea de operaciones te permite pasar lo que está a su izquierda como la primera variable en una función especificada a la derecha. Aunque pueda parecer extraño al principio, una vez que lo aprendas verás que hace tu código más fácil de leer al evitar declaraciones anidadas. No te preocupes si esto te resulta un poco complicado ahora. Será más fácil una vez que trabajemos con ejemplos.</p>
+                <p>Digamos que nos interesa saber la raíz cuadrada del valor de cada población y luego queremos sumar todas las raíces cuadradas antes de calcular la media. Obviamente, esto no es una medida útil pero demuestra cuán rápido puede complicarse la lectura del código de R. Normalmente, anidaríamos las siguientes declaraciones:</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_4" corresp="code_administracion-de-datos-en-r_4.txt" rend="block"/>
+                </ab>
+                <p>Como ves, con tantos comandos anidados es difícil recordar cuántos paréntesis necesitas y hace que el código sea complicado de leer. Para mitigar esto algunas personas crean vectores temporales entre la llamada a cada función.</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_5" corresp="code_administracion-de-datos-en-r_5.txt" rend="block"/>
+                </ab>
+                <p>Aunque vas a obtener la misma respuesta, esto es mucho más legible. Sin embargo, puede llenar tu espacio de trabajo con basura si olvidas borrar los vectores temporales. La línea de operaciones hace todo esto por ti. Aquí está el mismo código con la línea de operador <emph>pipe</emph>:</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_6" corresp="code_administracion-de-datos-en-r_6.txt" rend="block"/>
+                </ab>
+                <p>Esto es mucho más fácil de leer e incluso lo podrías hacer más claro escribiéndolo en diferentes líneas</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_7" corresp="code_administracion-de-datos-en-r_7.txt" rend="block"/>
+                </ab>
+                <p>Por favor, nota que los vectores o marcos de datos que la línea de operación crea son descartados cuando se completa la operación. Si quieres guardarlos, tienes que pasarlos a una nueva variable:</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_8" corresp="code_administracion-de-datos-en-r_8.txt" rend="block"/>
+                </ab>
+            </div>
+            <div type="2">
+                <head>Necesitamos un nuevo conjunto de datos</head>
+                <p>Ahora que entendemos la línea de operaciones, estamos preparados para empezar a mirar y administrar otro conjunto de datos. Desafortunadamente, para los historiadores, solo hay unos pocos conjuntos disponibles - ¡a lo mejor tú nos puedas ayudar a cambiar esto haciendo los tuyos públicos! Aquí contamos con el paquete <ref target="https://cran.r-project.org/web/packages/historydata/index.html">history data</ref> (datos históricos) creado por <ref target="https://lincolnmullen.com">Lincoln Mullen</ref>.</p>
+                <p>Vamos a instalar y cargar el paquete:</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_9" corresp="code_administracion-de-datos-en-r_9.txt" rend="block"/>
+                </ab>
+                <p>Este paquete contiene ejemplos de conjuntos de datos históricos - el ejemplo anterior con datos del censo del EEUU fue tomado de este paquete (y modificado por la traductora). A lo largo de este tutorial, vamos a trabajar con el conjunto de <code rend="inline">early_colleges</code> (primeras_universidades) que contiene datos sobre las universidades fundadas antes de 1848.<ref type="footnotemark" target="#es_note_4"/> Lo primero que vamos a hacer es cargar los datos y leerlos:</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_10" corresp="code_administracion-de-datos-en-r_10.txt" rend="block"/>
+                </ab>
+                <p>Como puedes ver, este conjunto de datos contiene el nombre actual de la universidad (<emph>original_name</emph>), la ciudad (<emph>city</emph>) y el estado (<emph>state</emph>) en que fue fundada, la fecha en que se fundó (<emph>established</emph>), y la entidad responsable de su patrocinio (<emph>sponsorship</emph>). Como ya hemos dicho, antes de poder trabajar con un conjunto de datos, es importante pensar en cómo organizar los datos. Veamos si alguno de estos datos no está en formato "limpio" (<emph>"tidy"</emph>). ¿Puedes ver alguna celda que no concuerde con los tres criterio de datos limpios?</p>
+                <p>Si piensas que se trata deel patrocinio de Harvard, estás en lo cierto. Además de señalar el patrocinio original, también menciona que cambió de patrocinador en 1805. Normalmente uno quiere mantener toda la información posible sobre los datos, pero para propósitos de este tutorial, vamos a cambiar la columna para tener solo el patrocinador inicial.</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_11" corresp="code_administracion-de-datos-en-r_11.txt" rend="block"/>
+                </ab>
+                <p>Ahora que tenemos nuestros datos en formato limpio, podemos formatearlos a través del paquete <code rend="inline">dplyr</code>.</p>
+            </div>
+            <div type="2">
+                <head>¿Qué es Dplyr?</head>
+                <p>
+                    <ref target="https://cran.rstudio.com/web/packages/dplyr/vignettes/dplyr.html">Dplyr</ref> es otra parte de tidyverse que proporciona funciones para manipular y transformar tu datos. Dado que nuestros datos van a seguir estando ordenados (<emph>tidy</emph>), solamente necesitamos un conjunto pequeño de herramientas para explorarlo. Comparándolo con el R Base, el uso de <code rend="inline">dplyr</code> es más rápido y garantiza que si los datos introducidos (<emph>input</emph>) están ordenados los datos que obtendremos (<emph>output</emph>) también lo estarán. Quizás de manera más importante, <code rend="inline">dplyr</code> hace nuestro código fácil de leer y utiliza "verbos" que son, en su mayoría, intuitivos (para el hablante de inglés). Cada función en <code rend="inline">dplyr</code> corresponde a estos verbos, siendo los cinco principales filtrar (<code rend="inline">filter</code>), seleccionar (<code rend="inline">select</code>), ordenar (<code rend="inline">arrange</code>), mutar (<code rend="inline">mutate</code>) y resumir (<code rend="inline">summarise</code> - con ortografía de inglés británico- o <code rend="inline">summarize</code> - con ortografía de inglés de EEUU-). Vamos a ver cada una de ellas para entender su funcionamiento en la práctica.</p>
+                <div type="3">
+                    <head>
+                        <code rend="inline">select</code> (seleccionar)</head>
+                    <p>Si miramos el conjunto <code rend="inline">early_colleges</code> (primeras_universidades), podemos ver que hay muchos "NA" en la columna de nombres originales. NA significa que los datos no están disponibles (del inglés <emph>not available</emph>), y quizás queramos ver nuestros datos sin esta columna. La función <code rend="inline">select()</code> de <code rend="inline">dplyr</code> nos posibilita esto precisamente. Toma el marco de datos que quieres manipular como el primer argumento, seguido de la lista indicando qué columnas queremos mantener:</p>
+                    <ab>
+                        <code xml:id="code_administracion-de-datos-en-r_12" corresp="code_administracion-de-datos-en-r_12.txt" rend="block"/>
+                    </ab>
+                    <p>Escribamos también esto mismo usando la línea de operador <code rend="inline">%&gt;%</code>:</p>
+                    <ab>
+                        <code xml:id="code_administracion-de-datos-en-r_13" corresp="code_administracion-de-datos-en-r_13.txt" rend="block"/>
+                    </ab>
+                    <p>Hacer referencia a cada una de las columnas que queremos mantener para deshacernos de una es un tanto tedioso. Podemos usar el símbolo de restar (-) para indicar que queremos descartar una columna, con su nombre.</p>
+                    <ab>
+                        <code xml:id="code_administracion-de-datos-en-r_14" corresp="code_administracion-de-datos-en-r_14.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>
+                        <code rend="inline">filter</code> (filtrar)</head>
+                    <p>La función <code rend="inline">filter()</code> hace lo mismo que la función <code rend="inline">select</code> pero en vez de escoger el nombre de la columna, la podemos usar para filtrar filas usando un test de requisitos. Por ejemplo, podemos ver todas las universidades que existían antes del cambio de siglo:</p>
+                    <ab>
+                        <code xml:id="code_administracion-de-datos-en-r_15" corresp="code_administracion-de-datos-en-r_15.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>
+                        <code rend="inline">mutate</code> (mutar)</head>
+                    <p>El comando <code rend="inline">mutate</code> nos permite añadir una columna al conjunto de datos. Ahora mismo, tenemos la ciudad y el estado en dos columnas diferentes. Podemos usar el comando de pegar (<code rend="inline">paste</code>) para combinar dos cadenas de caracteres y especificar un separador. Pongámoslas en una única columna llamada "location" (lugar):</p>
+                    <ab>
+                        <code xml:id="code_administracion-de-datos-en-r_16" corresp="code_administracion-de-datos-en-r_16.txt" rend="block"/>
+                    </ab>
+                    <p>Recuerda que <code rend="inline">dplyr</code> no guarda los datos ni manipula el original. Al contrario, crea marcos de datos temporales en cada paso. Si quieres guardarlos, tienes que crear una variable permanente con <code rend="inline">&lt;-</code>:</p>
+                    <ab>
+                        <code xml:id="code_administracion-de-datos-en-r_17" corresp="code_administracion-de-datos-en-r_17.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>
+                        <code rend="inline">arrange</code>(ordenar)</head>
+                    <p>La función <code rend="inline">arrange</code> nos permite ordenar nuestras columnas de una nueva forma. Ahora mismo, las universidades están organizadas por año en orden ascendiente. Pongámoslas en el orden descendiente de fundación desde, en este caso, el fin de la guerra con México en 1848.<ref type="footnotemark" target="#es_note_5"/>
+                    </p>
+                    <ab>
+                        <code xml:id="code_administracion-de-datos-en-r_18" corresp="code_administracion-de-datos-en-r_18.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>
+                        <code rend="inline">summarise</code> (resumir)</head>
+                    <p>La última función clave en <code rend="inline">dplyr</code> es <code rend="inline">summarise()</code> - en ortografía británica (con 's') o en estadounidense (con 'z'). <code rend="inline">summarise()</code> toma una función u operación y generalmente se usa para crear un <emph>data frame</emph> que contiene los datos estadísticos de resumen y que podemos visualizar en forma de gráfico. Aquí la vamos a usar para calcular el año promedio en que se fundaron las universidades antes de 1848.</p>
+                    <ab>
+                        <code xml:id="code_administracion-de-datos-en-r_19" corresp="code_administracion-de-datos-en-r_19.txt" rend="block"/>
+                    </ab>
+                </div>
+            </div>
+            <div type="2">
+                <head>Poniéndolo todo junto</head>
+                <p>Ahora que hemos aprendido los cinco verbos principales para <code rend="inline">dplyr</code>, podemos usarlos para crear rápidas visualizaciones de nuestros datos. Vamos a crear un gráfico de barras mostrando el número de universidades laicas y religiosas antes de la Guerra de EEUU de 1812<ref type="footnotemark" target="#es_note_6"/> :</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_20" corresp="code_administracion-de-datos-en-r_20.txt" rend="block"/>
+                </ab>
+                <p>Primero, se ejecuta la función de filtrado para escoger aquellas universidades establecidas antes de 1812. Luego, en la función <code rend="inline">mutate</code> la función interna <code rend="inline">ifelse</code> (<emph>if...else...</emph> o si...si no...) genera un test de verdadero (TRUE) o falso (FALSE) sobre los valores de la columna "sponsorship" y genera otra columna "es_laica" con los resultados; tal que "si el valor en la columna no es igual a (<code rend="inline">!=</code>) "Secular" añade un "no" en la nueva columna, si dice "Secular" añade un "si", repitiendo la operación para cada fila, en este caso para cada universidad [N. de la T.].</p>
+                <p>Ahora podemos visualizar los datos:</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_21" corresp="code_administracion-de-datos-en-r_21.txt" rend="block"/>
+                </ab>
+                <figure>
+                    <desc>Número de universidades laicas y religiosas antes de la Guerra de 1812</desc>
+                    <graphic url="universidades_seculares_antes_1812.png"/>
+                </figure>
+                <p>De nuevo, haciendo un cambio rápido en nuestro código, podemos también mirar el número de universidades laicas y religiosas después del comienzo de la Guerra de 1812:</p>
+                <ab>
+                    <code xml:id="code_administracion-de-datos-en-r_22" corresp="code_administracion-de-datos-en-r_22.txt" rend="block"/>
+                </ab>
+                <figure>
+                    <desc>Número de universidades laicas y religiosas después de la Guerra de 1812</desc>
+                    <graphic url="universidades_seculares_despues_1812.png"/>
+                </figure>
+            </div>
+            <div type="2">
+                <head>Conclusión</head>
+                <p>Este tutorial debería darte una idea de cómo organizar y manipular tus datos en R. Más adelante quizás quieras visualizar tus datos de alguna otra forma. Te recomiendo que empieces por explorar el paquete <ref target="https://ggplot2.tidyverse.org/">ggplot2</ref> (ver abajo) porque su conjunto de herramientas funciona muy bien con <code rend="inline">dplyr</code>. Además, puede que quieras examinar alguna otra función de las que viene con <code rend="inline">dplyr</code> para mejorar tus habilidades. En todo caso, esto te proporciona una buena base sobre la que construir para abarcar algunos de los problemas comunes que encontrarás.</p>
+            </div>
+            <div type="2">
+                <head>Recursos adicionales en español</head>
+                <list type="unordered">
+                    <item>
+                        <p>
+                            <ref target="https://swcarpentry.github.io/r-novice-gapminder-es/">R para Análisis Científicos Reproducibles</ref> de Software Carpentry (2018) tiene más información sobre cómo utilizar <code rend="inline">dplyr</code> para tus datos.</p>
+                    </item>
+                    <item>
+                        <p>Para aprender más sobre el paquete 'ggplot2' puedes consultar la sección "<ref target="https://cienciadedatos.github.io/r4ds/03-visualize.html">Visualización de datos</ref>" en el libro <emph>R para Ciencia de Datos</emph> de Hadley Wickham y Garrett Grolemund.</p>
+                    </item>
+                    <item>
+                        <p>Tanto la <emph>
+                                <ref target="https://www.inei.gob.pe/media/MenuRecursivo/metodologias/libro.pdf">Guía  para  la  Presentación  de  Gráficos  Estadísticos</ref>,</emph> del Instituto  Nacional  de Estadística e Informática (2009) así como la <ref target="http://academica-e.unavarra.es/bitstream/handle/2454/15785/Gram%C3%A1tica.pdf?sequence=1">
+                                <emph>Gramática de las gráficas: Pistas para mejorar las representaciones de datos</emph>
+                            </ref> de Joaquín Sevilla Moróder ofrecen explicaciones de cómo presentar tus datos y errores a evitar.</p>
+                    </item>
+                </list>
+                <p>
+                    <ref type="footnotemark" target="#es_note_1"/> : En el tutorial original se hace referencia al libro "<ref target="https://www.springer.com/us/book/9780387245447">The Grammar of Graphics</ref>" (2005) de Wilkinson.</p>
+                <p>
+                    <ref type="footnotemark" target="#es_note_2"/> : Este listado contiene el censo de la población de cada estado desde 1790, es decir, a partir de la formación de los Estados Unidos de América. De esta manera, el listado comienza con 15 estados (los 13 primeros estados eran ya parte del país desde su <ref target="https://es.wikipedia.org/wiki/Declaraci%C3%B3n_de_Independencia_de_los_Estados_Unidos">independencia en 1776</ref>, pero no se ratificó su admisión hasta la <ref target="https://es.wikipedia.org/wiki/Constituci%C3%B3n_de_los_Estados_Unidos">Constitución de 1787</ref>), los del noreste y parte del sureste, a los que se van añadiendo territorios (que luego se convertirán en estado) a lo largo de los siglos XIX y XX, hasta llegar a la actual división territorial del país: <ref target="https://es.wikipedia.org/wiki/Anexo:Estados_y_Territorios_de_los_Estados_Unidos#Lista_de_estados">50 estados</ref>, un <ref target="https://es.wikipedia.org/wiki/Anexo:Estados_y_Territorios_de_los_Estados_Unidos#Distrito_Federal">distrito federal</ref> y varios <ref target="https://es.wikipedia.org/wiki/Anexo:Estados_y_Territorios_de_los_Estados_Unidos#Territorios">territorios no incorporados</ref> (Puerto Rico aparece en este censo pero no es un estado como tal, sino un <ref target="https://es.wikipedia.org/wiki/Estado_libre_asociado">estado libre asociado</ref> o territorio). Se han traducido los datos originales (en inglés) al español. [N. de la T.]</p>
+                <p>
+                    <ref type="footnotemark" target="#es_note_3"/> : <ref target="https://es.wikipedia.org/wiki/Historia_territorial_de_los_Estados_Unidos">La migración hacia el oeste de los Estados Unidos</ref> se dio durante el siglo XIX a partir de la compra de Luisiana (a Francia) y hasta su llegada a la costa Pacífico, despojando a los norteamericanos nativos de sus tierras mediante la violencia. Nótese, además, que California fue incorporada a los Estados Unidos en 1850, tras su cesión por parte de México al finalizar la guerra entre ambos países (1846-1848) por el <ref target="https://es.wikipedia.org/wiki/Tratado_de_Guadalupe_Hidalgo">Tratado de Guadalupe Hidalgo</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#es_note_4"/> : No traducimos estos conjunto pero, por suerte, los datos son bastante intuitivos al tratarse de nombres propios, ciudades, años e iglesias cuyos nombres son cognados entre inglés y español (Anglican por anglicana, Presbyterian por presbiteriana, etc.) [N.de la T.]</p>
+                <p>
+                    <ref type="footnotemark" target="#es_note_5"/> : La también llamada <ref target="https://es.wikipedia.org/wiki/Intervenci%C3%B3n_estadounidense_en_M%C3%A9xico">Guerra Mexico-Americana</ref> fue la guerra librada entre los Estados Unidos y México desde 1846 hasta la firma del <ref target="https://es.wikipedia.org/wiki/Tratado_de_Guadalupe_Hidalgo">Tratado de Guadalupe Hidalgo</ref> en 1848 y la <ref target="https://es.wikipedia.org/wiki/Cesi%C3%B3n_mexicana">cesión mexicana</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#es_note_6"/> : La <ref target="https://es.wikipedia.org/wiki/Guerra_anglo-estadounidense_de_1812">Guerra de 1812</ref>, o guerra anglo-estadounidense, enfrentó a los EEUU contra el Reino Unido al tratar los primeros de conquistar los territorios coloniales de los segundos. Finalizó en 1815.</p>
+            </div>
+        </body>
+    </text>
 </TEI>

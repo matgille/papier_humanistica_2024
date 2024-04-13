@@ -1,0 +1,121 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="geocoding-qgis">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Geocoding Historical Data using QGIS</title>
+                <author role="original_author">Justin Colson</author>
+                <editor role="reviewers">
+                    <persName>Adam Dennett</persName>
+                    <persName>Léon Robichaud</persName>
+                </editor>
+                <editor role="editors">Adam Crymble</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0066</idno>
+                <date type="published">01/27/2017</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Learn how to use QGIS to convert lists of place names in to geographic coordinates, allowing you to map them.
+</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">mapping</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2">
+                <head>Lesson Goals</head>
+                <p>Many types of sources used by historians are inherently spatial. For example:</p>
+                <list type="unordered">
+                    <item>Census, population or taxation data</item>
+                    <item>Imports and exports</item>
+                    <item>Routes and itineraries</item>
+                </list>
+                <p>In this tutorial, you will learn how to 'geocode' historial data containing placenames (towns, counties, countries, etc), thus making them mappable using <ref target="http://www.qgis.org/en/site/">QGIS</ref>, a digital mapping software suite. This will allow you to:</p>
+                <list type="unordered">
+                    <item>Display your data as a map (whether it originated as a list, table, or prose)</item>
+                    <item>Analyse distances between locations in your data</item>
+                    <item>View and analyse geographical distribution within your data</item>
+                </list>
+                <p>This tutorial forms part of the Mapping and GIS series on <emph>Programming Historian</emph>, and builds upon skills you will have learned in earlier tutorials, especially <ref target="/lessons/qgis-layers">Installing QGIS 2.0 and Adding Layers</ref>. It presumes that you have a set of <ref target="https://en.wikipedia.org/wiki/Shapefile">shapefiles</ref> relevant to the region for which you intend to produce a map, and data that you would like to get into those shapefiles so that it can be visualised and analysed.</p>
+            </div>
+            <div type="2">
+                <head>About Geocoding</head>
+                <p>Mapping data such as these involves rendering spatial information which humans can understand (such as names of towns or counties) into a format that can be understood by <ref target="https://en.wikipedia.org/wiki/Geographic_information_system">GIS</ref> (mapping) software. This is limited to some kind of geometry (a point, line or polygon in a vector representation) relating to the coordinates of this place in two dimensional space – these might be latitude and longitude expressed in degrees, or as is often the case in the UK, eastings and northings of the <ref target="https://www.ordnancesurvey.co.uk/resources/maps-and-geographic-resources/the-national-grid.html">British National Grid</ref>. Geocoding always depends on the use of a <ref target="https://en.wikipedia.org/wiki/Gazetteer">gazetter</ref>, or list of places and coordinates.</p>
+                <p>There is often confusion between processes of <ref target="https://en.wikipedia.org/wiki/Geocoding">geocoding</ref> and <ref target="https://en.wikipedia.org/wiki/Georeference">georeferencing</ref>.</p>
+                <list type="unordered">
+                    <item>Georeferencing refers to placing visual elements, usually raster images such as satellite photographs, scans of old maps, or some types of vector image such as architectural or archaeological drawings, into geographical space. This involves specifying latitude, longitude coordinates, and scale.</item>
+                    <item>Geocoding is the process of resolving addresses (or some other kind of spatial description) which form part of a dataset into geometries on a map. This gives the ability to view, analyse and query that dataset spatially.</item>
+                </list>
+                <p>In many modern applications geocoding is completed automatically, often using the mapping tools and gazetters offered seamlessly as part of <ref target="https://www.google.co.uk/maps">Google Maps</ref> or <ref target="https://www.openstreetmap.org/">OpenStreetMap</ref>. When working with contemporary data, or data from relatively recent periods, and Western European or North American historical contexts, this is often sufficient. If you are using data containing place names that are consistent with the present day, you can use the QGIS web geocoder plugin detailed in the postscript to this tutorial, or the <ref target="/lessons/geoparsing-text-with-edinburgh">Edinburgh Geoparser</ref>.</p>
+                <p>Many historians will be working on contexts where the place names in their data do not match the present day. Remember that street names tend to change relatively frequently, either in terms of spelling or entirely. Administrative areas have changed relatively frequently and were sometimes used inconsistently in historical sources (e.g. was Bristol in Gloucestershire, Somerset, City of Bristol, Avon?) and indeed places have moved between countries, and countries have changed in name and extent. Even town names have changed and are subject to linguistic ambiguities (e.g. <emph>Lynn Episcopi</emph>, Bishop's Lynn, Lynn, King's Lynn, Kings Lynn). For these reasons it is often better to avoid using automated online geocoding tools and create a gazetteer to suit the historical context which you are researching. The processes described in this tutorial are manual, and can be modified and applied to almost any geographical or historical context.</p>
+            </div>
+            <div type="2">
+                <head>Lesson Structure</head>
+                <p>This lesson is divided into two main sections:</p>
+                <list type="unordered">
+                    <item>Part 1: <hi rend="bold">Joining tables</hi>, which is a simple way of mapping simple summary data such as totals or averages</item>
+                    <item>Part 2: <hi rend="bold">Geocoding full datasets</hi>, which maps each item of data to a location, allowing much more flexibility, detailed spatial analysis, and more interesting maps</item>
+                </list>
+                <p>At the end of the tutorial there is a note on using automated geocoding tools which are available to work with modern addresses, but these are of limited relevance to historians working on eras before the late nineteenth or twentieth centuries.</p>
+            </div>
+            <div type="2">
+                <head>Getting Started</head>
+                <p>This tutorial assumes that you have installed QGIS version 2 or newer and have followed the <emph>Programming Historian</emph> tutorial <ref target="/lessons/qgis-layers">Installing QGIS 2.0 and Adding Layers</ref> by Jim Clifford, Josh MacFadyen and Daniel Macfarlane. Or, at least that you are familiar with the process of adding vector layers in QGIS.</p>
+                <p>This tutorial was prepared using QGIS 2.14 'Essen' on Mac OS X 10.11. Menus, windows, and options might appear slightly different on different platforms or versions, but it should not be difficult to translate any differences. At a few points in the tutorial reference is made to how these techniques could be applied using <ref target="https://www.arcgis.com/features/index.html">ArcGIS</ref>, which is the industry standard commercial GIS application, and is widely available at universities, but is not always superior to QGIS.</p>
+                <p>You will also need to use a relational database such as Microsoft Access or <ref target="https://www.libreoffice.org/get-help/install-howto/">LibreOffice Base</ref>, or alternatively be very proficient with spreadsheets. The instructions in the tutorial are designed for use with LibreOffice Base, which is a free download as part of the <ref target="https://www.libreoffice.org/get-help/install-howto/">LibreOffice</ref> suite.</p>
+                <p>
+                    <hi rend="bold">NB</hi> LibreOffice requires a full installation of Java in order to use the Base application. This is achieved most easily by downloading and installing the Java 8 Development Kit for your operating system from <ref target="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">Oracle</ref>. The Java 8 Runtime Environment does NOT work with LibreOffice on Mac OS X 10.11.</p>
+                <p>The tutorial will map the data extracted from <ref target="http://www.british-history.ac.uk/alumni-oxon/1500-1714">
+                        <emph>Alumni Oxonienses</emph>
+                    </ref> in the <emph>Programming Historian</emph> lesson <ref target="/lessons/extracting-keywords">Using Gazetteers to Extract Sets of Keywords from Free-Flowing Texts</ref> using publically available maps of English and Welsh historic counties. If you complete that tutorial first it will help you to understand the nature of the data which is being mapped here. These data are provided as both a full dataset and also a separate file which is a summary of the numbers of Oxford alumni by their county of origin, created from the first file using an Excel PivotTable.</p>
+                <table>
+                    <row>
+                        <cell role="label">Student Name</cell>
+                        <cell role="label">Place of Origin</cell>
+                    </row>
+                    <row>
+                        <cell>Matthew Rogers</cell>
+                        <cell>Essex</cell>
+                    </row>
+                    <row>
+                        <cell>Tom Jones</cell>
+                        <cell>Essex</cell>
+                    </row>
+                    <row>
+                        <cell>Joe Smith</cell>
+                        <cell>Essex</cell>
+                    </row>
+                </table>
+                <table>
+                    <row>
+                        <cell role="label">Shapefile</cell>
+                        <cell role="label">Number of Students</cell>
+                    </row>
+                    <row>
+                        <cell>Middlesex</cell>
+                        <cell>81</cell>
+                    </row>
+                    <row>
+                        <cell>Norfolk</cell>
+                        <cell>28</cell>
+                    </row>
+                    <row>
+                        <cell>Essex</cell>
+                        <cell>50</cell>
+                    </row>
+                </table>
+            </div>
+        </body>
+    </text>
+</TEI>

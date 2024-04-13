@@ -1,327 +1,572 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="analisis-voyant-tools">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>An&#225;lisis de corpus con Voyant Tools
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Análisis de corpus con Voyant Tools
 </title>
-  <author role="original_author">Silvia Guti&#233;rrez De la Torre</author><editor role="reviewers"><persName>Daniela &#193;vido</persName><persName>Jennifer Isasi</persName></editor><editor role="editors">Jennifer Isasi</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phes0043</idno><date type="published">04/20/2019</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. This lesson is original.</p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>En este tutorial se aprender&#225; c&#243;mo organizar y analizar un conjunto de textos con Voyant-Tools.</p></abstract><textClass><keywords><term xml:lang="en">distant-reading</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="es">
-    <body>
-      <div type="1"><head>An&#225;lisis de corpus con Voyant Tools</head>
-<p>En este tutorial se aprender&#225; c&#243;mo organizar un conjunto de textos para la investigaci&#243;n; es decir, se aprender&#225;n los pasos b&#225;sicos de la creaci&#243;n de un corpus. Tambi&#233;n se aprender&#225;n las m&#233;tricas principales del an&#225;lisis cuantitativo de textos. Para este fin, se ensa&#241;ar&#225; a usar una plataforma que no requiere instalaci&#243;n (s&#243;lo conexi&#243;n a Internet): <ref target="https://voyant-tools.org/?lang=es">Voyant Tools</ref> (Sinclair y Rockwell, 2016). Este tutorial est&#225; pensado como un primer paso en una serie cada vez m&#225;s compleja de m&#233;todos de la ling&#252;&#237;stica de corpus. En este sentido, podr&#237;a considerarse este texto como una de las opciones para el an&#225;lisis de corpus que puedes encontrar en PH (ver por ejemplo: "<ref target="/es/lecciones/analisis-de-corpus-con-antconc">An&#225;lisis de corpus con Antconc</ref>").</p>
-<div type="2"><head>An&#225;lisis de corpus</head>
-<p>El an&#225;lisis de corpus es un tipo de <ref target="http://vocabularios.caicyt.gov.ar/portalthes/42/term/26">an&#225;lisis de contenido</ref> que permite hacer comparaciones a gran escala sobre un conjunto de textos o corpus.</p>
-<p>Desde el inicio de la inform&#225;tica, tanto ling&#252;istas computacionales como especialistas de la <ref target="http://vocabularios.caicyt.gov.ar/portalthes/42/term/178">recuperaci&#243;n de la informaci&#243;n</ref> han creado y utilizado software para apreciar patrones que no son evidentes en una lectura tradicional o bien para corroborar hip&#243;tesis que intu&#237;an al leer ciertos textos pero que requer&#237;an de trabajos laboriosos, costosos y mec&#225;nicos. Por ejemplo, para obtener los patrones de uso y decaimiento de ciertos t&#233;rminos en una &#233;poca dada era necesario contratar a personas que revisaran manualmente un texto y anotaran cu&#225;ntas veces aparec&#237;a el t&#233;rmino buscado. Muy pronto, al observar las capacidades de "contar" que ten&#237;an las computadoras, estos especialistas no tardaron en escribir programas que facilitaran la tarea de crear listas de frecuencias o tablas de concordancia (es decir, tablas con los contextos izquierdos y derechos de un t&#233;rmino). El programa que aprender&#225;s a usar en este tutorial, se inscribe en este contexto.</p>
-</div><div type="2"><head>Qu&#233; aprender&#225;s en este tutorial</head>
-<p>Voyant Tools es una herramienta basada en Web que no requiere de la instalaci&#243;n de ning&#250;n tipo de software especializado pues funciona en cualquier equipo con conexi&#243;n a Internet.</p>
-<p>Como se ha dicho en este otro <ref target="/es/lecciones/analisis-de-corpus-con-antconc">tutorial</ref>, esta herramienta es una buena puerta de entrada a otros m&#233;todos m&#225;s complejos.</p>
-<p>Al finalizar este tutorial, tendr&#225;s la capacidad de:</p>
-<list type="unordered">
-<item>Armar un corpus en texto plano</item>
-<item>Cargar tu corpus en Voyant Tools</item>
-<item>Entender y aplicar diferentes t&#233;cnicas de segmentaci&#243;n de corpus</item>
-<item>
-Identificar caracter&#237;sticas b&#225;sicas de tu conjunto de textos:<list type="unordered">
-<item>Extensi&#243;n de los documentos subidos</item>
-<item>Densidad l&#233;xica (llamada densidad de vocabulario en la plataforma)</item>
-<item>Promedio de palabras por oraci&#243;n</item>
-</list>
-</item>
-<item>Leer y entender diferentes estad&#237;sticas sobre los vocablos: frecuencia absoluta, frecuencia normalizada, asimetr&#237;a estad&#237;stica y palabras diferenciadas</item>
-<item>Buscar palabras clave en contexto y exportar los datos y las visualizaciones en diferentes formatos (csv, png, html)</item>
-</list>
-</div><div type="2"><head>Creando un corpus en texto plano</head>
-<p>Si bien VoyantTools puede trabajar con muchos tipos de formato (HTML, XML, PDF, RTF, y MS Word), en este tutorial utilizaramos el texto plano (.txt). El texto plano tienen tres ventajas fundamentales: no tiene ning&#250;n tipo de formato adicional, no requiere un programa especial y tampoco conocimiento extra. Los pasos para crear un corpus en texto plano son:</p>
-<div type="3"><head>1. Buscar textos</head>
-<p>Lo primero que debes hacer es buscar la informaci&#243;n que te interesa. Para este tutorial, <ref target="https://rivaquiroga.cl/">Riva Quiroga</ref> y yo preparamos un corpus de los discursos anuales de presidentes de Argentina, Chile, Colombia, M&#233;xico y Per&#250;<ref type="footnotemark" target="#note_1"/> entre 2006 y 2010, es decir dos a&#241;os antes y despu&#233;s de la crisis econ&#243;mica de 2008. Este corpus ha sido liberado con una licencia Creative Commons CC BY 4.0 y puedes usarlo siempre y cuando cites la fuente como sigue: </p>
-<quote>
-<p>Silvia Guti&#233;rrez y Riva Quiroga. 'Corpusenespa&#241;ol/discursos-presidenciales: 1.0 Primera Versi&#243;n Del Corpus'. Zenodo, 23 de enero de 2019. <ref target="https://doi.org/10.5281/zenodo.2547051">https://doi.org/10.5281/zenodo.2547051</ref>.</p>
-</quote>
-</div><div type="3"><head>2. Copiar en editor de texto plano</head>
-<p>Una vez localizada la informaci&#243;n, el segundo paso es copiar el texto que te interesa desde la primera palabra dicha hasta la &#250;ltima y guardarla en un editor de texto sin formato. Por ejemplo:</p>
-<list type="unordered">
-<item>en Windows podr&#237;a guardarse en <ref target="https://web.archive.org/web/20091013225307/http://windows.microsoft.com/en-us/windows-vista/Notepad-frequently-asked-questions">Bloc de Notas</ref></item>
-<item>en Mac, en <ref target="https://support.apple.com/es-mx/guide/textedit/welcome/mac">TextEdit</ref>;</item>
-<item>y en Linux, en <ref target="https://wiki.gnome.org/Apps/Gedit">Gedit</ref>.</item>
-</list>
-</div><div type="3"><head>3. Guardar archivo</head>
-<p>Cuando guardes el texto debes considerar tres cosas esenciales:</p>
-<p>Lo primero es <hi rend="bold">guardar tus textos en UTF-8</hi>, que es un formato de codificaci&#243;n est&#225;ndar para el espa&#241;ol y otros idiomas.</p>
-<quote>
-<p><hi rend="bold">&#191;Qu&#233; es utf-8?</hi> Si bien en nuestra pantalla vemos que al teclear una "&#201;" aprece una "&#201;"; para una computadora "&#201;" es una serie de ceros y unos que son interpretados en imagen depiendo del "traductor" o "codificador" que se est&#233; usando. El codificador que contiene c&#243;digos binarios para todas los caracteres que se usan en el espa&#241;ol es UTF-8. Siguiendo con el ejemplo "11000011", es una cadena de ocho bits --es decir, <hi rend="bold">ocho</hi> espacios de informaci&#243;n-- que en UTF-<hi rend="bold">8</hi> son interpretados como "&#201;"</p>
-</quote>
-<div type="4"><head>En Windows:</head>
-<figure><desc>Guardar en UTF-8 en Windows: 1) Abrir Bloc de Notas, 2) Despu&#233;s de pegar o escribir el texto, dar clic en 'Guardar como' 3) En la ventana de 'codificiaci&#243;n' seleccionar 'UTF-8' 4) Elegir nombre de archivo y guardar como .txt (Torresblanca, 2014)</desc><graphic url="guardar-en-utf8.gif"/></figure>
-</div><div type="4"><head>En Mac:</head>
-<figure><desc>Guardar en UTF-8 en Mac: 1) Abrir TextEdit 2) Pegar el texto que se desea guardar 3) Convertir a texto plano (opcin en el men&#250; de 'Formato') 4) Al guardar, seleccionar el encoding 'UTF-8' (Creative Corner, 2016)</desc><graphic url="guardar-en-utf8-mac.gif"/></figure>
-</div><div type="4"><head>En Linux</head>
-<figure><desc>Guardar en UTF-8 en Ubuntu: 1) Abrir Gedit 2) Despu&#233;s de pegar el texto, al guardar, seleccionar 'UTF-8' en la ventana de 'Codificaci&#243;n de caracteres'</desc><graphic url="guardar-en-utf8-ubuntu.gif"/></figure>
-<p>La segunda es que <hi rend="bold">el nombre de tu archivo no debe contener acentos ni espacios</hi>, esto asegurar&#225; que pueda ser abierto en otros sistemas operativos</p>
-<quote>
-<p><hi rend="bold">&#191;Por qu&#233; evitar acentos y espacios en los nombres de archivo?</hi> Por razones similares a el inciso anterior, un archivo que se llame &#201;bano.txt no siempre ser&#225; entendido de forma correcta por todos los sistemas operativos pues varios tienen otro codificador por defecto. Muchos usan ASCII, por ejemplo, que s&#243;lo tiene siete bits de manera que el &#250;ltimo bit (1) de "11000011" es interpretado como el inicio del siguiente caracter y se descuadra la interpretaci&#243;n.</p>
-</quote>
-<p>La tercera es <hi rend="bold">integrar metadatos de contexto (v.g. fecha, g&#233;nero, autor, origen) en el nombre del archivo</hi> que te permitan partir tu corpus seg&#250;n diferentes criterios y tambi&#233;n leer mejor los resultados. Para este tutorial hemos nombrado los archivos con el a&#241;o del discurso presidencial, el
-c&#243;digo del pa&#237;s (<ref target="https://es.wikipedia.org/wiki/ISO_3166-1#C%C3%B3digos_oficialmente_asignados">ISO 3166-1 alfa-2</ref>) y el apellido de quien profiri&#243; el discurso.</p>
-<quote>
-<p><ref title="2007_mx_calderon.txt" target="https://github.com/corpusenespanol/discursos-presidenciales/blob/master/mexico/2007_mx_calderon.txt">2007_mx_calderon.txt</ref> tiene el a&#241;o del discurso dividido con un gui&#243;n bajo, el c&#243;digo de dos letras del pa&#237;s (M&#233;xico = mx) y el apellido del presidente que dict&#243; el discurso, Calder&#243;n, (sin acentos ni e&#241;es)</p>
-</quote>
-</div></div></div><div type="2"><head>Cargar el corpus</head>
-<p>En la p&#225;gina de entrada de Voyant Tools encontrar&#225;s cuatro opciones sencillas para cargar textos.<ref type="footnotemark" target="#note_2"/> Las dos primeras opciones est&#225;n en el cuadro blanco. En este cuadro puedes pegar directamente un texto que hayas copiado de alg&#250;n lugar; o bien, pegar direcciones web --separadas por comas-- de los sitios en donde se encuentren los textos que quieres analizar.
-Una tercera opci&#243;n es dar clic en "Abrir" y seleccionar alguno de los dos corpus que Voyant tiene precargados (las obras de Shakespeare o las novelas de Austen: ambos en ingl&#233;s).</p>
-<p>Por &#250;ltimo, est&#225; la opci&#243;n que usaremos en este tutorial, en la que puedes cargar directamente los documentos que tengas en tu computadora. En este caso subiremos el <ref target="/assets/analisis-voyant-tools/corpus_presidentes.zip">corpus completo</ref> de discursos presidenciales.</p>
-<p>Para cargar los materiales pulsa sobre el icono que dice "Cargar", abre tu explorador de archivos y, dejando presionada la tecla 'Shift' selecciona todos los archivos que deseas analizar.</p>
-<figure><desc>Cargar documentos</desc><graphic url="cargar.png"/></figure>
-</div><div type="2"><head>Explorando el corpus</head>
-<p>Una vez cargados todos los archivos llegar&#225;s a la 'interfaz' ('skin') que tiene cinco herramientas por defecto. A continuaci&#243;n, una breve explicaci&#243;n de cada una de estas herramientas:</p>
-<list type="unordered">
-<item>Cirrus: nube de palabras que muestra los t&#233;rminos m&#225;s frecuentes</item>
-</list>
-<figure><desc>Cirrus</desc><graphic url="cirrus.png"/></figure>
-<p>Lector: espacio para la revisi&#243;n y lectura de los textos completos con una gr&#225;fica de barras que indica la cantidad de texto que tiene cada documento</p>
-<figure><desc>Lector</desc><graphic url="lector.png"/></figure>
-<list type="unordered">
-<item>Tendencias: gr&#225;fico de distribuci&#243;n que muestra los t&#233;rminos en todo el corpus (o dentro de un documento cuando s&#243;lo se carga uno)</item>
-</list>
-<figure><desc>Tendencias</desc><graphic url="tendencias.png"/></figure>
-<list type="unordered">
-<item>Sumario: proporciona una visi&#243;n general de ciertas estad&#237;sticas textuales del corpus actual</item>
-</list>
-<figure><desc>Sumario</desc><graphic url="sumario.png"/></figure>
-<list type="unordered">
-<item>Contextos: concordancia que muestra cada ocurrencia de una palabra clave con un poco de contexto circundante</item>
-</list>
-<figure><desc>Contextos</desc><graphic url="contextos.png"/></figure>
-<div type="3"><head>Sumario de los documentos: caracter&#237;sticas b&#225;sicas de tu conjunto de textos</head>
-<p>Una de las ventanas m&#225;s informativas de Voyant es la del sumario. Aqu&#237; obtenemos una vista de p&#225;jaro sobre algunas estad&#237;sticas de nuestro corpus por lo que funciona como un buen punto de partida. En las siguientes secciones obtendr&#225;s una explicaci&#243;n de las diferentes medidas que aparecen en esta ventana.</p>
-<div type="4"><head>N&#250;mero de textos, palabras y palabras &#250;nicas</head>
-<p>La primera frase que leemos se ve algo como esto:</p>
-<quote>
-<p>Este corpus tiene 25 documentos con 261,032  total de palabras y 18,550 formulario de palabra &#250;nica. Creado  hace 8 horas atr&#225;s [el texto es producto de una traducci&#243;n semi-autom&#225;tica del ingl&#233;s y por eso se lee raro]</p>
-</quote>
-<p>De entrada con esta informaci&#243;n sabemos exactamente cu&#225;ntos documentos distintos fueron cargados (25); cu&#225;ntas palabras hay en total (261,032); y cu&#225;ntas palabras &#250;nicas existen (18,550).</p>
-<quote>
-<p>En las siguientes l&#237;neas encontrar&#225;s nueve actividades que pueden ser resueltas en grupos o individualmente. Cinco de ellas tienen respuestas al final del texto para servir de gu&#237;a. Las &#250;ltimas cuatro est&#225;n abiertas a la reflexi&#243;n/discusi&#243;n de quienes las lleven a cabo</p>
-</quote>
-<div type="5"><head><emph>Actividad</emph></head>
-<p>Si nuestro corpus estuviera compuesto de dos documentos; uno que dijera: "tengo hambre"; y otro que dijera: "tengo sue&#241;o". &#191;Qu&#233; informaci&#243;n aparecer&#237;a en la primera l&#237;nea del sumario? Completa:</p>
-<p>Este corpus tiene _ documentos con un total de palabras de _ y _ palabras &#250;nicas.</p>
-</div></div><div type="4"><head>Extensi&#243;n de documentos</head>
-<p>Lo segundo que vemos es la secci&#243;n de "extensi&#243;n del documento". Ah&#237; aparece lo siguiente:</p>
-<list type="unordered">
-<item>M&#225;s largo:  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2008_cl_bachelet</ref> (20702);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2007_ar_kircher</ref> (20390);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_ar_kircher</ref> (18619);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2010_cl_pinera</ref> (16982);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2007_cl_bachelet</ref> (15514)</item>
-<item>M&#225;s corto:  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_pe_toledo</ref> (1289);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_mx_fox</ref> (2450);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2008_mx_calderon</ref> (3317);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_co_uribe</ref> (4709);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2009_co_uribe</ref> (5807)</item>
-</list>
-<div type="5"><head><emph>Actividad 2</emph></head>
-<list type="ordered">
-<item>&#191;Qu&#233; podemos concluir sobre los textos m&#225;s largos y los m&#225;s cortos considerando los metadatos en el nombre del archivo (a&#241;o, pa&#237;s, presidente)?</item>
-<item>&#191;Para qu&#233; nos sirve saber la longitud de los textos?</item>
-</list>
-</div></div><div type="4"><head>Densidad del vocabulario</head>
-<p>La densidad de vocubulario se mide dividiendo el n&#250;mero de palabras &#250;nicas entre el n&#250;mero de palabras totales. Entre m&#225;s cercano a uno es el &#237;ndice de densidad quiere decir que el vocabulario tiene mayor variedad de palabras, es decir, que es m&#225;s denso.</p>
-<div type="5"><head><emph>Actividad 3</emph></head>
-<p><hi rend="bold">1)</hi> Calcula la densidad de las siguientes estrofas, compara y comenta:</p>
-<list type="unordered">
-<item>Estrofa 1. De "Hombres necios que acus&#225;is" de Sor Juana In&#233;s de la Cruz</item>
-</list>
-<quote>
-<p>&#191;Qu&#233; humor puede ser m&#225;s raro
+                <author role="original_author">Silvia Gutiérrez De la Torre</author>
+                <editor role="reviewers">
+                    <persName>Daniela Ávido</persName>
+                    <persName>Jennifer Isasi</persName>
+                </editor>
+                <editor role="editors">Jennifer Isasi</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phes0043</idno>
+                <date type="published">04/20/2019</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>En este tutorial se aprenderá cómo organizar y analizar un conjunto de textos con Voyant-Tools.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">distant-reading</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="es">
+        <body>
+            <div type="1">
+                <head>Análisis de corpus con Voyant Tools</head>
+                <p>En este tutorial se aprenderá cómo organizar un conjunto de textos para la investigación; es decir, se aprenderán los pasos básicos de la creación de un corpus. También se aprenderán las métricas principales del análisis cuantitativo de textos. Para este fin, se ensañará a usar una plataforma que no requiere instalación (sólo conexión a Internet): <ref target="https://voyant-tools.org/?lang=es">Voyant Tools</ref> (Sinclair y Rockwell, 2016). Este tutorial está pensado como un primer paso en una serie cada vez más compleja de métodos de la lingüística de corpus. En este sentido, podría considerarse este texto como una de las opciones para el análisis de corpus que puedes encontrar en PH (ver por ejemplo: "<ref target="/es/lecciones/analisis-de-corpus-con-antconc">Análisis de corpus con Antconc</ref>").</p>
+                <div type="2">
+                    <head>Análisis de corpus</head>
+                    <p>El análisis de corpus es un tipo de <ref target="http://vocabularios.caicyt.gov.ar/portalthes/42/term/26">análisis de contenido</ref> que permite hacer comparaciones a gran escala sobre un conjunto de textos o corpus.</p>
+                    <p>Desde el inicio de la informática, tanto lingüistas computacionales como especialistas de la <ref target="http://vocabularios.caicyt.gov.ar/portalthes/42/term/178">recuperación de la información</ref> han creado y utilizado software para apreciar patrones que no son evidentes en una lectura tradicional o bien para corroborar hipótesis que intuían al leer ciertos textos pero que requerían de trabajos laboriosos, costosos y mecánicos. Por ejemplo, para obtener los patrones de uso y decaimiento de ciertos términos en una época dada era necesario contratar a personas que revisaran manualmente un texto y anotaran cuántas veces aparecía el término buscado. Muy pronto, al observar las capacidades de "contar" que tenían las computadoras, estos especialistas no tardaron en escribir programas que facilitaran la tarea de crear listas de frecuencias o tablas de concordancia (es decir, tablas con los contextos izquierdos y derechos de un término). El programa que aprenderás a usar en este tutorial, se inscribe en este contexto.</p>
+                </div>
+                <div type="2">
+                    <head>Qué aprenderás en este tutorial</head>
+                    <p>Voyant Tools es una herramienta basada en Web que no requiere de la instalación de ningún tipo de software especializado pues funciona en cualquier equipo con conexión a Internet.</p>
+                    <p>Como se ha dicho en este otro <ref target="/es/lecciones/analisis-de-corpus-con-antconc">tutorial</ref>, esta herramienta es una buena puerta de entrada a otros métodos más complejos.</p>
+                    <p>Al finalizar este tutorial, tendrás la capacidad de:</p>
+                    <list type="unordered">
+                        <item>Armar un corpus en texto plano</item>
+                        <item>Cargar tu corpus en Voyant Tools</item>
+                        <item>Entender y aplicar diferentes técnicas de segmentación de corpus</item>
+                        <item>
+Identificar características básicas de tu conjunto de textos:<list type="unordered">
+                                <item>Extensión de los documentos subidos</item>
+                                <item>Densidad léxica (llamada densidad de vocabulario en la plataforma)</item>
+                                <item>Promedio de palabras por oración</item>
+                            </list>
+                        </item>
+                        <item>Leer y entender diferentes estadísticas sobre los vocablos: frecuencia absoluta, frecuencia normalizada, asimetría estadística y palabras diferenciadas</item>
+                        <item>Buscar palabras clave en contexto y exportar los datos y las visualizaciones en diferentes formatos (csv, png, html)</item>
+                    </list>
+                </div>
+                <div type="2">
+                    <head>Creando un corpus en texto plano</head>
+                    <p>Si bien VoyantTools puede trabajar con muchos tipos de formato (HTML, XML, PDF, RTF, y MS Word), en este tutorial utilizaramos el texto plano (.txt). El texto plano tienen tres ventajas fundamentales: no tiene ningún tipo de formato adicional, no requiere un programa especial y tampoco conocimiento extra. Los pasos para crear un corpus en texto plano son:</p>
+                    <div type="3">
+                        <head>1. Buscar textos</head>
+                        <p>Lo primero que debes hacer es buscar la información que te interesa. Para este tutorial, <ref target="https://rivaquiroga.cl/">Riva Quiroga</ref> y yo preparamos un corpus de los discursos anuales de presidentes de Argentina, Chile, Colombia, México y Perú<ref type="footnotemark" target="#es_note_1"/> entre 2006 y 2010, es decir dos años antes y después de la crisis económica de 2008. Este corpus ha sido liberado con una licencia Creative Commons CC BY 4.0 y puedes usarlo siempre y cuando cites la fuente como sigue: </p>
+                        <quote>
+                            <p>Silvia Gutiérrez y Riva Quiroga. 'Corpusenespañol/discursos-presidenciales: 1.0 Primera Versión Del Corpus'. Zenodo, 23 de enero de 2019. <ref target="https://doi.org/10.5281/zenodo.2547051">https://doi.org/10.5281/zenodo.2547051</ref>.</p>
+                        </quote>
+                    </div>
+                    <div type="3">
+                        <head>2. Copiar en editor de texto plano</head>
+                        <p>Una vez localizada la información, el segundo paso es copiar el texto que te interesa desde la primera palabra dicha hasta la última y guardarla en un editor de texto sin formato. Por ejemplo:</p>
+                        <list type="unordered">
+                            <item>en Windows podría guardarse en <ref target="https://web.archive.org/web/20091013225307/http://windows.microsoft.com/en-us/windows-vista/Notepad-frequently-asked-questions">Bloc de Notas</ref>
+                            </item>
+                            <item>en Mac, en <ref target="https://support.apple.com/es-mx/guide/textedit/welcome/mac">TextEdit</ref>;</item>
+                            <item>y en Linux, en <ref target="https://wiki.gnome.org/Apps/Gedit">Gedit</ref>.</item>
+                        </list>
+                    </div>
+                    <div type="3">
+                        <head>3. Guardar archivo</head>
+                        <p>Cuando guardes el texto debes considerar tres cosas esenciales:</p>
+                        <p>Lo primero es <hi rend="bold">guardar tus textos en UTF-8</hi>, que es un formato de codificación estándar para el español y otros idiomas.</p>
+                        <quote>
+                            <p>
+                                <hi rend="bold">¿Qué es utf-8?</hi> Si bien en nuestra pantalla vemos que al teclear una "É" aprece una "É"; para una computadora "É" es una serie de ceros y unos que son interpretados en imagen depiendo del "traductor" o "codificador" que se esté usando. El codificador que contiene códigos binarios para todas los caracteres que se usan en el español es UTF-8. Siguiendo con el ejemplo "11000011", es una cadena de ocho bits --es decir, <hi rend="bold">ocho</hi> espacios de información-- que en UTF-<hi rend="bold">8</hi> son interpretados como "É"</p>
+                        </quote>
+                        <div type="4">
+                            <head>En Windows:</head>
+                            <figure>
+                                <desc>Guardar en UTF-8 en Windows: 1) Abrir Bloc de Notas, 2) Después de pegar o escribir el texto, dar clic en 'Guardar como' 3) En la ventana de 'codificiación' seleccionar 'UTF-8' 4) Elegir nombre de archivo y guardar como .txt (Torresblanca, 2014)</desc>
+                                <graphic url="guardar-en-utf8.gif"/>
+                            </figure>
+                        </div>
+                        <div type="4">
+                            <head>En Mac:</head>
+                            <figure>
+                                <desc>Guardar en UTF-8 en Mac: 1) Abrir TextEdit 2) Pegar el texto que se desea guardar 3) Convertir a texto plano (opcin en el menú de 'Formato') 4) Al guardar, seleccionar el encoding 'UTF-8' (Creative Corner, 2016)</desc>
+                                <graphic url="guardar-en-utf8-mac.gif"/>
+                            </figure>
+                        </div>
+                        <div type="4">
+                            <head>En Linux</head>
+                            <figure>
+                                <desc>Guardar en UTF-8 en Ubuntu: 1) Abrir Gedit 2) Después de pegar el texto, al guardar, seleccionar 'UTF-8' en la ventana de 'Codificación de caracteres'</desc>
+                                <graphic url="guardar-en-utf8-ubuntu.gif"/>
+                            </figure>
+                            <p>La segunda es que <hi rend="bold">el nombre de tu archivo no debe contener acentos ni espacios</hi>, esto asegurará que pueda ser abierto en otros sistemas operativos</p>
+                            <quote>
+                                <p>
+                                    <hi rend="bold">¿Por qué evitar acentos y espacios en los nombres de archivo?</hi> Por razones similares a el inciso anterior, un archivo que se llame Ébano.txt no siempre será entendido de forma correcta por todos los sistemas operativos pues varios tienen otro codificador por defecto. Muchos usan ASCII, por ejemplo, que sólo tiene siete bits de manera que el último bit (1) de "11000011" es interpretado como el inicio del siguiente caracter y se descuadra la interpretación.</p>
+                            </quote>
+                            <p>La tercera es <hi rend="bold">integrar metadatos de contexto (v.g. fecha, género, autor, origen) en el nombre del archivo</hi> que te permitan partir tu corpus según diferentes criterios y también leer mejor los resultados. Para este tutorial hemos nombrado los archivos con el año del discurso presidencial, el
+código del país (<ref target="https://es.wikipedia.org/wiki/ISO_3166-1#C%C3%B3digos_oficialmente_asignados">ISO 3166-1 alfa-2</ref>) y el apellido de quien profirió el discurso.</p>
+                            <quote>
+                                <p>
+                                    <ref target="https://github.com/corpusenespanol/discursos-presidenciales/blob/master/mexico/2007_mx_calderon.txt">2007_mx_calderon.txt</ref> tiene el año del discurso dividido con un guión bajo, el código de dos letras del país (México = mx) y el apellido del presidente que dictó el discurso, Calderón, (sin acentos ni eñes)</p>
+                            </quote>
+                        </div>
+                    </div>
+                </div>
+                <div type="2">
+                    <head>Cargar el corpus</head>
+                    <p>En la página de entrada de Voyant Tools encontrarás cuatro opciones sencillas para cargar textos.<ref type="footnotemark" target="#es_note_2"/> Las dos primeras opciones están en el cuadro blanco. En este cuadro puedes pegar directamente un texto que hayas copiado de algún lugar; o bien, pegar direcciones web --separadas por comas-- de los sitios en donde se encuentren los textos que quieres analizar.
+Una tercera opción es dar clic en "Abrir" y seleccionar alguno de los dos corpus que Voyant tiene precargados (las obras de Shakespeare o las novelas de Austen: ambos en inglés).</p>
+                    <p>Por último, está la opción que usaremos en este tutorial, en la que puedes cargar directamente los documentos que tengas en tu computadora. En este caso subiremos el <ref target="/assets/analisis-voyant-tools/corpus_presidentes.zip">corpus completo</ref> de discursos presidenciales.</p>
+                    <p>Para cargar los materiales pulsa sobre el icono que dice "Cargar", abre tu explorador de archivos y, dejando presionada la tecla 'Shift' selecciona todos los archivos que deseas analizar.</p>
+                    <figure>
+                        <desc>Cargar documentos</desc>
+                        <graphic url="cargar.png"/>
+                    </figure>
+                </div>
+                <div type="2">
+                    <head>Explorando el corpus</head>
+                    <p>Una vez cargados todos los archivos llegarás a la 'interfaz' ('skin') que tiene cinco herramientas por defecto. A continuación, una breve explicación de cada una de estas herramientas:</p>
+                    <list type="unordered">
+                        <item>Cirrus: nube de palabras que muestra los términos más frecuentes</item>
+                    </list>
+                    <figure>
+                        <desc>Cirrus</desc>
+                        <graphic url="cirrus.png"/>
+                    </figure>
+                    <p>Lector: espacio para la revisión y lectura de los textos completos con una gráfica de barras que indica la cantidad de texto que tiene cada documento</p>
+                    <figure>
+                        <desc>Lector</desc>
+                        <graphic url="lector.png"/>
+                    </figure>
+                    <list type="unordered">
+                        <item>Tendencias: gráfico de distribución que muestra los términos en todo el corpus (o dentro de un documento cuando sólo se carga uno)</item>
+                    </list>
+                    <figure>
+                        <desc>Tendencias</desc>
+                        <graphic url="tendencias.png"/>
+                    </figure>
+                    <list type="unordered">
+                        <item>Sumario: proporciona una visión general de ciertas estadísticas textuales del corpus actual</item>
+                    </list>
+                    <figure>
+                        <desc>Sumario</desc>
+                        <graphic url="sumario.png"/>
+                    </figure>
+                    <list type="unordered">
+                        <item>Contextos: concordancia que muestra cada ocurrencia de una palabra clave con un poco de contexto circundante</item>
+                    </list>
+                    <figure>
+                        <desc>Contextos</desc>
+                        <graphic url="contextos.png"/>
+                    </figure>
+                    <div type="3">
+                        <head>Sumario de los documentos: características básicas de tu conjunto de textos</head>
+                        <p>Una de las ventanas más informativas de Voyant es la del sumario. Aquí obtenemos una vista de pájaro sobre algunas estadísticas de nuestro corpus por lo que funciona como un buen punto de partida. En las siguientes secciones obtendrás una explicación de las diferentes medidas que aparecen en esta ventana.</p>
+                        <div type="4">
+                            <head>Número de textos, palabras y palabras únicas</head>
+                            <p>La primera frase que leemos se ve algo como esto:</p>
+                            <quote>
+                                <p>Este corpus tiene 25 documentos con 261,032  total de palabras y 18,550 formulario de palabra única. Creado  hace 8 horas atrás [el texto es producto de una traducción semi-automática del inglés y por eso se lee raro]</p>
+                            </quote>
+                            <p>De entrada con esta información sabemos exactamente cuántos documentos distintos fueron cargados (25); cuántas palabras hay en total (261,032); y cuántas palabras únicas existen (18,550).</p>
+                            <quote>
+                                <p>En las siguientes líneas encontrarás nueve actividades que pueden ser resueltas en grupos o individualmente. Cinco de ellas tienen respuestas al final del texto para servir de guía. Las últimas cuatro están abiertas a la reflexión/discusión de quienes las lleven a cabo</p>
+                            </quote>
+                            <div type="5">
+                                <head>
+                                    <emph>Actividad</emph>
+                                </head>
+                                <p>Si nuestro corpus estuviera compuesto de dos documentos; uno que dijera: "tengo hambre"; y otro que dijera: "tengo sueño". ¿Qué información aparecería en la primera línea del sumario? Completa:</p>
+                                <p>Este corpus tiene _ documentos con un total de palabras de _ y _ palabras únicas.</p>
+                            </div>
+                        </div>
+                        <div type="4">
+                            <head>Extensión de documentos</head>
+                            <p>Lo segundo que vemos es la sección de "extensión del documento". Ahí aparece lo siguiente:</p>
+                            <list type="unordered">
+                                <item>Más largo:  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2008_cl_bachelet</ref> (20702);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2007_ar_kircher</ref> (20390);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_ar_kircher</ref> (18619);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2010_cl_pinera</ref> (16982);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2007_cl_bachelet</ref> (15514)</item>
+                                <item>Más corto:  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_pe_toledo</ref> (1289);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_mx_fox</ref> (2450);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2008_mx_calderon</ref> (3317);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_co_uribe</ref> (4709);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2009_co_uribe</ref> (5807)</item>
+                            </list>
+                            <div type="5">
+                                <head>
+                                    <emph>Actividad 2</emph>
+                                </head>
+                                <list type="ordered">
+                                    <item>¿Qué podemos concluir sobre los textos más largos y los más cortos considerando los metadatos en el nombre del archivo (año, país, presidente)?</item>
+                                    <item>¿Para qué nos sirve saber la longitud de los textos?</item>
+                                </list>
+                            </div>
+                        </div>
+                        <div type="4">
+                            <head>Densidad del vocabulario</head>
+                            <p>La densidad de vocubulario se mide dividiendo el número de palabras únicas entre el número de palabras totales. Entre más cercano a uno es el índice de densidad quiere decir que el vocabulario tiene mayor variedad de palabras, es decir, que es más denso.</p>
+                            <div type="5">
+                                <head>
+                                    <emph>Actividad 3</emph>
+                                </head>
+                                <p>
+                                    <hi rend="bold">1)</hi> Calcula la densidad de las siguientes estrofas, compara y comenta:</p>
+                                <list type="unordered">
+                                    <item>Estrofa 1. De "Hombres necios que acusáis" de Sor Juana Inés de la Cruz</item>
+                                </list>
+                                <quote>
+                                    <p>¿Qué humor puede ser más raro
 que el que, falto de consejo,
-&#233;l mismo empa&#241;a el espejo,
-y siente que no est&#233; claro?</p>
-</quote>
-<list type="unordered">
-<item>Estrofa 2. De "Despacito" de Erika Ender, Luis Fonsi y Daddy Yankee</item>
-</list>
-<quote>
-<p>Pasito a pasito, suave suavecito
+él mismo empaña el espejo,
+y siente que no esté claro?</p>
+                                </quote>
+                                <list type="unordered">
+                                    <item>Estrofa 2. De "Despacito" de Erika Ender, Luis Fonsi y Daddy Yankee</item>
+                                </list>
+                                <quote>
+                                    <p>Pasito a pasito, suave suavecito
 Nos vamos pegando poquito a poquito
-Cuando t&#250; me besas con esa destreza
+Cuando tú me besas con esa destreza
 Veo que eres malicia con delicadeza</p>
-</quote>
-<p><hi rend="bold">2)</hi> Lee los datos de densidad l&#233;xica de los documentos de nuestro corpus, &#191;qu&#233; te dicen?</p>
-<list type="unordered">
-<item>M&#225;s alto:  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_pe_toledo</ref> (0.404);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_co_uribe</ref> (0.340);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2009_co_uribe</ref> (0.336);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2008_co_uribe</ref> (0.334);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_mx_fox</ref> (0.328)</item>
-<item>M&#225;s bajo:  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2008_cl_bachelet</ref> (0.192);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2007_mx_calderon</ref> (0.192);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2007_ar_kircher</ref> (0.206);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2007_pe_garcia</ref> (0.214);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2010_ar_fernandez</ref> (0.217)</item>
-</list>
-<p><hi rend="bold">3)</hi> Comp&#225;ralos con la informaci&#243;n sobre su extensi&#243;n, &#191;qu&#233; notas?</p>
-</div></div><div type="4"><head>Palabras por oraci&#243;n</head>
-<p>La forma en que Voyant calcula la longitud de las oraciones debe considerarse muy aproximada, especialmente por lo complicado que es distinguir entre el final de una abreviatura y el de una oraci&#243;n o de otros usos de la puntuaci&#243;n (por ejemplo, en algunos casos un punto y coma marca el l&#237;mite entre oraciones). El an&#225;lisis de las oraciones es realizado por una plantilla con instrucciones o 'clase' del lenguaje de programaci&#243;n Java que se llama <ref target="https://docs.oracle.com/javase/tutorial/i18n/text/about.html">BreakIterator</ref>.</p>
-<div type="5"><head><emph>Actividad 4</emph></head>
-<p><hi rend="bold">1)</hi> Observa las estad&#237;sticas de palabras por oraci&#243;n (ppo) y contesta: &#191;qu&#233; patr&#243;n o patrones puedes observar si consideras el &#237;ndice de "ppo" y los metadatos de pa&#237;s, presidente y a&#241;o contenidos en el nombre del documento?</p>
-<p><hi rend="bold">2)</hi> Da clic sobre los nombre de algunos documentos que te interesen por su &#237;ndice de "ppo". Dirige tu mirada a la ventana de "Lector" y lee algunas l&#237;neas, &#191;leer el texto original agrega informaci&#243;n nueva a tu lectura de los datos? Comenta por qu&#233;.</p>
-</div></div></div><div type="3"><head>Cirrus y sumario: frecuencias y filtros de palabras vac&#237;as</head>
-<p>Ya que tenemos una idea de algunas caracter&#237;sticas globales de nuestros documentos, es momento de que empecemos con las caracter&#237;sticas de los t&#233;rminos en nuestro corpus y uno de los puntos de entrada m&#225;s comunes es entender qu&#233; significa analizar un texto a partir de sus frecuencias.</p>
-<div type="4"><head>Frecuencias sin filtro</head>
-<p>El primer aspecto con el que vamos a trabajar es con el de <hi rend="bold">frecuencia bruta</hi> y para esto utilizaremos la ventana de Cirrus.</p>
-<div type="5"><head><emph>Actividad 5</emph></head>
-<p><hi rend="bold">1)</hi> &#191;Qu&#233; palabras son las m&#225;s frecuente en el corpus?</p>
-<p><hi rend="bold">2)</hi> &#191;Qu&#233; nos dicen estas palabras del corpus?, &#191;son significativas todas?</p>
-<quote>
-<p><hi rend="bold">Tip</hi> pasa el mouse sobre las palabras para obtener sus frecuencias derecho</p>
-</quote>
-</div></div><div type="4"><head>Palabras vac&#237;as</head>
-<p>La importancia no es un valor intr&#237;nseco y depender&#225; siempre de nuestros intereses. Justo por eso Voyant ofrece la opci&#243;n de filtrar ciertas palabras. Un procedimiento com&#250;n para obtener palabras relevantes es el de filtrar las unidades l&#233;xicas gramaticales o <emph>palabras vac&#237;as</emph>: art&#237;culos, preposiciones, interjecciones, pronombres, etc. (Pe&#241;a y Pe&#241;a, 2015).</p>
-<div type="5"><head><emph>Actividad 6</emph></head>
-<p><hi rend="bold">1)</hi> &#191;Qu&#233; palabras vac&#237;as est&#225;n en la nube de palabras?</p>
-<p><hi rend="bold">2)</hi> &#191;Cu&#225;les eliminar&#237;as y por qu&#233;?</p>
-<p>Voyant tiene ya cargada una lista de <emph>stop words</emph> o palabras vac&#237;as del espa&#241;ol; no obstante, nosotros podemos editarla de la siguiente manera:</p>
-<list type="ordered">
-<item>Colocamos nuestro cursor enor superior derecha de la ventana de Cirrus y damos clic sobre el icono que parece un interruptor.</item>
-</list>
-<figure><desc>Abrir opciones</desc><graphic url="editar_lista.png"/></figure>
-<list start="2" type="ordered">
-<item>Aparecer&#225; una ventana con diferentes opciones, seleccionamos la primera "Editar lista"</item>
-</list>
-<figure><desc>Editar lista</desc><graphic url="editarlista.png"/></figure>
-<list start="3" type="ordered">
-<item>Agregamos las palabras &#8220;vac&#237;as&#8221;, siempre separadas por un salto de l&#237;nea (tecla enter)</item>
-</list>
-<figure><desc>Quitar palabras vac&#237;as</desc><graphic url="lista_ruido.png"/></figure>
-<list start="4" type="ordered">
-<item>Una vez que hayamos a&#241;adido las palabras que deseamos filtrar damos clic en "salvar" (sic).</item>
-</list>
-<quote>
-<p><hi rend="bold">Cuidado:</hi> por defecto est&#225; seleccionada una caja que dice "Aplicar a todo"; si &#233;sta se deja seleccionada el filtrado de palabras afectar&#225; las m&#233;tricas de todas las otras herramientas. Es muy importante que documentes tus decisiones. Una buena pr&#225;ctica es guardar la lista de palabras vac&#237;as en un archivo de texto (.txt) Para este tutorial hemos creado una <ref target="/assets/analisis-voyant-tools/stopwords-es.txt">lista de palabras para filtrar</ref> y la puedes usar si as&#237; lo quieres, s&#243;lo recuerda que esto afectar&#225; tus resultados. Por ejemplo: en la lista de palabras filtradas inclu&#237; "todas" y "todos", habr&#225; personas para las que estas palabras podr&#237;an ser interesantes dado que muestran que "todos" es mucho m&#225;s utilizado que "todas" y esto podr&#237;a darnos pistas sobre el uso de lenguaje incluyente.</p>
-</quote>
-</div></div><div type="4"><head>Frecuencias con palabras vac&#237;as filtradas</head>
-<p>Volvamos entonces a esta secci&#243;n del sumario. Como dijimos en el iniciso anterior las palabras filtradas afectan otros campos de Voyant. En este caso, si dejaste seleccionada la caja de "Aplicar a todo", en la lista que aparece debajo de la leyenda: <hi rend="bold">Palabra m&#225;s frecuente en el corpus</hi> , se mostrar&#225;n las palabras que se repiten m&#225;s <hi rend="bold">sin contar</hi> aqu&#233;llas que fueron filtradas. En mi caso, muestra:</p>
-<quote>
-<p><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">social</ref> (437); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">nacional</ref> (427); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">nuestro</ref> (393); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">inversi&#243;n</ref> (376); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">ley</ref> (369)</p>
-</quote>
-<div type="5"><head><emph>Actividad 7</emph></head>
-<list type="ordered">
-<item>
-<p>Reflexiona sobre estas palabras y piensa qu&#233; informaci&#243;n te proporcionan y c&#243;mo se distingue esta informaci&#243;n de la que obtienes viendo la nube de palabras.</p>
-</item>
-<item>
-<p>Si est&#225;s en un grupo discute las diferencias de tus resultados con los de los dem&#225;s</p>
-</item>
-</list>
-</div></div></div><div type="3"><head>T&#233;rminos</head>
-<p>Si bien las frecuencias pueden decirnos algo sobre nuestros textos, existen muchas variables que pueden hacer que estos n&#250;meros sean poco significativos. En los siguientes apartados se explicar&#225;n diferentes estad&#237;sticas que pueden obtenerse en la pesta&#241;a o solapa de "T&#233;rminos" que est&#225; a la izquierda del bot&#243;n de "Cirrus" en la disposici&#243;n default de Voyant.</p>
-<table>
-<row>
-<cell role="label">palabra</cell>
-<cell role="label">frecuencia bruta</cell>
-<cell role="label">frecuencia normalizada</cell>
-</row>
-<row>
-<cell>dice</cell>
-<cell>2</cell>
-<cell>2*1,000,000/8 = 111,000</cell>
-</row>
-<row>
-<cell>coraz&#243;n</cell>
-<cell>1</cell>
-<cell>1*1,000,000/8 = 125,000</cell>
-</row>
-</table><div type="4"><head>Asimetr&#237;a estad&#237;stica</head>
-<p>Aunque la frecuencia relativa no sirve para entender la distribuci&#243;n de nuestro corpus, existe una medida que s&#237; nos da informaci&#243;n sobre qu&#233; tan constante es un t&#233;rmino a lo largo de nuestros documentos: la asimetr&#237;a estad&#237;stica.</p>
-<p>Esta medida nos da una idea de la distribuci&#243;n de probabilidad de una variable sin tener que hacer su representaci&#243;n gr&#225;fica. La forma en que se calcula es observando las desviaciones de una frecuencia con respecto a la media, para obtener si son mayores las que ocurren a la derecha de la media (asimetr&#237;a negativa) que las de la izquierda (asimetr&#237;a positiva). Entre m&#225;s cercano a cero sea el grado de la asimetr&#237;a estad&#237;stica, significa que la distribuci&#243;n de ese t&#233;rmino es m&#225;s regular (es decir que ocurre con una media muy similar en todos los documentos). Algo que no es muy intuitivo es que si un t&#233;rmino tiene una asimetr&#237;a estad&#237;stica con <hi rend="bold">n&#250;meros positivos</hi> significan que ese t&#233;rmino est&#225; <hi rend="bold">por debajo</hi> de la media, y entre m&#225;s grande el n&#250;mero m&#225;s asim&#233;trico es el t&#233;rmino (es decir, que ocurre much&#237;simo en un documento pero que casi no ocurre en el corpus). Los <hi rend="bold">n&#250;meros negativos</hi>, por el contrario, indican que ese t&#233;rmino tiende a estar <hi rend="bold">por arriba</hi> de la media.</p>
-<figure><desc>Asimetr&#237;a estad&#237;stica</desc><graphic url="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Posiciones_relativas_de_par%C3%A1metros_centrales.svg/500px-Posiciones_relativas_de_par%C3%A1metros_centrales.svg.png"/></figure>
-<p>Para obtener esta medida en Voyant, tenemos que repetir los pasos que hicimos para obtener la frencuencia relativa, pero esta vez seleccionar "Oblicuidad" ("Skew").  Esta medida nos permite observar entonces, que la palabra "crisis" por ejemplo, a pesar de tener una alta frecuencia, no s&#243;lo no tiene una frecuencia constante a lo largo del corpus, sino que &#233;sta tiende a estar por debajo de la media pues su asimetr&#237;a estad&#237;stica es positiva (1.9).</p>
-</div><div type="4"><head>Palabras diferenciadas</head>
-<p>Como tal vez ya sospechas, la informaci&#243;n m&#225;s interesante generalmente no se encuentra dentro de las palabras m&#225;s frecuentes, pues &#233;stas tienden a ser tambi&#233;n las m&#225;s evidentes. En el campo de la recuperaci&#243;n de la informaci&#243;n se han inventado otras medidas que permiten ubicar los t&#233;rminos que hacen que un documento se distinga de otro. Una de las medidas m&#225;s usadas se llama tf-idf (del ingl&#233;s <emph>term frequency &#8211; inverse document frequency</emph>). Esta medida busca expresar num&#233;ricamente qu&#233; tan relevante es un documento en una colecci&#243;n determinada; es decir, en una colecci&#243;n de textos sobre "manzanas" la palabra manzana puede ocurrir muchas veces, pero no nos dicen nada nuevo sobre la colecci&#243;n, por lo que no queremos saber la frecuencia bruta de las palabras (<emph>term frequency</emph>, frecuencia de t&#233;rmino) pero sopesarla en qu&#233; tan &#250;nica o com&#250;n es en la colecci&#243;n dada (<emph>inverse document frequency</emph>, frecuencia inversa de documento).</p>
-<p>En Voyant el tf-idf se calcula <ref target="https://twitter.com/VoyantTools/status/1025458748574326784">de la siguiente manera</ref>:</p>
-<p>Frecuencia Bruta  (tf) / N&#250;mero de Palabras (N)  * log10 ( N&#250;mero de Documentos / N&#250;mero de veces que aparece el t&#233;rmino en los documentos)</p>
-<figure><desc>F&#243;rmula de TF-IDF</desc><graphic url="tf_idf.png"/></figure>
-<div type="5"><head><emph>Actividad 8</emph></head>
-<p>Observa las <hi rend="bold">palabras diferenciadas  (comparado con el resto del corpus)</hi> de cada uno de los documentos y anota qu&#233; hip&#243;tesis puedes derivar de ellas</p>
-<list type="ordered">
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2006_ar_kircher</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">uruguay</ref>  (12),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2004</ref>  (13),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2005</ref>  (31),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">plata</ref>  (7),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">inclusi&#243;n</ref>  (16).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2006_cl_bachelet</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">innovaci&#243;n</ref>  (15),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">rodrigo</ref>  (8),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">alegremente</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">barrios</ref>  (9),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">cobre</ref>  (10).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2006_co_uribe</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">tutela</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">reelecci&#243;n</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">regal&#237;as</ref>  (7),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">iva</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">publicaci&#243;n</ref>  (5).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2006_mx_fox</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">atenta</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">apego</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">federalismo</ref>  (3),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">intransigencia</ref>  (2),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">fundamento</ref>  (3).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2006_pe_toledo</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">entrego</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">se&#241;or</ref>  (14),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">se&#241;ora</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">amigo</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">tracemos</ref>  (2).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2007_ar_kircher</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2006</ref>  (65),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">mercosur</ref>  (12),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">uruguay</ref>  (9),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">provincias</ref>  (16),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">interanual</ref>  (5).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2007_cl_bachelet</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">macrozona</ref>  (7),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">deudores</ref>  (12),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">cuna</ref>  (9),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">subvenci&#243;n</ref>  (10),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">pesimismo</ref>  (4).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2007_co_uribe</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">guerrilla</ref>  (10),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">sindicalistas</ref>  (7),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">paramilitares</ref>  (8),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">inversionista</ref>  (10),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">despeje</ref>  (7).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2007_mx_calderon</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">igualar</ref>  (9),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">transformar</ref>  (19),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">tortilla</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">acu&#237;feros</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">miseria</ref>  (10).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2007_pe_garcia</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">huancavelica</ref>  (9),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">redistribuci&#243;n</ref>  (10),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">callao</ref>  (8),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">407</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">lima</ref>  (7).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2008_ar_fernandez</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">abordar</ref>  (17),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">cap&#237;tulo</ref>  (12),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">presupone</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">lesa</ref>  (8),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">articular</ref>  (5).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2008_cl_bachelet</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">desaf&#237;o</ref>  (18),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">mirada</ref>  (10),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">aprobamos</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">adulto</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">diez</ref>  (11).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2008_co_uribe</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">ecopetrol</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">revaluaci&#243;n</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">juegos</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">desatrasar</ref>  (3),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">billones</ref>  (6).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2008_mx_calderon</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">c&#225;rtel</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">noches</ref>  (3),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">mexicanas</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">controlaba</ref>  (3),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">federales</ref>  (6).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2008_pe_garcia</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">poblados</ref>  (11),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">kil&#243;metros</ref>  (52),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">lima</ref>  (11),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">carreteras</ref>  (21),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">mineros</ref>  (4).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2009_ar_fernandez</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">sosteniendo</ref>  (7),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">dirigencia</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">coparticipaci&#243;n</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">catamarca</ref>  (7),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">pbi</ref>  (9).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2009_cl_bachelet</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">sello</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">fortalecidos</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">crisis</ref>  (48),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">gente</ref>  (24),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">aplauso</ref>  (4).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2009_co_uribe</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">colombia</ref>  (20),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">calzada</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">contributivo</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">desplazados</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">notificado</ref>  (3).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2009_mx_calderon</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">federal</ref>  (27),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">organizado</ref>  (10),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">cambiar</ref>  (13),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">propongo</ref>  (8),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">policiacos</ref>  (4).</item>
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2009_pe_garcia</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">lima</ref>  (11),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">1,500</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">tingo</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">pampas</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">desorden</ref>  (6).</item>
-</list>
-</div></div></div><div type="3"><head>Palabras en contexto</head>
-<p>El proyecto con el que algunas historias dan por inauguradas las Humanidades Digitales es el <emph>Index Thomisticus</emph>, una concordancia de la obra de Tom&#225;s de Aquino liderada por el fil&#243;logo y religioso Roberto Busa (Hockey, 2004), en la que participaron decenas de mujeres en la codificaci&#243;n (Terras, 2013). Este proyecto que tom&#243; a&#241;os en completarse, es una funci&#243;n integrada en Voyant Tools: en la esquina inferior derecha, en la ventana de "Contextos" es posible hacer consultas de las concordancias izquierdas y derechas de t&#233;rminos espec&#237;ficos.</p>
-<p>La tabla que vemos tiene las siguientes columnas predeterminadas:</p>
-<list type="ordered">
-<item><hi rend="bold">Documento</hi>: aqu&#237; aparece el nombre del documento en el que ocurre(n) la(s) palabra(s) clave(s)  de la consulta</item>
-<item><hi rend="bold">Izquierda</hi>: contexto izquierdo de la palabra clave (este puede ser modificado para abarcar m&#225;s palabras o menos y si se da clic sobre la celda, &#233;sta se expande para mostrar m&#225;s contexto)</item>
-<item><hi rend="bold">T&#233;rminos</hi>: palabra(s) clave(s) de la consulta</item>
-<item><hi rend="bold">Derecha</hi>: contexto derecho</item>
-</list>
-<p>Se puede a&#241;adir la columna <hi rend="bold">Posici&#243;n</hi> que indica el lugar en el documento en el que se encuentra el t&#233;rmino consultado:</p>
-<figure><desc>Agregar columna de posici&#243;n</desc><graphic url="posicion.png"/></figure>
-<quote>
-<p><hi rend="bold">Consulta avanzada</hi> Voyant permite el uso de comodines para buscar variaciones de una palabra. Estas son algunas de las combinaciones</p>
-<list type="unordered">
-<item><hi rend="bold">famili<code rend="inline">*</code></hi>: esta consulta arrojar&#225; todas las palabras que empiecen con el prefijo "famili" (familias, familiares, familiar, familia)</item>
-<item><hi rend="bold"><code rend="inline">*</code>ci&#243;n</hi>: t&#233;rminos que terminan con el sufijo "ci&#243;n" (contaminaci&#243;n, militarizaci&#243;n, fabricaci&#243;n)</item>
-<item><hi rend="bold">pobreza, desigualdad</hi>: puedes buscar m&#225;s de un t&#233;rmino separ&#225;ndolos por comas</item>
-<item><hi rend="bold">"contra la pobreza"</hi>: buscar la frase exacta</item>
-<item><hi rend="bold">"pobreza extrema"~ 5</hi>:  buscar los t&#233;rminos dentro de las comillas, el orden no importa, y pueden haber hasta 5 palabras de por medio (esa condici&#243;n regresar&#237;a frases c&#243;mo "la extrema desigualdad y la pobreza" donde se encuentra la palabra "pobreza" y "extrema"</item>
-</list>
-</quote>
-<h5><emph>Actividad 9</emph></h5>
-<list type="ordered">
-<item>Busca el uso de alg&#250;n t&#233;rmino que te parezca interesante, utiliza alguna de las estrategias de la consulta avanzada</item>
-<item>Ordena las filas usando las diferentes columnas (Documento, Izquierda, Derecha y Posici&#243;n): &#191;qu&#233; conclusiones puedes derivar sobre tus t&#233;rminos utilizando la informaci&#243;n de estas columnas?</item>
-</list>
-<quote>
-<p><hi rend="bold">Cuidado</hi>: el orden de las palabras en la columna "Izquierda" es inverso; es decir, de derecha a izquierda desde la palabra clave.</p>
-</quote>
-<div type="4"><head>Exportando las tablas</head>
-<p>Para exportar los datos se da clic en el cuadro con flecha que aparece cuando pasas el cursor sobre la esquina derecha de "Contextos". En seguida se selecciona la opci&#243;n &#8220;Exportar datos actuales&#8221; y se da clic sobre la &#250;ltima opci&#243;n <hi rend="bold">Export all available data as tab separated values (text)grid</hi>.</p>
-<p>Eso lleva a una p&#225;gina donde est&#225;n separados los campos por un tabulador:</p>
-<figure><desc>Exportar contextos</desc><graphic url="exportar_contextos.png"/></figure>
-<p>Selecciona todos los datos (Ctrl+A o Ctrl+E); copi&#225;los (Ctrl+C) y p&#233;galos en una hoja de c&#225;lculo (Ctrl+V). Si esto no funciona, guarda los datos como en un editor sencillo de texto como .txt (&#161;no olvides la codificaci&#243;n UTF-8!) y luego en tu hoja de c&#225;lculo importa los datos. En Excel esto se hace en la pesta&#241;a de "Datos" y despu&#233;s &#8220;Desde un archivo de texto&#8221;</p>
-<figure><desc>Importar datos desde un archivo de textos</desc><graphic url="datos_archivo_de_texto.png"/></figure>
-</div></div></div><div type="2"><head>Respuestas a las actividades</head>
-<div type="3"><head>Actividad 1</head>
-<p>Este corpus tiene 2 documentos con un total de palabras de 4 y 3 palabras &#250;nicas <emph>(tengo, hambre, sue&#241;o)</emph></p>
-</div><div type="3"><head>Actividad 2</head>
-<p><hi rend="bold">1)</hi> Podr&#237;amos observar, por ejemplo, que los textos m&#225;s largos son de dos pa&#237;ses: Chile y Argentina, y de tres presidentes distintos: Kirchner, Bachelet y Pinera. Sobre los m&#225;s cortos podr&#237;amos ver que si bien el m&#225;s corto es de Per&#250;, en realidad los que m&#225;s aparecen entre los breves son los de M&#233;xico y Colombia.</p>
-<p><hi rend="bold">2)</hi> Saber la extensi&#243;n de nuestros textos nos permite entender la homogeneidad o disparidad de nuestro corpus, as&#237; como entender ciertas tendencias (por ejemplo, en qu&#233; a&#241;os tend&#237;an a ser m&#225;s cortos los discursos, en qu&#233; momento cambi&#243; la extensi&#243;n, etc.)</p>
-</div><div type="3"><head>Actividad 3</head>
-<p><hi rend="bold">1)</hi> La primera estrofa tiene 23 palabras y 20 son palabras &#250;nicas, por lo que 20/23 da igual a una densidad de vocabulario de 0.870; en realidad de 0.869 pero Voyant Tools redondea estos n&#250;meros: <ref target="https://voyant-tools.org/?corpus=b6b17408eb605cb1477756ce412de78e">https://voyant-tools.org/?corpus=b6b17408eb605cb1477756ce412de78e</ref>. La segunda estrofa tiene 24 palabras y 20 son palabras &#250;nicas, por lo que 20/24 da igual a una densidad de vocabulario de 0.833: <ref target="https://voyant-tools.org/?corpus=366630ce91f54ed3577a0873d601d714">https://voyant-tools.org/?corpus=366630ce91f54ed3577a0873d601d714</ref>.</p>
-<p>Como podemos observar la diferencia entre un verso de Sor Juana In&#233;s de la Cruz y otro compuesto por &#201;rika Ender, Daddy Yankee y Luis Fonsi tienen una diferencia de densidad de 0.037, que no es muy alto. Debemos tener cuidado al interpretar estos n&#250;meros pues s&#243;lo son un indicador cuantitativo de la riqueza del vocabulario y no incluye par&#225;metros como la complejidad de la rima o de los t&#233;rminos.</p>
-<p>Parece haber una correspondencia entre los discursos m&#225;s cortos y los m&#225;s densos, esto es natural pues entre m&#225;s breve es un texto menos "oportunidad" hay para repetirse. No obstante, esto tambi&#233;n podr&#237;a decirnos algo sobre los estilos de diferentes pa&#237;ses o presidentes. Entre menos densidad es m&#225;s probable que recurran a m&#225;s recursos ret&#243;ricos.</p>
-</div><div type="3"><head>Actividad 4</head>
-<p>Estos resultados parecen indicar que la presidenta Kirchner, adem&#225;s de tener los discursos m&#225;s largos es la que hace frases m&#225;s largas; sin embargo tenemos que tener cuidado con las conclusiones de este tipo pues se trata de discursos orales en los que la puntuaci&#243;n depende de quien transcribe el texto.</p>
-</div><div type="3"><head>Actividad 5</head>
-<list type="ordered">
-<item><ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">a</ref> (5943); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">m&#225;s</ref> (1946); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">no</ref> (1694); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">mil</ref> (1045); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">millones</ref> (971)</item>
-<item>La primera palabra es una preposici&#243;n, la segunda un adverbio de comparici&#243;n y la tercera un adverbio de negaci&#243;n. Estas palabras podr&#237;an ser significativas si lo que se busca comprender es el uso de este tipo de palabras funcionales. Sin embargo, si lo que se  busca son m&#225;s bien sustantivos, habr&#225; que hacer un filtrado (ver secci&#243;n: "Palabras m&#225;s frecuentes")</item>
-</list>
-</div></div><div type="2"><head>Bibliograf&#237;a</head>
-<p>Hockey, Susan. 2004 &#8220;The History of Humanities Computing&#8221;. <emph>A Companion to Digital Humanities</emph>. Schreibman et&#160;al. (editores). Blackwell Publishing Ltd. <ref target="doi:10.1002/9780470999875.ch1">doi:10.1002/9780470999875.ch1</ref>.</p>
-<p>Pe&#241;a, Gilberto Anguiano, y Catalina Naumis Pe&#241;a. 2015. &#171;Extracci&#243;n de candidatos a t&#233;rminos de un corpus de la lengua general&#187;. <emph>Investigaci&#243;n Bibliotecol&#243;gica: Archivonom&#237;a, Bibliotecolog&#237;a e Informaci&#243;n</emph> 29 (67): 19-45. <ref target="https://doi.org/10.1016/j.ibbai.2016.02.035">https://doi.org/10.1016/j.ibbai.2016.02.035</ref>.</p>
-<p>Sinclair, St&#233;fan and Geoffrey Rockwell, 2016.  <emph>Voyant Tools</emph>. Web. <ref target="http://voyant-tools.org/">http://voyant-tools.org/</ref>.</p>
-<p>Terras, Melissa, 2013. "For Ada Lovelace Day &#8211; Father Busa&#8217;s Female Punch Card Operatives". <emph>Melissa Terras' Blog</emph>. Web. <ref target="http://melissaterras.blogspot.com/2013/10/for-ada-lovelace-day-father-busas.html">http://melissaterras.blogspot.com/2013/10/for-ada-lovelace-day-father-busas.html</ref>.</p>
-<p style="alert alert-warning">
-Este tutorial fue escrito gracias al apoyo de la Academia Brit&#225;nica y preparado durante el Taller de escritura de The Programming Historian en la Universidad de los Andes en Bogot&#225;, Colombia, el del 31 de julio al 3 de agosto de 2018.
+                                </quote>
+                                <p>
+                                    <hi rend="bold">2)</hi> Lee los datos de densidad léxica de los documentos de nuestro corpus, ¿qué te dicen?</p>
+                                <list type="unordered">
+                                    <item>Más alto:  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_pe_toledo</ref> (0.404);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_co_uribe</ref> (0.340);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2009_co_uribe</ref> (0.336);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2008_co_uribe</ref> (0.334);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2006_mx_fox</ref> (0.328)</item>
+                                    <item>Más bajo:  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2008_cl_bachelet</ref> (0.192);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2007_mx_calderon</ref> (0.192);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2007_ar_kircher</ref> (0.206);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2007_pe_garcia</ref> (0.214);  <ref target="https://voyant-tools.org/?corpus=b6f0e2c5ee1bc9b644ffda6b86a93740&amp;panels=cirrus,reader,trends,summary,contexts#">2010_ar_fernandez</ref> (0.217)</item>
+                                </list>
+                                <p>
+                                    <hi rend="bold">3)</hi> Compáralos con la información sobre su extensión, ¿qué notas?</p>
+                            </div>
+                        </div>
+                        <div type="4">
+                            <head>Palabras por oración</head>
+                            <p>La forma en que Voyant calcula la longitud de las oraciones debe considerarse muy aproximada, especialmente por lo complicado que es distinguir entre el final de una abreviatura y el de una oración o de otros usos de la puntuación (por ejemplo, en algunos casos un punto y coma marca el límite entre oraciones). El análisis de las oraciones es realizado por una plantilla con instrucciones o 'clase' del lenguaje de programación Java que se llama <ref target="https://docs.oracle.com/javase/tutorial/i18n/text/about.html">BreakIterator</ref>.</p>
+                            <div type="5">
+                                <head>
+                                    <emph>Actividad 4</emph>
+                                </head>
+                                <p>
+                                    <hi rend="bold">1)</hi> Observa las estadísticas de palabras por oración (ppo) y contesta: ¿qué patrón o patrones puedes observar si consideras el índice de "ppo" y los metadatos de país, presidente y año contenidos en el nombre del documento?</p>
+                                <p>
+                                    <hi rend="bold">2)</hi> Da clic sobre los nombre de algunos documentos que te interesen por su índice de "ppo". Dirige tu mirada a la ventana de "Lector" y lee algunas líneas, ¿leer el texto original agrega información nueva a tu lectura de los datos? Comenta por qué.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div type="3">
+                        <head>Cirrus y sumario: frecuencias y filtros de palabras vacías</head>
+                        <p>Ya que tenemos una idea de algunas características globales de nuestros documentos, es momento de que empecemos con las características de los términos en nuestro corpus y uno de los puntos de entrada más comunes es entender qué significa analizar un texto a partir de sus frecuencias.</p>
+                        <div type="4">
+                            <head>Frecuencias sin filtro</head>
+                            <p>El primer aspecto con el que vamos a trabajar es con el de <hi rend="bold">frecuencia bruta</hi> y para esto utilizaremos la ventana de Cirrus.</p>
+                            <div type="5">
+                                <head>
+                                    <emph>Actividad 5</emph>
+                                </head>
+                                <p>
+                                    <hi rend="bold">1)</hi> ¿Qué palabras son las más frecuente en el corpus?</p>
+                                <p>
+                                    <hi rend="bold">2)</hi> ¿Qué nos dicen estas palabras del corpus?, ¿son significativas todas?</p>
+                                <quote>
+                                    <p>
+                                        <hi rend="bold">Tip</hi> pasa el mouse sobre las palabras para obtener sus frecuencias derecho</p>
+                                </quote>
+                            </div>
+                        </div>
+                        <div type="4">
+                            <head>Palabras vacías</head>
+                            <p>La importancia no es un valor intrínseco y dependerá siempre de nuestros intereses. Justo por eso Voyant ofrece la opción de filtrar ciertas palabras. Un procedimiento común para obtener palabras relevantes es el de filtrar las unidades léxicas gramaticales o <emph>palabras vacías</emph>: artículos, preposiciones, interjecciones, pronombres, etc. (Peña y Peña, 2015).</p>
+                            <div type="5">
+                                <head>
+                                    <emph>Actividad 6</emph>
+                                </head>
+                                <p>
+                                    <hi rend="bold">1)</hi> ¿Qué palabras vacías están en la nube de palabras?</p>
+                                <p>
+                                    <hi rend="bold">2)</hi> ¿Cuáles eliminarías y por qué?</p>
+                                <p>Voyant tiene ya cargada una lista de <emph>stop words</emph> o palabras vacías del español; no obstante, nosotros podemos editarla de la siguiente manera:</p>
+                                <list type="ordered">
+                                    <item>Colocamos nuestro cursor enor superior derecha de la ventana de Cirrus y damos clic sobre el icono que parece un interruptor.</item>
+                                </list>
+                                <figure>
+                                    <desc>Abrir opciones</desc>
+                                    <graphic url="editar_lista.png"/>
+                                </figure>
+                                <list type="ordered">
+                                    <item>Aparecerá una ventana con diferentes opciones, seleccionamos la primera "Editar lista"</item>
+                                </list>
+                                <figure>
+                                    <desc>Editar lista</desc>
+                                    <graphic url="editarlista.png"/>
+                                </figure>
+                                <list type="ordered">
+                                    <item>Agregamos las palabras “vacías”, siempre separadas por un salto de línea (tecla enter)</item>
+                                </list>
+                                <figure>
+                                    <desc>Quitar palabras vacías</desc>
+                                    <graphic url="lista_ruido.png"/>
+                                </figure>
+                                <list type="ordered">
+                                    <item>Una vez que hayamos añadido las palabras que deseamos filtrar damos clic en "salvar" (sic).</item>
+                                </list>
+                                <quote>
+                                    <p>
+                                        <hi rend="bold">Cuidado:</hi> por defecto está seleccionada una caja que dice "Aplicar a todo"; si ésta se deja seleccionada el filtrado de palabras afectará las métricas de todas las otras herramientas. Es muy importante que documentes tus decisiones. Una buena práctica es guardar la lista de palabras vacías en un archivo de texto (.txt) Para este tutorial hemos creado una <ref target="/assets/analisis-voyant-tools/stopwords-es.txt">lista de palabras para filtrar</ref> y la puedes usar si así lo quieres, sólo recuerda que esto afectará tus resultados. Por ejemplo: en la lista de palabras filtradas incluí "todas" y "todos", habrá personas para las que estas palabras podrían ser interesantes dado que muestran que "todos" es mucho más utilizado que "todas" y esto podría darnos pistas sobre el uso de lenguaje incluyente.</p>
+                                </quote>
+                            </div>
+                        </div>
+                        <div type="4">
+                            <head>Frecuencias con palabras vacías filtradas</head>
+                            <p>Volvamos entonces a esta sección del sumario. Como dijimos en el iniciso anterior las palabras filtradas afectan otros campos de Voyant. En este caso, si dejaste seleccionada la caja de "Aplicar a todo", en la lista que aparece debajo de la leyenda: <hi rend="bold">Palabra más frecuente en el corpus</hi> , se mostrarán las palabras que se repiten más <hi rend="bold">sin contar</hi> aquéllas que fueron filtradas. En mi caso, muestra:</p>
+                            <quote>
+                                <p>
+                                    <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">social</ref> (437); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">nacional</ref> (427); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">nuestro</ref> (393); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">inversión</ref> (376); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">ley</ref> (369)</p>
+                            </quote>
+                            <div type="5">
+                                <head>
+                                    <emph>Actividad 7</emph>
+                                </head>
+                                <list type="ordered">
+                                    <item>
+                                        <p>Reflexiona sobre estas palabras y piensa qué información te proporcionan y cómo se distingue esta información de la que obtienes viendo la nube de palabras.</p>
+                                    </item>
+                                    <item>
+                                        <p>Si estás en un grupo discute las diferencias de tus resultados con los de los demás</p>
+                                    </item>
+                                </list>
+                            </div>
+                        </div>
+                    </div>
+                    <div type="3">
+                        <head>Términos</head>
+                        <p>Si bien las frecuencias pueden decirnos algo sobre nuestros textos, existen muchas variables que pueden hacer que estos números sean poco significativos. En los siguientes apartados se explicarán diferentes estadísticas que pueden obtenerse en la pestaña o solapa de "Términos" que está a la izquierda del botón de "Cirrus" en la disposición default de Voyant.</p>
+                        <head>Frecuencia normalizada</head>
+                        <p>En el apartado anterior hemos observado la "frecuencia bruta" de las palabras. Sin embargo, si tuviéramos un corpus de seis palabras y otro de 3,000 palabras, las frecuencias brutas son poco informativas. Tres palabras en un corpus de seis palabras representa 50% del total, tres palabras en un corpus de 6,000 representan el 0.1% del total.
+Para evitar la sobre-representación de un término, los lingüistas han ideado otra medida que se llama: "frecuencia relativa normalizada".
+Ésta se calcula de la siguiente manera:
+Frecuencia Bruta * 1,000,000 / Número total de palabras.
+Analicemos un verso como ejemplo. Tomemos la frase: "pero mi corazón dice que no, dice que no", que tiene ocho palabras en total. Si calculamos su frecuencia bruta y relativa tenemos que:</p>
+                        <table>
+                            <row>
+                                <cell role="label">palabra</cell>
+                                <cell role="label">frecuencia bruta</cell>
+                                <cell role="label">frecuencia normalizada</cell>
+                            </row>
+                            <row>
+                                <cell>corazón</cell>
+                                <cell>1</cell>
+                                <cell>1*1,000,000/8 = 125,000</cell>
+                            </row>
+                            <row>
+                                <cell>dice</cell>
+                                <cell>2</cell>
+                                <cell>2*1,000,000/8 = 111,000</cell>
+                            </row>
+                        </table>
+                        <p>¿Cuál es la ventaja de esto? Que si tuviéramos un corpus en el que la palabra corazón tuviera la misma proporción, por ejemplo 1,000 ocurrencias entre 8,000 palabras; si bien la frecuencia bruta es muy distinta, la frecuencia normalizada sería la misma, pues 1,000*1,000,000/8,000 también es 125,000.</p>
+                        <p>Veamos cómo funciona esto en Voyant Tools:</p>
+                        <list type="ordered">
+                            <item>En la sección de Cirrus (la nube de palabras), damos clic sobre 'Terms' o 'Términos'. Esto abrirá una tabla que por defecto tiene tres columnas: Términos (con la lista de palabras en los documentos, sin las filtradas), Contar (con la 'frecuencia bruta o neta' de cada término) y Tendencia (con una gráfica de la distribución de una palabra tomando su frecuencia relativa). Para obtener información sobre la frecuencia relativa de un término, en la barra de los nombres de columna, en el extremo derecho, se da clic sobre el triángulo que ofrece más opciones y en 'Columnas' se selecciona la opción 'Relativo' como se muestra en la imagen a continuación:</item>
+                        </list>
+                        <figure>
+                            <desc>Frecuencia relativa</desc>
+                            <graphic url="frecuencia_relativa.png"/>
+                        </figure>
+                        <list type="ordered">
+                            <item>Si ordenas las columnas en orden descendiente como lo harías en un programa de hojas de cálculo, observarás que el orden de la frecuencia bruta ('Contar') y la frecuencia relativa ('Relativo') el orden es el mismo. ¿Para qué nos sirve entonces esta medida? Para cuando comparamos diferentes corpus. Un corpus es un conjunto de textos con algo en común. En este caso, Voyant está interpretando todos los discursos como un solo corpus. Si quisiéramos que cada cada país fuera un corpus distinto, tendríamos que guardar nuestro texto en una tabla, en HTML o en XML, donde los metadatos estuvieran expresados en columnas (en el caso de la tabla) o en etiquetas (en el caso de HTML o XML).<ref type="footnotemark" target="#es_note_3"/>
+                            </item>
+                        </list>
+                        <div type="4">
+                            <head>Asimetría estadística</head>
+                            <p>Aunque la frecuencia relativa no sirve para entender la distribución de nuestro corpus, existe una medida que sí nos da información sobre qué tan constante es un término a lo largo de nuestros documentos: la asimetría estadística.</p>
+                            <p>Esta medida nos da una idea de la distribución de probabilidad de una variable sin tener que hacer su representación gráfica. La forma en que se calcula es observando las desviaciones de una frecuencia con respecto a la media, para obtener si son mayores las que ocurren a la derecha de la media (asimetría negativa) que las de la izquierda (asimetría positiva). Entre más cercano a cero sea el grado de la asimetría estadística, significa que la distribución de ese término es más regular (es decir que ocurre con una media muy similar en todos los documentos). Algo que no es muy intuitivo es que si un término tiene una asimetría estadística con <hi rend="bold">números positivos</hi> significan que ese término está <hi rend="bold">por debajo</hi> de la media, y entre más grande el número más asimétrico es el término (es decir, que ocurre muchísimo en un documento pero que casi no ocurre en el corpus). Los <hi rend="bold">números negativos</hi>, por el contrario, indican que ese término tiende a estar <hi rend="bold">por arriba</hi> de la media.</p>
+                            <figure>
+                                <desc>Asimetría estadística</desc>
+                                <graphic url="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Posiciones_relativas_de_par%C3%A1metros_centrales.svg/500px-Posiciones_relativas_de_par%C3%A1metros_centrales.svg.png"/>
+                            </figure>
+                            <p>Para obtener esta medida en Voyant, tenemos que repetir los pasos que hicimos para obtener la frencuencia relativa, pero esta vez seleccionar "Oblicuidad" ("Skew").  Esta medida nos permite observar entonces, que la palabra "crisis" por ejemplo, a pesar de tener una alta frecuencia, no sólo no tiene una frecuencia constante a lo largo del corpus, sino que ésta tiende a estar por debajo de la media pues su asimetría estadística es positiva (1.9).</p>
+                        </div>
+                        <div type="4">
+                            <head>Palabras diferenciadas</head>
+                            <p>Como tal vez ya sospechas, la información más interesante generalmente no se encuentra dentro de las palabras más frecuentes, pues éstas tienden a ser también las más evidentes. En el campo de la recuperación de la información se han inventado otras medidas que permiten ubicar los términos que hacen que un documento se distinga de otro. Una de las medidas más usadas se llama tf-idf (del inglés <emph>term frequency – inverse document frequency</emph>). Esta medida busca expresar numéricamente qué tan relevante es un documento en una colección determinada; es decir, en una colección de textos sobre "manzanas" la palabra manzana puede ocurrir muchas veces, pero no nos dicen nada nuevo sobre la colección, por lo que no queremos saber la frecuencia bruta de las palabras (<emph>term frequency</emph>, frecuencia de término) pero sopesarla en qué tan única o común es en la colección dada (<emph>inverse document frequency</emph>, frecuencia inversa de documento).</p>
+                            <p>En Voyant el tf-idf se calcula <ref target="https://twitter.com/VoyantTools/status/1025458748574326784">de la siguiente manera</ref>:</p>
+                            <p>Frecuencia Bruta  (tf) / Número de Palabras (N)  * log10 ( Número de Documentos / Número de veces que aparece el término en los documentos)</p>
+                            <figure>
+                                <desc>Fórmula de TF-IDF</desc>
+                                <graphic url="tf_idf.png"/>
+                            </figure>
+                            <div type="5">
+                                <head>
+                                    <emph>Actividad 8</emph>
+                                </head>
+                                <p>Observa las <hi rend="bold">palabras diferenciadas  (comparado con el resto del corpus)</hi> de cada uno de los documentos y anota qué hipótesis puedes derivar de ellas</p>
+                                <list type="ordered">
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2006_ar_kircher</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">uruguay</ref>  (12),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2004</ref>  (13),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2005</ref>  (31),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">plata</ref>  (7),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">inclusión</ref>  (16).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2006_cl_bachelet</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">innovación</ref>  (15),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">rodrigo</ref>  (8),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">alegremente</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">barrios</ref>  (9),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">cobre</ref>  (10).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2006_co_uribe</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">tutela</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">reelección</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">regalías</ref>  (7),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">iva</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">publicación</ref>  (5).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2006_mx_fox</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">atenta</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">apego</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">federalismo</ref>  (3),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">intransigencia</ref>  (2),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">fundamento</ref>  (3).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2006_pe_toledo</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">entrego</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">señor</ref>  (14),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">señora</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">amigo</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">tracemos</ref>  (2).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2007_ar_kircher</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2006</ref>  (65),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">mercosur</ref>  (12),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">uruguay</ref>  (9),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">provincias</ref>  (16),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">interanual</ref>  (5).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2007_cl_bachelet</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">macrozona</ref>  (7),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">deudores</ref>  (12),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">cuna</ref>  (9),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">subvención</ref>  (10),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">pesimismo</ref>  (4).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2007_co_uribe</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">guerrilla</ref>  (10),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">sindicalistas</ref>  (7),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">paramilitares</ref>  (8),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">inversionista</ref>  (10),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">despeje</ref>  (7).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2007_mx_calderon</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">igualar</ref>  (9),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">transformar</ref>  (19),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">tortilla</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">acuíferos</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">miseria</ref>  (10).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2007_pe_garcia</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">huancavelica</ref>  (9),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">redistribución</ref>  (10),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">callao</ref>  (8),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">407</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">lima</ref>  (7).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2008_ar_fernandez</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">abordar</ref>  (17),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">capítulo</ref>  (12),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">presupone</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">lesa</ref>  (8),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">articular</ref>  (5).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2008_cl_bachelet</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">desafío</ref>  (18),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">mirada</ref>  (10),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">aprobamos</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">adulto</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">diez</ref>  (11).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2008_co_uribe</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">ecopetrol</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">revaluación</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">juegos</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">desatrasar</ref>  (3),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">billones</ref>  (6).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2008_mx_calderon</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">cártel</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">noches</ref>  (3),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">mexicanas</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">controlaba</ref>  (3),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">federales</ref>  (6).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2008_pe_garcia</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">poblados</ref>  (11),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">kilómetros</ref>  (52),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">lima</ref>  (11),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">carreteras</ref>  (21),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">mineros</ref>  (4).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2009_ar_fernandez</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">sosteniendo</ref>  (7),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">dirigencia</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">coparticipación</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">catamarca</ref>  (7),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">pbi</ref>  (9).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2009_cl_bachelet</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">sello</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">fortalecidos</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">crisis</ref>  (48),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">gente</ref>  (24),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">aplauso</ref>  (4).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2009_co_uribe</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">colombia</ref>  (20),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">calzada</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">contributivo</ref>  (5),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">desplazados</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">notificado</ref>  (3).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2009_mx_calderon</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">federal</ref>  (27),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">organizado</ref>  (10),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">cambiar</ref>  (13),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">propongo</ref>  (8),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">policiacos</ref>  (4).</item>
+                                    <item>
+                                        <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">2009_pe_garcia</ref>:  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">lima</ref>  (11),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">1,500</ref>  (6),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">tingo</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">pampas</ref>  (4),  <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">desorden</ref>  (6).</item>
+                                </list>
+                            </div>
+                        </div>
+                    </div>
+                    <div type="3">
+                        <head>Palabras en contexto</head>
+                        <p>El proyecto con el que algunas historias dan por inauguradas las Humanidades Digitales es el <emph>Index Thomisticus</emph>, una concordancia de la obra de Tomás de Aquino liderada por el filólogo y religioso Roberto Busa (Hockey, 2004), en la que participaron decenas de mujeres en la codificación (Terras, 2013). Este proyecto que tomó años en completarse, es una función integrada en Voyant Tools: en la esquina inferior derecha, en la ventana de "Contextos" es posible hacer consultas de las concordancias izquierdas y derechas de términos específicos.</p>
+                        <p>La tabla que vemos tiene las siguientes columnas predeterminadas:</p>
+                        <list type="ordered">
+                            <item>
+                                <hi rend="bold">Documento</hi>: aquí aparece el nombre del documento en el que ocurre(n) la(s) palabra(s) clave(s)  de la consulta</item>
+                            <item>
+                                <hi rend="bold">Izquierda</hi>: contexto izquierdo de la palabra clave (este puede ser modificado para abarcar más palabras o menos y si se da clic sobre la celda, ésta se expande para mostrar más contexto)</item>
+                            <item>
+                                <hi rend="bold">Términos</hi>: palabra(s) clave(s) de la consulta</item>
+                            <item>
+                                <hi rend="bold">Derecha</hi>: contexto derecho</item>
+                        </list>
+                        <p>Se puede añadir la columna <hi rend="bold">Posición</hi> que indica el lugar en el documento en el que se encuentra el término consultado:</p>
+                        <figure>
+                            <desc>Agregar columna de posición</desc>
+                            <graphic url="posicion.png"/>
+                        </figure>
+                        <quote>
+                            <p>
+                                <hi rend="bold">Consulta avanzada</hi> Voyant permite el uso de comodines para buscar variaciones de una palabra. Estas son algunas de las combinaciones</p>
+                            <list type="unordered">
+                                <item>
+                                    <hi rend="bold">famili<code rend="inline">*</code>
+                                    </hi>: esta consulta arrojará todas las palabras que empiecen con el prefijo "famili" (familias, familiares, familiar, familia)</item>
+                                <item>
+                                    <hi rend="bold">
+                                        <code rend="inline">*</code>ción</hi>: términos que terminan con el sufijo "ción" (contaminación, militarización, fabricación)</item>
+                                <item>
+                                    <hi rend="bold">pobreza, desigualdad</hi>: puedes buscar más de un término separándolos por comas</item>
+                                <item>
+                                    <hi rend="bold">"contra la pobreza"</hi>: buscar la frase exacta</item>
+                                <item>
+                                    <hi rend="bold">"pobreza extrema"~ 5</hi>:  buscar los términos dentro de las comillas, el orden no importa, y pueden haber hasta 5 palabras de por medio (esa condición regresaría frases cómo "la extrema desigualdad y la pobreza" donde se encuentra la palabra "pobreza" y "extrema"</item>
+                            </list>
+                        </quote>
+                        <h5>
+                            <emph>Actividad 9</emph>
+                        </h5>
+                        <list type="ordered">
+                            <item>Busca el uso de algún término que te parezca interesante, utiliza alguna de las estrategias de la consulta avanzada</item>
+                            <item>Ordena las filas usando las diferentes columnas (Documento, Izquierda, Derecha y Posición): ¿qué conclusiones puedes derivar sobre tus términos utilizando la información de estas columnas?</item>
+                        </list>
+                        <quote>
+                            <p>
+                                <hi rend="bold">Cuidado</hi>: el orden de las palabras en la columna "Izquierda" es inverso; es decir, de derecha a izquierda desde la palabra clave.</p>
+                        </quote>
+                        <div type="4">
+                            <head>Exportando las tablas</head>
+                            <p>Para exportar los datos se da clic en el cuadro con flecha que aparece cuando pasas el cursor sobre la esquina derecha de "Contextos". En seguida se selecciona la opción “Exportar datos actuales” y se da clic sobre la última opción <hi rend="bold">Export all available data as tab separated values (text)grid</hi>.</p>
+                            <p>Eso lleva a una página donde están separados los campos por un tabulador:</p>
+                            <figure>
+                                <desc>Exportar contextos</desc>
+                                <graphic url="exportar_contextos.png"/>
+                            </figure>
+                            <p>Selecciona todos los datos (Ctrl+A o Ctrl+E); copiálos (Ctrl+C) y pégalos en una hoja de cálculo (Ctrl+V). Si esto no funciona, guarda los datos como en un editor sencillo de texto como .txt (¡no olvides la codificación UTF-8!) y luego en tu hoja de cálculo importa los datos. En Excel esto se hace en la pestaña de "Datos" y después “Desde un archivo de texto”</p>
+                            <figure>
+                                <desc>Importar datos desde un archivo de textos</desc>
+                                <graphic url="datos_archivo_de_texto.png"/>
+                            </figure>
+                        </div>
+                    </div>
+                </div>
+                <div type="2">
+                    <head>Respuestas a las actividades</head>
+                    <div type="3">
+                        <head>Actividad 1</head>
+                        <p>Este corpus tiene 2 documentos con un total de palabras de 4 y 3 palabras únicas <emph>(tengo, hambre, sueño)</emph>
+                        </p>
+                    </div>
+                    <div type="3">
+                        <head>Actividad 2</head>
+                        <p>
+                            <hi rend="bold">1)</hi> Podríamos observar, por ejemplo, que los textos más largos son de dos países: Chile y Argentina, y de tres presidentes distintos: Kirchner, Bachelet y Pinera. Sobre los más cortos podríamos ver que si bien el más corto es de Perú, en realidad los que más aparecen entre los breves son los de México y Colombia.</p>
+                        <p>
+                            <hi rend="bold">2)</hi> Saber la extensión de nuestros textos nos permite entender la homogeneidad o disparidad de nuestro corpus, así como entender ciertas tendencias (por ejemplo, en qué años tendían a ser más cortos los discursos, en qué momento cambió la extensión, etc.)</p>
+                    </div>
+                    <div type="3">
+                        <head>Actividad 3</head>
+                        <p>
+                            <hi rend="bold">1)</hi> La primera estrofa tiene 23 palabras y 20 son palabras únicas, por lo que 20/23 da igual a una densidad de vocabulario de 0.870; en realidad de 0.869 pero Voyant Tools redondea estos números: <ref target="https://voyant-tools.org/?corpus=b6b17408eb605cb1477756ce412de78e">https://voyant-tools.org/?corpus=b6b17408eb605cb1477756ce412de78e</ref>. La segunda estrofa tiene 24 palabras y 20 son palabras únicas, por lo que 20/24 da igual a una densidad de vocabulario de 0.833: <ref target="https://voyant-tools.org/?corpus=366630ce91f54ed3577a0873d601d714">https://voyant-tools.org/?corpus=366630ce91f54ed3577a0873d601d714</ref>.</p>
+                        <p>Como podemos observar la diferencia entre un verso de Sor Juana Inés de la Cruz y otro compuesto por Érika Ender, Daddy Yankee y Luis Fonsi tienen una diferencia de densidad de 0.037, que no es muy alto. Debemos tener cuidado al interpretar estos números pues sólo son un indicador cuantitativo de la riqueza del vocabulario y no incluye parámetros como la complejidad de la rima o de los términos.</p>
+                        <p>Parece haber una correspondencia entre los discursos más cortos y los más densos, esto es natural pues entre más breve es un texto menos "oportunidad" hay para repetirse. No obstante, esto también podría decirnos algo sobre los estilos de diferentes países o presidentes. Entre menos densidad es más probable que recurran a más recursos retóricos.</p>
+                    </div>
+                    <div type="3">
+                        <head>Actividad 4</head>
+                        <p>Estos resultados parecen indicar que la presidenta Kirchner, además de tener los discursos más largos es la que hace frases más largas; sin embargo tenemos que tener cuidado con las conclusiones de este tipo pues se trata de discursos orales en los que la puntuación depende de quien transcribe el texto.</p>
+                    </div>
+                    <div type="3">
+                        <head>Actividad 5</head>
+                        <list type="ordered">
+                            <item>
+                                <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">a</ref> (5943); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">más</ref> (1946); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">no</ref> (1694); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">mil</ref> (1045); <ref target="https://voyant-tools.org/?corpus=77227f21c006f5ef083d820d77667627#">millones</ref> (971)</item>
+                            <item>La primera palabra es una preposición, la segunda un adverbio de comparición y la tercera un adverbio de negación. Estas palabras podrían ser significativas si lo que se busca comprender es el uso de este tipo de palabras funcionales. Sin embargo, si lo que se  busca son más bien sustantivos, habrá que hacer un filtrado (ver sección: "Palabras más frecuentes")</item>
+                        </list>
+                    </div>
+                </div>
+                <div type="2">
+                    <head>Bibliografía</head>
+                    <p>Hockey, Susan. 2004 “The History of Humanities Computing”. <emph>A Companion to Digital Humanities</emph>. Schreibman et al. (editores). Blackwell Publishing Ltd. <ref target="doi:10.1002/9780470999875.ch1">doi:10.1002/9780470999875.ch1</ref>.</p>
+                    <p>Peña, Gilberto Anguiano, y Catalina Naumis Peña. 2015. «Extracción de candidatos a términos de un corpus de la lengua general». <emph>Investigación Bibliotecológica: Archivonomía, Bibliotecología e Información</emph> 29 (67): 19-45. <ref target="https://doi.org/10.1016/j.ibbai.2016.02.035">https://doi.org/10.1016/j.ibbai.2016.02.035</ref>.</p>
+                    <p>Sinclair, Stéfan and Geoffrey Rockwell, 2016.  <emph>Voyant Tools</emph>. Web. <ref target="http://voyant-tools.org/">http://voyant-tools.org/</ref>.</p>
+                    <p>Terras, Melissa, 2013. "For Ada Lovelace Day – Father Busa’s Female Punch Card Operatives". <emph>Melissa Terras' Blog</emph>. Web. <ref target="http://melissaterras.blogspot.com/2013/10/for-ada-lovelace-day-father-busas.html">http://melissaterras.blogspot.com/2013/10/for-ada-lovelace-day-father-busas.html</ref>.</p>
+                    <p style="alert alert-warning">
+Este tutorial fue escrito gracias al apoyo de la Academia Británica y preparado durante el Taller de escritura de The Programming Historian en la Universidad de los Andes en Bogotá, Colombia, el del 31 de julio al 3 de agosto de 2018.
 </p>
-</div><div type="2"><head>Notas al pie</head>
-<p><ref type="footnotemark" target="#note_1"/> : Los textos de Per&#250; fueron recopilados por a <ref target="https://twitter.com/madvivacious">Pamela Sertzen</ref>
-<ref type="footnotemark" target="#note_2"/> : Existen formas m&#225;s complejas para cargar el corpus que <ref target="https://voyant-tools.org/docs/#%21/guide/corpuscreator">puedes consultar en la documentaci&#243;n en ingl&#233;s</ref>.
-<ref type="footnotemark" target="#note_3"/> :  Para m&#225;s informaci&#243;n, consulta la documentaci&#243;n en ingl&#233;s.</p>
-</div></div>
-    </body>
-  </text>
+                </div>
+                <div type="2">
+                    <head>Notas al pie</head>
+                    <p>
+                        <ref type="footnotemark" target="#es_note_1"/> : Los textos de Perú fueron recopilados por a <ref target="https://twitter.com/madvivacious">Pamela Sertzen</ref>
+                        <ref type="footnotemark" target="#es_note_2"/> : Existen formas más complejas para cargar el corpus que <ref target="https://voyant-tools.org/docs/#%21/guide/corpuscreator">puedes consultar en la documentación en inglés</ref>.
+<ref type="footnotemark" target="#es_note_3"/> :  Para más información, consulta la documentación en inglés.</p>
+                </div>
+            </div>
+        </body>
+    </text>
 </TEI>

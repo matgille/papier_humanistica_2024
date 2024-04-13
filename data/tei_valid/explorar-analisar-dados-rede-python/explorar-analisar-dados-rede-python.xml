@@ -1,0 +1,401 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="explorar-analisar-dados-rede-python">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Explorar e Analisar Dados de Rede com Python</title>
+                <author role="original_author">
+                    <persName>John R. Ladd</persName>
+                    <persName>Jessica Otis</persName>
+                    <persName>Christopher N. Warren</persName>
+                    <persName>Scott Weingart</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Elisa Beshero-Bondar</persName>
+                    <persName>Anne Chao</persName>
+                    <persName>Qiwei Li</persName>
+                </editor>
+                <author role="translators">João Domingues Pereira</author>
+                <editor role="translation-reviewers">
+                    <persName>Josir Cardoso Gomes</persName>
+                    <persName>Daniel Alves</persName>
+                </editor>
+                <editor role="editors">Brandon Walsh</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">05/12/2023</date>
+                <idno type="doi">10.46430/phpt0041</idno>
+                <date type="published">06/16/2017</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#exploring-and-analyzing-network-data-with-python"/>.</p>
+                <p>There are other translations: <ref target=""/>
+                </p>
+                <p>There are other translations: <ref target=""/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Esta lição introduz métricas de rede e como tirar conclusões das mesmas quando se trabalha com dados de Humanidades. O leitor aprenderá como usar o pacote NetworkX do Python para produzir e trabalhar com estas estatísticas de rede.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">network-analysis</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <div type="1">
+                <head>Introdução</head>
+                <div type="2">
+                    <head>Objetivos da Lição</head>
+                    <p>Neste tutorial, o leitor irá aprender:</p>
+                    <list type="unordered">
+                        <item>A usar o pacote <ref target="https://perma.cc/F574-RREU">
+                                <hi rend="bold">NetworkX</hi>
+                            </ref> para trabalhar com dados de rede em <ref target="/pt/licoes/introducao-instalacao-python">
+                                <hi rend="bold">Python</hi>
+                            </ref>; e</item>
+                        <item>
+A analisar dados de rede de Humanidades para encontrar:<list type="unordered">
+                                <item>Estruturas de rede e comprimentos de caminho,</item>
+                                <item>Nós importantes ou centrais, e</item>
+                                <item>Comunidades e subgrupos.</item>
+                            </list>
+                        </item>
+                    </list>
+                    <p>
+                        <hi rend="bold">n.b.</hi>: Este é um tutorial para explorar estatísticas e métricas de rede. Assim sendo, iremos focar-nos em maneiras de analisar e tirar conclusões a partir de redes sem visualizá-las. Provavelmente, o leitor quererá uma combinação de visualização e métricas de rede no seu próprio projeto, e, por isso, nós recomendamos este artigo como um complemento a <ref target="/en/lessons/creating-network-diagrams-from-historical-sources">este tutorial anterior do <emph>Programming Historian</emph>
+                        </ref> (em inglês)<ref type="footnotemark" target="#note_1"/>.</p>
+                </div>
+                <div type="2">
+                    <head>Pré-Requisitos</head>
+                    <p>Este tutorial assume que o leitor:</p>
+                    <list type="unordered">
+                        <item>Tem uma familiaridade básica com redes e/ou leu <ref target="/en/lessons/creating-network-diagrams-from-historical-sources">
+                                <emph>From Hermeneutics to Data to Networks: Data Extraction and Network Visualization of Historical Sources</emph>
+                            </ref> (em inglês), de Marten Düring, aqui no <emph>Programming Historian</emph>;</item>
+                        <item>Instalou o Python 3, não o Python 2 que é nativamente instalado em sistemas operacionais com base no Unix, como os Macs (se precisar de assistência com a instalação do Python 3, veja <ref target="https://perma.cc/DP2N-B4EN">The Hitchhiker's Guide to Python</ref> (em inglês); e</item>
+                        <item>Instalou o instalador de pacotes <code rend="inline">pip</code>
+                            <ref type="footnotemark" target="#note_2"/>.</item>
+                    </list>
+                    <p>É possível ter duas versões do Python (2 <emph>e</emph> 3) instaladas no seu computador ao mesmo tempo. Por esta razão, ao aceder ao Python 3, o leitor frequentemente terá que o declarar explicitamente digitando <code rend="inline">python3</code> e <code rend="inline">pip3</code> em vez de simplesmente <code rend="inline">python</code> e <code rend="inline">pip</code>. Consulte os tutoriais do <emph>Programming Historian</emph> sobre a <ref target="/pt/licoes/introducao-instalacao-python">instalação do Python</ref> e o <ref target="/pt/licoes/instalacao-modulos-python-pip">uso do pip</ref> para mais informações<ref type="footnotemark" target="#note_3"/>.</p>
+                </div>
+                <div type="2">
+                    <head>O Que o Leitor Pode Aprender a Partir dos Dados de Rede?</head>
+                    <p>Há muito que as redes interessam aos pesquisadores nas Humanidades, mas muitos académicos recentes progrediram dum interesse grandemente qualitativo e metafórico em links e conexões para um séquito mais formal de ferramentas quantitativas para estudar mediadores, <emph>hubs</emph> (nós importantes) e estruturas interconectadas. Como o sociólogo Mark S. Granovetter apontou no seu importante artigo de maio de 1973 <ref target="https://perma.cc/A4PC-WPKN">
+                            <emph>The Strength of Weak Ties</emph>
+                        </ref> (em inglês), raramente é suficiente notar que duas pessoas estavam conectadas uma à outra. Fatores como a sua relação estrutural com outras pessoas e se essas pessoas adicionais estavam, elas próprias, conectadas umas às outras têm influência decisiva nos eventos. Na medida em que até o mais perspicaz dos académicos tem dificuldade em perceber, digamos, o contorno geral duma rede (a sua "Topologia" de rede) e em identificar os nós mais significativos para conectar grupos, a análise quantitativa de rede oferece aos académicos um modo de transitar relativamente fluidamente entre o objeto social de larga escala (o "grafo") e as particularidades minuciosas das pessoas e laços sociais.</p>
+                    <p>Este tutorial irá ajudá-lo a responder questões como:</p>
+                    <list type="unordered">
+                        <item>Qual é a estrutura geral da rede?</item>
+                        <item>Quem são as pessoas importantes, ou <emph>hubs</emph>, na rede?</item>
+                        <item>Quais são os subgrupos e comunidades na rede?</item>
+                    </list>
+                </div>
+                <div type="2">
+                    <head>O Nosso Exemplo: a Sociedade dos Amigos</head>
+                    <p>Antes que existissem amigos do Facebook, havia a Sociedade dos Amigos, conhecida como os <emph>quakers</emph>. Fundados na Inglaterra em meados do século XVII, os <emph>quakers</emph> eram cristãos protestantes que divergiram da oficial Igreja da Inglaterra e que promoviam uma ampla tolerância religiosa, preferindo a suposta "luz interior" (<emph>inner light</emph>; <hi rend="bold">nota de tradução</hi>: este conceito tinha uma extrema importância na Teologia <emph>quaker</emph>) e as consciências dos cristãos à ortodoxia imposta pelo Estado. O número de <emph>quakers</emph> cresceu rapidamente de meados para os finais do século XVII e os seus membros espalharam-se pelas Ilhas Britânicas, pela Europa e pelas colônias do Novo Mundo---especialmente pela Pensilvânia, fundada pelo líder <emph>quaker</emph> William Penn e lar dos quatro autores.</p>
+                    <p>Visto que os académicos há muito que ligam o crescimento e a persistência dos <emph>quakers</emph> à eficácia das suas redes, os dados usados neste tutorial são uma lista de nomes e relações entre os primevos <emph>quakers</emph> do século XVII. Este <emph>dataset</emph> é derivado do <ref target="http://www.oxforddnb.com">
+                            <emph>Oxford Dictionary of National Biography</emph>
+                        </ref> (em inglês) e do trabalho em progresso do projeto <ref target="http://www.sixdegreesoffrancisbacon.com">
+                            <emph>Six Degrees of Francis Bacon</emph>
+                        </ref> (em inglês), o qual está a reconstruir as redes sociais da Grã-Bretanha moderna (1500-1700).</p>
+                </div>
+            </div>
+            <div type="1">
+                <head>Preparação dos Dados e Instalação do NetworkX</head>
+                <p>Antes de iniciar este tutorial, o leitor precisará de fazer o download de dois ficheiros que, combinados, constituem o <emph>dataset</emph> da nossa rede. O ficheiro <ref target="/assets/exploring-and-analyzing-network-data-with-python/quakers_nodelist.csv">quakers_nodelist.csv</ref> é uma lista de <emph>quakers</emph> modernos (nós) e o ficheiro <ref target="/assets/exploring-and-analyzing-network-data-with-python/quakers_edgelist.csv">quakers_edgelist.csv</ref> é uma lista de relações entre esses <emph>quakers</emph> (<emph>edges</emph>). Para fazer o download destes ficheiros, basta clicar com o botão direito do <emph>mouse</emph> nos <emph>links</emph> e escolher "Guardar ligação como".</p>
+                <p>Será extremamente útil ao leitor familiarizar-se com a estrutura do <emph>dataset</emph> antes de continuar. Para mais informações sobre a estrutura geral dos <emph>datasets</emph> de rede, veja <ref target="/en/lessons/creating-network-diagrams-from-historical-sources#developing-a-coding-scheme">este tutorial</ref> (em inglês). Quando o leitor abrir o ficheiro de nós no programa da sua escolha, verá que cada <emph>quaker</emph> é primeiramente identificado pelo seu <emph>name</emph> (nome). Cada nó dum <emph>quaker</emph> também tem um número de atributos associados, incluindo <emph>historical significance</emph> (em português, significado histórico), <emph>gender</emph> (em português, género), <emph>birth</emph>/<emph>death dates</emph> (em português, datas de nascimento/morte), e o SDFB ID---um identificador numérico exclusivo que lhe permitirá cruzar nós neste <emph>dataset</emph> com o <emph>dataset</emph> original do <emph>Six Degrees of Francis Bacon</emph>, se desejado. Aqui estão as primeiras linhas:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_0" corresp="code_explorar-analisar-dados-rede-python_0.txt" rend="block"/>
+                </ab>
+                <p>Note que, embora as colunas não estejam corretamente alinhadas como ocorre numa tabela de dados, as vírgulas mantêm tudo apropriadamente separado.</p>
+                <p>Quando o leitor abrir o ficheiro de <emph>edges</emph>, verá que nós usamos os <emph>names</emph> do ficheiro de nós para identificar os nós conectados por cada <emph>edge</emph>. Estas <emph>edges</emph> começam num nó <emph>
+                        <hi rend="bold">source</hi>
+                    </emph> (em português, origem) e acabam num nó <emph>
+                        <hi rend="bold">target</hi>
+                    </emph> (em português, destino). Embora esta linguagem derive das chamadas estruturas de rede <hi rend="bold">direcionadas</hi>, nós usaremos os nossos dados como uma rede <hi rend="bold">não direcionada</hi>: se a Pessoa A conhece a Pessoa B, então a Pessoa B também deve conhecer a Pessoa A. Nas redes direcionadas, as relações não precisam de ser recíprocas (a Pessoa A pode enviar uma carta à B sem receber uma em troca), mas nas redes não direcionadas as conexões são sempre recíprocas, ou <hi rend="bold">simétricas</hi>. Uma vez que esta é uma rede de quem conhecia quem ao invés de, digamos, uma rede epistolar, um conjunto de relações não direcionadas é o mais apropriado. As relações simétricas nas redes não direcionadas são úteis sempre que estiver preocupado com relações que definem o mesmo papel para ambas as partes. Dois amigos têm uma relação simétrica: cada um deles é um amigo do outro. O autor e o destinatário duma carta têm uma relação assimétrica porque cada um tem um papel diferente. Tanto as redes direcionadas como as não direcionadas têm os seus próprios recursos (e, por vezes, as suas próprias métricas), e o leitor quererá escolher aquela que melhor se adapta aos tipos de relações que está a registrar e às questões que quer clarificar. Aqui estão as primeiras <emph>edges</emph> na rede <emph>quaker</emph> não direcionada:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_1" corresp="code_explorar-analisar-dados-rede-python_1.txt" rend="block"/>
+                </ab>
+                <p>Agora que fez o download dos dados <emph>quakers</emph> e viu como estão estruturados, está na hora de começar a trabalhar com esses dados no Python. Assim que tanto o Python como o pip estiverem instalados (ver Pré-Requisitos, acima), quererá instalar o NetworkX, digitando isto na sua <ref target="/en/lessons/intro-to-bash">linha de comandos</ref> (em inglês):<ref type="footnotemark" target="#note_4"/>
+                </p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_2" corresp="code_explorar-analisar-dados-rede-python_2.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Uma nota curta sobre controle de versão: este tutorial usa NetworkX 3.1, mas a biblioteca está em desenvolvimento ativo e é atualizada com frequência. Recomendamos usar o comando de instalação acima para garantir que a sua versão do NetworkX corresponde ao código abaixo (em vez de simplesmente instalar a versão mais recente). Se já tiver uma versão mais antiga do NetworkX instalada, execute <code rend="inline">pip3 install networkx==3.1 --upgrade</code> antes de tentar o tutorial<ref type="footnotemark" target="#note_5"/>.</p>
+                <p>Está feito! Está preparado para começar a codificar.</p>
+            </div>
+            <div type="1">
+                <head>Começando</head>
+                <h2>Ler Ficheiros, Importar Dados</h2>
+                <p>Inicie um novo ficheiro de texto simples, em branco, no mesmo diretório que os seus ficheiros de dados chamado <code rend="inline">quaker_network.py</code> (para mais detalhes sobre a instalação e execução do Python, ver <ref target="/pt/licoes/instalacao-windows">este tutorial</ref>). No topo desse ficheiro, importe as bibliotecas de que precisa. O leitor precisará de três bibliotecas---aquela que acabámos de instalar, e duas bibliotecas incorporadas no Python. Pode digitar:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_3" corresp="code_explorar-analisar-dados-rede-python_3.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Agora pode ordenar ao programa para ler os seus ficheiros de CSV e retirar os dados de que precisa. Ironicamente, ler ficheiros e reorganizar os dados geralmente requer um código mais complexo que as funções para executar uma análise de redes sociais, portanto pedimos que tenha paciência connosco ao longo deste primeiro bloco de código. Aqui está um conjunto de comandos para abrir e ler os ficheiros das nossas listas de nós e de <emph>edges</emph>:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_4" corresp="code_explorar-analisar-dados-rede-python_4.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Este código executa funções similares às <ref target="/pt/licoes/trabalhando-ficheiros-texto-python">deste tutorial</ref>, mas usa o módulo CSV para carregar os seus nós e <emph>edges</emph>. Mais tarde, o leitor voltará a atuar sobre os dados e obterá mais informação sobre os nós, mas, por agora, precisa de duas coisas: a lista completa de nós e uma lista de pares <emph>edges</emph> (como énuplos de nós)<ref type="footnotemark" target="#note_6"/>. Estas são as formas de que o NetworkX precisará para criar um "objeto grafo", um tipo de dados especial do NetworkX sobre o qual o leitor aprenderá na próxima secção.</p>
+                <p>Nesta fase, antes de começar a usar o NetworkX, o leitor pode fazer algumas verificações de sanidade básicas para se certificar que os seus dados foram corretamente carregados usando funções e métodos incorporados no Python. Digitando:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_5" corresp="code_explorar-analisar-dados-rede-python_5.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>e:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_6" corresp="code_explorar-analisar-dados-rede-python_6.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>e, depois, executando o seu <emph>script</emph> lhe mostrará quantos nós e <emph>edges</emph> carregou com sucesso no Python. Se o leitor vir 119 nós e 174 <emph>edges</emph>, então tem todos os dados necessários.</p>
+                <h2>Noções Básicas do NetworkX: Criar o Grafo</h2>
+                <p>Agora o leitor tem os seus dados como duas listas do Python: uma lista de nós (<code rend="inline">node_names</code>) e uma lista de <emph>edges</emph> (<code rend="inline">edges</code>). No NetworkX, o leitor pode juntar estas duas listas num só objeto rede que compreende como os nós e as <emph>edges</emph> se relacionam. Este objeto é chamado de <hi rend="bold">Grafo</hi>, referindo-se a um dos termos comuns para dados organizados como uma rede <hi rend="bold">n.b.</hi>: não se refere a alguma representação visual dos dados. Aqui, grafo é usado puramente num sentido matemático, de análise de rede. Primeiro, o leitor deve <emph>inicializar</emph> um objeto Grafo com o seguinte comando:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_7" corresp="code_explorar-analisar-dados-rede-python_7.txt" lang="language-python" rend="block"/>
+                </ab>
+                <quote>
+                    <p>
+                        <hi rend="bold">Nota de tradução</hi>: em inglês, 'gráfico' pode ser traduzido como '<emph>graphic</emph>' ou, de forma diminutiva, como '<emph>graph</emph>', que também pode significar 'grafo', o termo aqui referido. Esta homografia não ocorre no português.</p>
+                </quote>
+                <p>Isto criará um novo objeto grafo, <emph>G</emph>, com nada nele. Agora, o leitor pode adicionar as suas listas de nós e de <emph>edges</emph> assim:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_8" corresp="code_explorar-analisar-dados-rede-python_8.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Esta é uma de várias maneiras de adicionar dados a um objeto rede. O leitor pode verificar a <ref target="https://perma.cc/3QVU-FLPF">documentação do NetworkX</ref> (em inglês) para obter mais informações sobre como adicionar <emph>weighted edges</emph>, ou adicionar nós e <emph>edges</emph> uma de cada vez.</p>
+                <p>Finalmente, o leitor pode obter informação básica sobre a sua rede recém-criada usando a função <code rend="inline">info</code>:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_9" corresp="code_explorar-analisar-dados-rede-python_9.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>A função <code rend="inline">info</code> informa o tipo da sua rede (neste caso, é um objeto Graph padrão) e o número de nós e arestas na mesma. O <emph>output</emph> deve ser parecido a este:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_10" corresp="code_explorar-analisar-dados-rede-python_10.txt" rend="block"/>
+                </ab>
+                <p>Esta é uma forma rápida de obter informação geral sobre o seu grafo, mas como o leitor aprenderá em secções subsequentes, está apenas a passar pela superfície do que o NetworkX lhe pode indicar sobre os seus dados.</p>
+                <p>Para recapitular, de momento o seu <emph>script</emph> será semelhante a isto:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_11" corresp="code_explorar-analisar-dados-rede-python_11.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Até agora, o leitor leu dados de nós e de <emph>edges</emph> no Python a partir de ficheiros CSV, e, depois, contou esses nós e <emph>edges</emph>. Depois disso, o leitor criou um objeto grafo usando o NetworkX e carregou os seus dados para esse objeto.</p>
+                <h2>Adicionar Atributos</h2>
+                <p>Para o NetworkX, um objeto grafo é uma coisa grande (a sua rede) composta por dois tipos de coisas mais pequenas (os seus nós e as suas <emph>edges</emph>). Até agora, o leitor carregou nós e <emph>edges</emph> (como pares de nós), mas o NetworkX permite-lhe adicionar <emph>atributos</emph> tanto aos nós como às <emph>edges</emph>, providenciando mais informação sobre cada um deles. Mais à frente neste tutorial, o leitor executará métricas e adicionará alguns dos resultados de volta ao Grafo como atributos. Por agora, vamos certificar-nos que o seu Grafo contém todos os atributos que estão atualmente no seu CSV.</p>
+                <p>O leitor quererá retornar a uma lista que criou no início do seu <emph>script</emph>: <code rend="inline">nodes</code>. Esta lista contém todas as linhas do <code rend="inline">quakers_nodelist.csv</code>, incluindo colunas para o <emph>name</emph>, a <emph>historical significance</emph>, o <emph>gender</emph>, o <emph>birth year</emph>, o <emph>death year</emph> e o SDFB ID. O leitor quererá iterar por esta lista e adicionar esta informação ao nosso grafo. Existem algumas maneiras de fazer isto, mas o NetworkX providencia duas funções convenientes para adicionar atributos a todos os nós e <emph>edges</emph> dum Grafo duma só vez: <code rend="inline">nx.set_node_attributes()</code> e <code rend="inline">nx.set_edge_attributes()</code>. Para usar estas funções, o leitor irá precisar que os seus dados de atributos estejam na forma dum <emph>dicionário</emph> Python, no qual os nomes dos nós são as <emph>chaves</emph> e os atributos que quer adicionar são os <emph>valores</emph>
+                    <ref type="footnotemark" target="#note_7"/>. O leitor quererá criar um dicionário para cada um dos seus atributos, e, depois, adicioná-los usando as funções acima. A primeira coisa que o leitor deve fazer é criar cinco dicionários em branco, usando chavetas:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_12" corresp="code_explorar-analisar-dados-rede-python_12.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Agora nós podemos fazer o <emph>loop</emph> através da nossa lista de <code rend="inline">nodes</code> e adicionar os itens apropriados a cada dicionário. Nós fazemos isto sabendo antecipadamente a posição, ou <emph>índice</emph>, de cada atributo. Porque o nosso ficheiro <code rend="inline">quaker_nodelist.csv</code> está bem organizado, nós sabemos que o <emph>name</emph> da pessoa será sempre o primeiro item no lista: índice 0, visto que começamos sempre a contar do 0 no Python. A <emph>historical significance</emph> da pessoa será o índice 1, o seu <emph>gender</emph> será o índice 2, e assim por diante. Portanto, nós podemos construir os nossos dicionários desta forma<ref type="footnotemark" target="#note_8"/> :</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_13" corresp="code_explorar-analisar-dados-rede-python_13.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Agora o leitor tem um conjunto de dicionários que pode usar para adicionar atributos a nós no seu objeto Grafo. A função <code rend="inline">set_node_attributes</code> toma três variáveis: o Grafo ao qual o leitor está a adicionar o atributo, o dicionário de pares id-atributo, e o nome do novo atributo. O código para adicionar os seus seis atributos assemelha-se a isto:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_14" corresp="code_explorar-analisar-dados-rede-python_14.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Agora todos os seus nós têm estes seis atributos, e o leitor pode aceder a eles a qualquer momento. Por exemplo, o leitor pode obter todos os <emph>birth years</emph> dos seus nós iterando por eles e acedendo ao atributo <code rend="inline">birth_year</code>, assim:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_15" corresp="code_explorar-analisar-dados-rede-python_15.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>A partir desta instrução, o leitor obterá uma linha de <emph>output</emph> para cada nó na rede. Deve parecer-se como uma simples lista de nomes e anos:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_16" corresp="code_explorar-analisar-dados-rede-python_16.txt" rend="block"/>
+                </ab>
+                <p>Os passos acima são um método comum para adicionar atributos a nós que o leitor usará repetidamente mais tarde neste tutorial. Aqui está uma recapitulação do bloco de código desta secção:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_17" corresp="code_explorar-analisar-dados-rede-python_17.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Agora o leitor aprendeu como criar um objeto Grafo e adicionar atributos ao mesmo. Nesta próxima secção, o leitor aprenderá sobre uma variedade de métricas disponíveis no NetworkX e como aceder às mesmas. Mas relaxe, acabou de aprender o maior parte do código de que precisará para o resto do tutorial!</p>
+            </div>
+            <div type="1">
+                <head>Métricas Disponíveis no NetworkX</head>
+                <p>Quando o leitor começa a trabalhar num novo <emph>dataset</emph>, é uma boa ideia obter uma visão geral dos dados. A primeira etapa, descrita acima, consiste simplesmente em abrir os ficheiros e ver o que está lá dentro. Porque é uma rede, o leitor sabe que existirão nós e <emph>edges</emph>, mas quantos de cada um existem? Que informação está anexada a cada nó ou <emph>edge</emph>?</p>
+                <p>No nosso caso, existem 174 <emph>edges</emph> e 119 nós. Estas <emph>edges</emph> não têm direções (isto é, existe uma relação simétrica entre pessoas), nem incluem informação adicional. Para os nós, nós sabemos os seus <emph>names</emph>, a sua <emph>historical significance</emph>, o seu <emph>genders</emph>, a sua <emph>birth date</emph> e <emph>death date</emph>, e o SDFB ID.</p>
+                <p>Estes detalhes informam o que o leitor pode ou devia fazer com o seu <emph>dataset</emph>. Muitos poucos nós (digamos, 15), e uma análise de rede é menos útil que desenhar uma imagem ou fazer algumas leituras; Demasiadas (digamos, 15 milhões), e o leitor deveria considerar começar com um subconjunto ou encontrar um supercomputador.</p>
+                <p>As propriedades da rede também guiam a sua análise. Porque esta rede é <hi rend="bold">não direcionada</hi>, a sua análise tem que usar métricas que exigem <emph>edges</emph> simétricas entre nós. Por exemplo, o leitor pode determinar em que comunidades as pessoas se encontram, mas não pode determinar as rotas <emph>direcionais</emph> pelas quais a informação poderá fluir ao longo da rede (precisaria duma rede direcionada para isso). Ao usar as relações simétricas e não direcionadas neste caso, o leitor será capaz de encontrar subcomunidades e as pessoas que são importantes nessas comunidades, um processo que seria mais difícil (embora ainda que possível) com uma rede direcionada. O NetworkX permite-lhe realizar a maior parte das análises que o leitor pode conceber, mas deve compreender as possibilidades do seu <emph>dataset</emph> e perceber que alguns logaritmos do NetworkX são mais apropriados do que outros.</p>
+                <h3>O Formato da Rede</h3>
+                <p>Após ver a aparência do <emph>dataset</emph>, é importante ver a aparência da <emph>rede</emph>. Estas são coisas diferentes. O <emph>dataset</emph> é uma representação abstrata do que o leitor assume serem conexões entre entidades; a rede é a instanciação específica dessas suposições. A rede, pelo menos neste contexto, é como o computador, lê as conexões que o leitor codificou num <emph>dataset</emph>. A rede tem uma <ref target="https://perma.cc/8M84-GESG">Topologia</ref>, ou uma forma conectiva, que pode ser centralizada ou descentralizada; densa ou esparsa; cíclica ou linear. Um <emph>dataset</emph> não tem, fora da estrutura da tabela na qual está digitado.</p>
+                <p>O formato e as propriedades básicas da rede irão dar-lhe uma ideia sobre com o que está a trabalhar e que análises parecem razoáveis. O leitor já sabe o número de nós e de <emph>edges</emph>, mas a que a rede se 'assemelha'? Os nós agrupam-se, ou estão espalhados de forma regular? Existem estruturas complexas, ou cada nó está organizado numa linha reta?</p>
+                <p>A visualização abaixo, criada na ferramenta de visualização de redes <ref target="https://gephi.org/">Gephi</ref>, lhe dará uma ideia da Topologia desta rede<ref type="footnotemark" target="#note_9"/>. O leitor poderia criar um gráfico similar no Palladio usando <ref target="/en/lessons/creating-network-diagrams-from-historical-sources">este tutorial</ref> (em inglês).</p>
+                <figure>
+                    <desc>Visualização de rede baseada em força dos dados *quakers*, criado no Gephi.</desc>
+                    <graphic url="exploring-and-analyzing-network-data-with-python-1.png"/>
+                </figure>
+                <p>Existem várias formas de visualizar uma rede, e um <ref target="https://perma.cc/AM7G-BTWV">
+                        <emph>layout</emph> baseado em força</ref> (em inglês), do qual a imagem acima é um exemplo, encontra-se entre as mais comuns. Grafos baseados em força tentam encontrar o posicionamento ideal para nós com uma calculação baseada na <ref target="https://perma.cc/2RTL-CYVL">tensão de cordas segundo a Lei de Hooke</ref> (em inglês), a qual, para grafos mais pequenos, normalmente cria visualizações limpas e de leitura fácil. A visualização embutida acima mostra-lhe que existe um único grande <hi rend="bold">componente</hi> de nós conectados (no centro) e vários componentes pequenos com apenas uma ou duas conexões nas periferias. Esta é uma estrutura de rede relativamente comum. Sabendo que existem múltiplos componentes na rede irá limitar de forma útil as calculações que o leitor quererá realizar nela. Ao dispor o número de conexões (conhecidas como <hi rend="bold">grau</hi>, ver abaixo) como o tamanho dos nós, a visualização também mostra que existem alguns nós com muitas conexões que mantêm o componente central intricado. Estes grandes nós são conhecidos como <emph>
+                        <hi rend="bold">hubs</hi>
+                    </emph>, e o facto de eles aparecem tão claramente aqui dá-lhe uma pista em relação ao que o leitor encontrará quando medir a <hi rend="bold">centralidade</hi> na próxima secção.</p>
+                <p>Visualizações, no entanto, apenas o levam até certo ponto. Com quantas mais redes trabalhar, mais o leitor se aperceberá que a maior parte parece similar o suficiente ao ponto de ser difícil distinguir uma da outra. Métricas quantitativas deixam-no diferenciar redes, aprender sobre as suas Topologias, e tornar uma confusão de nós e <emph>edges</emph> em algo a partir do qual se pode aprender.</p>
+                <p>Uma boa métrica com a qual começar é a <hi rend="bold">densidade</hi> de rede. Isto é, simplesmente, o rácio de <emph>edges</emph> reais na rede face a todas as <emph>edges</emph> possíveis na rede. Numa rede não direcionada como esta, <emph>poderia</emph> haver uma única <emph>edge</emph> entre quaisquer dois nós, mas como o leitor viu na visualização, apenas algumas dessas <emph>edges</emph> possíveis estão realmente presentes. A densidade de rede dá-lhe uma ideia rápida do quão intimamente próxima a sua rede é.</p>
+                <p>E as boas notícias são que muitas destas métricas requerem comandos simples e unilineares no Python. Daqui para a frente, o leitor pode continuar a construir o seu bloco de código das secções anteriores. O leitor não tem de apagar nada que já tenha digitado, e porque criou o seu objeto rede <code rend="inline">G</code> no bloco de código acima, todas as métricas a partir daqui devem trabalhar corretamente.</p>
+                <p>O leitor pode calcular a densidade da rede executando <code rend="inline">nx.density(G)</code>. No entanto, a melhor maneira de fazer isto é armazenar a sua métrica numa variável para referência futura, e imprimir essa variável, como:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_18" corresp="code_explorar-analisar-dados-rede-python_18.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>O <emph>output</emph> da densidade é um número, então é isso que o leitor verá quando imprimir o valor. Neste caso, a densidade da nossa rede é, aproximadamente, 0.0248. Numa escala de 0 a 1, não é uma rede muito densa, o que confere com o que o leitor consegue ver na visualização<ref type="footnotemark" target="#note_10"/>. Um 0 significaria que não existem quaisquer conexões de todo, e um 1 indicaria que todas as <emph>edges possíveis</emph> estão presentes (uma rede perfeitamente conectada): esta rede <emph>quaker</emph> está na extremidade inferior dessa escala, mas, mesmo assim, longe do 0.</p>
+                <p>Uma medida de caminho mais curta é um pouco mais complexa. Ela calcula a série mais curta possível de nós e <emph>edges</emph> que se situam entre quaisquer dois nós, algo difícil de ver em visualizações de grandes redes. Esta medida corresponde, essencialmente, a encontrar amigos de amigos---se a minha mãe conhece alguém que eu não conheço, então a minha mãe é o caminho mais curto entre mim e essa pessoa. O jogo <emph>Six Degrees of Kevin Bacon</emph>, a partir do qual o <ref target="http://sixdegreesoffrancisbacon.com/">nosso projeto</ref> (em inglês) retira o nome, é basicamente um jogo que consiste em encontrar os caminhos mais curtos (com um <hi rend="bold">comprimento de caminho</hi> de seis ou menos) de Kevin Bacon a qualquer outro ator.</p>
+                <p>Para calcular um caminho mais curto, o leitor precisa de passar por várias variáveis de <emph>input</emph> (informação que dá a uma função do Python): o grafo inteiro, o seu nó <emph>source</emph>, e o seu nó <emph>target</emph>. Vamos procurar o caminho mais curto entre Margaret Fell e George Whitehead. Como usámos nomes para identificar unicamente os nossos nós nesta rede, o leitor pode aceder a esses nós (como a <emph>
+                        <hi rend="bold">source</hi>
+                    </emph> e o <emph>
+                        <hi rend="bold">target</hi>
+                    </emph> do seu caminho) usando os nomes diretamente.</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_19" corresp="code_explorar-analisar-dados-rede-python_19.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Dependendo do tamanho da sua rede, isto pode demorar algum tempo para calcular, visto que o Python primeiro encontra todos os caminhos possíveis e depois escolhe o mais curto. O <emph>output</emph> de <code rend="inline">shortest_path</code> será uma lista dos nós que incluí a "source" (Fell), o "target" (Whitehead), e os nós entre eles. Neste caso, nós podemos ver que o fundador dos <emph>quakers</emph>, George Fox, se encontra no caminho mais curto entre eles. Como Fox é também um <emph>
+                        <hi rend="bold">hub</hi>
+                    </emph> (ver centralidade de grau, abaixo) com muitas conexões, nós podemos supor que vários caminhos mais curtos passam por ele como mediador. O que é que isto pode indicar sobre a importância dos fundadores dos <emph>quakers</emph> para a sua rede social?</p>
+                <p>O Python incluí várias ferramentas que calculam os caminhos mais curtos. Existem funções para os comprimentos dos caminhos mais curtos, para todos os caminhos mais curtos, e para saber se um caminho existe ou não de todo na <ref target="https://perma.cc/3MJE-7MQQ">documentação</ref> (em inglês). O leitor poderia usar uma função separada para encontrar o comprimento do caminho <emph>Fell-Whitehead</emph> que acabámos de calcular, ou poderia simplesmente tomar o comprimento da lista menos um<ref type="footnotemark" target="#note_11"/>, assim:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_20" corresp="code_explorar-analisar-dados-rede-python_20.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Existem muitas métricas de rede derivadas dos comprimentos de caminho mais curtos. Uma tal medida é o <hi rend="bold">diâmetro</hi>, que é o mais longo de todos os caminhos mais curtos. Depois de calcular todos os caminhos mais curtos entre cada par de nós possível na rede, o diâmetro é o comprimento do caminho entre os dois nós que estão mais afastados. A medida está projetada para lhe dar um senso do tamanho geral da rede, a distância duma extremidade da rede à outra.</p>
+                <p>O diâmetro usa um comando simples: <code rend="inline">nx.diameter(G)</code>. No entanto, executar este comando no grafo <emph>quaker</emph> dará uma mensagem de erro indicando que o Grafo não está conectado ("<emph>not connected</emph>"). Isto significa apenas que o seu grafo, como o leitor já viu, tem mais que um componente. Porque existem alguns nós que não têm um caminho de todo com outros, é impossível encontrar todos os caminhos mais curtos. Veja novamente a visualização do seu grafo:</p>
+                <figure>
+                    <desc>Visualização de rede baseada em força dos dados *quakers*, criado no Gephi.</desc>
+                    <graphic url="exploring-and-analyzing-network-data-with-python-1.png"/>
+                </figure>
+                <p>Como não há caminho entre nós dum componente e nós doutro, <code rend="inline">nx.diameter()</code> retorna a mensagem de erro "<emph>not connected</emph>". O leitor pode remediar isto, primeiro, ao descobrir se o seu Grafo está conectado ("<emph>is connected</emph>") (<emph>i.e.</emph> tudo um componente) e, se não conectado, descobrir apenas o componente mais largo e calcular o diâmetro somente desse componente. Aqui está o código:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_21" corresp="code_explorar-analisar-dados-rede-python_21.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Como nós tomámos o componente mais largo, nós podemos assumir que não há nenhum diâmetro mais largo para os outros componentes. Portanto, esta figura é uma boa representação para o diâmetro de todo o Grafo. O diâmetro de rede do componente mais largo desta rede é 8: existe um comprimento de rede de 8 entre os dois nós mais afastados na rede. Ao contrário da densidade, que é apresentada de 0 a 1, é difícil saber a partir deste número somente se 8 é um diâmetro largo ou curto. Para algumas métricas globais, pode ser melhor compará-lo a redes de tamanho e forma similar<ref type="footnotemark" target="#note_12"/>.</p>
+                <p>O cálculo estrutural final que o leitor fará nesta rede concerne o conceito de <hi rend="bold">fechamento triádico</hi>. Fechamento triádico supõe que se duas pessoas conhecem a mesma pessoa, elas provavelmente conhecem-se mutuamente. Se Fox conhece tanto Fell como Whitehead, então Fell e Whitehead podem perfeitamente conhecer-se mutuamente, completando um <hi rend="bold">triângulo</hi> na visualização de três <emph>edges</emph> conectando Fox, Fell e Whitehead. O número destes triângulos fechados na rede pode ser usado para descobrir aglomerados e comunidades de indivíduos que se conhecem todos intimamente.</p>
+                <p>Uma forma de medir o fechamento triádico é o chamado <hi rend="bold">coeficiente de aglomeração</hi> por causa desta tendência aglomeradora, mas a medida estrutural de rede que o leitor aprenderá é conhecida como <hi rend="bold">transitividade</hi>
+                    <ref type="footnotemark" target="#note_13"/>. Transitividade é o rácio de todos os triângulos sobre todos os triângulos possíveis. Um triângulo possível existe quando uma pessoa (Fox) conhece duas pessoas (Fell e Whitehead). Então, transitividade, como a densidade, expressa quão interconectado um grafo é em termos dum rácio de conexões reais sobre as possíveis. Lembre-se, medidas como a transitividade e a densidade lidam com <emph>probabilidades</emph> e não com <emph>certezas</emph>. Todos os <emph>outputs</emph> do seu <emph>script</emph> no Python devem ser interpretados, como qualquer outro objeto de pesquisa. A transitividade permite-lhe uma forma de pensar sobre todas as relações no seu grafo que <emph>podem</emph> existir, mas que, atualmente, não existem.</p>
+                <p>O leitor pode calcular a transitividade numa só linha, da mesma forma que calculou a densidade:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_22" corresp="code_explorar-analisar-dados-rede-python_22.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Tal como a densidade, transitividade é numerada de 0 a 1, e o leitor pode ver que a transitividade da rede é de cerca de 0.1694, um valor um pouco mais alto que o da sua densidade de 0.0248. Porque o grafo não é muito denso, existem menos <emph>triângulos possíveis</emph>, o que pode resultar numa transitividade relativamente mais elevada. Isto é, nós que já têm várias conexões farão provavelmente parte destes triângulos fechados. Para suportar isto, o leitor quererá saber mais sobre nós com muitas conexões.</p>
+                <h2>Centralidade</h2>
+                <p>Depois de obter algumas medidas básicas da estrutura da rede inteira, um bom próximo passo é descobrir quais nós são os mais importantes na sua rede. Na análise de redes, medidas da importância dos nós são referidas como medidas de <hi rend="bold">centralidade</hi>. Porque existem várias maneiras de abordar a questão "Que nós são os mais importantes?",  existem várias formas diferentes de calcular a centralidade. Aqui, o leitor aprenderá sobre as três medidas de centralidade mais comuns: o grau, a centralidade de intermediação, e a centralidade adjacente.</p>
+                <p>O <hi rend="bold">grau</hi> é a forma mais simples e comum de encontrar nós importantes. O grau dum nó é a soma das suas <emph>edges</emph>. Se um nó tem três linhas a estenderem-se a outros nós, o seu grau é de três. Cinco <emph>edges</emph>, o seu grau é de cinco. É extremamente simples. Como cada uma dessas edges terá sempre um nó na outra extremidade, o leitor pode pensar no grau como o número de pessoas às quais qualquer pessoa está diretamente conectada. Os nós com os graus mais elevados numa rede social são as pessoas que conhecem mais pessoas. Estes nós são geralmente referidos como <emph>
+                        <hi rend="bold">hubs</hi>
+                    </emph>, e calcular o grau é a forma mais rápida de identificar os <emph>hubs</emph>.</p>
+                <p>Calcular a centralidade para cada nó no NetworkX não é exatamente tão simples como as métricas de toda a rede acima, mas continua a envolver comandos unilineares. Todos os comandos de centralidade que o leitor aprenderá nesta secção produzem dicionários nos quais as chaves são os nós e os valores são as medidas de centralidade. Isto significa que eles estão prontos para adicionar de volta à nossa rede como um atributo de nó, como o leitor fez na última secção. Comece por calcular o grau e adicione-o como um atributo à sua rede.</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_23" corresp="code_explorar-analisar-dados-rede-python_23.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>O leitor acabou de executar o método <code rend="inline">G.degree()</code> na lista completa de nós na sua rede (<code rend="inline">G.nodes()</code>). Como o leitor adicionou-o como um atributo, agora pode ver o grau de William Penn, bem como com o resto da sua informação se aceder ao seu nó diretamente:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_24" corresp="code_explorar-analisar-dados-rede-python_24.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Mas estes resultados são úteis para mais do que simplesmente adicionar atributos ao seu objeto Grafo. Como o leitor já está no Python, pode organizar e compará-los. O leitor pode usar a função incorporada <code rend="inline">sorted()</code> para organizar um dicionário com as suas chaves ou valores e encontrar o <emph>top</emph> vinte dos nós por grau. Para fazer isto, o leitor vai precisar de usar <code rend="inline">itemgetter</code>, o qual nós importámos no início do tutorial. Usando <code rend="inline">sorted</code> e <code rend="inline">itemgetter</code>, pode organizar o dicionário de graus assim:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_25" corresp="code_explorar-analisar-dados-rede-python_25.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Aqui, há muitas coisas a acontecer nos bastidores, mas concentre-se só nas três variáveis de <emph>input</emph> que o leitor deu a <code rend="inline">sorted()</code>. A primeira é o dicionário, <code rend="inline">degree_dict.items()</code>, que quer organizar. A segunda é o que organizar por: neste caso, item "1" é o segundo item no par, ou o valor do seu dicionário. Finalmente, o leitor diz a <code rend="inline">sorted()</code> para ir em <code rend="inline">reverse</code> para que os nós de grau mais elevado apareçam primeiro na lista resultante. Assim que o leitor tiver criado esta lista organizada, pode iterar por ela e usar a <emph>list slicing</emph>
+                    <ref type="footnotemark" target="#note_6"/> para obter somente os primeiros 20 nós:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_26" corresp="code_explorar-analisar-dados-rede-python_26.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Como o leitor pode ver, o grau de Penn é 18, relativamente elevado para esta rede. Mas digitar estas informações de classificação ilustra as limitações do grau como uma medida de centralidade. O leitor provavelmente não precisava que o NetworkX lhe dissesse que William Penn, líder <emph>quaker</emph> e fundador da Pensilvânia, era importante. A maioria das redes sociais terão somente alguns <emph>hubs</emph> de grau muito elevado, com o resto de grau similar e baixo<ref type="footnotemark" target="#note_14"/>. O grau pode informá-lo sobre os maiores <emph>hubs</emph>, mas não pode dizer-lhe muito sobre o resto dos nós. E, em muitos casos, esses <emph>hubs</emph> sobre os quaiso está a informar (como o Penn ou como a cofundadora do Quakerismo, Margaret Fell, com um grau de 13) não são especialmente surpreendentes. Neste caso, quase todos os <emph>hubs</emph> são fundadores da religião ou, noutros casos, figuras políticas importantes.</p>
+                <p>Felizmente, existem outras medidas de centralidade que lhe podem dizer mais do que só os <emph>hubs</emph>. A <ref target="https://perma.cc/VF28-JDCR">centralidade adjacente</ref> (em inglês) é um tipo de extensão do grau---analisa uma combinação dos <emph>edges</emph> dum nó e as <emph>edges</emph> dos vizinhos desse nó. Centralidade adjacente preocupa-se se um nó é um <emph>hub</emph>, mas também se preocupa com quantos <emph>hubs</emph> um nó está conectado. É calculado como um valor de 0 a 1: quanto mais próximo do um, maior a centralidade. A centralidade adjacente é útil para compreender que nós podem obter informação a outros nós rapidamente. Se o leitor conhece muitas pessoas bem-conectadas, poderia espalhar uma mensagem muito eficientemente. Se o leitor usou o Google, então está já mais ou menos familiarizado com a centralidade adjacente. O seu algoritmo de PageRank usa uma extensão desta fórmula para decidir que páginas de internet são colocadas no topo da lista de resultados.</p>
+                <p>A <ref target="https://perma.cc/C55J-7XAJ">centralidade de intermediação</ref> (em inglês) é um pouco diferente das outras duas calculações na medida em que não se preocupa com o número de <emph>edges</emph> que qualquer nó ou grupo de nós tem. A centralidade de intermediação observa todos os <hi rend="bold">caminhos mais curtos</hi> que passam por um nó em particular (ver acima). Para fazer isto, tem que primeiro calcular todos os possíveis caminhos mais curtos na sua rede, por isso mantenha em mente que a centralidade de intermediação vai demorar mais tempo para calcular que as outras medidas de centralidade (mas não será um problema num <emph>dataset</emph> desta dimensão). A centralidade de intermediação, que também é expressa numa escala de 0 a 1, é particularmente boa a encontrar nós que conectam duas partes distintas duma rede. Se o leitor é a única coisa conectando dois aglomerados, cada comunicação entre esses aglomerados tem que passar por si. Em contraste com um <emph>hub</emph>, este tipo de nó é regularmente referido como um <emph>
+                        <hi rend="bold">broker</hi>
+                    </emph>. A centralidade de intermediação não é a única maneira de encontrar <emph>brokerage</emph> (e outros métodos são mais sistemáticos), mas é uma forma rápida de lhe dar uma ideia de quais nós são importantes, não porque têm muitas conexões eles próprios, mas porque eles situam-se <emph>entre</emph> grupos, dando à rede conectividade e coesão.</p>
+                <p>Estas duas medidas de centralidade são ainda mais simples de executar que um grau---eles não precisam de receber uma lista de nós, só o grafo <code rend="inline">G</code>. O leitor pode executá-las com estas funções:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_27" corresp="code_explorar-analisar-dados-rede-python_27.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>O leitor pode organizar a centralidade de intermediação (ou a adjacente) ao mudar os nomes das variáveis no código organizador acima, como:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_28" corresp="code_explorar-analisar-dados-rede-python_28.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>O leitor notará que muitos, mas não todos, dos nós que têm graus elevados também têm uma centralidade de intermediação alta. De facto, centralidade de intermediação apresenta duas mulheres, Elizabeth Leavens e Mary Penington, cuja importância tinha sido obscurecida pela métrica da centralidade de grau. Uma vantagem de fazer estes cálculos no Python é que o leitor pode rapidamente comparar dois conjuntos de cálculos. E se o leitor quiser saber quais dos nós com alta centralidade de intermediação têm graus baixos? Isto é o mesmo que dizer: quais nós de alta intermediação são inesperados? Pode usar uma combinação da lista organizada acima:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_29" corresp="code_explorar-analisar-dados-rede-python_29.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>O leitor pode confirmar a partir destes resultados que algumas pessoas, como Leavens e Penington, têm alta centralidade de intermediação, mas baixo grau. Isto pode significar que estas mulheres eram <emph>brokers</emph> importantes, conectando partes díspares do grafo. O leitor também pode aprender coisas inesperadas sobre pessoas sobre as quais já se sabe algo---nesta lista, consegue ver que Penn tem um grau inferior ao do fundador <emph>quaker</emph> George Fox, mas uma centralidade de intermediação mais elevada. Isto é o mesmo que dizer, simplesmente conhecer mais pessoas não é tudo.</p>
+                <p>Isto aborda somente a superfície do que pode ser feito com métricas de rede no Python. O NetworkX oferece dezenas de funções e medidas para o leitor usar em várias combinações, e pode usar Python para estender estas medidas de formas quase ilimitadas. Uma linguagem de programação como o Python ou o R dar-lhe-á a flexibilidade para explorar a sua rede computacionalmente de formas que outros <emph>interfaces</emph> não podem ao permitir-lhe combinar e comparar os resultados estatísticos da sua rede com outros atributos dos seus dados (como as datas e ocupações que adicionou à rede no início deste tutorial!).</p>
+                <h2>Noções Avançadas do NetworkX: Deteção de Comunidades com Modularidade</h2>
+                <p>Outra coisa regularmente questionada sobre o <emph>dataset</emph> duma rede é quais são os subgrupos e comunidades dentro da estrutura social mais larga. A sua rede é uma família grande e feliz na qual todos se conhecem? Ou é uma coleção de subgrupos mais pequenos que estão conectados por um ou dois intermediários? O campo da deteção de comunidades em redes está desenhado para responder a estas questões. Existem várias formas de calcular comunidades, cliques, e aglomerados na sua rede, mas o método mais popular atualmente é a <hi rend="bold">modularidade</hi>. A modularidade é uma medida de densidade relativa na sua rede: uma comunidade (chamada um <hi rend="bold">módulo</hi> ou <hi rend="bold">classe</hi> modular) tem uma densidade elevada em relação a outros nós dentro do seu módulo, mas densidade baixa com os outros de fora. A modularidade dá-lhe uma pontuação geral de quão fracioanda a sua rede é, e essa pontuação pode ser usada para <hi rend="bold">repartir</hi> a rede e evidenciar as comunidades individuais<ref type="footnotemark" target="#note_15"/>.</p>
+                <p>Redes muito densas são geralmente mais difíceis de dividir em repartições sensatas. Felizmente, como o leitor descobriu anteriormente, esta rede não é assim tão densa. Não existem tantas conexões reais quanto conexões possíveis, e existem componentes desconectados de todo. Vale a pena repartir esta rede esparsa com modularidade e ver se os resultados fazem sentido histórico e analítico.</p>
+                <p>A deteção e repartição de comunidades no NetworkX requere um pouco mais de configuração do que algumas das outras métricas. Existem algumas abordagens incorporadas para a deteção de comunidades (como o <ref target="https://perma.cc/K59Y-WZRX">
+                        <emph>minimum cut</emph>
+                    </ref> (em inglês)), mas modularidade não vem incluída com o NetworkX. Felizmente, existe um <ref target="https://github.com/taynaud/python-louvain/">módulo adicional no Python</ref> (em inglês) que o leitor pode usar com o NetworkX, e que já instalou e importou no início deste tutorial. O leitor pode ler a <ref target="https://perma.cc/KW5K-ZX67">documentação completa</ref> (em inglês) para todas as funções que oferece, mas para a maior parte dos propósitos da deteção de comunidades, quererá apenas <code rend="inline">best_partition()</code>:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_30" corresp="code_explorar-analisar-dados-rede-python_30.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>O método <code rend="inline">greedy_modularity_communities()</code> tenta determinar o número de comunidades apropriadas para o grafo, e agrupa todos os nós em subconjuntos baseados nestas comunidades. Ao contrário das funções de centralidade, o código acima não criará um dicionário. Ao invés, criará uma lista especial de objetos "<emph>frozenset</emph>" (similar a listas). Existe um conjunto para cada grupo, e os conjuntos contêm os nomes das pessoas em cada grupo. Para adicionar esta informação à sua rede na maneira agora familiar, o leitor tem que primeiro criar um dicionário que classifique cada pessoa com um valor numérico para o grupo ao qual pertencem:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_31" corresp="code_explorar-analisar-dados-rede-python_31.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Como sempre, o leitor pode combinar estas medidas com outras. Por exemplo, aqui está como encontrar os nós de centralidade adjacente mais elevada na classe modular 0 (a primeira):</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_32" corresp="code_explorar-analisar-dados-rede-python_32.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Usando a centralidade adjacente como um <emph>ranking</emph> pode dar-lhe uma ideia das pessoas importantes nesta classe modular. O leitor notará que algumas destas pessoas, especialmente William Penn, William Bradford (<emph>não</emph> o fundador de Plymouth em que estará a pensar<ref type="footnotemark" target="#note_16"/>) e James Logan, passaram muito tempo na América. Também, Bradford e Tace Sowle eram ambos impressores <emph>quakers</emph> proeminentes. Com um pouco de pesquisa, nós podemos descobrir que existem tanto razões geográficas como ocupacionais que explicam que este grupo de pessoas se juntem. Isto é uma indicação de que a modularidade está a trabalhar como esperado.</p>
+                <p>Em redes mais pequenas como esta, uma tarefa comum é encontrar e listar todas as classes modulares e seus membros<ref type="footnotemark" target="#note_17"/>. O leitor pode fazer isto ao percorrer pela lista <code rend="inline">communities</code>:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_33" corresp="code_explorar-analisar-dados-rede-python_33.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Note no código acima que está a filtrar qualquer classe modular com dois ou menos nós, na linha <code rend="inline">if len(c) &gt; 2</code>. O leitor recordar-se-á da visualização que existiam vários componentes pequenos da rede com apenas dois nós. A modularidade encontrará estes componentes e tratá-los-á como classes separadas (visto que eles não estão conectados a mais nada). Ao filtrá-los, o leitor obtém uma ideia melhor das classes modulares maiores dentro do principal componente da rede.</p>
+                <p>Trabalhando só com o NetworkX trá-lo-á longe, e o leitor pode encontrar muito sobre classes modulares apenas ao trabalhar com os dados diretamente. Mas quase sempre quer visualizar os seus dados (e, talvez, expressar a modularidade como a cor de nó). Na próxima secção, o leitor irá aprender como exportar os seus dados do NetworkX para uso noutros programas.</p>
+            </div>
+            <div type="1">
+                <head>Exportar Dados</head>
+                <p>O NetworkX suporta um grande número de formatos de ficheiros para <ref target="https://perma.cc/X65S-HRCF">exportação de dados</ref> (em inglês). Se o leitor quiser exportar uma lista de <emph>edges</emph> em texto simples para carregar no Palladio, existe um <ref target="https://perma.cc/P9ES-57X3">
+                        <emph>wrapper</emph> conveniente</ref> (em inglês) para isso. Frequentemente, no <emph>Six Degrees of Francis Bacon</emph>, nós exportamos dados do NetworkX no <ref target="https://perma.cc/SF8Z-DWPW">formato JSON especializado do D3</ref> (em inglês), para visualização no navegador de internet. O leitor poderia até <ref target="https://perma.cc/Y6QJ-5VM8">exportar</ref> (em inglês) o seu grafo como um <ref target="https://perma.cc/87NA-KCK4">
+                        <emph>dataframe</emph> do Pandas</ref> (em inglês) se existissem operações estatísticas mais avançadas que quisesse executar. Existem várias opções, e se o leitor tiver adicionado diligentemente todas as suas métricas de volta no seu objeto Grafo como atributos, todos os seus dados serão exportados duma só vez.</p>
+                <p>A maior parte das opções de exportação funcionam da mesma maneira, por isso, para este tutorial o leitor aprenderá como exportar os seus dados para o formato GEXF do Gephi. Assim que tiver exportado o ficheiro, o leitor pode fazer o <emph>upload</emph>
+                    <ref target="https://gephi.org/users/supported-graph-formats/">diretamente para o Gephi</ref> (em inglês) para a visualização.</p>
+                <p>Exportar dados é, normalmente, um simples comando unilinear. Tudo o que é preciso é escolher um nome de ficheiro. Neste caso, usaremos <code rend="inline">quaker_network.gexf</code>. Para exportar, digite:</p>
+                <ab>
+                    <code xml:id="code_explorar-analisar-dados-rede-python_34" corresp="code_explorar-analisar-dados-rede-python_34.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>É só! Quando executar o seu <emph>script</emph> no Python, colocará automaticamente o novo ficheiro GEXF no mesmo diretório que o seu ficheiro Python.<ref type="footnotemark" target="#note_18"/>
+                </p>
+            </div>
+            <div type="1">
+                <head>Conclusões</head>
+                <p>Agora, tendo realizado e revisto uma panóplia de métricas de rede no Python, o leitor tem as evidências a partir das quais os argumentos se contrõem e se retiram conclusões sobre esta rede de <emph>quakers</emph> na Grã-Bretanha moderna. O leitor sabe, por exemplo, que a rede tem uma <hi rend="bold">densidade</hi> relativamente baixa, sugerindo associações ténues e/ou dados originais imcompletos. O leitor sabe que a comunidade está organizada em torno de vários <emph>
+                        <hi rend="bold">hubs</hi>
+                    </emph> desproporcionalmente grandes, entre eles fundadores da denominação, como Margaret Fell e George Fox, bem como líderes políticos e religiosos importantes, como William Penn. Mais útil, o leitor sabe sobre mulheres com graus relativamente baixos, como Elizabeth Leavens e Mary Penington, que (como resultado de centralidade de intermediação elevada) podem ter agido como <emph>
+                        <hi rend="bold">brokers</hi>
+                    </emph>, conectando múltiplos grupos. Finalmente, o leitor aprendeu que a rede é feita dum grande <hi rend="bold">componente</hi> e muitos muito pequenos. No interior desse grande componente, existem várias <hi rend="bold">comunidades</hi> distintas, algumas das quais parecem organizadas em torno do tempo ou local (como Penn e os seus associados estadunidenses). Por causa dos metadados que adicionou à sua rede, o leitor tem as ferramentas para explorar estas métricas em profundidade e para, potencialmente, explicar alguns dos recursos estruturais que identificou.</p>
+                <p>Cada uma destas descobertas é um convite para mais pesquisa ao invés dum ponto final ou prova. A análise de redes é um conjunto de ferramentas para perguntar questões específicas sobre a estrutura das relações num <emph>dataset</emph>, e o NetworkX providencia um interface relativamente simples a muitas das técnicas e métricas comuns. As redes são uma maneira útil de estender a sua pesquisa a um grupo ao providenciar informações sobre a estrutura da comunidade, e nós esperamos que o leitor será inspirado por este tutorial para usar métricas para enriquecer a sua própria pesquisa e para explorar a flexibilidade da análise de redes para além da visualização.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_1"/> : <hi rend="bold">Nota de tradução</hi>: Como o leitor poderá confirmar mais abaixo, os autores desta lição transformaram os dados aqui analisados num gráfico, sem explicar tal passo, visto que o artigo lida com a análise dos dados, e não com a sua visualização. Se desejar, pode ler também a lição aqui referida e voltar a esta para confirmar se o seu gráfico se assemelha ao dos quatro autores. Aconselhamos que o faça após ter concluído todos os passos aqui descritos.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_2"/> : Em muitos (mas não todos os) casos, <code rend="inline">pip</code> ou <code rend="inline">pip3</code> serão instalados automaticamente com o Python3.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_3"/> : <hi rend="bold">Nota de tradução</hi>: Isto pode estender-se ao uso de comandos, na sua <emph>shell</emph>, nomeadamente aquando da instalação do pip e de pacotes (ver Preparação dos Dados e Instalação do NetworkX).</p>
+                <p>
+                    <ref type="footnotemark" target="#note_4"/> : Algumas instalações só quererão que o leitor digite <code rend="inline">pip</code> sem "3," mas no Python 3, <code rend="inline">pip3</code> é a mais comum. Se um não funcionar, tente o outro!</p>
+                <p>
+                    <ref type="footnotemark" target="#note_5"/> : <hi rend="bold">Nota de tradução</hi>: É importante lembrar que existem variações entre as diferentes versões do NetworkX que podem resultar em erros ou outputs diferentes. Tal é o caso da 2.6, com a qual obtivemos uma mensagem de erro durante a avaliação da modularidade e uma resposta diferente com a função print(nx.info(G)) daquela apresentada com a 2.4.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_6"/> : Existem algumas técnicas <emph>pythónicas</emph> que este código usa. A primeira é a 'compreensão de lista' (<emph>list comprehensions</emph>), que incorpora <emph>loops</emph> (<code rend="inline">for n in nodes</code>) para criar novas listas (em parêntesis retos), assim: <code rend="inline">new_list = [item for item in old_list]</code>. A segunda é a <emph>list slicing</emph>, que permite-lhe subdividir ou "<emph>slice</emph>" ("cortar") a lista. A notação da <emph>list slicing</emph>
+                    <code rend="inline">[1:]</code> toma tudo <emph>exceto</emph> o primeiro item na lista. O 1 informa o Python para começar com o segundo item nesta lista (no Python, o leitor começa a contar do 0), e os dois pontos dizem ao Python para tomar tudo até ao fim da lista. Como a primeira linha em ambas destas listas é a fila de cabeçalho de cada CSV, nós não queremos que esses cabeçalhos sejam incluídos nos nossos dados.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_7"/> : Dicionários são um tipo de dados incorporados no Python, construídos com pares de chave-valor. Pense numa chave como a palavra-chave num dicionário, e o valor como a sua definição. Chaves têm que ser únicas (só uma de cada por dicionário), mas os valores podem ser qualquer coisa. Dicionários são representados por chavetas, com chaves e valores separados por dois pontos: <code rend="inline">{key1:value1, key2:value2, ...}</code>. Dicionários são uma das maneiras mais rápidas de armazenar valores que o leitor pode necessitar mais tarde. De facto, um objeto Grafo do NetworkX é, ele próprio, feito de dicionários aninhados.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_8"/> : Note que este código usa parêntesis retos de duas formas. Usa números em parêntesis retos para aceder índices específicos numa lista de nós (por exemplo, o ano de nascimento no <code rend="inline">node[4]</code>), mas também para designar uma <emph>chave</emph> (sempre <code rend="inline">node[0]</code>, o ID) a qualquer um dos nossos dicionários vazios: <code rend="inline">dictionary[key] = value</code>. Conveniente!</p>
+                <p>
+                    <ref type="footnotemark" target="#note_9"/> : Por uma questão de simplicidade, removemos quaisquer nós que <emph>não estão conectados a quaisquer outros</emph> do <emph>dataset</emph> antes de termos começado. Isto foi feito simplesmente para reduzir a desordem, mas também é muito comum de se ver muitos destes nós solteiros no seu <emph>dataset</emph> de rede comum.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_10"/> : Mas mantenha em mente que isto é a densidade de <emph>toda</emph> a rede, incluindo esses componentes não conectados a flutuar em órbita. Existem várias conexões possíveis entre e com eles. Se o leitor tivesse tomado a densidade somente do componente maior, poderia ter obtido um número diferente. O leitor poderia fazê-lo ao encontrar o componente mais largo como nós lhe mostramos na próxima secção sobre o <hi rend="bold">diâmetro</hi>, e, depois, ao executar o mesmo método de densidade somente nesse componente.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_11"/> : Nós tomamos o comprimento da lista <emph>menos um</emph> porque nós queremos o número de <emph>edges</emph> (ou passos) entre os nós listados aqui, ao invés do número de nós.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_12"/> : A forma mais correta de fazer este tipo de comparação é criar <emph>grafos aleatórios</emph> de tamanho idêntico para ver se as métricas diferem da norma. O NetworkX oferece várias ferramentas para <ref target="https://perma.cc/7Z4U-KAY7">gerar grafos aleatórios</ref> (em inglês).</p>
+                <p>
+                    <ref type="footnotemark" target="#note_13"/> : Porque se chama transitividade? O leitor pode recordar-se da propriedade transitiva de Geometria das aulas de Matemática no Ensino Secundário: se A=B e B=C, o A deve ser igual a C. Semelhantemente, no fechamento triádico, se a pessoa A conhece a pessoa B e a pessoa B conhece a pessoa C, então a pessoa A provavelmente conhece a pessoa C: logo, transitividade.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_14"/> : Aqueles com experiência em Estatística notarão que grau em redes sociais segue tipicamente uma <emph>lei de potência</emph>, mas isto não é nem pouco usual, nem especialmente útil saber.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_15"/> : Embora não venhamos a cobri-lo neste tutorial, é geralmente boa ideia obter a clasificação modular global primeiro para determinar se o leitor aprenderá qualquer coisa ao repartir a sua rede de acordo com a modularidade. Para ver a classificação geral da modularidade, tome as comunidades que calculou com <code rend="inline">communities = community.best_partition(G)</code> e execute <code rend="inline">global_modularity = community.modularity(communities, G)</code>. E depois basta aplicar <code rend="inline">print(global_modularity)</code>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_16"/> : <hi rend="bold">Nota de tradução</hi>: <ref target="https://perma.cc/2EKN-TJPW">Plymouth</ref> foi a primeira colónia inglesa permanente na região da Nova Inglaterra, no nordeste dos Estados Unidos da América, tendo sido fundada em 1620 por vários colonos puritanos, entre os quais um tal <ref target="https://perma.cc/UA8V-J4CX">William Bradford</ref>. Este <ref target="https://perma.cc/TW4C-QWUY">outro</ref> referido foi um importante impressor <emph>quaker</emph>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_17"/> : Em redes grandes, as listas seriam provavelmente ilegivelmente longas, mas o leitor poderia obter uma ideia de todas as classes modulares duma só vez ao visualizar a rede e adicionar cor aos nós baseada na sua classe modular.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_18"/> : Cada formato de ficheiro que é exportável é também importável. Se o leitor tiver um ficheiro GEXF do Gephi que quer pôr no NetworkX, digitaria <code rend="inline">G = nx.read_gexf('some_file.gexf')</code>.</p>
+            </div>
+        </body>
+    </text>
+</TEI>

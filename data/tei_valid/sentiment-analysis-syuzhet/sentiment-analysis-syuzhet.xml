@@ -1,0 +1,494 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="sentiment-analysis-syuzhet">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Sentiment Analysis with 'syuzhet' using R</title>
+                <author role="original_author">Jennifer Isasi</author>
+                <editor role="reviewers">Riva Quiroga</editor>
+                <author role="translators">Adam Crymble</author>
+                <editor role="translation-reviewers">
+                    <persName>Shuang Du</persName>
+                    <persName>Andrew Janco</persName>
+                </editor>
+                <editor role="editors">Maria José Afanador-Llach</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">04/01/2023</date>
+                <idno type="doi">10.46430/phen0110</idno>
+                <date type="published">03/23/2021</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#analisis-de-sentimientos-r"/>.</p>
+                <p>There are other translations: <ref target="#analise-sentimento-R-syuzhet"/>
+                </p>
+                <p>There are other translations: <ref target="#analise-sentimento-R-syuzhet"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>This lesson teaches you how to obtain and analyse narrative texts for patterns of sentiment and emotion.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">distant-reading</term>
+                    <term xml:lang="en">r</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2">
+                <head>Lesson Objectives</head>
+                <p>This lesson introduces you to the <ref target="https://perma.cc/9DNJ-ZWPW">
+                        <code rend="inline">syuzhet</code>
+                    </ref>
+                    <ref target="https://perma.cc/A92Q-PM4D">sentiment analysis</ref> algorithm, written by <ref target="https://perma.cc/9PF8-3GZ4">Matthew Jockers</ref> using the <ref target="https://perma.cc/W78Z-FUAX">R programming language</ref>, and applies it to a single narrative text to demonstrate its research potential. The term 'syuzhet' is Russian (сюже́т) and translates roughly as 'plot', or the order in which events in the narrative are presented to the reader, which may be different than the actual time sequence of events (the '<ref target="https://perma.cc/M7C9-XT99">fabula</ref>'). The <code rend="inline">syuzhet</code> package similarly considers sentiment analysis in a time-series-friendly manner, allowing you to explore the developing sentiment in a text across the pages.</p>
+                <p>To make the lesson useful for scholars working with non-English texts, this tutorial uses a Spanish-language novel, <emph>
+                        <ref target="https://perma.cc/G6V3-JCWS">Miau</ref>
+                    </emph> by <ref target="https://perma.cc/9P3P-2FQP">Benito Pérez Galdós</ref> (1888) as its case study. This allows you to learn the steps necessary to work with everything from accented characters to thinking through the intellectual problems of applying English language algorithms to non-English texts. You do not need to know Spanish to follow the lesson (though you will if you want to read the original novel). Some steps in the following instructions may not be necessary if you are working with English-language texts, but those steps should be self-evident.</p>
+                <p>Although the lesson is not intended for advanced R users, it is expected that you will have some knowledge of R, including an expectation that you already have <ref target="https://www.r-project.org/">R installed</ref> and that you know how to load R packages. The author recommends downloading <ref target="https://www.rstudio.com/">RStudio</ref> as a user-friendly environment for working in R. If you have not used R before, you may first want to try working through some of the following introductory R lessons:</p>
+                <list type="unordered">
+                    <item>Taylor Arnold and Lauren Tilton, '<ref target="/en/lessons/basic-text-processing-in-r">Basic Text Processing in R</ref>', <emph>Programming Historian</emph> 6 (2017), <ref target="https://doi.org/10.46430/phen0061">https://doi.org/10.46430/phen0061</ref>
+                    </item>
+                    <item>Taryn Dewar, '<ref target="/en/lessons/r-basics-with-tabular-data">R Basics with Tabular Data</ref>', <emph>Programming Historian</emph> 5 (2016), <ref target="https://doi.org/10.46430/phen0056">https://doi.org/10.46430/phen0056</ref>
+                    </item>
+                    <item>Nabeel Siddiqui, '<ref target="/en/lessons/data_wrangling_and_management_in_R">Data Wrangling and Management in R</ref>', <emph>Programming Historian</emph> 6 (2017), <ref target="https://doi.org/10.46430/phen0063">https://doi.org/10.46430/phen0063</ref>
+                    </item>
+                </list>
+                <p>You may also be interested in other sentiment analysis lessons:</p>
+                <list type="unordered">
+                    <item>Zoë Wilkinson Saldaña, '<ref target="/en/lessons/sentiment-analysis">Sentiment Analysis for Exploratory Data Analysis</ref>,' <emph>Programming Historian</emph> 7 (2018), <ref target="https://doi.org/10.46430/phen0079">https://doi.org/10.46430/phen0079</ref>
+                    </item>
+                    <item>Matthew Jockers, '<ref target="https://perma.cc/9BN2-F3N3">Introduction to the Syuzhet Package</ref>' (2020). </item>
+                </list>
+                <p>At the end of the lesson you will be able to:</p>
+                <list type="unordered">
+                    <item>Develop appropriate research questions that apply sentiment analysis to literary or narrative texts</item>
+                    <item>Use the R programming language, RStudio, and the <code rend="inline">syuzhet</code> package with the <ref target="https://perma.cc/A8M5-2SDG">NRC Word-Emotion Association Lexicon</ref> to generate sentiment scores for words in texts of various languages</item>
+                    <item>Critically interpret the results of your sentiment analysis</item>
+                    <item>Visualise the results through a range of graphs (bar, word cloud) to aid interpretation</item>
+                </list>
+                <p>This lesson was written and tested using version 4.2.x of R using a Mac and on 4.0.x using a Windows machine.</p>
+                <quote>
+                    <p>Generally, R works the same on Windows, Mac, and Linux operating systems. However, when working on a Windows machine with non-English texts or those containing accents or special characters, you will need to include some extra instructions to apply <ref target="https://perma.cc/5HY2-HHN2">UTF-8</ref> character encoding to ensure special characters are properly interpreted. Where this is a necessary step, it is shown below.</p>
+                </quote>
+                <p style="alert alert-warning">
+Translator's Note for Educators:
+<p>A number of steps in this tutorial require loading / running time that may exceed 15 to 30 minutes during which participants have to wait. This may affect your ability to use the tutorial in a time-limited live event such as a workshop. Note also that to use this tutorial in a workshop setting, participants will need the ability to install software on their machine.</p>
+                </p>
+            </div>
+            <div type="2">
+                <head>Background Information</head>
+                <p>This section introduces the concepts and the software that you will use to perform a sentiment analysis of a text. It also introduces the case study document, the novel <emph>Miau</emph> by Benito Pérez Galdós, and the ways you can apply sentiment analysis meaningfully to a text such as <emph>Miau</emph>.</p>
+                <div type="3">
+                    <head>Sentiment Analysis</head>
+                    <p>Sentiment analysis, also known as opinion mining, is an umbrella term for a number of processes for automatically calculating the degree of negativity or positivity in a text. It has been used for some time in the fields of marketing and politics to better understand the public mood;<ref type="footnotemark" target="#note_1"/> however, its adoption in literary studies is more recent and as of yet no one method dominates use.<ref type="footnotemark" target="#note_2"/> Some approaches to sentiment analysis also enable you to measure the presence of a number of different emotions in a text, as will be the case for the example in this tutorial.</p>
+                    <p>What is the difference between 'emotion' and 'sentiment'? The two words are often used interchageably in English but refer to different concepts.</p>
+                    <p>According to Antonio R. Damasio, 'emotions' are the biologically rooted, instinctive reactions of our bodies to environmental stimuli.<ref type="footnotemark" target="#note_3"/> There is no universally agreed list of basic emotions, however a common model includes six: anger (or rage), joy, disgust (or revulsion), fear, sadness, and surprise -- though for Damasio the last of those falls into a category he would describe as a '<ref target="https://perma.cc/Y675-4C52">secondary emotion</ref>'. In the case of the automated system that you will use, the secondary emotions 'anticipation' and 'trust' are also options for analysis.</p>
+                    <p>'Sentiment', on the other hand, is both the action of and effect of feeling an emotion. In other words, as Óscar Pereira Zazo notes, 'when an object, a person, a situation, or a thought brings us joy, it begins a process that can lead to the feeling of being joyful or happy'.<ref type="footnotemark" target="#note_4"/> Sentiment analysis suggests that you can measure the intensity of this effect (either positive, negative, or neutral) on the manifestation of an emotion.</p>
+                    <p>This lesson distiguishes between the two terms as described above. The effect (sentiment) will be measured as it evolves across the pages of the text, while the emotions will be measured by looking at word use more generally.</p>
+                </div>
+                <div type="3">
+                    <head>NRC Word-Emotion Association Lexicon</head>
+                    <p>Many sentiment analysis algorithms depend upon pre-compiled lexicons or dictionaries that assign numerical sentiment scores to words or phrases based on findings from previous linguistic research. The R package <code rend="inline">syuzhet</code> has been designed to allow you to choose from four of these sentiment lexicons: <ref target="https://perma.cc/G9RV-RA82">Bing</ref>, <ref target="https://perma.cc/GZB2-J2RH">Afinn</ref>, <ref target="https://perma.cc/TK8L-44ZW">Stanford</ref>, and the <ref target="https://perma.cc/A8M5-2SDG">NRC Word-Emotion Association Lexicon</ref>.<ref type="footnotemark" target="#note_5"/> This lesson uses the NRC lexicon, as it is the only one of the four that can currently be used with non-English texts.</p>
+                    <p>This lexicon, which includes positive and negative sentiment values as well as eight emotional categories, was developed by Saif M. Mohammad, a scientist at the National Research Council Canada (NRC). The dataset that forms the lexicon has been manually annotated using the <ref target="https://perma.cc/KWW4-AFJ4">Maximum Difference Scaling</ref> technique, or MaxDiff, to determine the most negative or positive sets of words relative to other words -- a sort of ranking of sentiment intensity of words.<ref type="footnotemark" target="#note_6"/> This particular lexicon has 14,182 unigrams (words) classified as either positive or negative. It also classifies a word's connection to various emotions: anger, anticipation, disgust, fear, joy, sadness, surprise, and trust. Using automatic translation, which may lack linguistic nuance in unpredictable ways, it is available in more than one hundred languages.</p>
+                    <p>The license on the dataset allows free use of the NRC lexicon for research purposes. All data is available for download.</p>
+                    <p>The <ref target="https://perma.cc/A8M5-2SDG">NRC Word-Emotion Association Lexicon</ref> website outlines the different categories and classifications in the dataset. It also provides a number of resources that can help you to better understand how the lexicon was built, including links to published research, more information on obtaining values for individual words, the organisation of the dataset, and how to extend it.</p>
+                </div>
+                <table>
+                    <row>
+                        <cell role="label">English</cell>
+                        <cell role="label">Spanish</cell>
+                    </row>
+                    <row>
+                        <cell>positive</cell>
+                        <cell>positivo</cell>
+                    </row>
+                    <row>
+                        <cell>negative</cell>
+                        <cell>negativo</cell>
+                    </row>
+                    <row>
+                        <cell>trust</cell>
+                        <cell>confianza</cell>
+                    </row>
+                    <row>
+                        <cell>surprise</cell>
+                        <cell>sorpresa</cell>
+                    </row>
+                    <row>
+                        <cell>sadness</cell>
+                        <cell>tristeza</cell>
+                    </row>
+                    <row>
+                        <cell>joy</cell>
+                        <cell>alegría</cell>
+                    </row>
+                    <row>
+                        <cell>fear</cell>
+                        <cell>miedo</cell>
+                    </row>
+                    <row>
+                        <cell>disgust</cell>
+                        <cell>disgusto</cell>
+                    </row>
+                    <row>
+                        <cell>anticipation</cell>
+                        <cell>anticipación</cell>
+                    </row>
+                    <row>
+                        <cell>anger</cell>
+                        <cell>enfado</cell>
+                    </row>
+                </table>
+                <div type="3">
+                    <head>A Brief Example</head>
+                    <p>Before diving into the full analysis of our text <emph>Miau</emph>, we offer a short example of sentiment analysis in action, using <code rend="inline">syuzhet</code> together with the NRC lexicon, focusing on the outputs instead of the code. This analysis uses R and prompts you to <ref target="https://perma.cc/243B-E9M7">tokenise</ref> the text into a list of single-word strings (unigrams) that are then analysed one at a time. Sentence-level analysis is also possible in sentiment analysis, but is not the focus of this tutorial.</p>
+                    <p>Consider the analysis of the final passage from <emph>Miau</emph>:</p>
+                    <quote>
+                        <p>
+                            <hi rend="bold">Spanish Original</hi>: Retumbó el disparo en la soledad de aquel abandonado y tenebroso lugar; Villaamil, dando terrible salto, hincó la cabeza en la movediza tierra, y rodó seco hacia el abismo, sin que el conocimiento le durase más que el tiempo necesario para poder decir: «Pues... sí...».</p>
+                        <p>
+                            <hi rend="bold">Rough English Translation</hi>: The shot boomed out in the solitude of that abandoned and gloomy space; Villaamil, taking a terrible leap, bowed his head to the moving earth and rolled towards the abyss, his awareness lasting no longer than the time necessary to say: 'Well...yes...'.</p>
+                        <p>
+                            <emph>Miau</emph> by Benito Pérez Galdós.</p>
+                    </quote>
+                    <p>This passage will be transformed into a list of words:</p>
+                    <ab>
+                        <code xml:id="code_sentiment-analysis-syuzhet_0" corresp="code_sentiment-analysis-syuzhet_0.txt" lang="language-R" rend="block"/>
+                    </ab>
+                    <p>Using the sentiment analysis function, you then calculate the eight emotions as classified by NRC, as well as the positive and negative scores of each word. The following is the result for the first few words in this short passage:</p>
+                    <ab>
+                        <code xml:id="code_sentiment-analysis-syuzhet_1" corresp="code_sentiment-analysis-syuzhet_1.txt" lang="language-R" rend="block"/>
+                    </ab>
+                    <p style="alert alert-warning">
+Translator's Note:
+R will not translate these into English for you, but to make the tutorial easier to follow for English speakers, the same output would look like the following if the passage was in English (notice that when translating word-by-word the results are slightly different than when translating whole passages, as above):
+</p>
+                    <ab>
+                        <code xml:id="code_sentiment-analysis-syuzhet_2" corresp="code_sentiment-analysis-syuzhet_2.txt" lang="language-R" rend="block"/>
+                    </ab>
+                    <p>The results are returned in a <ref target="https://perma.cc/ER4M-WRRC">data frame</ref>. Using this scoring system, every word in our human languages has a default value of 0 indicating no connection to the corresponding emotion. Any words not in the NRC lexicon will be treated by the code as if they have values of 0 for all categories. Any word with a scores greater than 0 indicates that it is both present in the NRC lexicon, and that it has been assigned a value by the researchers responsible for that lexicon indicating the strength of its connection to one of the emotional categories.</p>
+                    <p>In this example we can see that the words 'disparo' (shot), 'soledad' (solitude), 'abandonado' (abandoned), and 'terrible' (terrible) have a negative score associated with them (second-to-last column), while 'dando' (taking) is judged as a positive word (last column). </p>
+                    <p>We are also able to see which emotions each word is connected to: 'disparo' (shot) is associated with <emph>anger</emph> (3), <emph>fear</emph> (2), <emph>sadness</emph> (2), and <emph>surprise</emph> (1). Higher numbers mean greater strength of the connection to that emotion.</p>
+                    <p>The possibilities of exploring, analysing, and visualising these results depend on your programming skills, but also your research needs. To help you reach your potential with sentiment analysis, this lesson introduces you how to analyse data and build understanding of the results through various visualisations.</p>
+                </div>
+                <div type="3">
+                    <head>Appropriate Research Questions</head>
+                    <p>As already stated, in this lesson, you will analyse the Spanish novel <emph>Miau</emph> by <ref target="https://perma.cc/9P3P-2FQP">Benito Pérez Galdós</ref>, published in 1888. Known for his Spanish realist novels, this particular Pérez Galdós story takes place in Madrid at the end of the nineteenth century and satirises the government administration of the day. In a kind of tragic comedy, we witness the final days of Ramón Villaamil after becoming unemployed, while his family is trying to stretch their meagre budget while keeping up the pretence of wealthy living. Villaamil's spiral of misfortune and his inability to find a new job ends in tragedy.</p>
+                    <p>From a research standpoint, the question is: Can we observe the emotional downward spiral of this plot through an automatic extraction of sentiment in the text? Does a human reader's interpretation of the negative experiences of Villaamil match the results of the algorithm? And if so, what words within the novel are used most to signal the emotional trajectory of the story?</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Obtaining Sentiment and Emotion Scores</head>
+                <p>The process of conducting the sentiment analysis is a four stage affair. First, code must be installed and loaded into the R environment of your choice. Then, you must load and pre-process the text you want to analyse. Then you conduct your analysis. Finally, you turn your attention to interpreting the results.</p>
+                <div type="3">
+                    <head>Install and Load Relevant R Packages</head>
+                    <p>Before processing the text, you must first install and load the correct R code packages. In this case, that includes <ref target="https://cran.r-project.org/web/packages/syuzhet/vignettes/syuzhet-vignette.html">
+                            <code rend="inline">syuzhet</code>
+                        </ref>. You will also be visualising the results, which will require a number of other R packages: <ref target="https://cran.r-project.org/web/packages/RColorBrewer/index.html">
+                            <code rend="inline">RColorBrewer</code>
+                        </ref>, <ref target="https://perma.cc/GM67-HBH3">
+                            <code rend="inline">wordcloud</code>
+                        </ref>, <ref target="https://perma.cc/T2JG-LEBJ">
+                            <code rend="inline">tm</code>
+                        </ref> and <ref target="https://perma.cc/NS79-H5DH">
+                            <code rend="inline">NLP</code>
+                        </ref>.</p>
+                    <p>To install and load these packages, copy and execute the sample code below in your chosen R coding environment. The first few lines will install the packages (only needed if you haven't already got the packages installed). The second set of lines will load them so that you can use them in your programme. The installation of these packages may take a few minutes.</p>
+                    <ab>
+                        <code xml:id="code_sentiment-analysis-syuzhet_3" corresp="code_sentiment-analysis-syuzhet_3.txt" lang="language-R" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Load and Prepare the Text</head>
+                    <p>Next, download a machine readable copy of the novel: <ref target="/assets/sentiment-analysis-syuzhet/galdos_miau.txt">
+                            <emph>Miau</emph>
+                        </ref> and make sure to save it as a .txt file. When you open the file you will see that the novel is in <ref target="https://perma.cc/Z5WH-V9SW">plain text</ref> format, which is essential for this particular analysis using R.</p>
+                    <p>With the text at hand, you first need to load it into R as one long string so that you can work with it programmatically. Make sure to replace <code rend="inline">FILEPATH</code> with the location of the novel on your own computer (don't just type 'FILEPATH'). This loading process is slightly different on Mac/Linux and Windows machines:  </p>
+                    <div type="4">
+                        <head>On Mac and Linux</head>
+                        <p>You can <ref target="https://perma.cc/ZXZ8-FZHG">find the FILEPATH</ref> using your preferred method. The final format on my computer is <code rend="inline">/Users/Isasi/Desktop/miau.txt</code>
+                        </p>
+                        <p>On a Mac/Linux machine, use the function <code rend="inline">get_text_as_string</code>, which is part of the <code rend="inline">syuzhet</code> package:</p>
+                        <ab>
+                            <code xml:id="code_sentiment-analysis-syuzhet_4" corresp="code_sentiment-analysis-syuzhet_4.txt" lang="language-R" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4">
+                        <head>On Windows</head>
+                        <p>You can <ref target="https://perma.cc/N9R4-HEJY">find the FILEPATH</ref> using your preferred method. The final format on my computer is <code rend="inline">C:\\Users\\Isasi\\Desktop\\miau.txt</code>
+                        </p>
+                        <p>The Windows operating system cannot directly read characters with tildes, accents, or from extended alphabet sets, all of which are commonly used in languages such as Spanish, French, and Portuguese. Therefore we must first alert the software that our novel uses the <ref target="https://perma.cc/5HY2-HHN2">UTF-8</ref> set of characters (which includes accents and many other non-English characters). We do this using the <code rend="inline">scan</code> function.</p>
+                        <quote>
+                            <p>Note that when typing your filepath, you may need to escape the backslashes (<code rend="inline">\</code>) in the filepath. To do this, just add a second backslash each time it appears in the path. (E.g. "<code rend="inline">C:\\...</code>"</p>
+                        </quote>
+                        <ab>
+                            <code xml:id="code_sentiment-analysis-syuzhet_5" corresp="code_sentiment-analysis-syuzhet_5.txt" lang="language-R" rend="block"/>
+                        </ab>
+                        <p>Now that the data has loaded, you have to format it in the way the sentiment analysis algorithm expects to receive it. In this particular case, that is as a <ref target="https://perma.cc/LPV9-XGX8">list</ref> containing either single words or sentences (here you will focus on individual words only).</p>
+                        <p>This means you need an intermediate step between loading the text and extracting the sentiment values. To meet this need, we will divide the character string into a list of words, sometimes also referred to as <ref target="https://perma.cc/FX4C-ZLYB">unigrams</ref> or <ref target="https://perma.cc/V6UY-KKVK">tokens</ref>.</p>
+                        <p>To do this you can use the package's built-in <code rend="inline">get_tokens()</code> function to generate a new data object containing each individual word as a list. This function also removes spaces and punctuation from the original text. This approach to tokenisation uses <ref target="https://perma.cc/W7YD-K3R7">regular expressions</ref> and is not always appropriate in all use cases. It will, for example, split hyphenated words into two. Depending on your text, you should consider the implications of your chosen method of tokenisation as you can use any method you like as long as the output is in the same format as in the example below.</p>
+                        <ab>
+                            <code xml:id="code_sentiment-analysis-syuzhet_6" corresp="code_sentiment-analysis-syuzhet_6.txt" lang="language-R" rend="block"/>
+                        </ab>
+                        <p>Now you can use the <code rend="inline">length()</code> function to count how many words are in the original text:</p>
+                        <ab>
+                            <code xml:id="code_sentiment-analysis-syuzhet_7" corresp="code_sentiment-analysis-syuzhet_7.txt" lang="language-R" rend="block"/>
+                        </ab>
+                        <p>If you want to analyse the text by sentence, use the <code rend="inline">get_sentences()</code> function and follow the same proccess except for creating the word cloud below:</p>
+                        <ab>
+                            <code xml:id="code_sentiment-analysis-syuzhet_8" corresp="code_sentiment-analysis-syuzhet_8.txt" lang="language-R" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>Extracting Data with the NRC Sentiment Lexicon</head>
+                    <p>Now you can use the <code rend="inline">get_nrc_sentiment</code> function to obtain the sentiment scores for each word in the novel. The default vocabulary for the software is English. Since this text is in Spanish, you will use the <code rend="inline">lang</code> argument to set the vocabulary to Spanish. This would not be necessary if working on an English text. Then you will create a new data object to store the extracted data so that you can work with it further. This <code rend="inline">get_nrc_sentiment</code> function searches for the presence of the eight emotions and two sentiments against each word in your list, and assigns each a number greater than 0 if the word is found within the NRC's lexicon. Depending on the speed of your computer and the nature of your text, this process may take between 15 and 30 minutes.</p>
+                    <ab>
+                        <code xml:id="code_sentiment-analysis-syuzhet_9" corresp="code_sentiment-analysis-syuzhet_9.txt" lang="language-R" rend="block"/>
+                    </ab>
+                    <p>You can also use this package with <ref target="https://perma.cc/9BN2-F3N3">a range of other languages</ref>, though the 2020 release only works on languages with Latin-based alphabets. Other lessons that can be substituted for <code rend="inline">spanish</code> in the above line of code are: <code rend="inline">basque</code>, <code rend="inline">catalan</code>, <code rend="inline">danish</code>, <code rend="inline">dutch</code>, <code rend="inline">english</code>, <code rend="inline">esperanto</code>, <code rend="inline">finnish</code>, <code rend="inline">french</code>, <code rend="inline">german</code>, <code rend="inline">irish</code>, <code rend="inline">italian</code>, <code rend="inline">latin</code>, <code rend="inline">portuguese</code>, <code rend="inline">romanian</code>, <code rend="inline">swedish</code>, and <code rend="inline">welsh</code>. We can hope that the functionality will improve in future to include more languages.</p>
+                    <p>Some users reported getting a warning message when the code finished running. At the time of writing this is a warning that the <code rend="inline">syuzhet</code> codebase may need to be updated in future, but should not affect your ability to use it at present. The warning was that "spread_() was deprecated in tidyr 1.2.0. Please use spread() instead. The deprecated feature was likely used in the syuzhet package. Please report the issue to the authors." In this case, only Matthew Jockers can fix the error, as it is an issue with the code he created, not with your instructions to run it.</p>
+                    <p>When the process finishes, you may want to verify the contents of the new data object. To avoid printing thousands of lines of text, you can use the <code rend="inline">head()</code> function to show only the first six unigrams. If you are following the example, you should see the following (which is lacking in context at this point).</p>
+                    <ab>
+                        <code xml:id="code_sentiment-analysis-syuzhet_10" corresp="code_sentiment-analysis-syuzhet_10.txt" lang="language-R" rend="block"/>
+                    </ab>
+                    <div type="4">
+                        <head>Summary of the Text</head>
+                        <p>More interesting is a summary of the values associated with each of the six emotions and two sentiments, which can be displayed using the <code rend="inline">summary()</code> function. This can be very useful when comparing various texts, and can allow you to see different measures, such as the average relative value of each of the emotions and the two sentiments. For example, we can see that the novel <emph>Miau</emph> on average (<ref target="https://perma.cc/5NKH-2TYV">mean</ref>), uses more positive (0.05153) language than negative (0.04658), according to the algorithm. However, it seems that terms associated with sadness (0.02564) are also more prevalent than those associated with joy (0.01929).</p>
+                        <p>This summary output also shows a number of other calculations, many of which have a value of 0, including the <ref target="https://perma.cc/KB36-B855">median</ref>. Words that are not found in the sentiment lexicon (NRC) will automatically be treated as if they have a value of 0. Because there are a lot of categories and the story is quite complex, it is not surprising that no one emotion or sentiment has distinctively high statistical values. This makes the minimum, maximum, and mean the most useful measures from this summary output.</p>
+                        <ab>
+                            <code xml:id="code_sentiment-analysis-syuzhet_11" corresp="code_sentiment-analysis-syuzhet_11.txt" lang="language-R" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Interpreting the Results</head>
+                <p>You now have the quantitative results of your sentiment analysis of a text. Now, what can you do with these numbers? This section introduces three different visualisations of the data: bar charts, word counts, and word clouds, which offer quick but different ways of making sense of the outputs and telling a story or forming an argument about what you've discovered.</p>
+                <div type="3">
+                    <head>Bar Chart by Emotion</head>
+                    <p>To quickly get a sense of which emotions have a major presence in the text, a bar chart is both a simple and effective format for displaying your data (Figure 1). The built-in <ref target="https://perma.cc/5DXU-CYS9">
+                            <code rend="inline">barplot()</code>
+                        </ref> function can be paired with the summary data of each of the emotions: <emph>anger</emph>, <emph>anticipation</emph>, <emph>disgust</emph>, <emph>fear</emph>, <emph>joy</emph>, <emph>sadness</emph>, <emph>surprise</emph>, and <emph>trust</emph>. These are stored in columns 1 to 8 of our data table. This approach of displaying the data uses the <code rend="inline">prop.table()</code> function with the results of each of the emotion words to present the results.<ref type="footnotemark" target="#note_8"/>
+                    </p>
+                    <ab>
+                        <code xml:id="code_sentiment-analysis-syuzhet_12" corresp="code_sentiment-analysis-syuzhet_12.txt" lang="language-R" rend="block"/>
+                    </ab>
+                    <p>The rest of the parameters that you can see in the code are optional and have been added to help you learn how to customise the graph outputs. They include indicating the space between the bars (<code rend="inline">space = 0.2</code>), that the chart should include vertical not horizontal bars (<code rend="inline">horiz=FALSE</code>), and that the values on the axis should increase in units of 1 (<code rend="inline">las=1</code>). We also reduce the font size of the labels (<code rend="inline">cex.names = 0.7</code>) to make sure they fit nicely on the screen. Thanks to the <ref target="https://perma.cc/BHK9-AY7S">
+                            <code rend="inline">RColorBrewer</code>
+                        </ref> package that we installed and loaded at the beginning of the lesson, we can automatically colour the columns. In this case we've used the <code rend="inline">brewer.pal</code> colour palette from <code rend="inline">Set3</code>, and specified we need 8 colours (<code rend="inline">n=8</code>) – one colour per columnn. You can learn more about <code rend="inline">RColorBrewer</code> and its options on <ref target="https://perma.cc/4EHL-P8E9">the documentation page for that package</ref>. Finally, we add a title and subtitle to the graph using the <code rend="inline">main</code> and <code rend="inline">sub</code> parameters, along with the word <code rend="inline">emotions</code> on the X axis. We have not added a label to the Y axis, but you could do so if you wished by following the model above.</p>
+                    <figure>
+                        <desc>Figure 1: Bar chart showing the calculated scores of six emotions and two sub-emotions measured in the novel 'Miau' by Pérez Galdós.</desc>
+                        <graphic url="tr-en-analisis-de-sentimientos-r-1.png"/>
+                    </figure>
+                    <p>If you are not interested in modifying these parameters, you could create a bar chart with default styling using the following code:</p>
+                    <ab>
+                        <code xml:id="code_sentiment-analysis-syuzhet_13" corresp="code_sentiment-analysis-syuzhet_13.txt" lang="language-R" rend="block"/>
+                    </ab>
+                    <quote>
+                        <p>Make sure you have enough space in the display window for the graph to draw properly, including space for the labels.</p>
+                    </quote>
+                    <p>This information already indicates to us that the <emph>sadness</emph> and <emph>fear</emph> emotions are more prevalent than those of <emph>disgust</emph> or <emph>surprise</emph>. But what words does Galdós use to express <emph>fear</emph>? And how often does each emotionally charged word appear in the novel?</p>
+                </div>
+                <table>
+                    <row>
+                        <cell role="label">Spanish</cell>
+                        <cell role="label">English</cell>
+                    </row>
+                    <row>
+                        <cell>culpa</cell>
+                        <cell>fault</cell>
+                    </row>
+                    <row>
+                        <cell>ay</cell>
+                        <cell>ow!</cell>
+                    </row>
+                    <row>
+                        <cell>insignificante</cell>
+                        <cell>insignificant</cell>
+                    </row>
+                    <row>
+                        <cell>madre</cell>
+                        <cell>mother</cell>
+                    </row>
+                    <row>
+                        <cell>salir</cell>
+                        <cell>to leave</cell>
+                    </row>
+                    <row>
+                        <cell>malo</cell>
+                        <cell>bad</cell>
+                    </row>
+                    <row>
+                        <cell>caso</cell>
+                        <cell>case</cell>
+                    </row>
+                    <row>
+                        <cell>mal</cell>
+                        <cell>bad</cell>
+                    </row>
+                    <row>
+                        <cell>tarde</cell>
+                        <cell>late</cell>
+                    </row>
+                    <row>
+                        <cell>pobre</cell>
+                        <cell>poor</cell>
+                    </row>
+                    <row>
+                        <cell>nada</cell>
+                        <cell>nothing</cell>
+                    </row>
+                    <row>
+                        <cell>muy</cell>
+                        <cell>very</cell>
+                    </row>
+                </table>
+                <div type="3">
+                    <head>An Emotional Word Cloud</head>
+                    <p>In order to create a word cloud of terms that correspond with each emotion in <emph>Miau</emph>, you are going to first collect all words with an emotion score greater than 0. Similarly to the previous example, you use the <code rend="inline">$</code> symbol to specify which column of data (which emotion) you are interested in, indicating that you want entries with a value greater than 0.</p>
+                    <p>If working on a machine running Windows, you will have to indicate to the programme if your text contains accented characters using the following approach:</p>
+                    <div type="4">
+                        <head>On Mac and Linux</head>
+                        <ab>
+                            <code xml:id="code_sentiment-analysis-syuzhet_17" corresp="code_sentiment-analysis-syuzhet_17.txt" lang="language-R" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4">
+                        <head>On Windows</head>
+                        <p>Windows needs an additional step to indicate the text is in UTF-8 format, which is done using the <code rend="inline">iconv</code> function.</p>
+                        <ab>
+                            <code xml:id="code_sentiment-analysis-syuzhet_18" corresp="code_sentiment-analysis-syuzhet_18.txt" lang="language-R" rend="block"/>
+                        </ab>
+                        <p>Once you have collected the data for the four target emotions, you can organise it into four separate <code rend="inline">documents</code> to use as the basis for creating each of your four word clouds:</p>
+                        <ab>
+                            <code xml:id="code_sentiment-analysis-syuzhet_19" corresp="code_sentiment-analysis-syuzhet_19.txt" lang="language-R" rend="block"/>
+                        </ab>
+                        <p>Next, you transform the corpus into a term-document matrix using the <code rend="inline">TermDocumentMatrix()</code> function. Then you specify that you want the data organised as a matrix using the <code rend="inline">as.matrix()</code> function. </p>
+                        <p>To see the first few entries of this output, use the <code rend="inline">head</code> function:</p>
+                        <ab>
+                            <code xml:id="code_sentiment-analysis-syuzhet_20" corresp="code_sentiment-analysis-syuzhet_20.txt" lang="language-R" rend="block"/>
+                        </ab>
+                        <p>Now, rename the numbered columns with the relevant emotion words so that the output is more human-readable. Again, you can see the state of your dataset with the <code rend="inline">head</code> function:</p>
+                        <ab>
+                            <code xml:id="code_sentiment-analysis-syuzhet_21" corresp="code_sentiment-analysis-syuzhet_21.txt" lang="language-R" rend="block"/>
+                        </ab>
+                        <p>Finally, you can visualise these results as a word cloud. The font size of a word in a word cloud is linked to the frequency of its appearance in the document. We can also control a number of other aspects of the word cloud's presentation.</p>
+                        <p>To start, use the <code rend="inline">set.seed()</code> function to ensure that while following along your outputs will look the same as in the example (if you don't do this your output will have a randomised pattern and may not match the screenshots herein - which may not be important for your own research results but is helpful when following along). </p>
+                        <p>To generate the cloud itself, use the <ref target="https://perma.cc/6QRY-5KBG">comparison.cloud</ref> function from the R <code rend="inline">wordcloud</code> package. In this example, you will indicate that the object <code rend="inline">cloud_tdm</code> will have a non-random word order. You will also specify the colour scheme of each group of words, the title size, and general scale of the visualisation. To make the cloud readable, you will also specify a maximum number of terms. These parameters are all adjustable.</p>
+                        <ab>
+                            <code xml:id="code_sentiment-analysis-syuzhet_22" corresp="code_sentiment-analysis-syuzhet_22.txt" lang="language-R" rend="block"/>
+                        </ab>
+                        <p>You should get an image similar to Figure 2 although with the location of the words altered since it is generated according to the size of the canvas.</p>
+                        <figure>
+                            <desc>Figure 2: Word Cloud of most frequent words corresponding to sadness, happiness, anger, and joy in the novel 'Miau' by Pérez Galdós.</desc>
+                            <graphic url="tr-en-analisis-de-sentimientos-r-2.png"/>
+                        </figure>
+                        <p>What does the word cloud suggest to you? Surely the connection of 'very' (muy) to the sadness emotion and of 'money' (dinero) to the anger emotion needs further consideration. These less obvious results are exactly what many scholars warn about when thinking about sentiment analysis, and demonstrate why a researcher must always ask if the outcomes of the analysis make sense before trying to draw any research conclusions from them. As noted, the sentiment analysis vocabulary used in this tutorial uses a vocabulary that's been automatically translated from English, and is thus not perfect when used on Spanish-language text.</p>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>Visualising Emotion and Sentiment Across the Progression of a Text</head>
+                    <p>To complement the isolated readings of emotions as above, you can also study the fluctuation of positive and negative sentiment across the text (Figure 3). R provides a way to both normalise and visualise this time-series sentiment analysis data. Since the sentiment analysis algorithm assigns both positive and negative sentiment scores, you need to generate data between a range of -1 (most negative moments) and 1 (most positive moments); 0 is considered neutral. To calculate these scores, you multiply the values in the negative values of the original <code rend="inline">sentiment_scores</code> data table by -1 and then add the result to the positive values.</p>
+                    <ab>
+                        <code xml:id="code_sentiment-analysis-syuzhet_23" corresp="code_sentiment-analysis-syuzhet_23.txt" lang="language-R" rend="block"/>
+                    </ab>
+                    <p>Finally, you can generate a graph with the <code rend="inline">simple_plot()</code> function, which is built into the <code rend="inline">syuzhet</code> package, and which offers you a choice of two different graphs; the first presents the various measurements calculated by the algorithm, and the second is a normalisation of those measures. The horizontal axis (X axis) presents the text in 100 normalised fragments and the vertical axis (Y axis) shows the strength of the sentiment in the text. Depending on the computing power of your machine, the graph may take 20 to 30 minutes to finish rendering.</p>
+                    <ab>
+                        <code xml:id="code_sentiment-analysis-syuzhet_24" corresp="code_sentiment-analysis-syuzhet_24.txt" lang="language-R" rend="block"/>
+                    </ab>
+                    <quote>
+                        <p>Make sure your graph display window is sized large enough to actually draw the graph. If it isn't you will see the error message: <code rend="inline">Error in plot.new() : figure margins too large.</code>
+                        </p>
+                    </quote>
+                    <figure>
+                        <desc>Figure 3: Evolution of the use of positive and negative sentiment through the novel 'Miau' by Pérez Galdós</desc>
+                        <graphic url="tr-en-analisis-de-sentimientos-r-3.png"/>
+                    </figure>
+                    <p>Based on Figure 3, you might conclude that the novel <emph>Miau</emph> begins with fairly neutral language, transitions into moments of happiness early on, and moves into some quite negative description in the remaining pages, ending on a negative note, as indicated by the sample sentence we drew upon earlier in the lesson in which Villaamil dies. Anyone who has read the novel will know well the protagonist's despair, so in this case the analysis matches a traditional reading of the text, which answers our research question about whether or not the automated sentiment analysis reflects a close reading of the text.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Save Your Data</head>
+                <p>If you want to save the data so that you can come back to it later, you can archive it in comma separates values (<ref target="https://perma.cc/64FY-NTSU">CSV</ref>) format, using the function <code rend="inline">write.csv()</code>. This will save your main data table, <code rend="inline">sentiment_scores</code>, which contains the results of the eight emotions and two sentiments we generated, and puts that into a CSV file. You can also add the keyword associated with each row in the left-most column to act as helpful labels.</p>
+                <ab>
+                    <code xml:id="code_sentiment-analysis-syuzhet_25" corresp="code_sentiment-analysis-syuzhet_25.txt" lang="language-R" rend="block"/>
+                </ab>
+                <p>Now you have all of the tools and knowledge you need to start to analyse your own texts and compare them with each other.</p>
+            </div>
+            <div type="2">
+                <head>Loading your own Sentiment Lexicon</head>
+                <p>While the above introduction provides you with many tools for exploring sentiment analysis, this tutorial has not presented an exhaustive list of possibilities. </p>
+                <p>You may be working on a project in which you have already created a sentiment dictionary that you would like to use. Or perhaps you need to be able to customise a vocabulary and its corresponding sentiment scores to apply to a particular cultural or temporal context related to your research. Maybe you're looking to improve upon the automatically translated results of the NRC lexicon used here. In each of those cases, as of mid 2022, you can also load your own lexicon dataset into the software using the <code rend="inline">custom</code> function to repeat some of the calculations and visualisations used in this lesson.</p>
+                <p>To load your own sentiment lexicon, you first have to create or modify a dataframe containing at minimum a column of words and a column containing the corresponding scores for those words, which the author recommends saving in a CSV file format. </p>
+                <p>Try this example:</p>
+                <ab>
+                    <code xml:id="code_sentiment-analysis-syuzhet_26" corresp="code_sentiment-analysis-syuzhet_26.txt" lang="language-R" rend="block"/>
+                </ab>
+                <p>Next, to load your saved data from a CSV file, use the <code rend="inline">read.csv</code> function, which will create a new dataset that you can access in R just as you have in the above examples (change 'FILEPATH' to the full location of your CSV file):</p>
+                <ab>
+                    <code xml:id="code_sentiment-analysis-syuzhet_27" corresp="code_sentiment-analysis-syuzhet_27.txt" lang="language-R" rend="block"/>
+                </ab>
+                <p style="alert alert-warning">
+Warning: If you get an error message 'incomplete final line found by readTableHeader', this indicates that your CSV file has not formatted properly and lacks an 'end of line' character at the end of the file. The easiest way to correct this is to open your CSV file in a text editor (not MS Word), scroll to the end of the file, press return, and re-save the file. <ref target="https://perma.cc/3KDL-DNAL">A fuller explanation of this error is available on Stack Overflow</ref>.
+</p>
+                <p>If you want to visualise sentiment across the progression of a text, you can use the <code rend="inline">plot</code> function, which uses the same graphing parameters that you've already learned:</p>
+                <ab>
+                    <code xml:id="code_sentiment-analysis-syuzhet_28" corresp="code_sentiment-analysis-syuzhet_28.txt" lang="language-R" rend="block"/>
+                </ab>
+                <p>Keep in mind that this form of customised analysis is limited, and that you may not be able to perform all of the same operations that we introduced above. For example, following the model example with your own dictionary, as you would not have information about emotions you would not be able to make a word cloud in the same way.</p>
+            </div>
+            <div type="2">
+                <head>Works Cited</head>
+                <list type="unordered">
+                    <item>Arnold, Taylor, and Lauren Tilton. 'Basic Text Processing in R', <emph>Programming Historian</emph> 6 (2017), <ref target="https://doi.org/10.46430/phen0061">https://doi.org/10.46430/phen0061</ref>
+                    </item>
+                    <item>Damasio, Antonio R. <emph>El error de Descartes: La razón de las emociones</emph> (Andres Bello, 1999).</item>
+                    <item>Dewar, Taryn. 'R Basics with Tabular Data', <emph>Programming Historian</emph> 5 (2016), <ref target="https://doi.org/10.46430/phen0056">https://doi.org/10.46430/phen0056</ref>.</item>
+                    <item>Gottschalk, Louis, and Goldine Gleser. <emph>The Measurement of Psychological States through the Content Analysis of Verbal Behaviour</emph> (University of California, 1969).</item>
+                    <item>Heuser, Ryan, Franco Moretti, Erik Steiner. 'The Emotions of London' <emph>Stanford Literary Lab</emph>, Pamphlet 13 (2016) 1-10.</item>
+                    <item>Hu, Minqing, and Bing Liu, 'Mining and Summarizing Customer Reviews.', <emph>Proceedings of the ACM SIGKDD International Conference on Knowledge Discovery &amp; Data Mining</emph> (KDD-2004), 2004.</item>
+                    <item>Jockers, Matthew. 'Introduction to the Syuzhet Package' <emph>CRAN</emph> (2020), <ref target="https://cran.r-project.org/web/packages/syuzhet/vignettes/syuzhet-vignette.html">https://cran.r-project.org/web/packages/syuzhet/vignettes/syuzhet-vignette.html</ref>.</item>
+                    <item>Jockers, Matthew. 'Some thoughts on Annie's thoughts...about Syuzhet' <emph>Matthew L. Jockers</emph> (2015), <ref target="https://web.archive.org/web/20190708100723/http://www.matthewjockers.net/page/2/">http://www.matthewjockers.net/page/2/</ref>.</item>
+                    <item>Leemans, Inger, Janneke M. van der Zwaan, Isa Maks, Erika Kujpers, Kristine Steenberge. 'Mining Embodied Emotions: A Comparative Analysis of Sentiment and Emotion in Dutch Texts, 1600-1800' <emph>Digital Humanities Quarterly</emph> 11 (2017).</item>
+                    <item>Liu, Bing. <emph>Sentiment Analysis and Opinion Mining</emph> (Morgan &amp; Claypool, 2012).</item>
+                    <item>Meder, Theo, Dong Nguyen, Rilana Gravel. ‘The Apocalypse on Twitter’ <emph>Digital Scholarship in the Humanities</emph> 31 (2016), 398-410. </item>
+                    <item>Mohammad, Saif. 'NRC Word-Emotion Association Lexicon', <emph>National Research Council Canada</emph> (2010), <ref target="https://perma.cc/A8M5-2SDG">https://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm</ref>.</item>
+                    <item>Mohammad, Saif, and Peter D. Turney. 'Crowdsourcing a Word–Emotion Association Lexicon' <emph>Computational Intelligence</emph> 29 (2013): 436-465, doi: 10.1111/j.1467-8640.2012.00460.x.</item>
+                    <item>Nguyen, Thein Hai, Kiyoaki Shirai, Julien Velcin. 'Sentiment Analysis on Social Media for Stock Movement Prediction' <emph>Expert Systems with Applications</emph> 42 (2015), 9603-9611.</item>
+                    <item>Nielsen, Finn Årup. 'AFINN Sentiment Lexicon' (2009-2011).</item>
+                    <item>Pereira Zazo, Óscar. <emph>El analisis de la comunicación en español</emph> (Kendal Hunt, 2015).</item>
+                    <item>Pérez Galdós, Benito. <emph>Miau</emph> (La Guirnalda, 1888). </item>
+                    <item>Pérez Galdós, Benito. <emph>Miau</emph> (Sucesores de Hernando, 1907).</item>
+                    <item>Rodríguez Aldape, Fernando Manuel. <emph>Cuantificación del Interés de un usuario en un tema mediante minería de texto y análisis de sentimiento.</emph> (MA Thesis, Universidad Autónoma de Nuevo León, 2013).</item>
+                    <item>Schmidt, Thomas, Manuel Burghardt, Christian Wolff. 'Towards Multimodal Sentiment Analysis of Historic Plays: A Case Study with Text and Audio for Lessing's Emilia Galotti' <emph>4th Conference of the Association of Digital Humanities in the Nordic Countries</emph> (2019).</item>
+                    <item>Siddiqui, Nabeel. 'Data Wrangling and Management in R', <emph>Programming Historian</emph> 6 (2017), <ref target="https://doi.org/10.46430/phen0063">https://doi.org/10.46430/phen0063</ref>.</item>
+                    <item>Sprugnoli, Rachele, Sara Tonelli, Alessandro Marchetti, Giovanni Moretti. 'Towards Sentiment Analysis for Historical Texts' <emph>Digital Scholarship in the Humanities</emph> 31 (2016): 762-772.</item>
+                    <item>Stone, Philip, Dexter Dunphy, Marshall Smith. ‘The General Inquirer: A Computer Approach to Content Analysis’ (M.I.T. Press, 1966).</item>
+                    <item>Swafford, Annie. 'Problems with the Syuzhet Package' <emph>Anglophile in Academia</emph> (2015), <ref target="https://perma.cc/TYT3-5DTU">https://annieswafford.wordpress.com/2015/03/02/syuzhet/</ref>.</item>
+                    <item>Wilkinson Saldaña, Zoë.  'Sentiment Analysis for Exploratory Data Analysis,' <emph>Programming Historian</emph> 7 (2018), <ref target="https://doi.org/10.46430/phen0079">https://doi.org/10.46430/phen0079</ref>
+                    </item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Notes</head>
+                <p>
+                    <ref type="footnotemark" target="#note_1"/> : For example, see: Louis Gottschalk, Goldine Gleser (1969) <emph>The Measurement of Psychological States through the Content Analysis of Verbal Behaviour</emph> (University of California); Philip Stone, Dexter Dunphy, Marshall Smith (1966) ‘The General Inquirer: A Computer Approach to Content Analysis’ (M.I.T. Press); Bing Liu, (2012) <emph>Sentiment Analysis and Opinion Mining</emph> (Morgan &amp; Claypool); Thein Hai Nguyen, Kiyoaki Shirai, Julien Velcin (2015). ‘Sentiment Analysis on Social Media for Stock Movement Prediction’ <emph>Expert Systems with Applications</emph> 42: 9603-9611; Theo Meder, Dong Nguyen, Rilana Gravel (2016). ‘The Apocalypse on Twitter’ <emph>Digital Scholarship in the Humanities</emph> 31 (2): 398-410.
+<ref type="footnotemark" target="#note_2"/> : For some examples in English, see: Inger Leemans, Janneke M. van der Zwaan, Isa Maks, Erika Kujpers, Kristine Steenberge (2017). 'Mining Embodied Emotions: A Comparative Analysis of Sentiment and Emotion in Dutch Texts, 1600-1800' <emph>Digital Humanities Quarterly</emph> 11 (4); Rachele Sprugnoli, Sara Tonelli, Alessandro Marchetti, Giovanni Moretti (2016). 'Towards Sentiment Analysis for Historical Texts' <emph>Digital Scholarship in the Humanities</emph> 31 (4): 762-772; Thomas Schmidt, Manuel Burghardt, Christian Wolff (2019). 'Towards Multimodal Sentiment Analysis of Historic Plays: A Case Study with Text and Audio for Lessing's Emilia Galotti' <emph>4th Conference of the Association of Digital Humanities in the Nordic Countries</emph>; Ryan Heuser, Franco Moretti, Erik Steiner (2016). 'The Emotions of London' <emph>Stanford Literary Lab</emph>, Pamphlet 13: 1-10.
+<ref type="footnotemark" target="#note_3"/> : Antonio R. Damasio, <emph>El Error de Descartes: La razón de las emociones</emph>. (Barcelona: Andres Bello, 1999).
+<ref type="footnotemark" target="#note_4"/> : Óscar Pereira Zazo, <emph>El analisis de la comunicación en español</emph> (Iowa: Kendal Hunt, 2015), 32.
+<ref type="footnotemark" target="#note_5"/> : 'Bing': Minqing Hu and Bing Liu, 'Mining and summarizing customer reviews.', <emph>Proceedings of the ACM SIGKDD International Conference on Knowledge Discovery &amp; Data Mining</emph> (KDD-2004), 2004; 'Afinn': Finn Årup Nielsen, 'AFINN Sentiment Lexicon' (2009-2011); 'NRC': Saif Mohammad, '<ref target="https://perma.cc/A8M5-2SDG">NRC Word-Emotion Association Lexicon</ref>', <emph>National Research Council Canada</emph> (2010).
+<ref type="footnotemark" target="#note_6"/> : Saif Mohammad and Peter D. Turney, 'Crowdsourcing a Word–Emotion Association Lexicon', <emph>Computational intelligence</emph> 29 (2013): 436-465, doi: 10.1111/j.1467-8640.2012.00460.x
+<ref type="footnotemark" target="#note_7"/> : Richard Socher, 'Recursive Deep Learning for Natural Language Processing and Computer Vision' PhD diss., (Stanford University, 2014).
+<ref type="footnotemark" target="#note_8"/> : Thanks to Mounika Puligurthi, intern at the University of Texas (UT) Digital Scholarship Office (during the spring of 2019), for her help interpreting this calculation.
+<ref type="footnotemark" target="#note_9"/> : There are more words assigned to the emotion <emph>sadness</emph> than to <emph>joy</emph>, both in total number of words (2,061 vs 1,552) and in unique words (349 vs 263). The word 'Mother' appears under both sadness and joy with a value of 33 points. What do you think the significance of that classification decision is?</p>
+            </div>
+        </body>
+    </text>
+</TEI>

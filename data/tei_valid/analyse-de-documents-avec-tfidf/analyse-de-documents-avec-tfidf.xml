@@ -1,0 +1,907 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="analyse-de-documents-avec-tfidf">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Analyse de documents avec TF-IDF</title>
+                <author role="original_author">Matthew J. Lavin</author>
+                <editor role="reviewers">
+                    <persName>Quinn Dombrowski</persName>
+                    <persName>Catherine Nygren</persName>
+                </editor>
+                <author role="translators">François Dominic Laramée</author>
+                <editor role="translation-reviewers">
+                    <persName>Amélie Daloz</persName>
+                    <persName>Rémi Cardon</persName>
+                </editor>
+                <editor role="editors">Zoe LeBlanc</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">06/27/2022</date>
+                <idno type="doi">10.46430/phfr0022</idno>
+                <date type="published">05/13/2019</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#analyzing-documents-with-tfidf"/>.</p>
+                <p>There are other translations: <ref target=""/>
+                </p>
+                <p>There are other translations: <ref target=""/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Cette leçon présente une méthode de traitement automatique des langues et de recherche d'informations nommée Term Frequency - Inverse Document Frequency (tf-idf). Elle en expose les fondations et introduit à l'occasion des questions et des concepts liés à l'analyse de textes.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">distant-reading</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="fr">
+        <body>
+            <div type="2">
+                <head>Aperçu</head>
+                <p>Cette leçon présente une méthode de traitement automatique des langues et de recherche d'informations nommée <hi rend="bold">tf-idf</hi>, une appellation tirée de l'anglais <emph>Term Frequency - Inverse Document Frequency</emph>. Vous avez peut-être déjà entendu parler du <hi rend="bold">tf-idf</hi> dans le contexte d'une discussion de la modélisation thématique, de l'apprentissage automatique ou d'autres méthodes d'analyse textuelle. <hi rend="bold">Tf-idf</hi> apparaît régulièrement dans la littérature scientifique car il s'agit à la fois d'une méthode d'exploration de <ref target="https://perma.cc/G2LA-EKTH">corpus</ref> et d'une étape de prétraitement utile pour plusieurs autres méthodes de fouille de textes et de modélisation.</p>
+                <p>En étudiant <hi rend="bold">tf-idf</hi>, vous découvrirez une méthode d'analyse textuelle que vous pourrez appliquer immédiatement. Cette leçon vous permettra aussi de vous familiariser avec certaines des questions et certains des concepts de l'analyse textuelle assistée par ordinateur. Notamment, cette leçon explique comment isoler les mots les plus significatifs d'un document, des mots qui ont tendance à apparaître fréquemment dans de nombreux documents rédigés dans une même langue. Outre <hi rend="bold">tf-idf</hi>, il existe de nombreuses méthodes qui permettent de déterminer les mots et les locutions spécifiques à un ensemble de documents. Je recommande fortement la lecture de ce billet de blogue de Ted Underwood<ref type="footnotemark" target="#note_1"/> en complément d'information.</p>
+            </div>
+            <div type="2">
+                <head>Préparation</head>
+                <div type="3">
+                    <head>Connaissances préalables recommandées</head>
+                    <list type="unordered">
+                        <item>Être familiarisé(e) avec Python ou un langage de programmation similaire. Le code de cette leçon a été programmé en Python 3.6, mais vous pouvez exécuter <hi rend="bold">tf-idf</hi> dans toutes les versions courantes de Python, en utilisant l'un des divers modules appropriés, ainsi que dans plusieurs autres langages de programmation. Le niveau de compétence en programmation requis est difficile à évaluer, mais vous devrez au moins être à l'aise avec les types de données et les opérations élémentaires. Pour tirer profit de cette leçon, il serait aussi souhaitable de suivre un cours comme celui proposé par Antoine Rozo sur <ref target="https://perma.cc/7WJ4-WD3P">zestedesavoir.com</ref> ou d'avoir suivi certaines des <ref target="/fr/lecons/introduction-et-installation">leçons d'introduction à la programmation en Python</ref> du <emph>Programming Historian</emph>. Si vous avez accès à une bibliothèque, n'hésitez pas à consulter le livre d'Émilien Schultz et de Matthias Bussonnier <ref target="http://www.worldcat.org/oclc/1232233436">
+                                <emph>Python pour les sciences humaines et sociales</emph>
+                            </ref>.   </item>
+                        <item>À défaut de pouvoir suivre la recommandation précédente, vous pourriez <ref target="https://perma.cc/YDT4-9JJ6">réviser les bases de Python</ref>, dont les types de données élémentaires (chaînes de caractères, nombres entiers, nombres réels, tuples, listes et dictionnaires), les variables, les boucles, les classes d'objets et leurs instances.</item>
+                        <item>La maîtrise des bases d'Excel ou d'un autre tableur pourrait être utile si vous souhaitez examiner les feuilles de calcul au format CSV liées à cette leçon de plus près. Vous pouvez aussi employer le module Pandas du langage Python pour lire ces fichiers CSV.</item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Avant de commencer</head>
+                    <list type="unordered">
+                        <item>Installez la version Python 3 de l'environnement de développement Anaconda. La méthode à suivre est expliquée dans la leçon <ref target="/en/lessons/text-mining-with-extracted-features">Text Mining in Python through the HTRC Feature Reader</ref> (en anglais). Vous obtiendrez le langage Python 3.6 (ou une version plus récente), le module <ref target="https://scikit-learn.org/stable/install.html">Scikit-Learn</ref> (qui contient la version de <hi rend="bold">tf-idf</hi> que nous présentons ici) et tout ce qu'il faut pour exécuter du code Python dans un <ref target="https://jupyter.org/">carnet Jupyter</ref>.</item>
+                        <item>Il est possible d'obtenir toutes les librairies nécessaires sans installer Anaconda ou en choisissant plutôt une alternative plus légère comme <ref target="https://docs.conda.io/en/latest/miniconda.html">Miniconda</ref>. Pour plus d'informations, consultez la section <ref target="#alternatives-%C3%A0-anaconda">« Alternatives à Anaconda »</ref> à la fin de cette leçon.</item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Jeu de données</head>
+                    <p>Pour comprendre comment fonctionne <hi rend="bold">tf-idf</hi>, prenons un exemple. J'ai donc préparé pour vous un jeu de données formé de 366 <ref target="https://perma.cc/73CL-ZKL3">nécrologies</ref> historiques publiées dans le <emph>New York Times</emph> et moissonnées sur le site <ref target="https://perma.cc/R2V7-UBXX">https://archive.nytimes.com/www.nytimes.com/learning/general/onthisday/</ref> sur lequel, à chaque jour de l'année, le <emph>New York Times</emph> mettait en vedette la nécrologie d'une personne dont c'était l'anniversaire de naissance.</p>
+                    <p>Les fichiers requis pour suivre la leçon, dont ce jeu de données, peuvent être téléchargés <ref target="/assets/tf-idf/lecon-fichiers.zip">ici</ref>. Le jeu de données est assez petit pour que vous puissiez ouvrir et lire au moins quelques-uns des fichiers textes. Les données moissonnées sont également disponibles à deux endroits : </p>
+                    <list type="ordered">
+                        <item>Dans le répertoire <code rend="inline">necrologies</code> contenant les fichiers .html téléchargés à partir du site web « On This Day » de 2011</item>
+                        <item>Dans le répertoire <code rend="inline">txt</code> contenant des fichiers .txt.</item>
+                    </list>
+                    <p>Dans ces derniers se trouve le corps du texte de chaque nécrologie. Ces fichiers ont été générés à l'aide du <ref target="https://perma.cc/N6KK-ADEG">module Python</ref> nommé <ref target="https://perma.cc/2KTE-AEM3">BeautifulSoup</ref>.</p>
+                    <p>Ce corpus nécrologique constitue un artéfact historique en soi. Le choix éditorial des nécrologies est le reflet de choix d'inclusion et de représentation historiquement situé. Et cela a un fort impact sur le corpus. La signification de ce genre de décisions a été soulignée par le <emph>New York Times</emph> lui-même en mars 2018, lorsque le journal a commencé à publier les nécrologies de « femmes négligées ».<ref type="footnotemark" target="#note_2"/> Comme l'ont souligné à ce moment Amisha Padnani et Jessica Bennett, « de qui l'on se souvient - et comment on le fait - dépend invariablement d'un jugement. Revoir l'archive nécrologique peut ainsi constituer une leçon brutale sur la manière dont la société évaluait certaines réalisations et les personnes qui en sont responsables » (traduction libre). Vu sous cet angle, le jeu de données proposé ici constitue non pas un échantillon représentatif des nécrologies historiques, mais plutôt une vitrine vers les personnes que le <emph>New York Times</emph> jugeait dignes d'être mises en valeur en 2010-2011. Vous remarquerez que plusieurs des personnages historiques mentionnés sont bien connus, ce qui suggère un effort conscient de se pencher sur l'histoire du <emph>New York Times</emph> pour choisir les nécrologies selon des critères particuliers.<ref type="footnotemark" target="#note_3"/>
+                    </p>
+                </div>
+                <table>
+                    <row>
+                        <cell role="label">Rang</cell>
+                        <cell role="label">Terme</cell>
+                        <cell role="label">Décompte (tf)</cell>
+                    </row>
+                    <row>
+                        <cell>10</cell>
+                        <cell>vexations</cell>
+                        <cell>6.21</cell>
+                    </row>
+                    <row>
+                        <cell>9</cell>
+                        <cell>plume</cell>
+                        <cell>6.21</cell>
+                    </row>
+                    <row>
+                        <cell>8</cell>
+                        <cell>ironclad</cell>
+                        <cell>6.21</cell>
+                    </row>
+                    <row>
+                        <cell>7</cell>
+                        <cell>mark</cell>
+                        <cell>8.64</cell>
+                    </row>
+                    <row>
+                        <cell>6</cell>
+                        <cell>nellie</cell>
+                        <cell>9.92</cell>
+                    </row>
+                    <row>
+                        <cell>5</cell>
+                        <cell>bly</cell>
+                        <cell>12.42</cell>
+                    </row>
+                    <row>
+                        <cell>4</cell>
+                        <cell>seaman</cell>
+                        <cell>14.88</cell>
+                    </row>
+                    <row>
+                        <cell>3</cell>
+                        <cell>she</cell>
+                        <cell>16.22</cell>
+                    </row>
+                    <row>
+                        <cell>2</cell>
+                        <cell>her</cell>
+                        <cell>22.74</cell>
+                    </row>
+                    <row>
+                        <cell>1</cell>
+                        <cell>cochrane</cell>
+                        <cell>24.85</cell>
+                    </row>
+                </table>
+                <table>
+                    <row>
+                        <cell role="label">Rang</cell>
+                        <cell role="label">Terme</cell>
+                        <cell role="label">Décompte (tf)</cell>
+                    </row>
+                    <row>
+                        <cell>10</cell>
+                        <cell>to</cell>
+                        <cell>4</cell>
+                    </row>
+                    <row>
+                        <cell>9</cell>
+                        <cell>was</cell>
+                        <cell>4</cell>
+                    </row>
+                    <row>
+                        <cell>8</cell>
+                        <cell>cochrane</cell>
+                        <cell>4</cell>
+                    </row>
+                    <row>
+                        <cell>7</cell>
+                        <cell>at</cell>
+                        <cell>8</cell>
+                    </row>
+                    <row>
+                        <cell>6</cell>
+                        <cell>she</cell>
+                        <cell>10</cell>
+                    </row>
+                    <row>
+                        <cell>5</cell>
+                        <cell>and</cell>
+                        <cell>13</cell>
+                    </row>
+                    <row>
+                        <cell>4</cell>
+                        <cell>in</cell>
+                        <cell>14</cell>
+                    </row>
+                    <row>
+                        <cell>3</cell>
+                        <cell>her</cell>
+                        <cell>15</cell>
+                    </row>
+                    <row>
+                        <cell>2</cell>
+                        <cell>of</cell>
+                        <cell>16</cell>
+                    </row>
+                    <row>
+                        <cell>1</cell>
+                        <cell>the</cell>
+                        <cell>21</cell>
+                    </row>
+                </table>
+            </div>
+            <div type="2">
+                <head>Exécution de tf-idf</head>
+                <table>
+                    <row>
+                        <cell role="label">Indice</cell>
+                        <cell role="label">Mot</cell>
+                        <cell role="label">Décompte</cell>
+                        <cell role="label">Df</cell>
+                        <cell role="label">Idf</cell>
+                        <cell role="label">Tf-idf</cell>
+                    </row>
+                    <row>
+                        <cell>30</cell>
+                        <cell>character</cell>
+                        <cell>1</cell>
+                        <cell>89</cell>
+                        <cell>2.40555218</cell>
+                        <cell>2.40555218</cell>
+                    </row>
+                    <row>
+                        <cell>29</cell>
+                        <cell>career</cell>
+                        <cell>1</cell>
+                        <cell>223</cell>
+                        <cell>1.49371580</cell>
+                        <cell>1.49371580</cell>
+                    </row>
+                    <row>
+                        <cell>28</cell>
+                        <cell>by</cell>
+                        <cell>3</cell>
+                        <cell>349</cell>
+                        <cell>1.04742869</cell>
+                        <cell>3.14228608</cell>
+                    </row>
+                    <row>
+                        <cell>27</cell>
+                        <cell>but</cell>
+                        <cell>1</cell>
+                        <cell>343</cell>
+                        <cell>1.06472019</cell>
+                        <cell>1.06472019</cell>
+                    </row>
+                    <row>
+                        <cell>26</cell>
+                        <cell>born</cell>
+                        <cell>1</cell>
+                        <cell>342</cell>
+                        <cell>1.06763140</cell>
+                        <cell>1.06763140</cell>
+                    </row>
+                    <row>
+                        <cell>25</cell>
+                        <cell>body</cell>
+                        <cell>1</cell>
+                        <cell>112</cell>
+                        <cell>2.17797403</cell>
+                        <cell>2.17797403</cell>
+                    </row>
+                    <row>
+                        <cell>24</cell>
+                        <cell>bly</cell>
+                        <cell>2</cell>
+                        <cell>1</cell>
+                        <cell>6.21221467</cell>
+                        <cell>12.42442933</cell>
+                    </row>
+                    <row>
+                        <cell>23</cell>
+                        <cell>bell</cell>
+                        <cell>1</cell>
+                        <cell>24</cell>
+                        <cell>3.68648602</cell>
+                        <cell>3.68648602</cell>
+                    </row>
+                    <row>
+                        <cell>22</cell>
+                        <cell>began</cell>
+                        <cell>1</cell>
+                        <cell>241</cell>
+                        <cell>1.41642412</cell>
+                        <cell>1.41642412</cell>
+                    </row>
+                    <row>
+                        <cell>21</cell>
+                        <cell>beat</cell>
+                        <cell>1</cell>
+                        <cell>33</cell>
+                        <cell>3.37900132</cell>
+                        <cell>3.37900132</cell>
+                    </row>
+                    <row>
+                        <cell>20</cell>
+                        <cell>be</cell>
+                        <cell>1</cell>
+                        <cell>332</cell>
+                        <cell>1.09721936</cell>
+                        <cell>1.09721936</cell>
+                    </row>
+                    <row>
+                        <cell>19</cell>
+                        <cell>baxter</cell>
+                        <cell>1</cell>
+                        <cell>4</cell>
+                        <cell>5.29592394</cell>
+                        <cell>5.29592394</cell>
+                    </row>
+                    <row>
+                        <cell>18</cell>
+                        <cell>barrel</cell>
+                        <cell>1</cell>
+                        <cell>7</cell>
+                        <cell>4.82592031</cell>
+                        <cell>4.82592031</cell>
+                    </row>
+                    <row>
+                        <cell>17</cell>
+                        <cell>bankruptcy</cell>
+                        <cell>1</cell>
+                        <cell>8</cell>
+                        <cell>4.70813727</cell>
+                        <cell>4.70813727</cell>
+                    </row>
+                    <row>
+                        <cell>16</cell>
+                        <cell>balloon</cell>
+                        <cell>1</cell>
+                        <cell>2</cell>
+                        <cell>5.80674956</cell>
+                        <cell>5.80674956</cell>
+                    </row>
+                    <row>
+                        <cell>15</cell>
+                        <cell>avenue</cell>
+                        <cell>2</cell>
+                        <cell>68</cell>
+                        <cell>2.67125534</cell>
+                        <cell>5.34251069</cell>
+                    </row>
+                    <row>
+                        <cell>14</cell>
+                        <cell>at</cell>
+                        <cell>8</cell>
+                        <cell>362</cell>
+                        <cell>1.01095901</cell>
+                        <cell>8.08767211</cell>
+                    </row>
+                    <row>
+                        <cell>13</cell>
+                        <cell>asylum</cell>
+                        <cell>1</cell>
+                        <cell>2</cell>
+                        <cell>5.80674956</cell>
+                        <cell>5.80674956</cell>
+                    </row>
+                    <row>
+                        <cell>12</cell>
+                        <cell>ascension</cell>
+                        <cell>1</cell>
+                        <cell>6</cell>
+                        <cell>4.95945170</cell>
+                        <cell>4.95945170</cell>
+                    </row>
+                    <row>
+                        <cell>11</cell>
+                        <cell>as</cell>
+                        <cell>2</cell>
+                        <cell>357</cell>
+                        <cell>1.02482886</cell>
+                        <cell>2.04965772</cell>
+                    </row>
+                    <row>
+                        <cell>10</cell>
+                        <cell>around</cell>
+                        <cell>2</cell>
+                        <cell>149</cell>
+                        <cell>1.89472655</cell>
+                        <cell>3.78945311</cell>
+                    </row>
+                    <row>
+                        <cell>9</cell>
+                        <cell>and</cell>
+                        <cell>13</cell>
+                        <cell>364</cell>
+                        <cell>1.00546449</cell>
+                        <cell>13.07103843</cell>
+                    </row>
+                    <row>
+                        <cell>8</cell>
+                        <cell>an</cell>
+                        <cell>1</cell>
+                        <cell>352</cell>
+                        <cell>1.03889379</cell>
+                        <cell>1.03889379</cell>
+                    </row>
+                    <row>
+                        <cell>7</cell>
+                        <cell>american</cell>
+                        <cell>1</cell>
+                        <cell>277</cell>
+                        <cell>1.27774073</cell>
+                        <cell>1.27774073</cell>
+                    </row>
+                    <row>
+                        <cell>6</cell>
+                        <cell>all</cell>
+                        <cell>1</cell>
+                        <cell>310</cell>
+                        <cell>1.16556894</cell>
+                        <cell>1.16556894</cell>
+                    </row>
+                    <row>
+                        <cell>5</cell>
+                        <cell>air</cell>
+                        <cell>1</cell>
+                        <cell>80</cell>
+                        <cell>2.51091269</cell>
+                        <cell>2.51091269</cell>
+                    </row>
+                    <row>
+                        <cell>4</cell>
+                        <cell>ago</cell>
+                        <cell>1</cell>
+                        <cell>161</cell>
+                        <cell>1.81776551</cell>
+                        <cell>1.81776551</cell>
+                    </row>
+                    <row>
+                        <cell>3</cell>
+                        <cell>age</cell>
+                        <cell>1</cell>
+                        <cell>224</cell>
+                        <cell>1.48926145</cell>
+                        <cell>1.48926145</cell>
+                    </row>
+                    <row>
+                        <cell>2</cell>
+                        <cell>against</cell>
+                        <cell>1</cell>
+                        <cell>189</cell>
+                        <cell>1.65833778</cell>
+                        <cell>1.65833778</cell>
+                    </row>
+                    <row>
+                        <cell>1</cell>
+                        <cell>afternoon</cell>
+                        <cell>1</cell>
+                        <cell>66</cell>
+                        <cell>2.70066923</cell>
+                        <cell>2.70066923</cell>
+                    </row>
+                </table>
+                <table>
+                    <row>
+                        <cell role="label">Indice</cell>
+                        <cell role="label">Mot</cell>
+                        <cell role="label">Décompte (tf)</cell>
+                        <cell role="label">Df</cell>
+                    </row>
+                    <row>
+                        <cell>30</cell>
+                        <cell>character</cell>
+                        <cell>1</cell>
+                        <cell>89</cell>
+                    </row>
+                    <row>
+                        <cell>29</cell>
+                        <cell>career</cell>
+                        <cell>1</cell>
+                        <cell>223</cell>
+                    </row>
+                    <row>
+                        <cell>28</cell>
+                        <cell>by</cell>
+                        <cell>3</cell>
+                        <cell>349</cell>
+                    </row>
+                    <row>
+                        <cell>27</cell>
+                        <cell>but</cell>
+                        <cell>1</cell>
+                        <cell>343</cell>
+                    </row>
+                    <row>
+                        <cell>26</cell>
+                        <cell>born</cell>
+                        <cell>1</cell>
+                        <cell>342</cell>
+                    </row>
+                    <row>
+                        <cell>25</cell>
+                        <cell>body</cell>
+                        <cell>1</cell>
+                        <cell>112</cell>
+                    </row>
+                    <row>
+                        <cell>24</cell>
+                        <cell>bly</cell>
+                        <cell>2</cell>
+                        <cell>1</cell>
+                    </row>
+                    <row>
+                        <cell>23</cell>
+                        <cell>bell</cell>
+                        <cell>1</cell>
+                        <cell>24</cell>
+                    </row>
+                    <row>
+                        <cell>22</cell>
+                        <cell>began</cell>
+                        <cell>1</cell>
+                        <cell>241</cell>
+                    </row>
+                    <row>
+                        <cell>21</cell>
+                        <cell>beat</cell>
+                        <cell>1</cell>
+                        <cell>33</cell>
+                    </row>
+                    <row>
+                        <cell>20</cell>
+                        <cell>be</cell>
+                        <cell>1</cell>
+                        <cell>332</cell>
+                    </row>
+                    <row>
+                        <cell>19</cell>
+                        <cell>baxter</cell>
+                        <cell>1</cell>
+                        <cell>4</cell>
+                    </row>
+                    <row>
+                        <cell>18</cell>
+                        <cell>barrel</cell>
+                        <cell>1</cell>
+                        <cell>7</cell>
+                    </row>
+                    <row>
+                        <cell>17</cell>
+                        <cell>bankruptcy</cell>
+                        <cell>1</cell>
+                        <cell>8</cell>
+                    </row>
+                    <row>
+                        <cell>16</cell>
+                        <cell>balloon</cell>
+                        <cell>1</cell>
+                        <cell>2</cell>
+                    </row>
+                    <row>
+                        <cell>15</cell>
+                        <cell>avenue</cell>
+                        <cell>2</cell>
+                        <cell>68</cell>
+                    </row>
+                    <row>
+                        <cell>14</cell>
+                        <cell>at</cell>
+                        <cell>8</cell>
+                        <cell>362</cell>
+                    </row>
+                    <row>
+                        <cell>13</cell>
+                        <cell>asylum</cell>
+                        <cell>1</cell>
+                        <cell>2</cell>
+                    </row>
+                    <row>
+                        <cell>12</cell>
+                        <cell>ascension</cell>
+                        <cell>1</cell>
+                        <cell>6</cell>
+                    </row>
+                    <row>
+                        <cell>11</cell>
+                        <cell>as</cell>
+                        <cell>2</cell>
+                        <cell>357</cell>
+                    </row>
+                    <row>
+                        <cell>10</cell>
+                        <cell>around</cell>
+                        <cell>2</cell>
+                        <cell>149</cell>
+                    </row>
+                    <row>
+                        <cell>9</cell>
+                        <cell>and</cell>
+                        <cell>13</cell>
+                        <cell>364</cell>
+                    </row>
+                    <row>
+                        <cell>8</cell>
+                        <cell>an</cell>
+                        <cell>1</cell>
+                        <cell>352</cell>
+                    </row>
+                    <row>
+                        <cell>7</cell>
+                        <cell>american</cell>
+                        <cell>1</cell>
+                        <cell>277</cell>
+                    </row>
+                    <row>
+                        <cell>6</cell>
+                        <cell>all</cell>
+                        <cell>1</cell>
+                        <cell>310</cell>
+                    </row>
+                    <row>
+                        <cell>5</cell>
+                        <cell>air</cell>
+                        <cell>1</cell>
+                        <cell>80</cell>
+                    </row>
+                    <row>
+                        <cell>4</cell>
+                        <cell>ago</cell>
+                        <cell>1</cell>
+                        <cell>161</cell>
+                    </row>
+                    <row>
+                        <cell>3</cell>
+                        <cell>age</cell>
+                        <cell>1</cell>
+                        <cell>224</cell>
+                    </row>
+                    <row>
+                        <cell>2</cell>
+                        <cell>against</cell>
+                        <cell>1</cell>
+                        <cell>189</cell>
+                    </row>
+                    <row>
+                        <cell>1</cell>
+                        <cell>afternoon</cell>
+                        <cell>1</cell>
+                        <cell>66</cell>
+                    </row>
+                </table>
+                <div type="3">
+                    <head>Comment exécuter tf_idf en Python 3</head>
+                    <p>Dans cette section de la leçon, nous retracerons pas à pas le chemin que j'ai parcouru pour calculer des valeurs de <hi rend="bold">tf-idf</hi> pour tous les termes apparaissant dans tous les documents du corpus nécrologique. Si vous désirez suivre le processus de plus près, vous pouvez télécharger les fichiers associés à la leçon, ouvrir l'archive <code rend="inline">.zip</code> et exécuter le carnet Jupyter Notebook intitulé <code rend="inline">TF-IDF-code-fr.ipynb</code> qui se trouve dans le dossier <code rend="inline">lecon-fichiers</code>. Vous pouvez aussi créer votre propre carnet Jupyter au même endroit et copier-coller les blocs de code qui apparaissent ci-dessous au moment approprié. Si vous travaillez dans l'environnement Anaconda, consultez la <ref target="https://perma.cc/W92W-C3Z3">documentation des carnets Jupyter</ref> pour savoir comment changer le répertoire de travail des carnets. Notez que, comme dans tous les langages de programmation, il existe plusieurs manières de compléter chacune des étapes que nous étudierons ci-dessous.</p>
+                    <p>Mon premier bloc de code est conçu pour récupérer les noms de tous les fichiers .txt qui se trouvent dans le répertoire <code rend="inline">txt</code>. Ces lignes de code importent la classe <code rend="inline">Path</code> du module <code rend="inline">pathlib</code> et invoquent la méthode <code rend="inline">Path().rglob()</code> pour produire une liste de tous les fichiers qui se trouvent dans le répertoire 'txt' et dont les noms se terminent avec l'extension .txt. <code rend="inline">pathlib</code> concaténera le chemin du répertoire, <code rend="inline">file.parent</code>, à chaque nom de fichier pour construire des chemins complets pour chaque fichier (sous macOS ou Windows).</p>
+                    <p>J'ajoute ainsi chaque nom de fichier à une liste nommée <code rend="inline">tous_fichiers_txt</code>. Enfin, je renvoie la longueur de <code rend="inline">tous_fichiers_txt</code> pour vérifier que j'ai bien trouvé les 366 fichiers attendus. Cette approche boucler-et-ajouter est très courante en Python.</p>
+                    <ab>
+                        <code xml:id="code_analyse-de-documents-avec-tfidf_0" corresp="code_analyse-de-documents-avec-tfidf_0.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Concernant le choix des noms de variables il existe deux méthodes courantes qui donne respectivement la priorité à la commodité puis à la sémantique. Par commodité, on pourrait choisir de nommer une variable <hi rend="bold">x</hi> pour qu'il soit facile et rapide de taper son nom au besoin. Un nom de variable sémantique tente, quant à lui, de transmettre au lecteur une information sur la fonction ou l'usage de la variable. En nommant ma liste de fichiers textuels <code rend="inline">tous_fichiers_txt</code> et la variable qui contient la taille de cette liste <code rend="inline">n_fichiers</code>, j'accorde la priorité à la sémantique. En même temps, j'utilise des abréviations comme <code rend="inline">txt</code> pour « texte » et <code rend="inline">n</code> pour « nombre » pour gagner du temps et j'ai choisi <code rend="inline">tous_fichiers_txt</code> plutôt que <code rend="inline">les_noms_de_tous_les_fichiers_textuels</code> parce que la concision demeure un objectif important. Les normes concernant l'utilisation des majuscules et des barres de soulignement en Python sont codifiées dans PEP-8, le guide stylistique officiel du langage, avec lequel je vous recommande de vous familiariser.<ref type="footnotemark" target="#note_9"/>
+                    </p>
+                    <p>Pour diverses raisons, nous voulons que nos calculs s'effectuent par ordre journalier et mensuel (le corpus contient un fichier pour chaque jour et pour chaque mois de l'année). Pour ce faire, nous pouvons utiliser la méthode <code rend="inline">sort()</code> pour classer les fichiers par ordre numérique ascendant, puis afficher le premier nom de fichier pour nous assurer qu'il s'agit bien de <code rend="inline">txt/0101.txt</code>.</p>
+                    <ab>
+                        <code xml:id="code_analyse-de-documents-avec-tfidf_1" corresp="code_analyse-de-documents-avec-tfidf_1.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Nous pouvons ensuite utiliser la liste des noms de fichiers pour lire chaque fichier en mémoire et le convertir en un format que Python peut interpréter comme du texte. Le prochain bloc de code contient une autre opération de type boucler-et-ajouter qui parcourt la liste de noms de fichiers et ouvre chacun d'entre eux. L'instruction  <code rend="inline">with open(txt_file) as f</code> permet notamment d'ouvrir un fichier, d'effectuer une action sur celui-ci et de le refermer, ce que nous faisons ici sur tout les fichiers de notre liste. J'invoque ensuite la méthode <code rend="inline">read()</code> de Python pour convertir le contenu de chaque fichier textuel en une chaîne de caractères (<code rend="inline">str</code>), ce qui constitue la manière d'indiquer à Python que les données doivent être interprétées comme du texte. J'ajoute chacune de ces chaînes de caractères, une par une, à une nouvelle liste nommée <code rend="inline">tous_documents</code>. Note importante : les chaînes de caractères qui constituent cette liste y apparaissent dans le même ordre que les noms de fichiers dans la liste <code rend="inline">tous_fichiers_txt</code>.</p>
+                    <ab>
+                        <code xml:id="code_analyse-de-documents-avec-tfidf_2" corresp="code_analyse-de-documents-avec-tfidf_2.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>C'est tout le travail de mise en place dont nous avons besoin. Les étapes de traitement du texte comme la <ref target="https://perma.cc/8SZP-DCGF">tokenisation</ref> et l'élimination de la ponctuation seront effectuées automatiquement lorsque nous utiliserons le <code rend="inline">TfidfVectorizer</code> de Scikit-Learn pour représenter nos documents à l'aide des scores <hi rend="bold">tf-idf</hi> calculés en fonction de leur contenu. Le bloc de code ci-dessous importe <code rend="inline">TfidfVectorizer</code> du module Scikit-Learn, qui est préinstallé avec Anaconda. <code rend="inline">TfidfVectorizer</code> est une classe d'objets Python développée en programmation orientée objet. Je construis donc une instance de cette classe, nommée <code rend="inline">vectoriseur</code>, à laquelle je fournis des paramètres spécifiques (j’aurai plus de choses à dire au sujet de ces paramètres dans la section intitulée <ref target="#param%C3%A8tres-scikit-learn">« Paramètres Scikit-Learn »</ref>). J'applique ensuite la méthode <code rend="inline">fit_transform()</code> de cet objet à ma liste de chaînes de caractères (la variable nommée <code rend="inline">tous_documents</code>). La variable <code rend="inline">documents_transformes</code> contient les résultats de l'opération <code rend="inline">fit_transform()</code>. Notez que nous pourrions aussi fournir à <code rend="inline">TfidfVectorizer</code> une liste de mots vides (rappelons qu'il s'agit de mots structurels communs) dont nous ne voulons pas nous préoccuper. En outre, pour réaliser certaines opérations, comme la division en lexèmes ou le filtrage des mots vides, dans une langue autre que l'anglais, il pourrait être nécessaire de prétraiter les textes à l'aide d'un autre module Python ou de fournir à <code rend="inline">TfidfVectorizer</code> un analyseur (tokenizer) et/ou une liste de mots vides sur mesure.</p>
+                    <ab>
+                        <code xml:id="code_analyse-de-documents-avec-tfidf_3" corresp="code_analyse-de-documents-avec-tfidf_3.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>La méthode <code rend="inline">fit_transform()</code> ci-dessus transforme la liste de chaînes de caractères en une <ref target="https://perma.cc/4C3Y-M6FD">matrice creuse</ref>. Dans le cas qui nous concerne, la matrice contient des valeurs <hi rend="bold">tf-idf</hi> pour tous les mots et tous les textes. Les matrices creuses épargnent de la mémoire en laissant de côté toutes les valeurs égales à zéro. Nous avons cependant besoin d'accéder à toutes les valeurs. Le prochain bloc de code invoque donc la méthode <code rend="inline">toarray()</code> pour convertir la matrice creuse en un <ref target="https://perma.cc/78YF-4K7K">tableau NumPy</ref>. Nous pouvons afficher la longueur de ce tableau pour nous assurer qu'il est de la même taille que notre liste de documents.</p>
+                    <ab>
+                        <code xml:id="code_analyse-de-documents-avec-tfidf_4" corresp="code_analyse-de-documents-avec-tfidf_4.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Un tableau NumPy ressemble à une liste sans y être identique. Je pourrais rédiger une leçon complète rien que sur les différences entre les deux, mais une seule des caractéristiques des tableaux NumPy est importante pour le moment : ils convertissent les données stockées dans <code rend="inline">documents_transformes</code> dans un format qui contient explicitement les scores <hi rend="bold">tf-idf</hi> de tous les mots dans tous les documents. Rappelons que la matrice creuse, elle, excluait toutes les valeurs égales à zéro.</p>
+                    <p>Nous voulons que toutes les valeurs soient représentées pour que chaque document soit associé au même nombre de valeurs, soit une pour chaque mot qui existe dans le corpus. Chaque ligne du tableau <code rend="inline">documents_transformes_tableau</code> est elle-même un tableau qui représente un des documents du corpus. Nous disposons donc essentiellement d'une grille dans laquelle chaque ligne représente un document et chaque colonne, un mot. Imaginez un tableau semblable à ceux des sections précédentes pour chaque document, mais sans étiquettes pour identifier les lignes et les colonnes.</p>
+                    <p>Pour combiner les valeurs avec leurs étiquettes, il nous faut deux éléments d'information : l'ordre des documents et et l’ordre des tf-idf obtenu pour chaque mot. L'ordre des documents est facile à obtenir puisqu'il s'agit du même que dans la liste <code rend="inline">tous_documents</code>. La liste de tous les mots du corpus, elle, est stockée dans la variable <code rend="inline">vectoriseur</code> et elle suit le même ordre qu'utilise <code rend="inline">documents_transformes_tableau</code> pour emmagasiner les données. Nous pouvons utiliser la méthode <code rend="inline">get_feature_names_out()</code> de la classe <code rend="inline">TFIDFVectorizer</code> pour accéder à cette liste de mots. Puis, chaque ligne de <code rend="inline">documents_transformes_tableau</code> (qui contient les valeurs <hi rend="bold">tf-idf</hi> d'un document) peut être jumelée avec la liste de mots. Pour plus de détails sur les structures de données de type DataFrame du module Pandas de Python, veuillez consulter la leçon <ref target="/en/lessons/visualizing-with-bokeh">« Visualizing Data with Bokeh and Pandas »</ref>.</p>
+                    <ab>
+                        <code xml:id="code_analyse-de-documents-avec-tfidf_5" corresp="code_analyse-de-documents-avec-tfidf_5.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Le bloc de code ci-dessus est composé de trois parties :</p>
+                    <list type="ordered">
+                        <item>Après avoir importé le module pandas, le code vérifie l'existence du répertoire de sortie <code rend="inline">tf_idf_resultats</code>. Si ce répertoire n'existe pas déjà, il est créé à ce moment.</item>
+                        <item>Un chemin vers un fichier .csv est construit à partir de chacun des noms de fichiers .txt qui apparaissent dans la liste construite plus haut. Le processus de construction de la variable <code rend="inline">fichiers_resultats</code> convertira, par exemple, <code rend="inline">txt/0101.txt</code> (le chemin du premier fichier .txt de la liste) en <code rend="inline">tf_idf_resultats/0101.csv</code>, et ainsi de suite pour tous les fichiers du corpus.</item>
+                        <item>À l'aide d'une boucle, on associe chaque vecteur de scores <hi rend="bold">tf-idf</hi> avec la liste des mots extraite de <code rend="inline">vectoriseur</code>, on convertit les paires mot/score en objets de type DataFrame, et on enregistre chaque DataFrame dans son propre fichier .csv (un format textuel courant pour les feuilles de calcul).</item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Interpréter les listes de mots : meilleures pratiques et mises en garde</head>
+                    <p>Lorsque vous exécuterez les blocs de code ci-dessus, vous obtiendrez un répertoire nommé <code rend="inline">tf_idf_resultats</code> contenant 366 fichiers de type .csv. Chacun de ces fichiers contient une liste de mots et de leurs scores <hi rend="bold">tf-idf</hi> pour un document spécifique. Comme nous avons pu le constater dans le cas de la nécrologie de Nellie Bly, ces listes de mots peuvent être très significatives, cependant, il faut bien comprendre qu'une surinterprétation de ce genre de résultats peut déformer notre compréhension du texte sous-jacent.</p>
+                    <p>En général, il vaut mieux approcher ces listes de mots en se disant qu'elles seront utiles pour susciter des hypothèses ou des questions de recherche, mais que les résultats de <hi rend="bold">tf-idf</hi> ne justifieront peut-être pas de conclusions définitives à eux seuls. À titre d'exemple, j'ai assemblé une liste de nécrologies d'individus ayant vécus à la fin du <span style="font-variant:small-caps;">XIX</span>
+                        <sup>e</sup> et au début du <span style="font-variant:small-caps;">XX</span>
+                        <sup>e</sup> siècle qui ont écrit pour des journaux ou pour des magazines et qui étaient associés d'une quelconque façon aux mouvements de réforme sociale. Cette liste inclut Nellie Bly, <ref target="https://perma.cc/6RGB-UQHV">Willa Cather</ref>, <ref target="https://perma.cc/QYW8-SL8D">W.E.B. Du Bois</ref>, <ref target="https://perma.cc/43WH-G6XL">Upton Sinclair</ref> et <ref target="https://perma.cc/TC7V-8CEY">Ida Tarbell</ref>, mais il est possible que d'autres individus dont les nécrologies apparaissent dans le corpus correspondent également à cette description.<ref type="footnotemark" target="#note_10"/>
+                    </p>
+                    <p>Je m'attendais initialement à ce que plusieurs mots significatifs soient partagés entre ces individus, mais ce n'est pas toujours le cas. Le tableau ci-dessous présente les 20 mots dont les scores <hi rend="bold">tf-idf</hi> sont les plus élevés dans chacune des cinq nécrologies. Chaque liste est dominée par des mots spécifiques à son document (noms propres, lieux, entreprises, etc.) que l'on peut filtrer à l'aide des paramètres de <hi rend="bold">tf-idf</hi> ou tout simplement ignorer. La section « Paramètres Scikit-Learn » approfondit les questions liées aux entités nommées ou un syntagme comme des tokens uniques. D'autre part, on peut chercher des mots qui expriment clairement la relation entre un individu et sa profession littéraire.</p>
+                    <p>| Rang Tf-idf | Nellie Bly | Willa Cather | W.E.B. Du Bois | Upton Sinclair | Ida Tarbell |
+| 1 | cochrane | cather | dubois | sinclair | tarbell |
+| 2 | her | her | dr | socialist | she |
+| 3 | she | she | negro | upton | her |
+| 4 | seaman | nebraska | ghana | <hi rend="bold">books</hi> | lincoln |
+| 5 | bly | miss | peace | lanny | miss |
+| 6 | nellie | forrester | <hi rend="bold">encyclopedia</hi> | social | oil |
+| 7 | mark | sibert | communist | budd | abraham |
+| 8 | ironclad | twilights | barrington | jungle | mcclure |
+| 9 | <hi rend="bold">plume</hi> | willa | fisk | brass | easton |
+| 10 | vexations | antonia | atlanta | california | <hi rend="bold">volumes</hi> |
+| 11 | phileas | mcclure | folk | <hi rend="bold">writer</hi> | minerva |
+| 12 | 597 | <hi rend="bold">novels</hi> | booker | vanzetti | standard |
+| 13 | elizabeth | pioneers | successively | macfadden | business |
+| 14 | <hi rend="bold">nom</hi> | cloud | souls | sacco | titusville |
+| 15 | balloon | <hi rend="bold">book</hi> | council | <hi rend="bold">wrote</hi> | <hi rend="bold">articles</hi> |
+| 16 | forgeries | calif | party | meat | bridgeport |
+| 17 | mcalpin | <hi rend="bold">novel</hi> | disagreed | <hi rend="bold">pamphlets</hi> | expose |
+| 18 | asylum | southwest | harvard | my | trusts |
+| 19 | fogg | <hi rend="bold">verse</hi> | <hi rend="bold">arts</hi> | industry | mme
+| 20 | verne | <hi rend="bold">wrote</hi> | soviet | <hi rend="bold">novel</hi> | <hi rend="bold">magazine</hi> |</p>
+                    <p>J'ai utilisé les caractères gras pour souligner des termes qui semblent particulièrement reliés à l'écriture. Cette liste inclut <emph>articles</emph>, <emph>arts</emph>, <emph>book</emph> (livre), <emph>books</emph> (livres), <emph>encyclopedia</emph> (encyclopédie), <emph>magazine</emph>, <emph>nom</emph>, <emph>novel</emph> (roman), <emph>novels</emph> (romans), <emph>pamphlets</emph>, <emph>plume</emph>, <emph>verse</emph> (vers/poésie), <emph>volumes</emph>, <emph>writer</emph> (auteur/autrice) et <emph>wrote</emph> (écrit), auxquels on pourrait ajouter les titres de livres spécifiques ou les noms de magazines. Ne tenons pas compte de ces détails pour le moment et remarquons que, si les listes de Cather et de Sinclair contiennent plusieurs mots associés aux livres et à l'écriture, ce n'est pas le cas pour Bly, Du Bois et Tarbell.</p>
+                    <p>On pourrait facilement tirer des conclusions hâtives. L'identité de Cather semble fortement reliée à son genre, à son attachement à des lieux, à sa fiction et à sa poésie. Sinclair est plus fortement associé à la politique et à ses écrits au sujet de la viande, de l'industrie et du procès controversé de <ref target="https://perma.cc/3VZK-PLDG">Nicola Sacco et Bartolomeo Vanzetti</ref> qui a mené à l'exécution des deux individus. Bly est reliée à son pseudonyme, à son mari et à ses écrits portant sur les institutions psychiatriques. Du Bois est relié aux questions de race et à sa carrière universitaire. Quant à Tarbell, ce sont les thèmes sur lesquels elle écrit qui la définissent : les affaires, les monopoles, le géant du pétrole Standard Oil et le président américain Abraham Lincoln. En allant un peu plus loin, je pourrais argumenter que la discussion du genre semble plus caractéristique des nécrologies de femmes, tandis que la question raciale n'apparaît parmi les termes les plus importants que dans le cas du seul Afro-Américain de la liste.</p>
+                    <p>Chacune de ces observations nécessite d’être approfondie et ne doit  pas impliquer une généralisation. D'abord, je dois vérifier si les paramètres que j'ai choisis pour <hi rend="bold">tf-idf</hi> produisent des effets qui pourraient disparaître dans d'autres conditions ; des résultats probants devraient être assez stables pour résister à ce genre d'ajustements. Notez que nous discuterons de certains de ces paramètres dans la section <ref target="#param%C3%A8tres-scikit-learn">« Paramètres Scikit-Learn »</ref>. Je devrai ensuite lire au moins quelques-unes des nécrologies pour m'assurer que certains termes ne me transmettent pas de faux signaux. En lisant la nécrologie de Du Bois, par exemple, je pourrais constater que les mentions de son oeuvre « The Encyclopedia of the Negro » contribue au moins en partie à la valeur du score du mot <emph>negro</emph> dans le texte.</p>
+                    <p>Par ailleurs, je pourrais découvrir que la nécrologie de Bly inclut effectivement des mots comme <emph>journalism</emph>, <emph>journalistic</emph>, <emph>newspapers</emph> (journaux) et <emph>writing</emph> (écriture), mais cette nécrologie est très courte et la plupart des mots qui y apparaissent ne le font qu'une ou deux fois. Des mots qui ont de très forts scores <hi rend="bold">idf</hi> sont donc plus susceptibles d'apparaître au sommet de sa liste. Puisque je veux vraiment équilibrer les poids de <hi rend="bold">tf</hi> et d'<hi rend="bold">idf</hi>, je pourrais ne pas tenir compte des mots qui apparaissent seulement dans quelques documents ou encore ignorer les résultats provenant de nécrologies dont la longueur est inférieure à un certain seuil.</p>
+                    <p>Enfin, je peux concevoir des tests pour répondre directement à des questions comme: est-ce que les nécrologies d'Afro-Américains sont plus susceptibles de mentionner la race ? Je crois que l'hypothèse « oui » est plausible mais je devrais tout de même assujettir mes hypothèses à l'épreuve d'un examen minutieux avant de tirer d'en des conclusions.</p>
+                </div>
+                <div type="3">
+                    <head>Quelques manières d'utiliser tf-idf en histoire numérique</head>
+                    <p>Comme je l'ai déjà mentionné, <hi rend="bold">tf-idf</hi> provient du domaine de la reherche d'informations. La normalisation de la fréquence d'occurrence de mots dans les différents documents d'un corpus constitue d'ailleurs toujours une opération courante dans l'industrie du développement Web, notamment dans le cas des moteurs de recherche textuels. En contexte d'analyse culturelle ou d'histoire numérique, cependant, la pertinence de <hi rend="bold">tf-idf</hi> se limite à des tâches bien précises. En général, celles-ci appartiennent à l'une de trois catégories :</p>
+                    <div type="4">
+                        <head>1. Outil d'exploration ou de visualisation</head>
+                        <p>Nous avons déjà démontré que des listes de mots accompagnées de scores <hi rend="bold">tf-idf</hi> pour chacun des documents d'un corpus peuvent constituer de puissants outils d'interprétation. Elles peuvent notamment suggérer des hypothèses ou des questions de recherche. Ces listes peuvent aussi former les bases de stratégies d'exploration et de visualisation plus sophistiquées. L'article <ref target="https://perma.cc/QBZ4-DKTE">« A full-text visualization of the Iraq War Logs »</ref> de Jonathan Stray et Julian Burgess en constitue un bon exemple.<ref type="footnotemark" target="#note_11"/> Stray et Burgess utilisent des valeurs <hi rend="bold">tf-idf</hi> pour construire une visualisation de réseau dans laquelle des registres de la guerre en Irak sont reliés à leurs mots-clés les plus distinctifs. Cette technique de visualisation d'information textuelle a permis à Stray de développer le <ref target="https://perma.cc/L8PN-KQ5B">projet Overview</ref>, qui propose aux usagers un tableau de bord à partir duquel naviguer dans des milliers de documents pour visualiser leurs contenus. Nous pourrions employer cette approche pour visualiser notre corpus nécrologique et peut-être y identifier des groupes d'articles dont les mots-clés se ressemblent.</p>
+                    </div>
+                    <div type="4">
+                        <head>2. Outil pour calculer la similarité des textes et des ensembles de traits caractéristiques</head>
+                        <p>Puisque <hi rend="bold">tf-idf</hi> produit souvent des scores bas pour les mots structurels fréquents et des scores plus élevés pour les mots associés au contenu thématique d'un texte, cette méthode est appropriée pour les tâches qui requièrent l'identification de similarités entre des textes. Un moteur de recherche appliquera souvent <hi rend="bold">tf-idf</hi> à un corpus pour ensuite proposer à l'usager des résultats classés en fonction de la <ref target="https://perma.cc/9NV6-SS9G">similarité cosinus</ref> entre les documents et les mots-clés de recherche entrés par l'usager. Le même raisonnement s'applique à des questions comme: « quelle nécrologie de notre corpus ressemble le plus à celle de Nellie Bly » ?</p>
+                        <p>Nous pouvons aussi utiliser <hi rend="bold">tf-idf</hi> pour découvrir les mots les plus importants dans un document ou dans un groupe de documents. Par exemple, je pourrais regrouper un ensemble de nécrologies de journalistes (dont celle de Nellie Bly) dans un seul document avant d'appliquer <hi rend="bold">tf-idf</hi> à celui-ci. Les résultats de l'opération pourraient servir de règle heuristique pour identifier des termes spécifiques aux nécrologies de journalistes, en comparaison avec l'ensemble des nécrologies du corpus. La liste de mots ainsi obtenue pourrait ensuite servir dans une variété d'autres tâches informatiques.</p>
+                    </div>
+                    <div type="4">
+                        <head>3. Étape de prétraitement</head>
+                        <p>Les paragraphes ci-dessus ont permis d'introduire les raisons pour lesquelles le score <hi rend="bold">tf-idf</hi> sert souvent d'étape de prétraitement dans les calculs d'apprentissage automatique. Par exemple, les scores <hi rend="bold">tf-idf</hi> ont tendance à être plus révélateurs que les décomptes bruts lorsqu'on développe un modèle de classification par apprentissage automatique supervisé, notamment parce qu'ils augmentent les poids des mots reliés aux thèmes des documents tout en réduisant ceux des mots structurels fréquents. Il existe cependant une exception notable à cette règle : l'identification de l'auteur d'un texte anonyme, pour laquelle les mots structurels ont une forte valeur prédictive. </p>
+                        <p rend="alert">Note du traducteur : la leçon intitulée <ref target="https://programminghistorian.org/fr/lecons/introduction-a-la-stylometrie-avec-python">« Introduction à la stylométrie en Python »</ref> présente une application de ce genre de calculs.</p>
+                        <p>Comme nous le verrons dans la section sur les <ref target="#param%C3%A8tres-scikit-learn">paramètres de Scikit-Learn</ref>, <hi rend="bold">tf-idf</hi> peut aussi émonder les listes de traits caractéristiques des modèles d'apprentissage automatique ; or, il est souvent préférable de développer des modèles basés sur le moins de traits caractéristiques possible.</p>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>Variations sur le thème de tf-idf</head>
+                    <div type="4">
+                        <head>Paramètres Scikit-Learn</head>
+                        <p>L'objet <code rend="inline">TfidfVectorizer</code> de Scikit-Learn dispose de plusieurs paramètres internes qu'on peut modifier pour influencer les résultats de calcul. En règle générale, tous ces paramètres ont leurs avantages et leurs inconvénients : il n'existe pas de configuration parfaite unique. Il est donc préférable de bien connaître chacun des réglages possibles afin de pouvoir expliquer et défendre vos choix le moment venu. La liste complète des paramètres peut être consultée dans la <ref target="https://perma.cc/JUN8-39Z6">documentation de Scikit-Learn</ref> ; en voici quelques-uns parmi les plus importants :</p>
+                        <div type="5">
+                            <head>1. Mots vides (stopwords)</head>
+                            <p>Dans le code ci-dessus, j'ai utilisé <code rend="inline">stop_words=None</code> mais <code rend="inline">stop_words='english'</code> est aussi disponible. Ce réglage filtrera automatiquement de votre corpus les mots très courants, comme « the », « to », and « of », qui apparaissent dans une <ref target="https://perma.cc/6CSZ-G9BL">liste prédéfinie</ref>. Notez que la plupart de ces mots vides ont probablement déjà des scores <hi rend="bold">tf-idf</hi> très bas en raison de leur ubiquité, même si d'autres réglages peuvent influencer ces scores. Pour une discussion des listes de mots vides qu’on retrouve dans divers outils open-source de traitement du langage naturel, veuillez lire <ref target="https://perma.cc/V5WN-4E8P">« Stop Word Lists in Free Open-source Software Packages »</ref>.</p>
+                        </div>
+                        <div type="5">
+                            <head>2. min_df, max_df</head>
+                            <p>Ces paramètres contrôlent le nombre minimal et le nombre maximal de documents dans lesquels un mot doit apparaître pour être inclus dans les calculs. Les deux paramètres peuvent être exprimés sous forme de nombres réels entre 0 et 1, qui représentent alors des pourcentages de l'ensemble du corpus, ou sous forme de nombres entiers qui représentent des décomptes de documents bruts. En règle générale, spécifier une valeur inférieure à 0.9 pour max_df éliminera la majorité (voire la totalité) des mots vides.</p>
+                        </div>
+                        <div type="5">
+                            <head>3. max_features</head>
+                            <p>Ce paramètre élague les termes les moins fréquents du corpus avant d'appliquer <hi rend="bold">tf-idf</hi>. Il peut être particulièrement utile en contexte d'apprentissage automatique, où l'on ne souhaite habituellement pas dépasser le nombre de traits caractéristiques recommandé par les concepteurs de l'algorithme choisi.</p>
+                        </div>
+                        <div type="5">
+                            <head>4. norm, smooth_idf, and sublinear_tf</head>
+                            <p>Chacun de ces paramètres influencera l'éventail de valeurs numériques que l'algorithme <hi rend="bold">tf-idf</hi> produira. Le paramètre <code rend="inline">norm</code> est compatible avec la normalisation l1 et l2, expliquée sur <ref target="https://perma.cc/3ULS-SUB2">machinelearningmastery.com</ref>. <code rend="inline">Smooth_idf</code> lisse les résultats en ajoutant la valeur 1 à chaque fréquence de document, comme s'il existait un document additionnel qui contient exactement une occurrence de tous les mots qui apparaissent dans le corpus. <code rend="inline">Sublinear_tf'</code> applique une opération de changement d'échelle aux résultats en remplaçant tf par log(tf). Pour plus de détails au sujet du lissage et de la normalisation dans le contexte de <hi rend="bold">tf-idf</hi>, veuillez consulter Manning, Raghavan et Schütze.<ref type="footnotemark" target="#note_12"/>
+                            </p>
+                        </div>
+                    </div>
+                    <div type="4">
+                        <head>Traits caractéristiques : au-delà des mots</head>
+                        <p>Le concept fondamental de <hi rend="bold">tf-idf</hi>, qui consiste à pondérer les décomptes d'occurrences en fonction du nombre de documents dans lesquels les mots apparaissent, peut s'appliquer à d'autres traits caractéristiques des textes. Par exemple, il est relativement facile de combiner <hi rend="bold">tf-idf</hi> avec la <ref target="https://perma.cc/WV3J-BF3B">racinisation</ref> ou la <ref target="https://perma.cc/T3XA-Q9HG">lemmatisation</ref>, deux méthodes courantes qui permettent de regrouper de multiples déclinaisons et conjugaisons du même mot en une seule forme. Par exemple, la racine de <emph>happy</emph> et <emph>happiness</emph> est <emph>happi</emph> tandis que le lemme qui les regroupe est <emph>happy</emph>. Une fois la racinisation ou la lemmatisation complétée, on peut remplacer les décomptes de mots par les décomptes de racines ou de lemmes avant d'appliquer <hi rend="bold">tf-idf</hi>. Notez que, puisque ces opérations fusionnent plusieurs formes apparentées en une seule, les lemmes et les racines auront des décomptes d'occurrences plus élevés que chacun des mots qu'ils regroupent, et donc des valeurs <hi rend="bold">tf-idf</hi> habituellement plus basses.</p>
+                        <p>On peut aussi appliquer la transformation <hi rend="bold">tf-idf</hi> à des locutions ou à des n-grammes, c'est-à-dire à des séquences de mots consécutifs. Un article intitulé  <ref target="https://perma.cc/37WS-MB8F">« These Are The Phrases Each GOP Candidate Repeats Most »</ref>, publié sur fivethirtyeight.com en mars 2016, utilise cette approche pour calculer les fréquences inverses de documents de phrases entières plutôt que celles de mots.<ref type="footnotemark" target="#note_13"/>
+                        </p>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>tf-idf et méthodes alternatives communes</head>
+                    <p>On peut comparer <hi rend="bold">tf-idf</hi> à plusieurs autres méthodes qui servent à isoler et/ou à classifier les mots les plus importants dans un document ou dans une collection de documents. Cette section mentionne brièvement trois de ces méthodes alternatives, apparentées mais distinctes, qui mesurent des aspects similaires mais non identiques de l'information textuelle.</p>
+                    <div type="4">
+                        <head>1. Spécificité (Keyness)</head>
+                        <p>Plutôt que de transformer les décomptes d'occurrences à l'aide de calculs, la spécificité produit une valeur numérique qui indique jusqu'à quel point la présence d'un mot dans un document est statistiquement typique ou atypique par rapport à l'ensemble du corpus. Par exemple, à l'aide d'un <ref target="https://perma.cc/4Z2W-SZCS">test du khi-carré</ref>, il est possible de mesurer l'écart entre la fréquence d'occurrence d'un mot et la norme du corpus, puis de dériver une <ref target="https://perma.cc/X3AW-F6B9">valeur p</ref> qui indique la probabilité d'observer cette fréquence d'occurrence dans un échantillon aléatoire. Pour plus d'information sur la spécificité, voir Bondi et Scott.<ref type="footnotemark" target="#note_14"/>
+                        </p>
+                    </div>
+                    <div type="4">
+                        <head>2. Modèles thématiques</head>
+                        <p>La modélisation thématique et <hi rend="bold">tf-idf</hi> sont des techniques radicalement différentes, mais je constate que les néophytes en matière d'humanités numériques désirent souvent modéliser les thèmes d'un corpus dès le début alors que <hi rend="bold">tf-idf</hi> constituerait parfois un meilleur choix.<ref type="footnotemark" target="#note_15"/> Puisque l'algorithme est transparent et que ses résultats sont reproductibles, <hi rend="bold">tf-idf</hi> est particulièrement utile lorsqu'on souhaite obtenir une vue d'ensemble d'un corpus, à vol d'oiseau, pendant la phase d'exploration initiale de la recherche. Comme le mentionne Ben Schmidt, les chercheurs qui emploient la modélisation thématique doivent reconnaître que les thèmes qui en ressortent ne sont pas forcément aussi cohérents qu'on le souhaiterait.<ref type="footnotemark" target="#note_16"/> C'est l'une des raisons pour lesquelles <hi rend="bold">tf-idf</hi> a été intégré au <ref target="https://perma.cc/L8PN-KQ5B">projet Overview</ref>.</p>
+                        <p>Les modèles thématiques peuvent aussi aider les chercheurs à explorer leurs corpus et ils offrent de nombreux avantages, notamment la capacité de suggérer de vastes catégories ou « communautés » de textes, mais il s'agit d'une caractéristique commune à l'ensemble des méthodes d'apprentissage automatique non supervisées. Les modèles thématiques sont particulièrement attrayants parce qu'ils assignent à chaque document des valeurs numériques qui mesurent jusqu'à quel point chacun des thèmes y est important et parce qu'ils représentent ces thèmes sous forme de listes de mots coprésents, ce qui suscite de fortes impressions de cohérence. Cependant, l'algorithme probabiliste qui sous-tend la modélisation thématique est très sophistiqué et simple d'en déformer les résultats si l'on n'est pas assez prudent. Les mathématiques derrière <hi rend="bold">tf-idf</hi>, elles, sont assez simples pour être expliquées dans une feuille de calcul Excel.</p>
+                    </div>
+                    <div type="4">
+                        <head>3. Résumé automatique des textes</head>
+                        <p>Le résumé automatique est une autre manière d'explorer un corpus. Rada Mihalcea et Paul Tarau, par exemple, ont publié au sujet de TextRank, un modèle de classement basé sur la théorie des graphes, aux possibilités prometteuses pour l'extraction automatique de mots et de phrases-clés.<ref type="footnotemark" target="#note_17"/> Comme dans le cas de la modélisation thématique, TextRank approche la recherche d'informations d'une manière complètement différente du <hi rend="bold">tf-idf</hi> mais les objectifs des deux algorithmes ont beaucoup en commun. Cette méthode pourrait être appropriée pour votre propre recherche, surtout si votre but consiste à obtenir assez rapidement une impression générale du contenu de vos documents avant de construire un projet de recherche plus poussé.</p>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Références et lectures supplémentaires</head>
+                <list type="unordered">
+                    <item>
+                        <p>Milo Beckman, « These Are The Phrases Each GOP Candidate Repeats Most, », <emph>FiveThirtyEight</emph>, le 10 mars 2016,  consulté le 9 juin 2022, <ref target="https://perma.cc/37WS-MB8F">https://fivethirtyeight.com/features/these-are-the-phrases-each-gop-candidate-repeats-most/</ref>.</p>
+                    </item>
+                    <item>
+                        <p>Jessica Bennett et Amisha Padnani, « Overlooked », <emph>The New York Times</emph>, 8 mars 2018, <ref target="https://perma.cc/HWZ7-XS23">https://www.nytimes.com/interactive/2018/obituaries/overlooked.html</ref>.</p>
+                    </item>
+                    <item>
+                        <p>David M. Blei, Andrew Y. Ng et Michael I. Jordan, « Latent Dirichlet Allocation« , <emph>Journal of Machine Learning Research</emph> 3 (Janvier 2003): 993-1022.</p>
+                    </item>
+                    <item>
+                        <p>Marina Bondi et Mike Scott, dirs. <emph>Keyness in Texts</emph>. Philadelphie: John Benjamins, 2010.</p>
+                    </item>
+                    <item>
+                        <p>Scikit-Learn Developers « TfidfVectorizer »(en anglais), consulté le 9 juin 2022, <ref target="https://perma.cc/JUN8-39Z6">https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html</ref>.</p>
+                    </item>
+                    <item>
+                        <p>Justin Grimmer et Gary King. <ref target="https://perma.cc/4YAL-H6VN">« Quantitative Discovery from Qualitative Information: A General-Purpose Document Clustering Methodology (2009) »</ref>, <emph>Rencontre APSA 2009 à Toronto</emph>, le 24 août 2009, <ref target="https://perma.cc/NUS2-J3YP">PDF</ref>.</p>
+                    </item>
+                    <item>
+                        <p>« Ida M. Tarbell, 86, Dies in Bridgeport », <ref target="https://perma.cc/NBV6-S2XM">
+                                <emph>The New York Times</emph>, 17 janvier 1944</ref>.</p>
+                    </item>
+                    <item>
+                        <p>Pierre Lafon, « Sur la variabilité de la fréquence des formes dans un corpus », <emph>Mots</emph> 1, no. 1 (1980): 127-165.</p>
+                    </item>
+                    <item>
+                        <p>C.D. Manning, P. Raghavan et H. Schütze, <emph>Introduction to Information Retrieval</emph>. Cambridge: Cambridge University Press, 2008.</p>
+                    </item>
+                    <item>
+                        <p>Rada Mihalcea et Paul Tarau. « Textrank: Bringing order into text », <emph>Proceedings of the 2004 Conference on Empirical Methods in Natural Language Processing</emph>, Barcelone, Espagne, 2004. <ref target="https://perma.cc/SMV5-7MYY">http://www.aclweb.org/anthology/W04-3252</ref>
+                        </p>
+                    </item>
+                    <item>
+                        <p>« Nellie Bly, Journalist, Dies of Pneumonia », <ref target="https://perma.cc/LA5B-65HL">
+                                <emph>The New York Times</emph>, 28 janvier 1922</ref>.</p>
+                    </item>
+                    <item>
+                        <p>G. Salton et M.J. McGill, <emph>Introduction to Modern Information Retrieval</emph>. New York: McGraw-Hill, 1983.</p>
+                    </item>
+                    <item>
+                        <p>Ben Schmidt, « Do Digital Humanists Need to Understand Algorithms? », <emph>Debates in the Digital Humanities 2016</emph>. Édition en ligne. Minneapois: University of Minnesota Press. <ref target="https://perma.cc/95WD-SDM5">http://dhdebates.gc.cuny.edu/debates/text/99</ref>.</p>
+                    </item>
+                    <item>
+                        <p>Ben Schmidt, « Words Alone: Dismantling Topic Models in the Humanities », <emph>Journal of Digital Humanities</emph>. Vol. 2, No. 1 (2012): n.p. <ref target="https://perma.cc/LT4N-X4MZ">http://journalofdigitalhumanities.org/2-1/words-alone-by-benjamin-m-schmidt/</ref>.</p>
+                    </item>
+                    <item>
+                        <p>Karen Spärck Jones, « A Statistical Interpretation of Term Specificity and Its Application in Retrieval. », <emph>Journal of Documentation</emph> 28, no. 1 (1972): 11–21.</p>
+                    </item>
+                    <item>
+                        <p>Jonathan Stray et Julian Burgess. « A Full-text Visualization of the Iraq War Logs », 10 décembre 2010 (dernière mise à jour en avril 2012), <ref target="https://perma.cc/QBZ4-DKTE">http://jonathanstray.com/a-full-text-visualization-of-the-iraq-war-logs</ref>.</p>
+                    </item>
+                    <item>
+                        <p>Ted Underwood, « Identifying diction that characterizes an author or genre: why Dunning's may not be the best method », <emph>The Stone and the Shell</emph>, 9 novembre 2011, <ref target="https://perma.cc/SY25-UXK3">https://tedunderwood.com/2011/11/09/identifying-the-terms-that-characterize-an-author-or-genre-why-dunnings-may-not-be-the-best-method/</ref>.</p>
+                    </item>
+                    <item>
+                        <p>Ted Underwood, « The Historical Significance of Textual Distances », Atelier LaTeCH-CLfL (Version préimpression), COLING, Santa Fe, 2018, <ref target="https://doi.org/10.48550/arXiv.1807.00181">https://doi.org/10.48550/arXiv.1807.00181</ref>.</p>
+                    </item>
+                    <item>
+                        <p>Guido van Rossum, Barry Warsaw et Nick Coghlan. « PEP 8 - Style Guide for Python Code », 5 juillet 2001 (mise à jour août 2013), <ref target="https://perma.cc/P2ZM-VPQM">https://www.python.org/dev/peps/pep-0008/</ref>.</p>
+                    </item>
+                    <item>
+                        <p>Alden Whitman, « Upton Sinclair, Author, Dead; Crusader for Social Justice, 90 », <ref target="https://perma.cc/E4N7-2KD6">
+                                <emph>The New York Times</emph>, 26 novembre 1968</ref>.</p>
+                    </item>
+                    <item>
+                        <p>« W. E. B. DuBois Dies in Ghana; Negro Leader and Author, 95 », <ref target="https://perma.cc/W5NX-XZRV">
+                                <emph>The New York Times</emph>, 28 août 1963</ref>.</p>
+                    </item>
+                    <item>
+                        <p>« Willa Cather Dies; Noted Novelist, 70 », <ref target="https://perma.cc/2L7H-WGKN">
+                                <emph>The New York Times</emph>, 25 avril 1947</ref>.</p>
+                    </item>
+                </list>
+                <div type="3">
+                    <head>Alternatives à Anaconda</head>
+                    <p>Si vous n'utilisez pas Anaconda, il faudra vous assurer de disposer des outils prérequis suivants :</p>
+                    <list type="ordered">
+                        <item>Une installation de Python 3 (préférablement Python 3.6 ou une version plus récente)</item>
+                        <item>Idéalement, un environnement virtuel dans lequel installer et exécuter le Python</item>
+                        <item>Le module Scikit-Learn et ses dépendances (voir <ref target="http://scikit-learn.org/stable/install.html">http://scikit-learn.org/stable/install.html</ref>)</item>
+                        <item>Jupyter Notebook et ses dépendances</item>
+                    </list>
+                </div>
+            </div>
+            <div type="2">
+                <head>Notes</head>
+                <p>
+                    <ref type="footnotemark" target="#note_1"/> : Ted Underwood, « Identifying diction that characterizes an author or genre: why Dunning's may not be the best method », <emph>The Stone and the Shell</emph>, 9 novembre 2011, <ref target="https://perma.cc/SY25-UXK3">https://tedunderwood.com/2011/11/09/identifying-the-terms-that-characterize-an-author-or-genre-why-dunnings-may-not-be-the-best-method/</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_2"/> : Jessica Bennett et Amisha Padnani, « Overlooked », <emph>The New York Times</emph>, 8 mars 2018, <ref target="https://perma.cc/HWZ7-XS23">https://www.nytimes.com/interactive/2018/obituaries/overlooked.html</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_3"/> : Ce jeu de données est tiré d'une version du site « On This Day » du <emph>New York Times</emph> qui n'a pas été mise à jour depuis le 31 janvier 2011 et qui a été remplacée par un nouveau blogue plus élégant situé au <ref target="https://perma.cc/W627-RBUS">https://learning.blogs.nytimes.com/on-this-day/</ref>. Ce qui reste sur le site "On This Day" est une page HTML statique pour chaque jour de l'année (0101.html, 0102.html, etc.), y compris une page pour le 29 février (0229.html). Le contenu semble avoir été écrasé à chaque mise à jour ; il n'y a donc pas d'archives du contenu publié à chaque année. On peut présumer que les pages associées aux jours de janvier ont été mises à jour pour la dernière fois en 2011, tandis que celles pour les dates entre le 1er février et de 31 décembre ont probablement été mises à jour pour la dernière fois en 2010. La page du 29 février a probablement été changée pour la dernière fois le 29 février 2008.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_4"/> : Karen Spärck Jones, « A Statistical Interpretation of Term Specificity and Its Application in Retrieval. », <emph>Journal of Documentation</emph> 28, no. 1 (1972): 16.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_5"/> : « Nellie Bly, Journalist, Dies of Pneumonia », <ref target="https://perma.cc/LA5B-65HL">
+                        <emph>The New York Times</emph>, 28 janvier 1922: 11</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_6"/> : Scikit-Learn Developers, « TfidfVectorizer » (en anglais), consulté le 9 juin 2022, <ref target="https://perma.cc/JUN8-39Z6">https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_7"/> : Ben Schmidt, « Do Digital Humanists Need to Understand Algorithms? », <emph>Debates in the Digital Humanities 2016</emph>. Édition en ligne. Minneapolis: University of Minnesota Press. <ref target="https://perma.cc/95WD-SDM5">http://dhdebates.gc.cuny.edu/debates/text/99</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_8"/> : Guido van Rossum, Barry Warsaw et Nick Coghlan. « PEP 8 - Style Guide for Python Code », 5 juillet 2001 (mise à jour août 2013), <ref target="https://perma.cc/P2ZM-VPQM">https://www.python.org/dev/peps/pep-0008/</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_9"/> : « Ida M. Tarbell, 86, Dies in Bridgeport », <ref target="https://perma.cc/NBV6-S2XM">
+                        <emph>The New York Times</emph>, 17 janvier 1944</ref>; « W. E. B. DuBois Dies in Ghana; Negro Leader and Author, 95 », <ref target="https://perma.cc/W5NX-XZRV">
+                        <emph>The New York Times</emph>, 28 août 1963</ref>; Alden Whitman, « Upton Sinclair, Author, Dead; Crusader for Social Justice, 90 », <ref target="https://perma.cc/E4N7-2KD6">
+                        <emph>The New York Times</emph>, 26 novembre 1968</ref>; « Willa Cather Dies; Noted Novelist, 70 », <ref target="https://perma.cc/2L7H-WGKN">
+                        <emph>The New York Times</emph>, 25 avril 1947</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_10"/> : Jonathan Stray et Julian Burgess. « A Full-text Visualization of the Iraq War Logs », 10 décembre 2010 (dernière mise à jour en avril 2012), <ref target="https://perma.cc/QBZ4-DKTE">http://jonathanstray.com/a-full-text-visualization-of-the-iraq-war-logs</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_11"/> : C.D. Manning, P. Raghavan et H. Schütze, <emph>Introduction to Information Retrieval</emph> (Cambridge: Cambridge University Press, 2008), 118-120.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_12"/> : Milo Beckman, « These Are The Phrases Each GOP Candidate Repeats Most », <emph>FiveThirtyEight</emph>, le 10 mars 2016,  consulté le 9 juin 2022, <ref target="https://perma.cc/37WS-MB8F">https://fivethirtyeight.com/features/these-are-the-phrases-each-gop-candidate-repeats-most/</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_13"/> : Marina Bondi et Mike Scott (dir.). <emph>Keyness in Texts</emph>. (Philadelphie: John Benjamins, 2010).</p>
+                <p>
+                    <ref type="footnotemark" target="#note_14"/> : Il n'est habituellement pas recommandé d'appliquer <hi rend="bold">tf-idf</hi> comme prétraitement avant de produire un modèle thématique. Voir : <ref target="https://perma.cc/N5W9-TYX7">https://datascience.stackexchange.com/questions/21950/why-we-should-not-feed-lda-with-tfidf</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_15"/> : Ben Schmidt, « Words Alone: Dismantling Topic Models in the Humanities », <emph>Journal of Digital Humanities</emph>. Vol. 2, No. 1 (2012): n.p., <ref target="https://perma.cc/LT4N-X4MZ">http://journalofdigitalhumanities.org/2-1/words-alone-by-benjamin-m-schmidt/</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_16"/> : Rada Mihalcea et Paul Tarau. « Textrank: Bringing order into text », <emph>Proceedings of the 2004 Conference on Empirical Methods in Natural Language Processing</emph>, Barcelone, Espagne, 2004, <ref target="https://perma.cc/SMV5-7MYY">http://www.aclweb.org/anthology/W04-3252</ref>.</p>
+            </div>
+        </body>
+    </text>
+</TEI>

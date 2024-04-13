@@ -1,0 +1,820 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="linear-regression">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Regression Analysis with Scikit-Learn (part 1 - Linear)</title>
+                <author role="original_author">Matthew J. Lavin</author>
+                <editor role="reviewers">
+                    <persName>Thomas Jurczyk</persName>
+                    <persName>Rennie C Mapp</persName>
+                </editor>
+                <editor role="editors">James Baker</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0099</idno>
+                <date type="published">07/13/2022</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>This lesson is the first of a two-part lesson focusing on an indispensable set of data analysis methods, logistic and linear regression. It provides an overview of linear regression and walks through running both algorithms in Python (using scikit-learn). The lesson also discusses interpreting the results of a regression model and some common pitfalls to avoid.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2">
+                <head>Lesson Overview</head>
+                <p>This lesson is the first of two that focus on an indispensable set of data analysis methods, linear and logistic regression. Linear regression represents how a quantitative measure (or multiple measures) relates to or predicts some other quantitative measure. A computational historian, for example, might use linear regression analysis to do the following:</p>
+                <list type="ordered">
+                    <item>
+                        <p>Assess how access to rail transportation affected population density and urbanization in the American Midwest between 1850 and 1860<ref type="footnotemark" target="#note_1"/>
+                        </p>
+                    </item>
+                    <item>
+                        <p>Interrogate the ostensible link between periods of drought and the stability of nomadic societies<ref type="footnotemark" target="#note_2"/>
+                        </p>
+                    </item>
+                </list>
+                <p>Logistic regression uses a similar approach to represent how a quantitative measure (or multiple measures) relates to or predicts a category. Depending on one's home discipline, one might use logistic regression to do the following:</p>
+                <list type="ordered">
+                    <item>
+                        <p>Explore the historical continuity of three fiction market genres by comparing the accuracy of three binary logistic regression models that predict, respectively, horror fiction vs. general fiction; science fiction vs. general fiction; and crime/mystery fiction vs. general fiction<ref type="footnotemark" target="#note_3"/>
+                        </p>
+                    </item>
+                    <item>
+                        <p>Analyze the degree to which the ideological leanings of U.S. Courts of Appeals predict panel decisions<ref type="footnotemark" target="#note_4"/>
+                        </p>
+                    </item>
+                </list>
+                <p>The first of these examples is a good example of how logistic regression classification tends to be used in cultural analytics (in this case literary history), and the second is more typical of how a quantitative historian or political scientist might use logistic regression.</p>
+                <p>Logistic and linear regression are perhaps the most widely used methods in quantitative analysis, including but not limited to computational history. They remain popular in part because:</p>
+                <list type="unordered">
+                    <item>They are extremely versatile, as the above examples suggest   </item>
+                    <item>Their performance can be evaluated with easy-to-understand metrics</item>
+                    <item>The underlying mechanics of model predictions are accessible to human interpretation (in contrast to many "black box" models)</item>
+                </list>
+                <p>The central goals of these two lessons are:</p>
+                <list type="ordered">
+                    <item>To provide overviews of linear and logistic regression</item>
+                    <item>To describe how linear and logistic regression models make predictions</item>
+                    <item>To walk through running both algorithms in Python using the scikit-learn library</item>
+                    <item>To describe how to assess model performance</item>
+                    <item>To explain how linear and logistic regression models are validated</item>
+                    <item>To discuss interpreting the results of linear and logistic regression models</item>
+                    <item>To describe some common pitfalls to avoid when conducting regression analysis</item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Preparation</head>
+                <div type="3">
+                    <head>Suggested Prior Skills</head>
+                    <list type="unordered">
+                        <item>Prior familiarity with Python or a similar programming language. Code for this lesson is written in Python 3.7.3 on MacOS Catalina, but you can likely run regression analysis in many ways. The precise level of code literacy or familiarity recommended is hard to estimate, but you will want to be comfortable with basic Python types and operations (functions, loops, conditionals, etc.).</item>
+                        <item>
+This lesson uses term frequency tables as its primary dataset. Since the data is already pre-processed, you do not need to repeat these steps to complete the lesson. If you want to know more about each step, however, I have provided some links for you. To create term frequency tables, I used Python for normalization, tokenization, and converting tokens to document-term matrices.<list type="unordered">
+                                <item>Tokenization involves using a computer program to recognize separations between terms. It is discussed in two existing <emph>Programming Historian</emph> lessons, <ref target="/en/lessons/introduction-to-stylometry-with-python">Introduction to Stylometry with Python</ref> and <ref target="/en/lessons/basic-text-processing-in-r">Basic Text Processing in R</ref>. The first, uses Python so it's more directly relevant to this lesson, while the second describes the logic of tokenization more thoroughly.</item>
+                                <item>A document-term matrix is a very common data structure in computational text analysis. To envision its properties, picture a spreadsheet in which each row is a document, each column is a term, and each value is a number representing the count or relative frequency of a particular term in a particular document. The lesson <ref target="/en/lessons/common-similarity-measures">Understanding and Using Common Similarity Measures for Text Analysis</ref> demonstrates how to create document-term matrices using scikit-learn's <code rend="inline">CountVectorizer</code>.</item>
+                            </list>
+                        </item>
+                        <item>This lesson also uses a Term Frequency - Inverse Document Frequency (TF-IDF) transformation to convert term counts into TF-IDF scores. The logic behind this transformation, and its applicability to machine learning, is described in <ref target="/en/lessons/analyzing-documents-with-tfidf">Analyzing Documents with TF-IDF</ref>.</item>
+                        <item>For the <ref target="https://doi.org/10.22148/001c.11831">
+                                <emph>Cultural Analytics</emph> article</ref> on which this lesson is based, I applied lemmatization after tokenizing the book reviews. Lemmatization is a process for grouping together different word forms/inflections, such that the verbs <emph>write</emph> and <emph>writes</emph> would both be tabulated under one label. I describe lemmatization and stemming (another way of grouping term variants) in my lesson <ref target="/en/lessons/analyzing-documents-with-tfidf">Analyzing Documents with TF-IDF</ref>. I also point readers to descriptions of stemming and lemmatization from Christopher D. Manning, Prabhakar Raghavan and Hinrich Schütze's <ref target="https://perma.cc/T2CS-543V">
+                                <emph>Introduction to Information Retrieval</emph>
+                            </ref>. The subsequent pre-processing steps included converting lemma data to a document-lemma matrix (similar to a document-term matrix, but with lemma counts instead of term counts) and applying TF-IDF to lemma data (which would most accurately be abbreviated LF-IDF).</item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Before You Begin</head>
+                    <list type="unordered">
+                        <item>Install the Python 3 version of Anaconda. Installing Anaconda is covered in <ref target="/en/lessons/text-mining-with-extracted-features">Text Mining in Python through the HTRC Feature Reader</ref>. This will install Python 3.7.3 (or higher), the <ref target="https://scikit-learn.org/stable/install.html">Scikit-Learn library</ref>, <ref target="https://pandas.pydata.org/docs/">the Pandas library</ref>, the <ref target="https://matplotlib.org/">matplotlib</ref> and <ref target="https://seaborn.pydata.org/">seaborn</ref> libraries used to generate visualizations, and all the dependencies needed to run a <ref target="https://jupyter.org/">Jupyter Notebook</ref>.</item>
+                        <item>It is possible to install all these dependencies without Anaconda (or with a lightweight alternative like <ref target="https://docs.conda.io/en/latest/miniconda.html">Miniconda</ref>). For more information, see the section below titled <ref target="#alternatives-to-anaconda">Alternatives to Anaconda</ref>
+                        </item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Lesson Dataset</head>
+                    <p>This lesson and its partner, <ref target="/en/lessons/logistic-regression">Logistic Regression Analysis with Scikit-Learn</ref>, will demonstrate linear and logistic regression using a corpus of book reviews published in <emph>The New York Times</emph> between 1905 and 1925. Lesson files, including metadata and term-frequency CSV documents, can be downloaded from <ref target="/assets/linear-regression/lesson-files.zip">lesson-files.zip</ref>.</p>
+                    <p>This corpus represents a sample of approximately 2,000 reviews, each of which focuses on a single published book. I prepared this dataset in conjunction with an article titled "Gender Dynamics and Critical Reception: A Study of Early 20th-century Book Reviews from <emph>The New York Times</emph>," which was published in <emph>Cultural Analytics</emph> in January 2020.<ref type="footnotemark" target="#note_5"/> For that article, I tagged each book review with a label representing the presumed gender of the book's author. I then trained a logistic regression model to classify the reviews as 'presumed male' or 'presumed female', based on the words that reviews with each label tended to use. After maximizing the performance of this model, I examined the terms most likely to predict a male or female label.  </p>
+                    <p>There are several good reasons to use a dataset like this one for lessons on linear and logistic regression, but also several drawbacks. Typically, to demonstrate linear regression, a much simpler dataset is used, such as the very well-known "Diabetes Dataset," in which a range of variables (age, sex, BMI, etc.) can be used to predict diabetes disease progression one year after an established baseline.<ref type="footnotemark" target="#note_6"/> In scikit-learn, datasets like this one are termed "toy datasets" because they are "useful to quickly illustrate the behavior of the various algorithms implemented in scikit-learn" but are "often too small to be representative of real world machine learning tasks."<ref type="footnotemark" target="#note_7"/> The dataset I have elected to use, in contrast, is taken from my published scholarship, which makes it more complex than a toy dataset but also demonstrative of the kind of data you might be working with in your own scholarship. The way I will use this dataset for <ref target="/en/lessons/logistic-regression">a logistic regression model</ref> is in many ways typical of computational text analysis in digital humanities and cultural analytics. Running a linear regression on text features to predict dates is less typical in a digital humanities context, but using the dataset in this way still allows me to demonstrate the key principles of linear regression, and to walk through the steps of making sense of a regression model with many coefficients.  </p>
+                    <p>The text of each book review in this dataset has been pre-processed, tokenized, and converted to CSV files. Each of these CSV files represents one document. In any given CSV, each term from that document is represented as a value in the first column and each term count represented as a value in the second column. The CSV files are all stored in a folder called <code rend="inline">corpus</code>, with each review named after its unique id from <emph>The New York Times</emph> Archive API, such as <code rend="inline">4fc03a7d45c1498b0d1e2e6e.csv</code>. Outside of the <code rend="inline">corpus</code> folder, a file called <code rend="inline">reviews_meta.csv</code> includes information about each review, including the corresponding id field from the Archive API. Metadata for the corpus includes fields retrieved from the Archive API as well as additional fields that were tagged by hand:</p>
+                    <div type="4">
+                        <head>New York Times Data Fields</head>
+                        <list type="unordered">
+                            <item>
+                                <hi rend="bold">nyt_id</hi> This is a unique alpha-numeric identifier used by the New York Times Archive API to identify each periodical article</item>
+                            <item>
+                                <hi rend="bold">xml_id</hi> This is a unique numeric identifier used by the New York Times to align XML files with metadata. The alignments between <code rend="inline">xml_id</code> and <code rend="inline">nyt_id</code> were obtained, by request, from <emph>The New York Times</emph>
+                            </item>
+                            <item>
+                                <hi rend="bold">month</hi> Month of publication for the specific article</item>
+                            <item>
+                                <hi rend="bold">day</hi> Day of publication for the specific article</item>
+                            <item>
+                                <hi rend="bold">year</hi> Year of publication for the specific article</item>
+                            <item>
+                                <hi rend="bold">nyt_pdf_endpoint</hi> A url linking the entry to its corresponding content on <emph>The New York Times</emph>' Times Machine</item>
+                        </list>
+                    </div>
+                    <div type="4">
+                        <head>Hand-coded Fields</head>
+                        <p>The following fields were added by Dr. Matthew Lavin as part of his scholarly work on book reviews:</p>
+                        <list type="unordered">
+                            <item>
+                                <hi rend="bold">cluster_id</hi> If the entry was created by splitting up a group of book reviews scanned as one article, this id maps the review to a corresponding text file for the individual review.</item>
+                            <item>
+                                <hi rend="bold">perceived_author_gender</hi> This field describes the gender of the author assumed by the review/reviewer. If the review calls the author he or she, or Mr. of Mrs., or other gendered pronouns and/or honorifics, these were taken as evidence of a gender presumption. There are three possible values for this field:<list type="unordered">
+                                    <item>m: author described using male gendering terms such as Mr., Lord, Baron, he, and his</item>
+                                    <item>f: author described using female gendering terms such as Mrs., Miss, madam, she, and her</item>
+                                    <item>u: gender label is unclear, or maybe the reviewer avoided gender terms to remain neutral</item>
+                                </list>
+                            </item>
+                        </list>
+                    </div>
+                </div>
+                <table>
+                    <row>
+                        <cell role="label">Type</cell>
+                        <cell role="label">Subtype</cell>
+                        <cell role="label">Definition</cell>
+                    </row>
+                    <row>
+                        <cell>Categorical</cell>
+                        <cell>Nominal</cell>
+                        <cell>Qualitative labels without distinct or defined order</cell>
+                    </row>
+                    <row>
+                        <cell>Categorical</cell>
+                        <cell>Ordinal</cell>
+                        <cell>Qualitative scales, such as satisfaction score 1-5</cell>
+                    </row>
+                    <row>
+                        <cell>Numerical</cell>
+                        <cell>Continuous</cell>
+                        <cell>Real number values where both whole numbers and decimals are meaningful</cell>
+                    </row>
+                    <row>
+                        <cell>Numerical</cell>
+                        <cell>Discrete</cell>
+                        <cell>Count values where whole numbers make sense but decimals don't</cell>
+                    </row>
+                </table>
+                <div type="3">
+                    <head>Overview of Linear Regression</head>
+                    <p>Simple linear regression (a linear model with one continuous, independent variable and one continuous, dependent variable) is most often taught first because the math underlying it is the easiest to understand. The concepts you learn can then be extended to multiple linear regression, that is, a linear model with many independent variables and one dependent variable.</p>
+                    <p>The goal with a simple linear regression model is to calculate a two-dimensional <hi rend="bold">line of best fit</hi> for a sample of data and to evaluate how to close to the regression line a given set of data points are. A simplified example, using our book reviews data set, can help clarify what a <hi rend="bold">line of best fit</hi> is, and how it is generated.</p>
+                    <p>The following plot visualizes the relationship between the average length of single-work book reviews in the <emph>The New York Times</emph> and the year in which those reviews appeared. Later in this lesson, I will come back to how a plot like this is made in Python. What's important now, is the idea that we could train a model to predict a book review's year of publication by knowing only how long, on average, book reviews are for each year. We shouldn't necessarily expect a strong relationship between average review length and date, unless book reviews were steadily getting shorter or longer over time.</p>
+                    <figure>
+                        <desc>Book reviews by average word count per year</desc>
+                        <graphic url="regplot_book_review_length.png"/>
+                    </figure>
+                    <p>In this case, we do see an increase over time in this example, with an average difference of about 35 words per year. However, we can also see that the trend line would be very different if the years 1920-1924 were excluded.</p>
+                    <p>If we were evaluating the results of this model, we might summarize that:</p>
+                    <list type="ordered">
+                        <item>The average length of book reviews published between 1905 and 1925 does change from year to year</item>
+                        <item>The change in averages does not look linear</item>
+                        <item>To the extent that the change over time is fitted to a linear model, the average length of book reviews published between 1914 and 1919 doesn't fit the expected pattern</item>
+                    </list>
+                    <p>There could be various causes for this apparent relationship between average review length and date. However, this simplified example is useful for demonstrating several key concepts associated with linear (and by extension, logistic) regression models:</p>
+                    <list type="ordered">
+                        <item>A line-of-best-fit can be used to evaluate the relationships among variables</item>
+                        <item>Interpreting these relationships requires first assessing whether the model is showing a strong relationship  </item>
+                        <item>In a linear regression context, variables may be related but not linearly related, which might suggest that some other model (such as a polynomial regression) would be more appropriate. (For more on this topic, take a look at my discussion of Homoscedasticity)</item>
+                        <item>Visualizing a line-of-best-fit among the points used to produce it can be provide an effective "gut check" of a model's efficacy</item>
+                    </list>
+                    <p>The visualization above is a conventional scatter plot with average length on one axis, and year on the other. Through the two-dimensional data, a straight line has been drawn, and this line is drawn in such a way as to minimize the total distance of all points from the line. We can imagine that if we made the line shallower or steeper, or moved the entire line up or down without changing its angle, some points might be closer to the line, but other points would now be farther away. A <hi rend="bold">line of best fit</hi> in this case, expresses the general idea that the line should work as well as possible for the greatest number of points, and the specific idea that that a line's goodness-of-fit can be assessed by calculating <hi rend="bold">the mean of the squared error</hi>. To clarify this idea of squared error, I have added some new labels to the same regression plot:</p>
+                    <figure>
+                        <desc>Book reviews by average word count per year with error lines</desc>
+                        <graphic url="regplot_book_review_length_w_error.png"/>
+                    </figure>
+                    <p>In this plot, a vertical line between each point and the regression line expresses the error for each data point. The squared error is the length of that line squared, and the mean squared error is the sum of all squared error values, divided by the total number of data points.<ref type="footnotemark" target="#note_11"/> Fitting a regression line in this way is sometimes referred to as an <hi rend="bold">ordinary least squares regression</hi>.<ref type="footnotemark" target="#note_12"/> One thing that makes a line-of-best-fit approach so appealing is that it describes a singularity function to convert one or more input values into an output value. The standard regression function looks like this:</p>
+                    <p>$$
+Y = a + bX
+$$</p>
+                    <p>In this function, X is the explanatory variable and Y is the dependent variable, or the prediction. The lowercase a is the value of y when x = 0 (or the <hi rend="bold">intercept</hi>), and b is the slope of the line. If this formula looks familiar, you may recall from algebra class that any line in a coordinate system can be expressed by designating two values: a starting set of coordinates and "rise over run." In a linear regression, the intercept provides the starting coordinate, the coefficient provides information about the rise of the slope, and the run value is expressed by the explanatory variable.<ref type="footnotemark" target="#note_13"/> When we perform multiple regression, we end up with a similar function, as follows:</p>
+                    <p>$$
+Y = a + bX1 + cX2 + dXn
+$$</p>
+                    <p>In this formula, the prediction is generated by adding the intercept (a) to the product of each explanatory variable and its coefficient. In other words, the math behind a multiple linear regression is more complicated than simple linear regression, but the intuition is the same: to draw a line of best fit, expressed by a single function, that generates predictions based on input values.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Linear Regression Procedure</head>
+                <p>In this lesson, we will begin by training a linear regression model using the corpus of book reviews from <emph>The New York Times</emph> described above. The corpus is sufficiently large to demonstrate splitting the data set into subsets for training and testing a model. This is a very common procedure in machine learning, as it ensures that the trained model will make accurate predictions on objects not included in the training process. We'll do something similar with logistic regression in the second of these two lessons.</p>
+                <p>As we have seen, a linear regression model uses one or more variables to predict a continuous numerical value, so we will train our first model to predict a book review's publication date. Logistic regression, in turn, uses one or more variables to predict a binary categorical or nominal label. For this task, we will reproduce a version of the model I trained for the article "Gender Dynamics and Critical Reception: A Study of Early 20th-century Book Reviews from The New York Times," which was published in <emph>Cultural Analytics</emph> in January 2020. Gender is a social construction and not binary, but the work I did for <emph>Cultural Analytics</emph> codes gender not as an essential identity, but as a reflection of the book reviewers' perceptions. Rather than reifying a binary view of gender, I believe this example makes for an effective case study on how document classification can be used to complicate, historicize, and interrogate the gender binaries in <emph>The New York Times Book Review</emph>.</p>
+                <div type="3">
+                    <head>Running Linear Regression in Python 3</head>
+                    <p>In this section of the lesson, we will run a linear regression model in Python 3 to predict a book review's date (represented as a continuous variable). We will rely primarily on the scikit-learn library for setting up, training, and evaluating our models, but we will also use pandas for reading CSV files and data manipulation, as well as matplotlib and seaborn to make data visualizations. Later, we will use the same mix of libraries to train a logistic regression model to predict the perceived gender of the author being reviewed (represented as a binary, nominal variable).</p>
+                    <p>Some of the code below is specific to the way I have set up my metadata and data files, but the choices I have made are common in data science and are becoming increasingly popular in computational humanities research. I will explain the principles behind each block of code as I walk you through each of the steps.</p>
+                    <div type="4">
+                        <head>Step 1: Loading metadata</head>
+                        <p>As stated previously, the metadata for this lesson can be found on two CSV files, <code rend="inline">metadata.csv</code> and <code rend="inline">meta_cluster.csv</code>. They are presented as two separate files because, in the first file, a row represents one review and one pdf file in the New York Times API. In the second file, again a row represents one review, but each of these reviews was clustered into one pdf file with one or more additional reviews in the New York Times API. Both of our tasks call for consolidating the two review lists into one DataFrame in Python.</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_0" corresp="code_linear-regression_0.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>In the above code chunk, <code rend="inline">pd.concat()</code> allows us to combine multiple DataFrames using rules or logic.<ref type="footnotemark" target="#note_14"/>
+                        </p>
+                        <p>In this example, the parameter<code rend="inline">axis= 0</code> instructs the <code rend="inline">pd.concat()</code> method to join by rows instead of columns; <code rend="inline">sort=True</code> directs it to sort the results; and <code rend="inline">fillna('none')</code> fills any <code rend="inline">nan</code> values with 0. This last directive is important because <code rend="inline">meta_cluster.csv</code> has a column for cluster_id and <code rend="inline">metadata.csv</code> does not.<ref type="footnotemark" target="#note_15"/>
+                        </p>
+                    </div>
+                    <div type="4">
+                        <head>Step 2: Preparing The Data and Creating Date Labels</head>
+                        <p>In this step, we prepare the DataFrame for linear regression analysis. For the linear regression model we are going to train, we need to be sure each row has a year, month, and day, and we want to use those fields to create a new column that represents the date as a floating-point decimal. In this schema, for example, the date February 9, 1907 would be encoded as 1907.106849 and April 12, 1914 would be 1914.276712.</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_1" corresp="code_linear-regression_1.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>This chunk of Python code defines two functions, drops any rows in the <code rend="inline">df_all</code> DataFrame with NA (i.e., "not available" or missing data) values in the <code rend="inline">day</code>, <code rend="inline">month</code>, or <code rend="inline">year</code> columns, and then uses an <code rend="inline">apply()</code> method to run the <code rend="inline">toYearDecimal()</code> function on each row in the <code rend="inline">df_all</code> DataFrame. You could also do this with a loop, but <code rend="inline">apply()</code> is faster and more consistent with the pandas ecosystem, especially since we are generating the values for a new column in that very DataFrame.</p>
+                        <p>The logic of the <code rend="inline">toYearDecimal()</code> function is fairly straightforward: it uses the <code rend="inline">day</code>, <code rend="inline">month</code>, or <code rend="inline">year</code> columns to construct a <code rend="inline">Date</code> object (which is why it's important that there be no NA values in those fields) and then expresses the date as number of days since January 1 of that year. It then divides that number by the total number of days in that date's year (365 or 366 depending on whether it's a leap year) to convert the number of days into a decimal value. It adds that decimal back to the year to express the date as its year + the decimal value of days. The decimal date is then stored in the <code rend="inline">yearDecimal</code> column of the <code rend="inline">df_all</code> DataFrame, and the index is reset once more since we have removed many rows of data.</p>
+                    </div>
+                    <div type="4">
+                        <head>Step 3: Loading Term Frequency Data, Converting to List of Dictionaries</head>
+                        <p>There are lots of ways to the work with term frequency data, but one of the most common is to create metadata CSV file and then to key each corresponding term frequency CSV to an id in that metadata file. In this case, we started with two CSVs and joined them to together to create one central list of documents. Now, we can iterate through the rows of the <code rend="inline">df_all</code> DataFrame and build up a list of dictionaries. Each dictionary will have terms as keys and counts as values, like this:</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_2" corresp="code_linear-regression_2.txt" rend="block"/>
+                        </ab>
+                        <p>The order of this list of dictionaries will be the same as the rows in <code rend="inline">df_all</code>.</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_3" corresp="code_linear-regression_3.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>This block of code's purpose is to load term frequency data from multiple CSV files and convert them to list of dictionaries. We want the list to match the metadata file, so we loop through the rows of the <code rend="inline">df_all</code> DataFrame just like we did with the previous block of Python. This time, however, I'm using the method <code rend="inline">iterrows()</code> rather than <code rend="inline">apply()</code>. There are various pros and cons to each method, but <code rend="inline">iterrows()</code> might be a little more intuitive in this context since, instead of creating a new column in our DataFrame, we are building up a new list of dictionaries.</p>
+                        <p>The <code rend="inline">if</code> and <code rend="inline">else</code> statements in the code are there because, for each row, we need to use column data to generate the file path of the corresponding CSV. Solo reviews will have one kind of file name and reviews extracted from clusters of reviews will have another. Here are two example file paths:</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_4" corresp="code_linear-regression_4.txt" rend="block"/>
+                        </ab>
+                        <ab>
+                            <code xml:id="code_linear-regression_5" corresp="code_linear-regression_5.txt" rend="block"/>
+                        </ab>
+                        <p>Did you notice the difference? If a row has no numerical cluster id, the file name will be built from the folder location, the review id, and the string '.csv'. If the row does have a numerical cluster id, the file name will be built using the folder location, the id, a hyphen, the cluster id, and the string '.csv'.</p>
+                        <p>Once the correct file path is determined, the code block loads the CSV as its own pandas DataFrame. This is often the fastest way to get tabular data into Python, but we want to convert that DataFrame to a dictionary where terms are keys and counts are values. As a result, we preemptively execute three pandas methods, <code rend="inline">dropna()</code>, <code rend="inline">reset_index(drop=True)</code> and <code rend="inline">set_index('term')</code>. Pandas supports chaining, so we can add them sequentially to the tail of the <code rend="inline">pd.read_csv()</code> statement. The <code rend="inline">dropna()</code> method removes any rows with NA values; The <code rend="inline">reset_index(drop=True)</code> renumbers the rows in case any rows were dropped; and <code rend="inline">set_index('term')</code> converts the term column to the index so that it's easier to convert to a dictionary.</p>
+                        <p>The code to do the conversion is <code rend="inline">mydict = df['count'].to_dict()</code>. It begins with <code rend="inline">df['count']</code>, which represents the <code rend="inline">count</code> column as a pandas Series. (For more on the Series datatype, see the <ref target="https://perma.cc/YE48-62A8">pandas documentation</ref>). Next, the pandas method <code rend="inline">to_dict()</code> converts that series to a dictionary, using the index values as dictionary keys and the Series values as dictionary values. Each dictionary is then appended to <code rend="inline">list_of_dictionaries</code>. After the loop has finished running, the <code rend="inline">len()</code> of <code rend="inline">list_of_dictionaries</code> will be the same as the number of reviews, and in the same order.</p>
+                        <p style="alert alert-warning">
+  The file path code from this block may need to be edited for Windows machines.
+</p>
+                    </div>
+                    <div type="4">
+                        <head>Step 4: Converting data to a document-term matrix</head>
+                        <p>Converting dictionary-style data to a document-term matrix is a fairly common task in a text analysis pipeline. We essentially want the data to resemble a CSV file with each document in its own row and each term in its own column. Each cell in this imagined CSV, as a result, will represent the count of a particular term in a particular document. If a word does not appear in a document, the value for that cell will be zero.</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_6" corresp="code_linear-regression_6.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>In the above block of code, we import the <code rend="inline">DictVectorizer()</code> class from scikit-learn and instantiate a <code rend="inline">DictVectorizer</code>, which we will use to convert our <code rend="inline">list_of_dictionaries</code> variable to a document-term matrix. Once we have our data in this format, we will use the TF-IDF transformation to convert our term counts to TF-IDF weights, which help us isolate distinctive terms and ignore words that appear frequently in many documents.<ref type="footnotemark" target="#note_16"/>
+                        </p>
+                    </div>
+                    <div type="4">
+                        <head>Step 5: TF-IDF Transformation, Feature Selection, and Splitting Data</head>
+                        <p>An important area for concern or caution in machine learning is the ratio of features to samples. This concern is especially important in computational text analysis, where there are often small training samples and hundreds of thousands different tokens (words, punctuation, etc.) that one could use as training features. The biggest potential liability of having too many features is over-fitting. When a model is trained on sparse data, the presence of each additional training feature increases the probability of a spurious correlation, a purely coincidental association between, say, a particular term frequency and the date we are trying to predict. When a model is too well fitted to its training data, the model will fail to provide meaningful predictions on other datasets.  </p>
+                        <p>When employing computational text analysis in a scholarly context, one can limit the number of features in a model in several ways:</p>
+                        <list type="ordered">
+                            <item>Using feature consolidation and/or dimension reduction strategies such as stemming/lemmatization and Principal Component Analysis (PCA)</item>
+                            <item>Limiting term lists to the top K most frequent terms in the corpus (here K is just a placeholder for whatever number is used)</item>
+                            <item>Employing feature selection techniques such as with a variance threshold or a univariate feature selection strategy</item>
+                        </list>
+                        <p>In the context of a more general lesson on regression, I have included some code to employ a two-step feature selection strategy. The intuition behind this is relatively straightforward. First, we select the 10,000 most frequent features in the book reviews as a whole. Second, after executing our TF-IDF transformation, we conduct univariate feature selection to find the most promising 3,500 features of these terms, as represented by the scikit-learn <code rend="inline">f_regression()</code> scoring function. I'll come back to this scoring function in a moment but, first, let's isolate the top 10,000 terms in the corpus.</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_7" corresp="code_linear-regression_7.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>This block of code begins by importing a very useful class from Python's <code rend="inline">collections</code> library called a <code rend="inline">Counter()</code>. Counter's are a little bit like Python dictionaries, but they have built-in methods that make some common operations especially easy. In our case, the first of our two functions determines the top N terms in the corpus. We loop through our entire list of dictionaries and build up a single vocabulary Counter with cumulative counts for each term. We then use our Counter's <code rend="inline">most_common()</code> method to return the keys and values of the top N terms in that vocabulary. The <code rend="inline">number</code> parameter supplies the number of terms the function will return.</p>
+                        <p>Our second function takes two parameters: a term list and a list of dictionaries. It loops through the list of dictionaries and, for each dictionary, it checks each term against the term list. Words that match are compiled to a new list of dictionaries, and words that do not match are skipped over. The output of this second function is stored as a variable called <code rend="inline">new_list_of_dicts</code>. It has the same order as <code rend="inline">list_of_dictionaries</code>, but now only the top 10,000 terms are represented in these dictionaries.  </p>
+                        <p>After running both of these functions, we are ready to compute TF-IDF scores. In the previous section, we stored our <code rend="inline">DictVectorizer()</code> instance as a variable called <code rend="inline">v</code>, so we can use that variable here to fit the object with our <code rend="inline">new_list_of_dicts</code> data.</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_8" corresp="code_linear-regression_8.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>In this code block, we import the <code rend="inline">TfidfTransformer</code> class from scikit-learn, instantiate a <code rend="inline">TfidfTransformer</code>, and run the <code rend="inline">fit_transform()</code> method on <code rend="inline">v</code>. At the end of this code block, the data is in a format that scikit-learn's regression models (and other machine learning models) can now understand.</p>
+                        <p>However, we still need to execute step 2 of our feature selection strategy: using the scikit-learn <code rend="inline">f_regression</code> scoring function to isolate the most promising 3,500 TF-IDF features out of the top 10,000 terms from the vocabulary. The <code rend="inline">f_regression</code> function computes a correlation between each feature and the dependent variable, converts it to an F-score, and then derives a p-value for each F-score. No doubt, some of the "K Best" terms selected by this procedure will be highly correlated with the training data but will not help the model make good predictions. However, this approach is easy to implement and, as we will see below, produces a reasonably strong model.  </p>
+                        <ab>
+                            <code xml:id="code_linear-regression_9" corresp="code_linear-regression_9.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>We've now reduced our model to 3,500 features: that is, terms and TF-IDF scores that are likely to help us predict the publication date of book review. The next code block partitions the data into a training set and a test set using scikit-learn's <code rend="inline">train_test_split()</code> function. Creating a split between training and test data is especially important since we still have a lot of features, and a very real possibility of over-fitting.</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_10" corresp="code_linear-regression_10.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>The operation creates four variables: training data, training labels, test data, and test labels. Since we are training a model to predict dates, the training and test data are the decimal dates that we previously generated and stored in the <code rend="inline">yearDecimal </code> column of <code rend="inline">df_all</code>. The <code rend="inline">test_size</code> parameter is used to set the ratio of training to test data (approximately 2 to 1 in this case) and the <code rend="inline">random_state</code> parameter is used to control reproducibility. If we re-used the same <code rend="inline">random_state</code> value, the same shuffle would be applied to the data before applying the split. Changing the <code rend="inline">random_state</code> value if one were rerunning the split would ensure that different rows would be selected.<ref type="footnotemark" target="#note_17"/>
+                        </p>
+                    </div>
+                    <div type="4">
+                        <head>Let's Pause: A Look at the Training and Test Data</head>
+                        <p>The next few steps involve relatively few lines of code because they are based on a very common sequence of actions. The scikit-learn library has made these steps especially straightforward. Setting up the data is, by comparison, more involved because scikit-learn is designed to work easily as long as the data are prepared in specific ways. If you haven't done so already, take a look at the data stored in the variables <code rend="inline">X_train</code>, <code rend="inline">X_test</code>, <code rend="inline">y_train</code>, and <code rend="inline">y_test</code>. Assuming you are working in a Jupyter Notebook, you can inspect any of these variables by typing the variable's name in an empty Notebook cell and pressing the "Run" button (assuming you've already run all the code blocks above). Let's start with <code rend="inline">X_train</code>. For this variable, your Jupyter Notebook output will look something like this:</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_11" corresp="code_linear-regression_11.txt" rend="block"/>
+                        </ab>
+                        <p>This message tells us that <code rend="inline">X_train</code> is a sparse matrix made up of float64 data. This data type comes from the NumPy library and is used to represent 64-bit floating-point numbers, which have the same level of precision of Python’s built-in <code rend="inline">float</code> type). The dimensions 1514x3500 tell us that we have 1514 reviews in our training data, and 3500 TF-IDF weighted terms from which to train the model. Scikit-learn expects independent variables (training and test) to stored in an array-like object with the dimensions [number-of-samples x number-of-features], whether that's a SciPy sparse matrix, a pandas DataFrame, a NumPy array, or a standard-Python list of lists.</p>
+                        <p>Meanwhile, if you inspect <code rend="inline">X_test</code>, you will see something like this:</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_12" corresp="code_linear-regression_12.txt" rend="block"/>
+                        </ab>
+                        <p>This block of output is also a group of float64 values, but this time they are contained within a pandas Series. A Series is a one-dimensional sequences of values with axis labels built on top of NumPy's <code rend="inline">ndarray</code> class. It is similar to a pandas DataFrame, but it represents only one dimension of data, so it's the default type for a single column from a pandas DataFrame.<ref type="footnotemark" target="#note_18"/> In scikit-learn, training and test labels should be an array-like object with a length equal to the number of samples or, if multiple labels are being predicted, an array-like object with the dimensions [number-of-samples x number-of-targets]. A group of one-dimensional target labels can be a pandas Series, a NumPy array, or a Python list.</p>
+                    </div>
+                    <div type="4">
+                        <head>Step 6: Training the Model</head>
+                        <p>Equipped with a better understanding of what our data looks like, we can proceed to importing a <code rend="inline">LinearRegression()</code> class from scikit-learn, instantiating it as a variable, and fitting the newly designated model with our training set. As stated, scikit-learn makes these steps easy, so we only need three lines of code:</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_13" corresp="code_linear-regression_13.txt" lang="language-python" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4">
+                        <head>Step 7: Generate Predictions</head>
+                        <p>Now that the model has been trained, we will use the fitted model to generate label predictions on the test data. We need to execute the <code rend="inline">lr</code> instance's <code rend="inline">predict()</code> method, using the variable <code rend="inline">X_test</code>. Remember, <code rend="inline">X_test</code> is a matrix-like object with the same number of variables and observations as <code rend="inline">X_train</code> but, significantly, our model has never seen these rows of data before.</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_14" corresp="code_linear-regression_14.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>After this line of code has been run, <code rend="inline">results</code> will be a one-dimsensional NumPy array with a length equal to the number of rows in <code rend="inline">X_test</code> and, by definition, the same number of rows in <code rend="inline">Y_test</code>. What's more, all three variables represent the same observations, in the same order. For example, the first row of <code rend="inline">X_test</code> represents TF-IDF values for terms in a book review, the first value in <code rend="inline">results</code> represents the predicted year of that book review, and the first value in <code rend="inline">Y_test</code> represents the labeled year of that book review. Maintaining the sequencing of these three variables will make it easier to evaluate the performance of our predictions in the next step.</p>
+                    </div>
+                    <div type="4">
+                        <head>Step 8: Evaluating Performance</head>
+                        <p>A linear regression model can be evaluated using several important metrics, but the most important thing to bear in mind is whether the model is making (or will make) consistently good predictions. This why this lesson demonstrates splitting the data into partitioned training and test sets. Now that we've generated predictions and stored them in the <code rend="inline">results</code> variable, we can compare those predictions to the test labels in <code rend="inline">Y_test</code>. We can obtain a good first impression a linear regression model's performance by calculating the r² (pronounced r-squared) score, finding the mean of the residuals, and making a histogram or kernel density estimate (KDE) plot to see how the residuals are distributed. We can then flesh out this picture by computing an f-statistic and a p-value.</p>
+                        <p>An r² score computes the "coefficient of determination" of the regression model, which is the proportion of the variance in the dependent variable that is predictable from the independent variable or variables.<ref type="footnotemark" target="#note_19"/> Scikit-learn has a built-in r² scoring function, but the math behind this score is relatively simple, and writing our own function from scratch will help us understand what it captures. If you want to skip this step, you can simply do the following:</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_15" corresp="code_linear-regression_15.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>You'll notice that the first step in the function below is to calculate the residuals, which represent the differences between predictions and test labels. I'll say more about those in just a moment. First, let's take a look at this block of code:</p>
+                        <ab>
+                            <code xml:id="code_linear-regression_16" corresp="code_linear-regression_16.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>If you've been following along, you can paste this entire code chunk in a Jupyter Notebook cell and run it. It is dependent only on the <code rend="inline">y_test</code> and <code rend="inline">results</code> variables, as the rest is Python standard. Here's a step-by-step breakdown of the function:</p>
+                        <list type="ordered">
+                            <item>Calculate the difference (i.e. residual) between each true review date and each predicted date</item>
+                            <item>For each residual, square the value</item>
+                            <item>Add all the squared values together to derive the "model sum of squares" (MSS)</item>
+                            <item>Calculate the mean true value by adding all the true values together and dividing by the number of observations</item>
+                            <item>For each true review date, subtract the mean true value and square the result</item>
+                            <item>Add all these squared values together to derive the "total sum of squares" (TSS)</item>
+                            <item>Calculate the final r² score, which equals 1-(mss/tss)</item>
+                        </list>
+                        <p>In our case the result is about 0.441.<ref type="footnotemark" target="#note_20"/> Since this is the amount of variance in the book review date field that can be predicted by a sample of a book review's TF-IDF scores, the best value would be a 1.0. (However, the r² score can also be less than zero if the model performs worse than random guessing.<ref type="footnotemark" target="#note_21"/>) This particular r² score tells us that our features are giving us some information, but perhaps not a lot.</p>
+                    </div>
+                    <table>
+                        <row>
+                            <cell role="label"/>
+                            <cell role="label">predicted</cell>
+                            <cell role="label">actual</cell>
+                            <cell role="label">residual</cell>
+                        </row>
+                        <row>
+                            <cell>0</cell>
+                            <cell>1898.616989</cell>
+                            <cell>1912.016393</cell>
+                            <cell>-13.399405</cell>
+                        </row>
+                    </table>
+                    <table>
+                        <row>
+                            <cell role="label"/>
+                            <cell role="label">predicted</cell>
+                            <cell role="label">actual</cell>
+                            <cell role="label">residual</cell>
+                        </row>
+                        <row>
+                            <cell>max</cell>
+                            <cell>1932.678418</cell>
+                            <cell>1924.950820</cell>
+                            <cell>13.878532</cell>
+                        </row>
+                        <row>
+                            <cell>75%</cell>
+                            <cell>1921.142702</cell>
+                            <cell>1922.671119</cell>
+                            <cell>2.491212</cell>
+                        </row>
+                        <row>
+                            <cell>50%</cell>
+                            <cell>1917.948008</cell>
+                            <cell>1918.799886</cell>
+                            <cell>-0.484037</cell>
+                        </row>
+                        <row>
+                            <cell>25%</cell>
+                            <cell>1912.849458</cell>
+                            <cell>1912.647541</cell>
+                            <cell>-3.067451</cell>
+                        </row>
+                        <row>
+                            <cell>min</cell>
+                            <cell>1894.024129</cell>
+                            <cell>1906.013699</cell>
+                            <cell>-13.399405</cell>
+                        </row>
+                        <row>
+                            <cell>std</cell>
+                            <cell>5.815610</cell>
+                            <cell>5.669469</cell>
+                            <cell>4.236798</cell>
+                        </row>
+                        <row>
+                            <cell>mean</cell>
+                            <cell>1917.276958</cell>
+                            <cell>1917.428992</cell>
+                            <cell>-0.152034</cell>
+                        </row>
+                        <row>
+                            <cell>count</cell>
+                            <cell>169.000000</cell>
+                            <cell>169.000000</cell>
+                            <cell>169.000000</cell>
+                        </row>
+                    </table>
+                    <div type="4">
+                        <head>Some Brief Remarks on F-Statistics</head>
+                        <p>Depending on the context and scholarly discipline, a metric called an F-Statistics can be a crucial aspect of assessing a linear regression model. With multiple linear regression, an F-test evaluates the statistical significance of the independent variables. Like many statistical tests of significance, it computes both a test statistic and a p-value. In this case, it tests against the null hypothesis that the independent variable coefficients are zero; or, put another way, that the predictor variables provide no real information about the value of the thing we are trying to predict. With any isolated sample of data, there is a possibility that the observed effect is just a coincidence so this statistical test, like others, attempt to use the sample size and the magnitude of the observed effect as factors in assessing how likely one might be to end up with this kind of sample if the true coefficients were zero. Generally speaking, if the model is not statistically significant (p-value less than 0.05), the r² score cannot be considered meaningful.<ref type="footnotemark" target="#note_32"/> In our case, using an F-Statistic as a performance metric wouldn't be meaninigful because we have used F-Statistic p-values to select features.</p>
+                    </div>
+                    <table>
+                        <row>
+                            <cell role="label">index</cell>
+                            <cell role="label">term</cell>
+                            <cell role="label">selected</cell>
+                            <cell role="label">coef</cell>
+                        </row>
+                        <row>
+                            <cell>3499</cell>
+                            <cell>appreciation</cell>
+                            <cell>TRUE</cell>
+                            <cell>-34.41473242</cell>
+                        </row>
+                        <row>
+                            <cell>3498</cell>
+                            <cell>discussion</cell>
+                            <cell>TRUE</cell>
+                            <cell>-32.60202105</cell>
+                        </row>
+                        <row>
+                            <cell>3497</cell>
+                            <cell>capt</cell>
+                            <cell>TRUE</cell>
+                            <cell>-31.82279355</cell>
+                        </row>
+                        <row>
+                            <cell>3496</cell>
+                            <cell>establishing</cell>
+                            <cell>TRUE</cell>
+                            <cell>-31.78036166</cell>
+                        </row>
+                        <row>
+                            <cell>3495</cell>
+                            <cell>enhance</cell>
+                            <cell>TRUE</cell>
+                            <cell>-31.65955902</cell>
+                        </row>
+                        <row>
+                            <cell>3494</cell>
+                            <cell>salon</cell>
+                            <cell>TRUE</cell>
+                            <cell>-28.37312216</cell>
+                        </row>
+                        <row>
+                            <cell>3493</cell>
+                            <cell>cloth</cell>
+                            <cell>TRUE</cell>
+                            <cell>-28.06872431</cell>
+                        </row>
+                        <row>
+                            <cell>3492</cell>
+                            <cell>uncommon</cell>
+                            <cell>TRUE</cell>
+                            <cell>-27.9644468</cell>
+                        </row>
+                        <row>
+                            <cell>3491</cell>
+                            <cell>questioned</cell>
+                            <cell>TRUE</cell>
+                            <cell>-27.4071934</cell>
+                        </row>
+                        <row>
+                            <cell>3490</cell>
+                            <cell>painter</cell>
+                            <cell>TRUE</cell>
+                            <cell>-27.38461758</cell>
+                        </row>
+                        <row>
+                            <cell>3489</cell>
+                            <cell>reckless</cell>
+                            <cell>TRUE</cell>
+                            <cell>-27.0190841</cell>
+                        </row>
+                        <row>
+                            <cell>3488</cell>
+                            <cell>unnecessary</cell>
+                            <cell>TRUE</cell>
+                            <cell>-26.71165398</cell>
+                        </row>
+                        <row>
+                            <cell>3487</cell>
+                            <cell>estimated</cell>
+                            <cell>TRUE</cell>
+                            <cell>-25.76258457</cell>
+                        </row>
+                        <row>
+                            <cell>3486</cell>
+                            <cell>delayed</cell>
+                            <cell>TRUE</cell>
+                            <cell>-25.64993146</cell>
+                        </row>
+                        <row>
+                            <cell>3485</cell>
+                            <cell>presumably</cell>
+                            <cell>TRUE</cell>
+                            <cell>-25.1690956</cell>
+                        </row>
+                        <row>
+                            <cell>3484</cell>
+                            <cell>hunted</cell>
+                            <cell>TRUE</cell>
+                            <cell>-24.971894</cell>
+                        </row>
+                        <row>
+                            <cell>3483</cell>
+                            <cell>strong</cell>
+                            <cell>TRUE</cell>
+                            <cell>-24.87008756</cell>
+                        </row>
+                        <row>
+                            <cell>3482</cell>
+                            <cell>addressed</cell>
+                            <cell>TRUE</cell>
+                            <cell>-24.84150245</cell>
+                        </row>
+                        <row>
+                            <cell>3481</cell>
+                            <cell>destroy</cell>
+                            <cell>TRUE</cell>
+                            <cell>-24.75801894</cell>
+                        </row>
+                        <row>
+                            <cell>3480</cell>
+                            <cell>condemnation</cell>
+                            <cell>TRUE</cell>
+                            <cell>-24.43852897</cell>
+                        </row>
+                        <row>
+                            <cell>3479</cell>
+                            <cell>strange</cell>
+                            <cell>TRUE</cell>
+                            <cell>-24.34135893</cell>
+                        </row>
+                        <row>
+                            <cell>3478</cell>
+                            <cell>careless</cell>
+                            <cell>TRUE</cell>
+                            <cell>-23.93616947</cell>
+                        </row>
+                        <row>
+                            <cell>3477</cell>
+                            <cell>imported</cell>
+                            <cell>TRUE</cell>
+                            <cell>-23.88409368</cell>
+                        </row>
+                        <row>
+                            <cell>3476</cell>
+                            <cell>unpublished</cell>
+                            <cell>TRUE</cell>
+                            <cell>-23.8369814</cell>
+                        </row>
+                        <row>
+                            <cell>3475</cell>
+                            <cell>mitchell</cell>
+                            <cell>TRUE</cell>
+                            <cell>-23.7954173</cell>
+                        </row>
+                    </table>
+                    <table>
+                        <row>
+                            <cell role="label">index</cell>
+                            <cell role="label">term</cell>
+                            <cell role="label">selected</cell>
+                            <cell role="label">coef</cell>
+                        </row>
+                        <row>
+                            <cell>24</cell>
+                            <cell>review</cell>
+                            <cell>TRUE</cell>
+                            <cell>22.92900629</cell>
+                        </row>
+                        <row>
+                            <cell>23</cell>
+                            <cell>par</cell>
+                            <cell>TRUE</cell>
+                            <cell>23.01131685</cell>
+                        </row>
+                        <row>
+                            <cell>22</cell>
+                            <cell>hoy</cell>
+                            <cell>TRUE</cell>
+                            <cell>23.01967989</cell>
+                        </row>
+                        <row>
+                            <cell>21</cell>
+                            <cell>hence</cell>
+                            <cell>TRUE</cell>
+                            <cell>23.10776443</cell>
+                        </row>
+                        <row>
+                            <cell>20</cell>
+                            <cell>renewed</cell>
+                            <cell>TRUE</cell>
+                            <cell>23.28669294</cell>
+                        </row>
+                        <row>
+                            <cell>19</cell>
+                            <cell>emma</cell>
+                            <cell>TRUE</cell>
+                            <cell>23.30372737</cell>
+                        </row>
+                        <row>
+                            <cell>18</cell>
+                            <cell>living</cell>
+                            <cell>TRUE</cell>
+                            <cell>23.38540528</cell>
+                        </row>
+                        <row>
+                            <cell>17</cell>
+                            <cell>output</cell>
+                            <cell>TRUE</cell>
+                            <cell>23.53388803</cell>
+                        </row>
+                        <row>
+                            <cell>16</cell>
+                            <cell>hot</cell>
+                            <cell>TRUE</cell>
+                            <cell>23.64065207</cell>
+                        </row>
+                        <row>
+                            <cell>15</cell>
+                            <cell>continued</cell>
+                            <cell>TRUE</cell>
+                            <cell>24.03201786</cell>
+                        </row>
+                        <row>
+                            <cell>14</cell>
+                            <cell>interpreter</cell>
+                            <cell>TRUE</cell>
+                            <cell>24.04869859</cell>
+                        </row>
+                        <row>
+                            <cell>13</cell>
+                            <cell>garibaldi</cell>
+                            <cell>TRUE</cell>
+                            <cell>24.18361705</cell>
+                        </row>
+                        <row>
+                            <cell>12</cell>
+                            <cell>feeling</cell>
+                            <cell>TRUE</cell>
+                            <cell>24.28307742</cell>
+                        </row>
+                        <row>
+                            <cell>11</cell>
+                            <cell>bachelor</cell>
+                            <cell>TRUE</cell>
+                            <cell>24.69907017</cell>
+                        </row>
+                        <row>
+                            <cell>10</cell>
+                            <cell>eighteenth</cell>
+                            <cell>TRUE</cell>
+                            <cell>24.96393149</cell>
+                        </row>
+                        <row>
+                            <cell>9</cell>
+                            <cell>victorian</cell>
+                            <cell>TRUE</cell>
+                            <cell>25.43889262</cell>
+                        </row>
+                        <row>
+                            <cell>8</cell>
+                            <cell>paragraph</cell>
+                            <cell>TRUE</cell>
+                            <cell>25.4695864</cell>
+                        </row>
+                        <row>
+                            <cell>7</cell>
+                            <cell>deemed</cell>
+                            <cell>TRUE</cell>
+                            <cell>25.58949141</cell>
+                        </row>
+                        <row>
+                            <cell>6</cell>
+                            <cell>recounted</cell>
+                            <cell>TRUE</cell>
+                            <cell>25.73118544</cell>
+                        </row>
+                        <row>
+                            <cell>5</cell>
+                            <cell>paragraphs</cell>
+                            <cell>TRUE</cell>
+                            <cell>26.59646481</cell>
+                        </row>
+                        <row>
+                            <cell>4</cell>
+                            <cell>di</cell>
+                            <cell>TRUE</cell>
+                            <cell>26.94660532</cell>
+                        </row>
+                        <row>
+                            <cell>3</cell>
+                            <cell>expansion</cell>
+                            <cell>TRUE</cell>
+                            <cell>32.22799018</cell>
+                        </row>
+                        <row>
+                            <cell>2</cell>
+                            <cell>action</cell>
+                            <cell>TRUE</cell>
+                            <cell>32.7580998</cell>
+                        </row>
+                        <row>
+                            <cell>1</cell>
+                            <cell>hut</cell>
+                            <cell>TRUE</cell>
+                            <cell>37.95476112</cell>
+                        </row>
+                        <row>
+                            <cell>0</cell>
+                            <cell>today</cell>
+                            <cell>TRUE</cell>
+                            <cell>48.73025541</cell>
+                        </row>
+                    </table>
+                </div>
+            </div>
+            <div type="2">
+                <head>End Notes</head>
+                <p>
+                    <ref type="footnotemark" target="#note_1"/> : Atack, Jeremy, Fred Bateman, Michael Haines, and Robert A. Margo. "Did railroads induce or follow economic growth?: Urbanization and population growth in the American Midwest, 1850–1860." <emph>Social Science History</emph> 34, no. 2 (2010): 171-197.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_2"/> : Cosmo, Nicola Di, et al. "Environmental Stress and Steppe Nomads: Rethinking the History of the Uyghur Empire (744–840) with Paleoclimate Data." <emph>Journal of Interdisciplinary History</emph> 48, no. 4 (2018): 439-463, <ref target="https://perma.cc/P3FU-PW5Q">https://muse.jhu.edu/article/687538</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_3"/> : Underwood, Ted. “The Life Cycles of Genres.” <emph>Journal of Cultural Analytics</emph> 2, no. 2 (May 23, 2016), <ref target="https://doi.org/10.22148/16.005">https://doi.org/10.22148/16.005</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_4"/> : Broscheid, A. (2011), Comparing Circuits: Are Some U.S. Courts of Appeals More Liberal or Conservative Than Others?. <emph>Law &amp; Society Review</emph>, 45: 171-194.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_5"/> : Lavin, Matthew. “Gender Dynamics and Critical Reception: A Study of Early 20th-Century Book Reviews from The New York Times.” <emph>Journal of Cultural Analytics</emph>, 5, no. 1 (January 30, 2020), <ref target="https://doi.org/10.22148/001c.11831">https://doi.org/10.22148/001c.11831</ref>. Note that, as of January 2021, the <emph>New York Times</emph> has redesigned its APIs, and the <code rend="inline">nyt_id</code>s listed in <code rend="inline">metadata.csv</code> and <code rend="inline">meta_cluster.csv</code> no longer map to ids in the API.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_6"/> : See <emph>Diabetes Data</emph>
+                    <ref target="https://perma.cc/NX8A-V7Y7">https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html</ref>, The Scikit-Learn Development Team. <emph>Linear Regression Example</emph>, <ref target="https://perma.cc/4AGZ-ZBT4">https://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html</ref>, and Bradley Efron. Trevor Hastie. Iain Johnstone. Robert Tibshirani. "<ref target="https://perma.cc/MAC3-F7YU">Least angle regression</ref>." Annals of Statistics 32 (2) April 2004: 407-499, <ref target="https://doi.org/10.1214/009053604000000067">https://doi.org/10.1214/009053604000000067</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_7"/> : The Scikit-Learn Development Team. <emph>7.1 Toy datasets</emph>, <ref target="https://perma.cc/TZ5F-SLHD">https://scikit-learn.org/stable/datasets/toy_dataset.html</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_8"/> : University of Southern California Libraries. <emph>Research Guides: Independent and Dependent Variables</emph>, <ref target="https://perma.cc/8KX7-SBDB">https://libguides.usc.edu/writingguide/variables</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_9"/> : Ibid.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_10"/> : The University of Texas at Austin. <emph>Statistics Online Support: Variable Types</emph>, <ref target="https://perma.cc/GN36-BCPD">http://sites.utexas.edu/sos/variables/</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_11"/> : Jarausch, Konrad H., and Kenneth A. Hardy. <emph>Quantitative Methods for Historians: A Guide to Research, Data, and Statistics</emph>. 1991. UNC Press Books, 2016: 122.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_12"/> : Bruce, Peter, Andrew Bruce, and Peter Gedeck. <emph>Practical Statistics for Data Scientists: 50+ Essential Concepts Using R and Python</emph>. O’Reilly Media, Inc., 2020: 148.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_13"/> : Jarausch and Hardy, 122.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_14"/> : See The Pandas Development Team, <emph>Merge, join, concatenate and compare</emph>, <ref target="https://perma.cc/4CPU-VB8P">https://pandas.pydata.org/pandas-docs/stable/user_guide/merging.html</ref> for differences among merge, join, concatenate, and compare operations.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_15"/> : See also The Pandas Development Team, <emph>pandas.concat</emph>, <ref target="https://perma.cc/MF4L-RDC7">https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.concat.html</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_16"/> : See Matthew J. Lavin, "Analyzing Documents with TF-IDF," Programming Historian 8 (2019), <ref target="https://doi.org/10.46430/phen0082">https://doi.org/10.46430/phen0082</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_17"/> : See The Scikit-Learn Development Team, <emph>sklearn.model_selection.train_test_split</emph>, <ref target="https://perma.cc/9ESS-34AG">https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_18"/> : See SciPy, <emph>Sparse matrices (scipy.sparse)</emph>, <ref target="https://perma.cc/C32K-755X">https://docs.scipy.org/doc/scipy/reference/sparse.html</ref> for documentation on sparse matrices and NumPy, <emph>Data types</emph>, <ref target="https://perma.cc/L9NQ-VD5M">https://numpy.org/doc/stable/user/basics.types.html</ref> for documentation on NumPy's <code rend="inline">float64</code> class, and The Pandas Development Team, <emph>pandas.Series</emph>, <ref target="https://perma.cc/XY9H-NG3L">https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html</ref> for documentation on pandas' <code rend="inline">Series</code> class.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_19"/> : See The Scikit-Learn Development Team, <emph>Metrics and scoring: quantifying the quality of predictions</emph>
+                    <ref target="https://perma.cc/66TJ-XYRN">https://scikit-learn.org/stable/modules/model_evaluation.html#r2-score</ref> and <emph>sklearn.metrics.r2_score</emph>, <ref target="https://perma.cc/P79U-VSK3">https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_20"/> : Note that the scikit-learn <code rend="inline">r2()</code> function may return a slightly different value than the <code rend="inline">r_square_scratch</code> function, as there are differences in precision between NumPy's mathematical operations (used by scikit-learn) and standard Python (used by me).</p>
+                <p>
+                    <ref type="footnotemark" target="#note_21"/> : The Scikit-Learn Development Team, <emph>sklearn.metrics.r2_score</emph>, <ref target="https://perma.cc/P79U-VSK3">https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_22"/> : Drost, Ellen A. "Validity and Reliability in Social Science Research" <emph>Education Research and Perspectives</emph> 38.1 (2011): 105-123. 114. <ref target="https://perma.cc/ZUU6-EBFQ">https://www3.nd.edu/~ggoertz/sgameth/Drost2011.pdf</ref>
+                </p>
+                <p>
+                    <ref type="footnotemark" target="#note_23"/> : Ibid., 114.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_24"/> : Ibid., 106, 114-120. Statistical conclusion validity is concerned with "major threats" to validity such as "low statistical power, violation of assumptions, reliability of measures, reliability of treatment, random irrelevancies in the experimental setting, and random heterogeneity of respondents" (115). Internal validity "speaks to the validity of the research itself" (115). Construct validity "refers to how well you translated or transformed a concept, idea, or behaviour – that is a construct – into a functioning and operating reality, the operationalisation" (116). External validity relates to generalizing "to other persons, settings, and times" with different concerns for generalizing "to well-explained target populations" versus generalizing "across populations" (120).</p>
+                <p>
+                    <ref type="footnotemark" target="#note_25"/> : Nisbet, Robert, John Elder, and Gary Miner. <emph>Handbook of Statistical Analysis and Data Mining Applications</emph>. Academic Press, 2009: 8.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_26"/> : Schroeder, Larry D., David L. Sjoquist, and Paula E. Stephan. <emph>Understanding Regression Analysis: An Introductory Guide</emph>. SAGE Publications, 2016: 72.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_27"/> : Ibid.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_28"/> : Nisbet et. al., 74.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_29"/> : Fox, John. <emph>Regression Diagnostics: An Introduction</emph>. SAGE, 1991: 252-255.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_30"/> : Gentzkow, Matthew, Bryan Kelly, and Matt Taddy. "Text as Data." <emph>Journal of Economic Literature</emph> 57, no. 3 (September 2019): 535–74. <ref target="https://doi.org/10.1257/jel.20181020">https://doi.org/10.1257/jel.20181020</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_31"/> : See Feinstein, Charles H. and Mark Thomas, <emph>Making History Count: A Primer in Quantitative Methods for Historians</emph>. Cambridge University Press, 2002: 309-310.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_32"/> :  Ibid., 269-272.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_33"/> : Oxford University Press. "uncommon, adj. (and adv.)". <emph>OED Online</emph>. 2022. Oxford University Press. <ref target="https://perma.cc/5ER6-XEZR">https://www.oed.com/view/Entry/210577</ref>.</p>
+            </div>
+        </body>
+    </text>
+</TEI>

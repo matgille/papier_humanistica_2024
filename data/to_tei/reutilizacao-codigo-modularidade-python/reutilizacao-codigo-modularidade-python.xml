@@ -1,48 +1,90 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="reutilizacao-codigo-modularidade-python">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Reutiliza&#231;&#227;o de c&#243;digo e modularidade em Python</title>
-  <author role="original_author"><persName>William J. Turkel</persName><persName>Adam Crymble</persName></author><editor role="reviewers">Jim Clifford</editor><author role="translators">Felipe Lamarca</author><editor role="translation-reviewers"><persName>Ivo Veiga</persName><persName>Suemi Higuchi</persName></editor><editor role="editors">Miriam Posner</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phpt0014</idno><date type="published">07/17/2012</date><date type="translated">05/21/2021</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#code-reuse-and-modularity"/>.</p><p>There are other translations: <ref target="#reutilizacion-de-codigo-y-modularidad #reutilisation-de-code-et-modularite"/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Programas de computador podem se tornar longos, pesados e confusos sem mecanismos especiais para gerenciar a complexidade. Esta li&#231;&#227;o mostrar&#225; como reutilizar partes do seu c&#243;digo escrevendo fun&#231;&#245;es e dividindo seus programas em m&#243;dulos, a fim de mant&#234;-los concisos e f&#225;ceis de serem depurados.</p></abstract><textClass><keywords><term xml:lang="en">python</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="pt">
-    <body>
-      <div type="2"><head>Objetivos da li&#231;&#227;o</head>
-<p>Programas de computador podem se tornar longos, pesados e confusos sem mecanismos especiais para gerenciar a complexidade. Esta li&#231;&#227;o mostrar&#225; como reutilizar partes do seu c&#243;digo escrevendo <emph>Fun&#231;&#245;es</emph> e dividindo seus programas em <emph>M&#243;dulos</emph>, a fim de mant&#234;-los concisos e f&#225;ceis de serem depurados. A possibilidade de remover um &#250;nico m&#243;dulo disfuncional pode economizar tempo e esfor&#231;o.</p>
-<div type="3"><head>Fun&#231;&#245;es</head>
-<p>Frequentemente voc&#234; descobrir&#225; que deseja reutilizar um determinado conjunto de comandos, geralmente porque h&#225; uma tarefa que precisa ser realizada repetidas vezes. Programas s&#227;o majoritariamente compostos de rotinas que s&#227;o poderosas e cujos usos s&#227;o gerais o suficiente para serem reutilizadas. Essas rotinas s&#227;o conhecidos como fun&#231;&#245;es, e o Python possui mecanismos que permitem a defini&#231;&#227;o de novas fun&#231;&#245;es. Vamos trabalhar com um exemplo muito simples de fun&#231;&#227;o. Suponha que voc&#234; deseja criar uma fun&#231;&#227;o de uso geral para cumprimentar pessoas. Copie a defini&#231;&#227;o de fun&#231;&#227;o a seguir no Komodo Edit e salve o documento como <code rend="inline">cumprimento.py</code>.</p>
-<ab><code xml:id="code_reutilizacao-codigo-modularidade-python_0" corresp="code_reutilizacao-codigo-modularidade-python_0.txt" rend="block"/></ab>
-<p>A linha que come&#231;a com <code rend="inline">def</code> &#233; a declara&#231;&#227;o de fun&#231;&#227;o. Definiremos ("def") uma fun&#231;&#227;o, que neste caso nomeamos "cumprimentar_entidade". O <code rend="inline">x</code> &#233; o par&#226;metro da fun&#231;&#227;o. Seu funcionamento deve ficar claro num instante. A segunda linha cont&#233;m o c&#243;digo da fun&#231;&#227;o. O n&#250;mero de linhas do c&#243;digo varia conforme a nossa necessidade, mas neste exemplo &#233; apenas uma &#250;nica linha.</p>
-<p>Note que a <emph>indenta&#231;&#227;o</emph> &#233; muito importante em Python. O espa&#231;o vazio antes do comando <code rend="inline">print</code> informa ao interpretador que esse comando &#233; parte da fun&#231;&#227;o que est&#225; sendo definida. Voc&#234; aprender&#225; mais sobre isso &#224; medida que prosseguirmos; por ora, certifique-se de manter a indenta&#231;&#227;o da maneira como foi mostrada. Ao executar o programa, dever&#225; ver algo assim:</p>
-<ab><code xml:id="code_reutilizacao-codigo-modularidade-python_1" corresp="code_reutilizacao-codigo-modularidade-python_1.txt" rend="block"/></ab>
-<p>Este exemplo cont&#233;m uma fun&#231;&#227;o: <emph>cumprimentar_entidade</emph>. Ent&#227;o essa fun&#231;&#227;o &#233; "chamada" (ou "invocada") duas vezes. Chamar ou invocar uma fun&#231;&#227;o significa apenas dizer ao programa para executar o c&#243;digo daquela fun&#231;&#227;o. &#201; como dar ao cachorro sua guloseima com sabor de frango (*au* *au*). Nesse caso, para cada vez que chamamos a fun&#231;&#227;o damos &#224; mesma um par&#226;metro diferente. Tente editar <code rend="inline">cumprimento.py</code> de forma que ele chame a fun&#231;&#227;o <emph>cumprimentar_entidade</emph> uma terceira vez utilizando seu pr&#243;prio nome como par&#226;metro. Execute o c&#243;digo novamente. Agora deve entender melhor o que <code rend="inline">x</code> faz na declara&#231;&#227;o da fun&#231;&#227;o.</p>
-<p>Antes de prosseguirmos para o pr&#243;ximo passo, edite <code rend="inline">cumprimento.py</code> para deletar os chamados da fun&#231;&#227;o, deixando apenas a declara&#231;&#227;o da fun&#231;&#227;o. Agora aprender&#225; como chamar uma fun&#231;&#227;o atrav&#233;s de outro programa. Quando terminar, seu ficheiro <code rend="inline">cumprimento.py</code> deve estar assim:</p>
-<ab><code xml:id="code_reutilizacao-codigo-modularidade-python_2" corresp="code_reutilizacao-codigo-modularidade-python_2.txt" rend="block"/></ab>
-</div></div>
-      <div type="2"><head>Modularidade</head>
-<p>Quando os programas s&#227;o pequenos como o do exemplo acima, tipicamente ficam hospedados num &#250;nico ficheiro. Quando quiser executar um de seus programas, pode simplesmente enviar o ficheiro ao interpretador. &#192; medida que os programas ficam maiores, faz sentido dividi-los em ficheiros separados conhecidos como m&#243;dulos. Essa modularidade torna mais f&#225;cil o trabalho em se&#231;&#245;es quando os programas forem maiores. Aperfei&#231;oando cada se&#231;&#227;o do programa antes de unir todas as se&#231;&#245;es, torna-se mais f&#225;cil n&#227;o apenas reutilizar m&#243;dulos individuais em outros programas, como tamb&#233;m torna mais f&#225;cil corrigir eventuais problemas pois permite identificar a origem do erro. Quando voc&#234; divide um programa em m&#243;dulos, tamb&#233;m consegue ocultar os detalhes de como algo &#233; feito dentro do m&#243;dulo que o faz. Outros m&#243;dulos n&#227;o precisam saber como algo &#233; feito se n&#227;o s&#227;o os respons&#225;veis pela sua execu&#231;&#227;o. Esse princ&#237;pio "need-to-know" (necessidade de saber) &#233; chamado de "encapsulamento".</p>
-<p>Suponha que voc&#234; esteja construindo um carro. &#201; poss&#237;vel come&#231;ar a adicionar pe&#231;as &#224; vontade, mas faria mais sentido come&#231;ar construindo e testando um m&#243;dulo - talvez o motor - antes de passar para os outros. O motor, por sua vez, pode ser imaginado como consistindo em v&#225;rios outros m&#243;dulos menores, como o carburador e o sistema de igni&#231;&#227;o, e esses s&#227;o compostos de m&#243;dulos ainda menores e mais b&#225;sicos. O mesmo se aplica &#224; codifica&#231;&#227;o. Voc&#234; tenta quebrar um problema em peda&#231;os menores e resolv&#234;-los primeiro.</p>
-<p>Um m&#243;dulo j&#225; foi criado quando o programa <code rend="inline">cumprimento.py</code> foi escrito. Agora voc&#234; escrever&#225; um segundo programa, <code rend="inline">utilizando-cumprimento.py</code>, que importar&#225; o c&#243;digo do seu m&#243;dulo e far&#225; uso dele. O Python possui um comando especial, <code rend="inline">import</code>, que permite que um programa tenha acesso ao conte&#250;do de outro ficheiro de programa. &#201; isso que ser&#225; utilizado.</p>
-<p>Copie este c&#243;digo no Komodo Edit e salve-o como <code rend="inline">utilizando-cumprimento.py</code>. Este ficheiro &#233; o seu programa; <code rend="inline">cumprimento.py</code> &#233; o seu m&#243;dulo.</p>
-<ab><code xml:id="code_reutilizacao-codigo-modularidade-python_3" corresp="code_reutilizacao-codigo-modularidade-python_3.txt" rend="block"/></ab>
-<p>Fizemos algumas coisas aqui. Primeiro, dissemos ao Python para importar (carregar), utilizando o comando <code rend="inline">import</code>, o m&#243;dulo <code rend="inline">cumprimento.py</code> que criamos anteriormente.</p>
-<p>Voc&#234; perceber&#225; que, embora antes consegu&#237;ssemos executar a fun&#231;&#227;o chamando-a pelo nome: <emph>cumprimentar_entidade("mundo")</emph>, agora precisamos incluir o nome do m&#243;dulo seguido por um ponto (.) na frente do nome da fun&#231;&#227;o. De uma forma clara, isso significa: execute a fun&#231;&#227;o <emph>cumprimentar_entidade</emph>, que deve ser encontrada no m&#243;dulo <code rend="inline">cumprimento.py</code>.</p>
-<p>&#201; poss&#237;vel executar o programa <code rend="inline">utilizando-cumprimento.py</code> com o comando "Run Python" que voc&#234; criou no Komodo Edit. Note que n&#227;o &#233; necess&#225;rio executar o m&#243;dulo&#8230; somente o programa que chama por ele. Se tudo correu bem, dever&#225; ver o seguinte no painel de sa&#237;da do Komodo Edit:</p>
-<ab><code xml:id="code_reutilizacao-codigo-modularidade-python_4" corresp="code_reutilizacao-codigo-modularidade-python_4.txt" rend="block"/></ab>
-<p>Tenha certeza de que entende a diferen&#231;a entre carregar um ficheiro de texto (ex.: olamundo.txt) e importar um ficheiro de programa (ex.: cumprimento.py) antes de prosseguir.</p>
-</div>
-      <div type="2"><head>Leituras recomendadas</head>
-<list type="unordered">
-<item><ref target="https://users.astro.ufl.edu/~warner/prog/python.html">Python Basics</ref> (em ingl&#234;s)</item>
-</list>
-</div>
-    </body>
-  </text>
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Reutilização de código e modularidade em Python</title>
+                <author role="original_author">
+                    <persName>William J. Turkel</persName>
+                    <persName>Adam Crymble</persName>
+                </author>
+                <editor role="reviewers">Jim Clifford</editor>
+                <author role="translators">Felipe Lamarca</author>
+                <editor role="translation-reviewers">
+                    <persName>Ivo Veiga</persName>
+                    <persName>Suemi Higuchi</persName>
+                </editor>
+                <editor role="editors">Miriam Posner</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">05/21/2021</date>
+                <idno type="doi">10.46430/phpt0014</idno>
+                <date type="published">07/17/2012</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#code-reuse-and-modularity"/>.</p>
+                <p>There are other translations: <ref target="#reutilizacion-de-codigo-y-modularidad #reutilisation-de-code-et-modularite"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Programas de computador podem se tornar longos, pesados e confusos sem mecanismos especiais para gerenciar a complexidade. Esta lição mostrará como reutilizar partes do seu código escrevendo funções e dividindo seus programas em módulos, a fim de mantê-los concisos e fáceis de serem depurados.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <div type="2">
+                <head>Objetivos da lição</head>
+                <p>Programas de computador podem se tornar longos, pesados e confusos sem mecanismos especiais para gerenciar a complexidade. Esta lição mostrará como reutilizar partes do seu código escrevendo <emph>Funções</emph> e dividindo seus programas em <emph>Módulos</emph>, a fim de mantê-los concisos e fáceis de serem depurados. A possibilidade de remover um único módulo disfuncional pode economizar tempo e esforço.</p>
+                <div type="3">
+                    <head>Funções</head>
+                    <p>Frequentemente você descobrirá que deseja reutilizar um determinado conjunto de comandos, geralmente porque há uma tarefa que precisa ser realizada repetidas vezes. Programas são majoritariamente compostos de rotinas que são poderosas e cujos usos são gerais o suficiente para serem reutilizadas. Essas rotinas são conhecidos como funções, e o Python possui mecanismos que permitem a definição de novas funções. Vamos trabalhar com um exemplo muito simples de função. Suponha que você deseja criar uma função de uso geral para cumprimentar pessoas. Copie a definição de função a seguir no Komodo Edit e salve o documento como <code rend="inline">cumprimento.py</code>.</p>
+                    <ab>
+                        <code xml:id="code_reutilizacao-codigo-modularidade-python_0" corresp="code_reutilizacao-codigo-modularidade-python_0.txt" rend="block"/>
+                    </ab>
+                    <p>A linha que começa com <code rend="inline">def</code> é a declaração de função. Definiremos ("def") uma função, que neste caso nomeamos "cumprimentar_entidade". O <code rend="inline">x</code> é o parâmetro da função. Seu funcionamento deve ficar claro num instante. A segunda linha contém o código da função. O número de linhas do código varia conforme a nossa necessidade, mas neste exemplo é apenas uma única linha.</p>
+                    <p>Note que a <emph>indentação</emph> é muito importante em Python. O espaço vazio antes do comando <code rend="inline">print</code> informa ao interpretador que esse comando é parte da função que está sendo definida. Você aprenderá mais sobre isso à medida que prosseguirmos; por ora, certifique-se de manter a indentação da maneira como foi mostrada. Ao executar o programa, deverá ver algo assim:</p>
+                    <ab>
+                        <code xml:id="code_reutilizacao-codigo-modularidade-python_1" corresp="code_reutilizacao-codigo-modularidade-python_1.txt" rend="block"/>
+                    </ab>
+                    <p>Este exemplo contém uma função: <emph>cumprimentar_entidade</emph>. Então essa função é "chamada" (ou "invocada") duas vezes. Chamar ou invocar uma função significa apenas dizer ao programa para executar o código daquela função. É como dar ao cachorro sua guloseima com sabor de frango (*au* *au*). Nesse caso, para cada vez que chamamos a função damos à mesma um parâmetro diferente. Tente editar <code rend="inline">cumprimento.py</code> de forma que ele chame a função <emph>cumprimentar_entidade</emph> uma terceira vez utilizando seu próprio nome como parâmetro. Execute o código novamente. Agora deve entender melhor o que <code rend="inline">x</code> faz na declaração da função.</p>
+                    <p>Antes de prosseguirmos para o próximo passo, edite <code rend="inline">cumprimento.py</code> para deletar os chamados da função, deixando apenas a declaração da função. Agora aprenderá como chamar uma função através de outro programa. Quando terminar, seu ficheiro <code rend="inline">cumprimento.py</code> deve estar assim:</p>
+                    <ab>
+                        <code xml:id="code_reutilizacao-codigo-modularidade-python_2" corresp="code_reutilizacao-codigo-modularidade-python_2.txt" rend="block"/>
+                    </ab>
+                </div>
+            </div>
+            <div type="2">
+                <head>Modularidade</head>
+                <p>Quando os programas são pequenos como o do exemplo acima, tipicamente ficam hospedados num único ficheiro. Quando quiser executar um de seus programas, pode simplesmente enviar o ficheiro ao interpretador. À medida que os programas ficam maiores, faz sentido dividi-los em ficheiros separados conhecidos como módulos. Essa modularidade torna mais fácil o trabalho em seções quando os programas forem maiores. Aperfeiçoando cada seção do programa antes de unir todas as seções, torna-se mais fácil não apenas reutilizar módulos individuais em outros programas, como também torna mais fácil corrigir eventuais problemas pois permite identificar a origem do erro. Quando você divide um programa em módulos, também consegue ocultar os detalhes de como algo é feito dentro do módulo que o faz. Outros módulos não precisam saber como algo é feito se não são os responsáveis pela sua execução. Esse princípio "need-to-know" (necessidade de saber) é chamado de "encapsulamento".</p>
+                <p>Suponha que você esteja construindo um carro. É possível começar a adicionar peças à vontade, mas faria mais sentido começar construindo e testando um módulo - talvez o motor - antes de passar para os outros. O motor, por sua vez, pode ser imaginado como consistindo em vários outros módulos menores, como o carburador e o sistema de ignição, e esses são compostos de módulos ainda menores e mais básicos. O mesmo se aplica à codificação. Você tenta quebrar um problema em pedaços menores e resolvê-los primeiro.</p>
+                <p>Um módulo já foi criado quando o programa <code rend="inline">cumprimento.py</code> foi escrito. Agora você escreverá um segundo programa, <code rend="inline">utilizando-cumprimento.py</code>, que importará o código do seu módulo e fará uso dele. O Python possui um comando especial, <code rend="inline">import</code>, que permite que um programa tenha acesso ao conteúdo de outro ficheiro de programa. É isso que será utilizado.</p>
+                <p>Copie este código no Komodo Edit e salve-o como <code rend="inline">utilizando-cumprimento.py</code>. Este ficheiro é o seu programa; <code rend="inline">cumprimento.py</code> é o seu módulo.</p>
+                <ab>
+                    <code xml:id="code_reutilizacao-codigo-modularidade-python_3" corresp="code_reutilizacao-codigo-modularidade-python_3.txt" rend="block"/>
+                </ab>
+                <p>Fizemos algumas coisas aqui. Primeiro, dissemos ao Python para importar (carregar), utilizando o comando <code rend="inline">import</code>, o módulo <code rend="inline">cumprimento.py</code> que criamos anteriormente.</p>
+                <p>Você perceberá que, embora antes conseguíssemos executar a função chamando-a pelo nome: <emph>cumprimentar_entidade("mundo")</emph>, agora precisamos incluir o nome do módulo seguido por um ponto (.) na frente do nome da função. De uma forma clara, isso significa: execute a função <emph>cumprimentar_entidade</emph>, que deve ser encontrada no módulo <code rend="inline">cumprimento.py</code>.</p>
+                <p>É possível executar o programa <code rend="inline">utilizando-cumprimento.py</code> com o comando "Run Python" que você criou no Komodo Edit. Note que não é necessário executar o módulo… somente o programa que chama por ele. Se tudo correu bem, deverá ver o seguinte no painel de saída do Komodo Edit:</p>
+                <ab>
+                    <code xml:id="code_reutilizacao-codigo-modularidade-python_4" corresp="code_reutilizacao-codigo-modularidade-python_4.txt" rend="block"/>
+                </ab>
+                <p>Tenha certeza de que entende a diferença entre carregar um ficheiro de texto (ex.: olamundo.txt) e importar um ficheiro de programa (ex.: cumprimento.py) antes de prosseguir.</p>
+            </div>
+            <div type="2">
+                <head>Leituras recomendadas</head>
+                <list type="unordered">
+                    <item>
+                        <ref target="https://users.astro.ufl.edu/~warner/prog/python.html">Python Basics</ref> (em inglês)</item>
+                </list>
+            </div>
+        </body>
+    </text>
 </TEI>

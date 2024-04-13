@@ -1,0 +1,242 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="from-html-to-list-of-words-1">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>From HTML to List of Words (part 1)</title>
+                <author role="original_author">
+                    <persName>William J. Turkel</persName>
+                    <persName>Adam Crymble</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Jim Clifford</persName>
+                    <persName>Frederik Elwert</persName>
+                </editor>
+                <editor role="editors">Miriam Posner</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0006</idno>
+                <date type="published">07/17/2012</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original. Available translations are the following: Available translations are the following: Available translations are the following:<ref type="translations" target="#de-html-a-lista-de-palabras-1 #HTML-lista-palavras-1 #du-html-a-une-liste-de-mots-1"/>
+                    <ref type="translations" target="#de-html-a-lista-de-palabras-1 #HTML-lista-palavras-1 #du-html-a-une-liste-de-mots-1"/>
+                    <ref type="translations" target="#de-html-a-lista-de-palabras-1 #HTML-lista-palavras-1 #du-html-a-une-liste-de-mots-1"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>In this two-part lesson, we will build on what you’ve learned about Downloading Web Pages with Python, learning how to remove the HTML markup from the webpage of Benjamin Bowsey’s 1780 criminal trial transcript. We will achieve this by using a variety of string operators, string methods, and close reading skills. We introduce looping and branching so that programs can repeat tasks and test for certain conditions, making it possible to separate the content from the HTML tags. Finally, we convert content from a long string to a list of words that can later be sorted, indexed, and counted.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2">
+                <head>Lesson Goals</head>
+                <p>In this two-part lesson, we will build on what you’ve learned about
+<ref target="/lessons/working-with-web-pages">Downloading Web Pages with Python</ref>, learning how to remove the <emph>HTML markup</emph> from
+the webpage of <ref target="http://www.oldbaileyonline.org/browse.jsp?id=t17800628-33&amp;div=t17800628-33">Benjamin Bowsey’s 1780 criminal trial transcript</ref>. We
+will achieve this by using a variety of <emph>string operators</emph>, <emph>string methods</emph>
+and close reading skills. We introduce <emph>looping</emph> and <emph>branching</emph> so that
+programs can repeat tasks and test for certain conditions, making it
+possible to separate the content from the HTML tags. Finally, we convert
+content from a long string to a <emph>list of words</emph> that can later be sorted,
+indexed, and counted.</p>
+            </div>
+            <div type="2">
+                <head>The Challenge</head>
+                <p>To get a clearer picture of the task ahead, open the
+<emph>obo-t17800628-33.html</emph> file that you created in <ref target="/lessons/working-with-web-pages">Downloading Web Pages with Python</ref> (or [download and save the trial]
+<ref target="/assets/obo-t17800628-33.html">obo-t17800628-33.html</ref> if you do not already have a
+copy), then look at the HTML source by clicking on
+<emph>Tools -&gt; Web Developer -&gt; Page Source</emph>. As you scroll through the
+source code you’ll notice that there are HTML tags mixed in with
+the text. If HTML is new to you, we recommend that you take the W3 Schools <ref target="http://www.w3schools.com/html/">HTML</ref> tutorial
+to familiarize yourself with HTML markup. If your work often requires
+that you remove HTML markup, it will certainly help to be able to
+understand it when you see it.</p>
+                <div type="3">
+                    <head>Files Needed For This Lesson</head>
+                    <list type="unordered">
+                        <item>
+                            <emph>
+                                <ref target="/assets/obo-t17800628-33.html">obo-t17800628-33.html</ref>
+                            </emph>
+                        </item>
+                    </list>
+                </div>
+            </div>
+            <div type="2">
+                <head>Devising an Algorithm</head>
+                <p>Since the goal is to get rid of the HTML, the first step is to create an
+<emph>algorithm</emph> that returns only the text (minus the HTML tags) of the
+article. An algorithm is a procedure that has been specified in enough
+detail that it can be implemented on a computer. It helps to write your
+algorithms first in plain English; it's a great way to outline exactly
+what you want to do before diving into code. To construct this algorithm
+you are going to use your close reading skills to figure out a way to
+capture only the textual content of the biography.</p>
+                <p>Looking at the source code of <emph>obo-t17800628-33.html</emph> you will notice
+the actual transcript does not start right away. Instead there are a
+number of HTML tags and some citation information. In this case the content does
+not even start until quite far along line 81!</p>
+                <ab>
+                    <code xml:id="code_from-html-to-list-of-words-1_0" corresp="code_from-html-to-list-of-words-1_0.txt" lang="language-xml" rend="block"/>
+                </ab>
+                <p>We are only interested in the transcript itself, not the extra metadata
+contained in the tags. However, you will notice that the end of the
+metadata corresponds with the start of the transcript. This makes the
+location of the metadata a potentially useful marker for isolating the
+transcript text.</p>
+                <p>At a glance, we can see that the trial transcript itself starts with an HTML tag:
+<code rend="inline">&lt;p&gt;</code>, which stands for 'paragraph'. This happens to be the first paragraph tag in the document.
+We might be able to use this to find the starting point
+of our transcript text. We are lucky in this case because it turns out
+that this tag is a reliable way to find the start of transcript text
+in the trial (if you want, take a look at a few other trials to check).</p>
+                <p>The trial text ends on line 82 with another HTML tag: <code rend="inline">&lt;br/&gt;</code>, which stands for line break.
+This happens to be the LAST line break in the document. These two tags (first paragraph tag and last linebreak)
+thus provide a way to isolate our desired text. Well-formatted websites will almost always have some
+unique way of signalling the end of the content. You often just need to
+look closely.</p>
+                <p>The next thing that you want to do is strip out all of the HTML markup
+that remains mixed in with the content. Since you know HTML tags are
+always found between matching pairs of angle brackets, it’s probably a
+safe bet that if you remove everything between angle brackets, you will
+remove the HTML and be left only with the transcript. Note that we are
+making the assumption that the transcript will not contain the
+mathematical symbols for “less than” or “greater than.” If Bowsey was a
+mathematician, this assumption would not be as safe.</p>
+                <p>The following describes our algorithm in words.</p>
+                <p>To isolate the content:</p>
+                <list type="unordered">
+                    <item>Download the transcript text</item>
+                    <item>Search the HTML for and store the location of the first <code rend="inline">&lt;p&gt;</code> tag</item>
+                    <item>Search the HTML for and store the location of the last <code rend="inline">&lt;br/&gt;</code> tag</item>
+                    <item>Save everything after the <code rend="inline">&lt;p&gt;</code> tag and before the <code rend="inline">&lt;br/&gt;</code> tag to a string:
+<emph>pageContents</emph>
+                    </item>
+                </list>
+                <p>At this point we have the trial transcript text, plus HTML markup. Next:</p>
+                <list type="unordered">
+                    <item>Look at every character in the <emph>pageContents</emph> string, one character at
+a time</item>
+                    <item>If the character is a left angle bracket (&lt;) we are now inside a
+tag so ignore each following character</item>
+                    <item>If the character is a right angle bracket (&gt;) we are now leaving
+the tag; ignore the current character, but look at each following
+character</item>
+                    <item>If we’re not inside a tag, append the current character to a new
+variable: <emph>text</emph>
+                    </item>
+                </list>
+                <p>Finally:</p>
+                <list type="unordered">
+                    <item>Split the text string into a list of individual words that can later
+be manipulated further.</item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Isolating Desired Content</head>
+                <p>The following step uses Python commands introduced in the <ref target="/lessons/manipulating-strings-in-python">Manipulating
+Strings in Python</ref> lesson to implement the first half of the
+algorithm: removing all content before the <code rend="inline">&lt;p&gt;</code> tag and after the <code rend="inline">&lt;br/&gt;</code> tag. To recap,
+the algorithm was as follows:</p>
+                <list type="unordered">
+                    <item>Download the transcript text</item>
+                    <item>Search the HTML for and store the location of the first <code rend="inline">&lt;p&gt;</code> tag</item>
+                    <item>Search the HTML for and store the location of the last <code rend="inline">&lt;br/&gt;</code> tag</item>
+                    <item>Save everything after the <code rend="inline">&lt;p&gt;</code> tag and before the <code rend="inline">&lt;br/&gt;</code> tag to a string:
+<emph>pageContents</emph>
+                    </item>
+                </list>
+                <p>To achieve this, you will use the 'find' string method and .rfind() method
+(which finds the last match of something) and create a new
+substring containing only the desired content between those index positions.</p>
+                <p>As you work, you will be developing separate files to contain your code.
+One of these will be called <emph>obo.py</emph> (for “Old Bailey Online”). This
+file is going to contain all of the code that you will want to re-use;
+in other words, <emph>obo.py</emph> is a module. We discussed the idea of modules
+in <ref target="/lessons/code-reuse-and-modularity">Code Reuse and Modularity</ref> when we saved our functions to
+<emph>greet.py</emph>.</p>
+                <p>Create a new file named <emph>obo.py</emph> and save it to your
+<emph>programming-historian</emph> directory. We are going to use this file to keep
+copies of the functions needed to process The Old Bailey Online. Type or
+copy the following code into your file.</p>
+                <ab>
+                    <code xml:id="code_from-html-to-list-of-words-1_1" corresp="code_from-html-to-list-of-words-1_1.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Create a second file, <emph>trial-content.py</emph>, and save the program shown
+below.</p>
+                <ab>
+                    <code xml:id="code_from-html-to-list-of-words-1_2" corresp="code_from-html-to-list-of-words-1_2.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>When you run <emph>trial-content.py</emph> it will get the web page for Bowsey’s
+trial transcript, then look in the <emph>obo.py</emph> module for the <emph>stripTags</emph>
+function. It will use that function to extract the stuff after the first
+<code rend="inline">&lt;p&gt;</code> tag and before the last <code rend="inline">&lt;br/&gt;</code> tag. With any luck, this should be the textual content of
+the Bowsey transcript, along with some of HTML markup. Don’t worry if
+your Command Output screen ends in a thick black line. Komodo Edit’s
+output screen has a maximum number of characters it will display, after
+which characters start literally writing over one another on the screen,
+giving the appearance of a black blob. Don’t worry, the text is in there
+even though you cannot read it; you can cut and paste it to a text file
+to double check.</p>
+                <p>Let’s take a moment to make sure we understand how <emph>trial-contents.py</emph>
+is able to use the functions stored in <emph>obo.py</emph>. The <emph>stripTags</emph> function
+that we saved to <emph>obo.py</emph> requires one argument. In other words, to run
+properly it needs one piece of information to be supplied. Recall the
+trained dog example from a previous lesson. In order to bark, the dog
+needs two things: air and a delicious treat. The <emph>stripTags</emph> function in
+<emph>obo.py</emph> needs one thing: a string called <emph>pageContents</emph>. But you’ll
+notice that when we call <emph>stripTags</emph> in the final program
+(<emph>trialcontents.py</emph>) there’s no mention of “<emph>pageContents</emph>“. Instead the
+function is given HTML as an argument. This can be confusing to many
+people when they first start programming. Once a function has been
+declared, we no longer need to use the same variable name when we call
+the function. As long as we provide the right type of argument,
+everything should work fine, no matter what we call it. In this case we
+wanted <emph>pageContents</emph> to use the contents of our HTML variable. You could
+have passed it any string, including one you input directly between the
+parentheses. Try rerunning <emph>trial-content.py</emph>, changing the <emph>stripTags</emph>
+argument to “I am quite fond of dogs” and see what happens. Note that
+depending on how you define your function (and what it does) your
+argument may need to be something other than a string: an <emph>integer</emph> for
+example.</p>
+            </div>
+            <div type="2">
+                <head>Suggested Reading</head>
+                <list type="unordered">
+                    <item>
+Lutz, <emph>Learning Python</emph>
+                        <list type="unordered">
+                            <item>Ch. 7: Strings</item>
+                            <item>Ch. 8: Lists and Dictionaries</item>
+                            <item>Ch. 10: Introducing Python Statements</item>
+                            <item>Ch. 15: Function Basics</item>
+                        </list>
+                    </item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Code Syncing</head>
+                <p>To follow along with future lessons it is important that you have the
+right files and programs in your programming-historian directory. At the
+end of each chapter you can download the programming-historian zip file
+to make sure you have the correct code. Note we have removed unneeded
+files from earlier lessons. Your directory may contain more files and
+that’s ok!</p>
+                <list type="unordered">
+                    <item>programming-historian-2 (<ref target="/assets/python-lessons2.zip">zip</ref>)</item>
+                </list>
+            </div>
+        </body>
+    </text>
+</TEI>

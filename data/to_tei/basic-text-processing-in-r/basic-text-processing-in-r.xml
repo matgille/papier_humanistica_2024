@@ -1,220 +1,405 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="basic-text-processing-in-r">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Basic Text Processing in R
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Basic Text Processing in R
 </title>
-  <author role="original_author"><persName>Taylor Arnold</persName><persName>Lauren Tilton</persName></author><editor role="reviewers"><persName>Brandon Walsh</persName><persName>John Russell</persName></editor><editor role="editors">Jeri Wieringa</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phen0061</idno><date type="published">03/27/2017</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#procesamiento-basico-de-textos-en-r #processamento-basico-texto-r"/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Learn how to use R to analyze high-level patterns in texts, apply stylometric methods over time and across authors, and use summary methods to describe items in a corpus.
-</p></abstract><textClass><keywords><term xml:lang="en">distant-reading</term><term xml:lang="en">r</term><term xml:lang="en">data-visualization</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="en">
-    <body>
-      <div type="2"><head>Learning Goals</head>
-<p>A substantial amount of historical data is now available in the form of raw, digitized text. Common examples include letters, newspaper articles, personal notes, diary entries, legal documents and transcribed speeches. While some stand-alone software applications provide tools for analyzing text data, a programming language offers increased flexibility to analyze a corpus of text documents. In this tutorial we guide users through the basics of text analysis within the R programming language. The approach we take involves only using a tokenizer that parses text into elements such as words, phrases and sentences. By the end of the lesson users will be able to:</p>
-<list type="unordered">
-<item>employ exploratory analyses to check for errors and detect high-level patterns;</item>
-<item>apply basic stylometric methods over time and across authors;</item>
-<item>approach document summarization to provide a high-level description of the
+                <author role="original_author">
+                    <persName>Taylor Arnold</persName>
+                    <persName>Lauren Tilton</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Brandon Walsh</persName>
+                    <persName>John Russell</persName>
+                </editor>
+                <editor role="editors">Jeri Wieringa</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0061</idno>
+                <date type="published">03/27/2017</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#procesamiento-basico-de-textos-en-r #processamento-basico-texto-r"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Learn how to use R to analyze high-level patterns in texts, apply stylometric methods over time and across authors, and use summary methods to describe items in a corpus.
+</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">distant-reading</term>
+                    <term xml:lang="en">r</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2">
+                <head>Learning Goals</head>
+                <p>A substantial amount of historical data is now available in the form of raw, digitized text. Common examples include letters, newspaper articles, personal notes, diary entries, legal documents and transcribed speeches. While some stand-alone software applications provide tools for analyzing text data, a programming language offers increased flexibility to analyze a corpus of text documents. In this tutorial we guide users through the basics of text analysis within the R programming language. The approach we take involves only using a tokenizer that parses text into elements such as words, phrases and sentences. By the end of the lesson users will be able to:</p>
+                <list type="unordered">
+                    <item>employ exploratory analyses to check for errors and detect high-level patterns;</item>
+                    <item>apply basic stylometric methods over time and across authors;</item>
+                    <item>approach document summarization to provide a high-level description of the
 elements in a corpus.</item>
-</list>
-<p>All of these will be demonstrated on a dataset from the text of United States Presidential State of the Union Addresses.<ref type="footnotemark" target="#note_2"/></p>
-<p>We assume that users have only a very basic understanding of the R programming language. The <ref target="/lessons/r-basics-with-tabular-data">'R Basics with Tabular Data' lesson by Taryn Dewar</ref><ref type="footnotemark" target="#note_1"/> is an excellent guide that covers all of the R knowledge assumed here, such as installing and starting R, installing and loading packages, importing data and working with basic R data. Users can download R for their operating system from <ref target="https://cran.r-project.org/">The Comprehensive R Archive Network</ref>. Though not required, we also recommend that new users download <ref target="https://www.rstudio.com/products/rstudio/#Desktop">RStudio</ref>, an open source development environment for writing and executing R programs.</p>
-<p>All of the code in this lesson was tested in R version 3.3.2, though we expect it to run properly on any future version of the software.</p>
-</div>
-      <div type="2"><head>A Small Example</head>
-<div type="3"><head>Package Set-up</head>
-<p>Two R packages need to be installed before moving on through the tutorial. These are <hi rend="bold">tidyverse</hi><ref type="footnotemark" target="#note_8"/> and <hi rend="bold">tokenizers</hi>.<ref type="footnotemark" target="#note_9"/> The first provides convenient tools for reading in and working with data sets, and the second contains the functions that allow us to split text data into words and sentences. To install these, simply start R on your computer and run the following two lines in the console:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_0" corresp="code_basic-text-processing-in-r_0.txt" lang="language-{r}" rend="block"/></ab>
-<p>Depending on your system setup, these may open a dialog box asking you to choose a mirror to download from. Select one near your current location. The download and installation should follow automatically.</p>
-<p>Now that these packages are downloaded to your machine, we need to tell R that these packages should also be loaded for use. We do this via the <code rend="inline">library</code> command; some warnings may be printed out as other dependencies are loaded, but can usually be safely ignored.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_1" corresp="code_basic-text-processing-in-r_1.txt" lang="language-{r}" rend="block"/></ab>
-<p>While the <code rend="inline">install.packages</code> command will only need to be run the very first time
+                </list>
+                <p>All of these will be demonstrated on a dataset from the text of United States Presidential State of the Union Addresses.<ref type="footnotemark" target="#en_note_2"/>
+                </p>
+                <p>We assume that users have only a very basic understanding of the R programming language. The <ref target="/lessons/r-basics-with-tabular-data">'R Basics with Tabular Data' lesson by Taryn Dewar</ref>
+                    <ref type="footnotemark" target="#en_note_1"/> is an excellent guide that covers all of the R knowledge assumed here, such as installing and starting R, installing and loading packages, importing data and working with basic R data. Users can download R for their operating system from <ref target="https://cran.r-project.org/">The Comprehensive R Archive Network</ref>. Though not required, we also recommend that new users download <ref target="https://www.rstudio.com/products/rstudio/#Desktop">RStudio</ref>, an open source development environment for writing and executing R programs.</p>
+                <p>All of the code in this lesson was tested in R version 3.3.2, though we expect it to run properly on any future version of the software.</p>
+            </div>
+            <div type="2">
+                <head>A Small Example</head>
+                <div type="3">
+                    <head>Package Set-up</head>
+                    <p>Two R packages need to be installed before moving on through the tutorial. These are <hi rend="bold">tidyverse</hi>
+                        <ref type="footnotemark" target="#en_note_8"/> and <hi rend="bold">tokenizers</hi>.<ref type="footnotemark" target="#en_note_9"/> The first provides convenient tools for reading in and working with data sets, and the second contains the functions that allow us to split text data into words and sentences. To install these, simply start R on your computer and run the following two lines in the console:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_0" corresp="code_basic-text-processing-in-r_0.txt" rend="block"/>
+                    </ab>
+                    <p>Depending on your system setup, these may open a dialog box asking you to choose a mirror to download from. Select one near your current location. The download and installation should follow automatically.</p>
+                    <p>Now that these packages are downloaded to your machine, we need to tell R that these packages should also be loaded for use. We do this via the <code rend="inline">library</code> command; some warnings may be printed out as other dependencies are loaded, but can usually be safely ignored.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_1" corresp="code_basic-text-processing-in-r_1.txt" rend="block"/>
+                    </ab>
+                    <p>While the <code rend="inline">install.packages</code> command will only need to be run the very first time
 you use this tutorial, the <code rend="inline">library</code> commands must be run each and every time you
 restart R.</p>
-</div><div type="3"><head>Word Tokenization</head>
-<p>In this section, we will work with a single paragraph of text. The
+                </div>
+                <div type="3">
+                    <head>Word Tokenization</head>
+                    <p>In this section, we will work with a single paragraph of text. The
 example here is a paragraph from the opening of Barack Obama's final State of the Union address in 2016.</p>
-<p>To read this into R, copy and paste the following into the R console.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_2" corresp="code_basic-text-processing-in-r_2.txt" lang="language-{r}" rend="block"/></ab>
-<p>After running this, type <code rend="inline">text</code> in the console and hit enter. R will print
+                    <p>To read this into R, copy and paste the following into the R console.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_2" corresp="code_basic-text-processing-in-r_2.txt" rend="block"/>
+                    </ab>
+                    <p>After running this, type <code rend="inline">text</code> in the console and hit enter. R will print
 out the paragraph of text verbatim because the variable 'text' now stores the document inside it.</p>
-<p>As a first step in processing this text, we will use the <code rend="inline">tokenize_words</code> function
+                    <p>As a first step in processing this text, we will use the <code rend="inline">tokenize_words</code> function
 from the <hi rend="bold">tokenizers</hi> package to split the text into individual words.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_3" corresp="code_basic-text-processing-in-r_3.txt" lang="language-{r}" rend="block"/></ab>
-<p>To print out the results to your R console window, giving both the tokenized output as well as a counter showing the position of each token in the left hand margin, enter <code rend="inline">words</code> into the console:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_4" corresp="code_basic-text-processing-in-r_4.txt" lang="language-{r}" rend="block"/></ab>
-<p>Which gives the following output:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_5" corresp="code_basic-text-processing-in-r_5.txt" rend="block"/></ab>
-<p>How has the R function changed the input text? It has removed all of the punctuation, split the text into individual words, and converted everything into lowercase characters. We will see shortly why all of these interventions are useful in our analysis.</p>
-<p>How many words are there in this short snippet of text? If we use the <code rend="inline">length</code> function directly on the <code rend="inline">words</code> object, the result is not particularly useful.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_6" corresp="code_basic-text-processing-in-r_6.txt" lang="language-{r}" rend="block"/></ab>
-<p>With output equal to:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_7" corresp="code_basic-text-processing-in-r_7.txt" lang="language-{r}" rend="block"/></ab>
-<p>The reason that the length is equal to 1 is that the function <code rend="inline">tokenize_words</code>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_3" corresp="code_basic-text-processing-in-r_3.txt" rend="block"/>
+                    </ab>
+                    <p>To print out the results to your R console window, giving both the tokenized output as well as a counter showing the position of each token in the left hand margin, enter <code rend="inline">words</code> into the console:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_4" corresp="code_basic-text-processing-in-r_4.txt" rend="block"/>
+                    </ab>
+                    <p>Which gives the following output:</p>
+                    <ab>
+                        <code xml:id="code_basic-text-processing-in-r_5" corresp="code_basic-text-processing-in-r_5.txt" rend="block"/>
+                    </ab>
+                    <p>How has the R function changed the input text? It has removed all of the punctuation, split the text into individual words, and converted everything into lowercase characters. We will see shortly why all of these interventions are useful in our analysis.</p>
+                    <p>How many words are there in this short snippet of text? If we use the <code rend="inline">length</code> function directly on the <code rend="inline">words</code> object, the result is not particularly useful.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_6" corresp="code_basic-text-processing-in-r_6.txt" rend="block"/>
+                    </ab>
+                    <p>With output equal to:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_7" corresp="code_basic-text-processing-in-r_7.txt" rend="block"/>
+                    </ab>
+                    <p>The reason that the length is equal to 1 is that the function <code rend="inline">tokenize_words</code>
 returns a list object with one entry per document in the input. Our input only has a single document and therefore the list only has one element. To see the words <emph>inside</emph> the first document, we use the symbol <code rend="inline">[[1]]</code> to select just the first element of the list:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_8" corresp="code_basic-text-processing-in-r_8.txt" lang="language-{r}" rend="block"/></ab>
-<p>The result is <code rend="inline">89</code>, indicating that there are 89 words in this
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_8" corresp="code_basic-text-processing-in-r_8.txt" rend="block"/>
+                    </ab>
+                    <p>The result is <code rend="inline">89</code>, indicating that there are 89 words in this
 paragraph of text.</p>
-<p>The separation of the document into individual words makes it possible to see how many times each word was used in the text. To do so, we first apply the
+                    <p>The separation of the document into individual words makes it possible to see how many times each word was used in the text. To do so, we first apply the
 <code rend="inline">table</code> function to the words in the first (and here, only) document and then split
 apart the names and values of the table into a single object called a data frame.
 Data frames in R are used similarly to the way a table is used in a database.
 These steps, along with printing out the result, are accomplished by the following
 lines of code:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_9" corresp="code_basic-text-processing-in-r_9.txt" lang="language-{r}" rend="block"/></ab>
-<p>The output from this command should look like this in your console (a tibble is a specific variety of a data frame created by the <hi rend="bold">tidydata</hi> package):</p>
-<ab><code xml:id="code_basic-text-processing-in-r_10" corresp="code_basic-text-processing-in-r_10.txt" rend="block"/></ab>
-<p>There is substantial amount of information in this display. We see that there are 71 unique words, as given by the dimensions of the table at the top. The first 10 rows of the dataset are printed, with the second column showing how many times the word in the first column was used. For example, "and" was used 4 times but "achieve" was used only once.</p>
-<p>We can also sort the table using the <code rend="inline">arrange</code> function. The arrange function takes the dataset to be worked on, here <code rend="inline">tab</code>, and then the name of the column to arrange by. The <code rend="inline">desc</code> function in the second argument indicates that we want to sort in <emph>desc</emph>ending order.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_11" corresp="code_basic-text-processing-in-r_11.txt" lang="language-{r}" rend="block"/></ab>
-<p>And the output will now be:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_12" corresp="code_basic-text-processing-in-r_12.txt" lang="language-{r}" rend="block"/></ab>
-<p>The most common words are pronouns and functions words such as "and", "i", "the", and "we". Notice how taking the lower-case version of every word helps in the analysis here. The word "We" at the start of the sentence is not treated differently than the "we" in the middle of a sentence.</p>
-<p>A popular technique is to maintain a list of highly used words and removing these prior to any formal analysis. The words on such a list are called "stopwords", and usually include words such as pronouns, conjugations of the most common verbs, and conjunctions. In this tutorial we will use a nuanced variation of this technique.</p>
-</div><div type="3"><head>Detecting Sentence Boundaries</head>
-<p>The <hi rend="bold">tokenizer</hi> package also supplies the function <code rend="inline">tokenize_sentences</code> that splits a text into sentences rather than words. It can be applied as follows:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_13" corresp="code_basic-text-processing-in-r_13.txt" lang="language-{r}" rend="block"/></ab>
-<p>With output:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_14" corresp="code_basic-text-processing-in-r_14.txt" lang="language-{r}" rend="block"/></ab>
-<p>The output is given as a character vector, a one-dimensional R object consisting only of elements represented as characters. Notice that the output pushed each sentence into a separate element.</p>
-<p>It is possible to pair the output of the sentence tokenizer with the word tokenizer. If we pass the sentences split from the paragraph to the <code rend="inline">tokenize_words</code> function, each sentence gets treated as its own document. Apply this using the following line of code and see whether the output looks as you would have expected it, using the second line to print the object.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_15" corresp="code_basic-text-processing-in-r_15.txt" lang="language-{r}" rend="block"/></ab>
-<p>Checking the size of the output directly, we can see that there are four "documents" in the object <code rend="inline">sentence_words</code>:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_16" corresp="code_basic-text-processing-in-r_16.txt" lang="language-{r}" rend="block"/></ab>
-<p>Accessing each directly, it is possible to figure out how many words are in each sentence of the paragraph:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_17" corresp="code_basic-text-processing-in-r_17.txt" lang="language-{r}" rend="block"/></ab>
-<p>This can become quite cumbersome, but fortunately there is an easier way. The <code rend="inline">sapply</code> function applies its second argument to every element of its first argument. As a result, we can calculate the length of every sentence in the paragraph with one line of code:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_18" corresp="code_basic-text-processing-in-r_18.txt" lang="language-{r}" rend="block"/></ab>
-<p>The output will now look like this:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_19" corresp="code_basic-text-processing-in-r_19.txt" lang="language-{r}" rend="block"/></ab>
-<p>We can see that we have four sentences that are length 19, 32, 29 and 9. We will
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_9" corresp="code_basic-text-processing-in-r_9.txt" rend="block"/>
+                    </ab>
+                    <p>The output from this command should look like this in your console (a tibble is a specific variety of a data frame created by the <hi rend="bold">tidydata</hi> package):</p>
+                    <ab>
+                        <code xml:id="code_basic-text-processing-in-r_10" corresp="code_basic-text-processing-in-r_10.txt" rend="block"/>
+                    </ab>
+                    <p>There is substantial amount of information in this display. We see that there are 71 unique words, as given by the dimensions of the table at the top. The first 10 rows of the dataset are printed, with the second column showing how many times the word in the first column was used. For example, "and" was used 4 times but "achieve" was used only once.</p>
+                    <p>We can also sort the table using the <code rend="inline">arrange</code> function. The arrange function takes the dataset to be worked on, here <code rend="inline">tab</code>, and then the name of the column to arrange by. The <code rend="inline">desc</code> function in the second argument indicates that we want to sort in <emph>desc</emph>ending order.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_11" corresp="code_basic-text-processing-in-r_11.txt" rend="block"/>
+                    </ab>
+                    <p>And the output will now be:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_12" corresp="code_basic-text-processing-in-r_12.txt" rend="block"/>
+                    </ab>
+                    <p>The most common words are pronouns and functions words such as "and", "i", "the", and "we". Notice how taking the lower-case version of every word helps in the analysis here. The word "We" at the start of the sentence is not treated differently than the "we" in the middle of a sentence.</p>
+                    <p>A popular technique is to maintain a list of highly used words and removing these prior to any formal analysis. The words on such a list are called "stopwords", and usually include words such as pronouns, conjugations of the most common verbs, and conjunctions. In this tutorial we will use a nuanced variation of this technique.</p>
+                </div>
+                <div type="3">
+                    <head>Detecting Sentence Boundaries</head>
+                    <p>The <hi rend="bold">tokenizer</hi> package also supplies the function <code rend="inline">tokenize_sentences</code> that splits a text into sentences rather than words. It can be applied as follows:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_13" corresp="code_basic-text-processing-in-r_13.txt" rend="block"/>
+                    </ab>
+                    <p>With output:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_14" corresp="code_basic-text-processing-in-r_14.txt" rend="block"/>
+                    </ab>
+                    <p>The output is given as a character vector, a one-dimensional R object consisting only of elements represented as characters. Notice that the output pushed each sentence into a separate element.</p>
+                    <p>It is possible to pair the output of the sentence tokenizer with the word tokenizer. If we pass the sentences split from the paragraph to the <code rend="inline">tokenize_words</code> function, each sentence gets treated as its own document. Apply this using the following line of code and see whether the output looks as you would have expected it, using the second line to print the object.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_15" corresp="code_basic-text-processing-in-r_15.txt" rend="block"/>
+                    </ab>
+                    <p>Checking the size of the output directly, we can see that there are four "documents" in the object <code rend="inline">sentence_words</code>:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_16" corresp="code_basic-text-processing-in-r_16.txt" rend="block"/>
+                    </ab>
+                    <p>Accessing each directly, it is possible to figure out how many words are in each sentence of the paragraph:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_17" corresp="code_basic-text-processing-in-r_17.txt" rend="block"/>
+                    </ab>
+                    <p>This can become quite cumbersome, but fortunately there is an easier way. The <code rend="inline">sapply</code> function applies its second argument to every element of its first argument. As a result, we can calculate the length of every sentence in the paragraph with one line of code:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_18" corresp="code_basic-text-processing-in-r_18.txt" rend="block"/>
+                    </ab>
+                    <p>The output will now look like this:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_19" corresp="code_basic-text-processing-in-r_19.txt" rend="block"/>
+                    </ab>
+                    <p>We can see that we have four sentences that are length 19, 32, 29 and 9. We will
 use this function to manage larger documents.</p>
-</div></div>
-      <div type="2"><head>Analyzing Barack Obama's 2016 State of the Union Address</head>
-<div type="3"><head>Exploratory Analysis</head>
-<p>Let us now apply the techniques from the previous section to an entire State of the Union address. For consistency, we will use the same 2016 Obama speech. Here we will load the data in from a file as copying directly becomes too difficult at scale.</p>
-<p>To do so, we will combine the <code rend="inline">readLines</code> function to read the text into R and the <code rend="inline">paste</code> function to combine all of the lines into a single object. We will build the URL of the text file using the <code rend="inline">sprintf</code> function as this format will make it easily modified to grab other addresses.<ref type="footnotemark" target="#note_3"/></p>
-<ab><code xml:id="code_basic-text-processing-in-r_20" corresp="code_basic-text-processing-in-r_20.txt" lang="language-{r}" rend="block"/></ab>
-<p>As before, we will tokenize the text and see how many word there are in the
+                </div>
+            </div>
+            <div type="2">
+                <head>Analyzing Barack Obama's 2016 State of the Union Address</head>
+                <div type="3">
+                    <head>Exploratory Analysis</head>
+                    <p>Let us now apply the techniques from the previous section to an entire State of the Union address. For consistency, we will use the same 2016 Obama speech. Here we will load the data in from a file as copying directly becomes too difficult at scale.</p>
+                    <p>To do so, we will combine the <code rend="inline">readLines</code> function to read the text into R and the <code rend="inline">paste</code> function to combine all of the lines into a single object. We will build the URL of the text file using the <code rend="inline">sprintf</code> function as this format will make it easily modified to grab other addresses.<ref type="footnotemark" target="#en_note_3"/>
+                    </p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_20" corresp="code_basic-text-processing-in-r_20.txt" rend="block"/>
+                    </ab>
+                    <p>As before, we will tokenize the text and see how many word there are in the
 entire document.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_21" corresp="code_basic-text-processing-in-r_21.txt" lang="language-{r}" rend="block"/></ab>
-<p>From the output we see that this speech contains a total of <code rend="inline">6113</code> words. Combining the <code rend="inline">table</code>, <code rend="inline">data_frame</code>, and <code rend="inline">arrange</code> functions exactly as we did on the small example, shows the most frequently used words in the entire speech. Notice as you run this how easily we are able to re-use our prior code to repeat an analysis on a new set of data; this is one of the strongest benefits of using a programming language to run a data-based analysis.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_22" corresp="code_basic-text-processing-in-r_22.txt" lang="language-{r}" rend="block"/></ab>
-<p>The output here should look like this:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_23" corresp="code_basic-text-processing-in-r_23.txt" lang="language-{r}" rend="block"/></ab>
-<p>Once again, extremely common words such as "the", "to", "and", and "of" float to the top of the table. These terms are not particularly insightful for determining the content of the speech. Instead, we want to find words that are represented much more often in this text than over a large external corpus of English. To accomplish this we need a dataset giving these frequencies. Here is a dataset from Peter Norvig using the Google Web Trillion Word Corpus, collected from data gathered via Google's crawling of known English websites:<ref type="footnotemark" target="#note_4"/></p>
-<ab><code xml:id="code_basic-text-processing-in-r_24" corresp="code_basic-text-processing-in-r_24.txt" lang="language-{r}" rend="block"/></ab>
-<p>The first column lists the language (always "en" for English in this case), the second gives the word and the third the percentage of the Trillion Word Corpus consisting of the given word. For example, the word "for" occurs almost exactly in 1 out of every 100 words, at least for text on websites indexed by Google.</p>
-<p>To combine these overall word frequencies with the dataset <code rend="inline">tab</code> constructed from this one State of the Union speech, we can utilize the <code rend="inline">inner_join</code> function. This function takes two data sets and combines them on all commonly named columns; in this case the common column is the one named "word".</p>
-<ab><code xml:id="code_basic-text-processing-in-r_25" corresp="code_basic-text-processing-in-r_25.txt" lang="language-{r}" rend="block"/></ab>
-<p>Notice that our dataset now has two extra columns giving the language (relatively
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_21" corresp="code_basic-text-processing-in-r_21.txt" rend="block"/>
+                    </ab>
+                    <p>From the output we see that this speech contains a total of <code rend="inline">6113</code> words. Combining the <code rend="inline">table</code>, <code rend="inline">data_frame</code>, and <code rend="inline">arrange</code> functions exactly as we did on the small example, shows the most frequently used words in the entire speech. Notice as you run this how easily we are able to re-use our prior code to repeat an analysis on a new set of data; this is one of the strongest benefits of using a programming language to run a data-based analysis.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_22" corresp="code_basic-text-processing-in-r_22.txt" rend="block"/>
+                    </ab>
+                    <p>The output here should look like this:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_23" corresp="code_basic-text-processing-in-r_23.txt" rend="block"/>
+                    </ab>
+                    <p>Once again, extremely common words such as "the", "to", "and", and "of" float to the top of the table. These terms are not particularly insightful for determining the content of the speech. Instead, we want to find words that are represented much more often in this text than over a large external corpus of English. To accomplish this we need a dataset giving these frequencies. Here is a dataset from Peter Norvig using the Google Web Trillion Word Corpus, collected from data gathered via Google's crawling of known English websites:<ref type="footnotemark" target="#en_note_4"/>
+                    </p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_24" corresp="code_basic-text-processing-in-r_24.txt" rend="block"/>
+                    </ab>
+                    <p>The first column lists the language (always "en" for English in this case), the second gives the word and the third the percentage of the Trillion Word Corpus consisting of the given word. For example, the word "for" occurs almost exactly in 1 out of every 100 words, at least for text on websites indexed by Google.</p>
+                    <p>To combine these overall word frequencies with the dataset <code rend="inline">tab</code> constructed from this one State of the Union speech, we can utilize the <code rend="inline">inner_join</code> function. This function takes two data sets and combines them on all commonly named columns; in this case the common column is the one named "word".</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_25" corresp="code_basic-text-processing-in-r_25.txt" rend="block"/>
+                    </ab>
+                    <p>Notice that our dataset now has two extra columns giving the language (relatively
 unhelpful as this is always equal to "en") and the frequency of the word over a large external corpus. This second new column will be very helpful as we can filter for rows that have a frequency less than 0.1%, that is, occurring more than once in every 1000 words.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_26" corresp="code_basic-text-processing-in-r_26.txt" lang="language-{r}" rend="block"/></ab>
-<p>Which outputs the following:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_27" corresp="code_basic-text-processing-in-r_27.txt" lang="language-{r}" rend="block"/></ab>
-<p>This list is starting to look a bit more interesting. A term such as "america" floats
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_26" corresp="code_basic-text-processing-in-r_26.txt" rend="block"/>
+                    </ab>
+                    <p>Which outputs the following:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_27" corresp="code_basic-text-processing-in-r_27.txt" rend="block"/>
+                    </ab>
+                    <p>This list is starting to look a bit more interesting. A term such as "america" floats
 to the top because we might speculate that it is used a lot in speeches by politicians, but relatively less so in other domains. Setting the threshold even lower, to 0.002, gives an even better summary of the speech. It will be useful to see more than the default first ten lines here, so we will use the <code rend="inline">print</code> function along with the option <code rend="inline">n</code> set to 15 in order to print out more than the default 10 values.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_28" corresp="code_basic-text-processing-in-r_28.txt" lang="language-{r}" rend="block"/></ab>
-<p>Which now gives the following result:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_29" corresp="code_basic-text-processing-in-r_29.txt" lang="language-{r}" rend="block"/></ab>
-<p>Now, these seem to suggest some of the key themes of the speech such as "syria", "terrorist", and "qaida" (al-qaida is split into "al" and "qaida" by the tokenizer).</p>
-</div><div type="3"><head>Document Summarization</head>
-<p>To supply contextual information for the dataset we are analyzing we have provided a table with metadata about each State of the Union speech. Let us read that into R now:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_30" corresp="code_basic-text-processing-in-r_30.txt" lang="language-{r}" rend="block"/></ab>
-<p>The first ten rows of the dataset will be printed; they should look like this:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_31" corresp="code_basic-text-processing-in-r_31.txt" lang="language-{r}" rend="block"/></ab>
-<p>For each speech we have the president, the year, the president's party, and whether the State of the Union was given as a speech or as a written address. The 2016 speech is the 236th row of the metadata data, which is also the last one.</p>
-<p>It will be useful in the next section to be able to summarize an address in just a single line of text. We can do that here by extracting the top five most used words that have a frequency less than 0.002% in the Google Web Corpus, and combining this with the president and year.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_32" corresp="code_basic-text-processing-in-r_32.txt" lang="language-{r}" rend="block"/></ab>
-<p>This should give the following line as an output:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_33" corresp="code_basic-text-processing-in-r_33.txt" rend="block"/></ab>
-<p>Does this line capture everything in the speech? Of course not. Text processing will never replace doing a close reading of a text, but it does help to give a high level summary of the themes discussed (laughter come from notations of audience laughter in the speech text). This summary is useful in several ways. It may give a good ad-hoc title and abstract for a document that has neither; it may serve to remind readers who have read or listened to a speech what exactly the key points discussed were; taking many summaries together at once may elucidate large-scale patterns that get lost over a large corpus. It is this last application that we turn to now as we apply the techniques from this section to the large set of State of the Union addresses.</p>
-</div></div>
-      <div type="2"><head>Analyzing Every State of the Union Address from 1790 to 2016</head>
-<div type="3"><head>Loading the Corpus</head>
-<p>The first step in analyzing the entire State of the Union corpus is to read all of the
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_28" corresp="code_basic-text-processing-in-r_28.txt" rend="block"/>
+                    </ab>
+                    <p>Which now gives the following result:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_29" corresp="code_basic-text-processing-in-r_29.txt" rend="block"/>
+                    </ab>
+                    <p>Now, these seem to suggest some of the key themes of the speech such as "syria", "terrorist", and "qaida" (al-qaida is split into "al" and "qaida" by the tokenizer).</p>
+                </div>
+                <div type="3">
+                    <head>Document Summarization</head>
+                    <p>To supply contextual information for the dataset we are analyzing we have provided a table with metadata about each State of the Union speech. Let us read that into R now:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_30" corresp="code_basic-text-processing-in-r_30.txt" rend="block"/>
+                    </ab>
+                    <p>The first ten rows of the dataset will be printed; they should look like this:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_31" corresp="code_basic-text-processing-in-r_31.txt" rend="block"/>
+                    </ab>
+                    <p>For each speech we have the president, the year, the president's party, and whether the State of the Union was given as a speech or as a written address. The 2016 speech is the 236th row of the metadata data, which is also the last one.</p>
+                    <p>It will be useful in the next section to be able to summarize an address in just a single line of text. We can do that here by extracting the top five most used words that have a frequency less than 0.002% in the Google Web Corpus, and combining this with the president and year.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_32" corresp="code_basic-text-processing-in-r_32.txt" rend="block"/>
+                    </ab>
+                    <p>This should give the following line as an output:</p>
+                    <ab>
+                        <code xml:id="code_basic-text-processing-in-r_33" corresp="code_basic-text-processing-in-r_33.txt" rend="block"/>
+                    </ab>
+                    <p>Does this line capture everything in the speech? Of course not. Text processing will never replace doing a close reading of a text, but it does help to give a high level summary of the themes discussed (laughter come from notations of audience laughter in the speech text). This summary is useful in several ways. It may give a good ad-hoc title and abstract for a document that has neither; it may serve to remind readers who have read or listened to a speech what exactly the key points discussed were; taking many summaries together at once may elucidate large-scale patterns that get lost over a large corpus. It is this last application that we turn to now as we apply the techniques from this section to the large set of State of the Union addresses.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Analyzing Every State of the Union Address from 1790 to 2016</head>
+                <div type="3">
+                    <head>Loading the Corpus</head>
+                    <p>The first step in analyzing the entire State of the Union corpus is to read all of the
 addresses into R together. This involves the same <code rend="inline">paste</code> and <code rend="inline">readLines</code> functions as before, but we must put this function in a <code rend="inline">for</code> loop that applies it over each of the 236 text files. These are combined using the <code rend="inline">c</code> function.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_34" corresp="code_basic-text-processing-in-r_34.txt" lang="language-{r}" rend="block"/></ab>
-<p>This technique loads all of the files one by one off of GitHub. Optionally, you can download a zip file of the entire corpus and read these files in manually. This technique is described in the next section.</p>
-</div><div type="3"><head>Alternative Method for Loading the Corpus (Optional)</head>
-<p>The entire corpus can be downloaded from here: <ref target="/assets/basic-text-processing-in-r/sotu_text.zip">sotu_text.zip</ref>. Unzip the repository somewhere on your machine and set the variable <code rend="inline">input_loc</code> to the full path of the directory where your unzipped file is. For example, if the file is on the desktop of a computer running macOS and the username is stevejobs, <code rend="inline">input_loc</code> should be set to:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_35" corresp="code_basic-text-processing-in-r_35.txt" lang="language-{r}" rend="block"/></ab>
-<p>Once this is done, the following code block can be used to read in all of the texts:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_36" corresp="code_basic-text-processing-in-r_36.txt" lang="language-{r}" rend="block"/></ab>
-<p>This same technique can be used to read in your own corpus of text.</p>
-</div><div type="3"><head>Exploratory Analysis</head>
-<p>Once again calling the <code rend="inline">tokenize_words</code> function, we now see the length of each address in total number of words.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_37" corresp="code_basic-text-processing-in-r_37.txt" lang="language-{r}" rend="block"/></ab>
-<p>Is there a temporal pattern to the length of addresses? How do the lengths of the past several administration's speeches compare to those of FDR, Abraham Lincoln, and George Washington?</p>
-<p>The best way to see this is by using a scatter plot. You can construct one by using the <code rend="inline">qplot</code> function, putting the year on the x-axis and the length in words on the y-axis.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_38" corresp="code_basic-text-processing-in-r_38.txt" lang="language-{r}" rend="block"/></ab>
-<p>This will produce a plot similar to this one:</p>
-<figure><desc>Number of words in each State of the Union Address plotted by year.</desc><graphic url="sotu-number-of-words.jpg"/></figure>
-<p>It seems that for the most part addresses steadily increased in length from 1790 to around 1850, and then increase again until the end of the 19th century. The length dramatically decreased around World War I, with a handful of fairly large outliers scattered throughout the 20th century.</p>
-<p>Is there any rational behind these changes? Setting the color of the points
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_34" corresp="code_basic-text-processing-in-r_34.txt" rend="block"/>
+                    </ab>
+                    <p>This technique loads all of the files one by one off of GitHub. Optionally, you can download a zip file of the entire corpus and read these files in manually. This technique is described in the next section.</p>
+                </div>
+                <div type="3">
+                    <head>Alternative Method for Loading the Corpus (Optional)</head>
+                    <p>The entire corpus can be downloaded from here: <ref target="/assets/basic-text-processing-in-r/sotu_text.zip">sotu_text.zip</ref>. Unzip the repository somewhere on your machine and set the variable <code rend="inline">input_loc</code> to the full path of the directory where your unzipped file is. For example, if the file is on the desktop of a computer running macOS and the username is stevejobs, <code rend="inline">input_loc</code> should be set to:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_35" corresp="code_basic-text-processing-in-r_35.txt" rend="block"/>
+                    </ab>
+                    <p>Once this is done, the following code block can be used to read in all of the texts:</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_36" corresp="code_basic-text-processing-in-r_36.txt" rend="block"/>
+                    </ab>
+                    <p>This same technique can be used to read in your own corpus of text.</p>
+                </div>
+                <div type="3">
+                    <head>Exploratory Analysis</head>
+                    <p>Once again calling the <code rend="inline">tokenize_words</code> function, we now see the length of each address in total number of words.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_37" corresp="code_basic-text-processing-in-r_37.txt" rend="block"/>
+                    </ab>
+                    <p>Is there a temporal pattern to the length of addresses? How do the lengths of the past several administration's speeches compare to those of FDR, Abraham Lincoln, and George Washington?</p>
+                    <p>The best way to see this is by using a scatter plot. You can construct one by using the <code rend="inline">qplot</code> function, putting the year on the x-axis and the length in words on the y-axis.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_38" corresp="code_basic-text-processing-in-r_38.txt" rend="block"/>
+                    </ab>
+                    <p>This will produce a plot similar to this one:</p>
+                    <figure>
+                        <desc>Number of words in each State of the Union Address plotted by year.</desc>
+                        <graphic url="sotu-number-of-words.jpg"/>
+                    </figure>
+                    <p>It seems that for the most part addresses steadily increased in length from 1790 to around 1850, and then increase again until the end of the 19th century. The length dramatically decreased around World War I, with a handful of fairly large outliers scattered throughout the 20th century.</p>
+                    <p>Is there any rational behind these changes? Setting the color of the points
 to denote whether a speech is written or delivered orally explains a large part of the variation. The command to do this plot is only a small tweak on our other plotting command:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_39" corresp="code_basic-text-processing-in-r_39.txt" lang="language-{r}" rend="block"/></ab>
-<p>This yields the following plot:</p>
-<figure><desc>Number of words in each State of the Union Address plotted by year, with color denoting whether it was a written or oral message.</desc><graphic url="sotu-number-of-words-and-type.jpg"/></figure>
-<p>We see that the rise in the 19th century occurred when the addresses switched to written documents, and the dramatic drop comes when Woodrow Wilson broke tradition and gave his State of the Union as a speech in Congress. The outliers we saw previously were all written addresses given after the end of World War II .</p>
-</div><div type="3"><head>Stylometric Analysis</head>
-<p>Stylometry, the study of linguistic style, makes extensive use of computational methods to describe the style of an author's writing. With our corpus, it is possible to detect changes in writing style over the course of the 19th and 20th centuries. A more formal stylometric analysis would usually entail the application of part of speech codes or complex, dimensionality reduction algorithms such as principal component analysis to study patterns over time of across authors. For this tutorial we will stick to studying sentence length.</p>
-<p>The corpus can be split into sentences using the <code rend="inline">tokenize_sentences</code> function. In this case the result is a list with 236 items in it, each representing a specific
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_39" corresp="code_basic-text-processing-in-r_39.txt" rend="block"/>
+                    </ab>
+                    <p>This yields the following plot:</p>
+                    <figure>
+                        <desc>Number of words in each State of the Union Address plotted by year, with color denoting whether it was a written or oral message.</desc>
+                        <graphic url="sotu-number-of-words-and-type.jpg"/>
+                    </figure>
+                    <p>We see that the rise in the 19th century occurred when the addresses switched to written documents, and the dramatic drop comes when Woodrow Wilson broke tradition and gave his State of the Union as a speech in Congress. The outliers we saw previously were all written addresses given after the end of World War II .</p>
+                </div>
+                <div type="3">
+                    <head>Stylometric Analysis</head>
+                    <p>Stylometry, the study of linguistic style, makes extensive use of computational methods to describe the style of an author's writing. With our corpus, it is possible to detect changes in writing style over the course of the 19th and 20th centuries. A more formal stylometric analysis would usually entail the application of part of speech codes or complex, dimensionality reduction algorithms such as principal component analysis to study patterns over time of across authors. For this tutorial we will stick to studying sentence length.</p>
+                    <p>The corpus can be split into sentences using the <code rend="inline">tokenize_sentences</code> function. In this case the result is a list with 236 items in it, each representing a specific
 document.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_40" corresp="code_basic-text-processing-in-r_40.txt" lang="language-{r}" rend="block"/></ab>
-<p>Next, we want to split each of these sentences into words. The <code rend="inline">tokenize_words</code> may be used, but not directly on the list object <code rend="inline">sentences</code>. It would be possible to do this with a <code rend="inline">for</code> loop again, but there is an easier way. The <code rend="inline">sapply</code> function provides a more straightforward approach. Here, we want to apply the word tokenizer individually to each document, and so this function works perfectly.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_41" corresp="code_basic-text-processing-in-r_41.txt" lang="language-{r}" rend="block"/></ab>
-<p>We now have a list (with each element representing a document) of lists (with each element representing the words in a given sentence). The output we need is a list object giving the length of each sentence in a given document. To do this, we now combine a <code rend="inline">for</code> loop with the <code rend="inline">sapply</code> function.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_42" corresp="code_basic-text-processing-in-r_42.txt" lang="language-{r}" rend="block"/></ab>
-<p>The output of <code rend="inline">sentence_length</code> may be visualized over time. We first need to summarize all of the sentence lengths within a document to a single number. The <code rend="inline">median</code> function, which finds the 50th percentile of its inputs, is a good choice for summarizing these as it will not be overly effected by a parsing error that may mistakenly create an artificially long sentence.<ref type="footnotemark" target="#note_5"/></p>
-<ab><code xml:id="code_basic-text-processing-in-r_43" corresp="code_basic-text-processing-in-r_43.txt" lang="language-{r}" rend="block"/></ab>
-<p>We now plot this variable against the speech year using, once again, the <code rend="inline">qplot</code> function.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_44" corresp="code_basic-text-processing-in-r_44.txt" lang="language-{r}" rend="block"/></ab>
-<figure><desc>Median sentence length for each State of the Union Address.</desc><graphic url="sotu-sentence-length.jpg"/></figure>
-<p>The plot shows a strong general trend in shorter sentences over the two centuries of our corpus. Recall that a few addresses in the later half of the 20th century were long, written addresses much like those of the 19th century. It is particularly interesting that these do not show up in terms of the median sentence length. This points out at least one way in which the State of the Union addresses have been changed and adapted over time.</p>
-<p>To make the pattern even more explicit, it is possible to add a smoothing line over the plot with the function <code rend="inline">geom_smooth</code>.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_45" corresp="code_basic-text-processing-in-r_45.txt" lang="language-{r}" rend="block"/></ab>
-<figure><desc>Median sentence length for each State of the Union Address, with a smoothing line.</desc><graphic url="sotu-sentence-length-smooth.jpg"/></figure>
-<p>Smoothing lines are a great addition to many plots. They have a dual purpose of picking out the general trend of time series data, while also highlighting any outlying data points.</p>
-</div><div type="3"><head>Document Summarization</head>
-<p>As a final task, we want to apply the one-line summarization function we used in the previous section to each of the documents in this larger corpus. This again requires the use of a for loop, but the inner code stays largely the same with the exception of needing to save the results as an element of the vector <code rend="inline">description</code>.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_46" corresp="code_basic-text-processing-in-r_46.txt" lang="language-{r}" rend="block"/></ab>
-<p>This will print out a line that says <hi rend="bold">Joining, by = "word"</hi> as each file is processed as a result of the <code rend="inline">inner_join</code> function. As the loop may take a minute or more to run, this is a helpful way of being sure that the code is actually processing the files as we wait for it to finish. We can see the output of our loop by simply typing <code rend="inline">description</code> in the console, but a slightly cleaner view is given through the use of the <code rend="inline">cat</code> function.</p>
-<ab><code xml:id="code_basic-text-processing-in-r_47" corresp="code_basic-text-processing-in-r_47.txt" lang="language-{r}" rend="block"/></ab>
-<p>The results yield one row for each State of the Union. Here, for example, are the lines from the Bill Clinton, George W. Bush, and Barack Obama administrations:</p>
-<ab><code xml:id="code_basic-text-processing-in-r_48" corresp="code_basic-text-processing-in-r_48.txt" rend="block"/></ab>
-<p>As before, these thematic summaries in no way replace a careful reading of each document. They do however serve as a great high-level summary of each presidency. We see, for example,
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_40" corresp="code_basic-text-processing-in-r_40.txt" rend="block"/>
+                    </ab>
+                    <p>Next, we want to split each of these sentences into words. The <code rend="inline">tokenize_words</code> may be used, but not directly on the list object <code rend="inline">sentences</code>. It would be possible to do this with a <code rend="inline">for</code> loop again, but there is an easier way. The <code rend="inline">sapply</code> function provides a more straightforward approach. Here, we want to apply the word tokenizer individually to each document, and so this function works perfectly.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_41" corresp="code_basic-text-processing-in-r_41.txt" rend="block"/>
+                    </ab>
+                    <p>We now have a list (with each element representing a document) of lists (with each element representing the words in a given sentence). The output we need is a list object giving the length of each sentence in a given document. To do this, we now combine a <code rend="inline">for</code> loop with the <code rend="inline">sapply</code> function.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_42" corresp="code_basic-text-processing-in-r_42.txt" rend="block"/>
+                    </ab>
+                    <p>The output of <code rend="inline">sentence_length</code> may be visualized over time. We first need to summarize all of the sentence lengths within a document to a single number. The <code rend="inline">median</code> function, which finds the 50th percentile of its inputs, is a good choice for summarizing these as it will not be overly effected by a parsing error that may mistakenly create an artificially long sentence.<ref type="footnotemark" target="#en_note_5"/>
+                    </p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_43" corresp="code_basic-text-processing-in-r_43.txt" rend="block"/>
+                    </ab>
+                    <p>We now plot this variable against the speech year using, once again, the <code rend="inline">qplot</code> function.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_44" corresp="code_basic-text-processing-in-r_44.txt" rend="block"/>
+                    </ab>
+                    <figure>
+                        <desc>Median sentence length for each State of the Union Address.</desc>
+                        <graphic url="sotu-sentence-length.jpg"/>
+                    </figure>
+                    <p>The plot shows a strong general trend in shorter sentences over the two centuries of our corpus. Recall that a few addresses in the later half of the 20th century were long, written addresses much like those of the 19th century. It is particularly interesting that these do not show up in terms of the median sentence length. This points out at least one way in which the State of the Union addresses have been changed and adapted over time.</p>
+                    <p>To make the pattern even more explicit, it is possible to add a smoothing line over the plot with the function <code rend="inline">geom_smooth</code>.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_45" corresp="code_basic-text-processing-in-r_45.txt" rend="block"/>
+                    </ab>
+                    <figure>
+                        <desc>Median sentence length for each State of the Union Address, with a smoothing line.</desc>
+                        <graphic url="sotu-sentence-length-smooth.jpg"/>
+                    </figure>
+                    <p>Smoothing lines are a great addition to many plots. They have a dual purpose of picking out the general trend of time series data, while also highlighting any outlying data points.</p>
+                </div>
+                <div type="3">
+                    <head>Document Summarization</head>
+                    <p>As a final task, we want to apply the one-line summarization function we used in the previous section to each of the documents in this larger corpus. This again requires the use of a for loop, but the inner code stays largely the same with the exception of needing to save the results as an element of the vector <code rend="inline">description</code>.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_46" corresp="code_basic-text-processing-in-r_46.txt" rend="block"/>
+                    </ab>
+                    <p>This will print out a line that says <hi rend="bold">Joining, by = "word"</hi> as each file is processed as a result of the <code rend="inline">inner_join</code> function. As the loop may take a minute or more to run, this is a helpful way of being sure that the code is actually processing the files as we wait for it to finish. We can see the output of our loop by simply typing <code rend="inline">description</code> in the console, but a slightly cleaner view is given through the use of the <code rend="inline">cat</code> function.</p>
+                    <ab>
+                        <code lang="language-{r}" xml:id="code_basic-text-processing-in-r_47" corresp="code_basic-text-processing-in-r_47.txt" rend="block"/>
+                    </ab>
+                    <p>The results yield one row for each State of the Union. Here, for example, are the lines from the Bill Clinton, George W. Bush, and Barack Obama administrations:</p>
+                    <ab>
+                        <code xml:id="code_basic-text-processing-in-r_48" corresp="code_basic-text-processing-in-r_48.txt" rend="block"/>
+                    </ab>
+                    <p>As before, these thematic summaries in no way replace a careful reading of each document. They do however serve as a great high-level summary of each presidency. We see, for example,
 Bill Clinton's initial focus on the deficit in the first few years, his turn towards bipartisanship as the House and Senate flipped towards the Republicans in the mid-1990s, and a turn towards Medicare reform at the end of his term. George W. Bush's speeches focus primarily on terrorism, with the exception of the 2001 speech, which occurred prior to the 9/11 terrorist attacks. Barack Obama returned the focus towards the economy in the shadow of the recession of 2008. The word "laughter" occurs frequently because it was added to the transcripts whenever the audience was laughing long enough to force the speaker to pause.</p>
-</div></div>
-      <div type="2"><head>Next Steps</head>
-<p>In this short tutorial we have explored some basic ways in which textual data may be analyzed within the R programming language. There are several directions one can pursue to dive further into the cutting edge techniques in text analysis. Three particularly interesting examples are:</p>
-<list type="unordered">
-<item>running a full NLP annotation pipeline on the text to extract features such as named entities, part of speech tags, and dependency relationship. These are available in several R packages, including <hi rend="bold">cleanNLP</hi>.<ref type="footnotemark" target="#note_6"/></item>
-<item>fitting topic models to detect particular discourses in the corpus using packages such as <hi rend="bold">mallet</hi><ref type="footnotemark" target="#note_10"/> and <hi rend="bold">topicmodels</hi>.<ref type="footnotemark" target="#note_11"/></item>
-<item>applying dimensionality reduction techniques to plot stylistic tendencies over time or across multiple authors. For example, the package <hi rend="bold">tsne</hi> performs a powerful form of dimensionality reduction particularly amenable to insightful plots.</item>
-</list>
-<p>Many generic tutorials exist for all three of these, as well as extensive package documentation.<ref type="footnotemark" target="#note_7"/> We hope to offer tutorials particularly focused on historical applications on these in the near future.</p>
-</div>
-      <div type="2"><head>Endnotes</head>
-<p><ref type="footnotemark" target="#note_1"/> : Taryn Dewar, "R Basics with Tabular Data," Programming Historian (05 September 2016), <ref target="/lessons/r-basics-with-tabular-data">/lessons/r-basics-with-tabular-data</ref>.</p>
-<p><ref type="footnotemark" target="#note_2"/> : Our corpus has 236 State of the Union addresses. Depending on exactly what is counted, this number can be slightly higher or lower.</p>
-<p><ref type="footnotemark" target="#note_3"/> : All Presidential State of the Union Addresses were downloaded from The American Presidency Project at the University of California Santa Barbara. (Accessed 2016-11-11) <ref target="http://www.presidency.ucsb.edu/sou.php">http://www.presidency.ucsb.edu/sou.php</ref>.</p>
-<p><ref type="footnotemark" target="#note_4"/> : Peter Norvig. "Google Web Trillion Word Corpus". (Accessed 2016-11-11) <ref target="http://norvig.com/ngrams/">http://norvig.com/ngrams/</ref>.</p>
-<p><ref type="footnotemark" target="#note_5"/> : This does happen for a few written State of the Union addresses, where a long bulleted list gets parsed into one very long sentence.</p>
-<p><ref type="footnotemark" target="#note_6"/> : Taylor Arnold. "cleanNLP: A Tidy Data Model for Natural Language Processing". R Package, Version 0.24. <ref target="https://cran.r-project.org/web/packages/cleanNLP/index.html">https://cran.r-project.org/web/packages/cleanNLP/index.html</ref></p>
-<p><ref type="footnotemark" target="#note_7"/> : See for example, the author's text: Taylor Arnold and Lauren Tilton. <emph>Humanities Data in R: Exploring Networks, Geospatial Data, Images, and Text</emph>. Springer, 2015.</p>
-<p><ref type="footnotemark" target="#note_8"/> : Hadley Wickham. "tidyverse: Easily Install and Load 'Tidyverse' Packages". R Package, Version 1.1.1. <ref target="https://cran.r-project.org/web/packages/tidyverse/index.html">https://cran.r-project.org/web/packages/tidyverse/index.html</ref></p>
-<p><ref type="footnotemark" target="#note_9"/> : Lincoln Mullen and Dmitriy Selivanov. "tokenizers: A Consistent Interface to Tokenize Natural Language Text Convert". R Package, Version 0.1.4. <ref target="https://cran.r-project.org/web/packages/tokenizers/index.html">https://cran.r-project.org/web/packages/tokenizers/index.html</ref></p>
-<p><ref type="footnotemark" target="#note_10"/> : David Mimno. "mallet: A wrapper around the Java machine learning tool MALLET". R Package, Version 1.0. <ref target="https://cran.r-project.org/web/packages/mallet/index.html">https://cran.r-project.org/web/packages/mallet/index.html</ref></p>
-<p><ref type="footnotemark" target="#note_11"/> : Bettina Gr&#252;n and Kurt Hornik. "https://cran.r-project.org/web/packages/topicmodels/index.html". R Package, Version 0.2-4. <ref target="https://cran.r-project.org/web/packages/topicmodels/index.html">https://cran.r-project.org/web/packages/topicmodels/index.html</ref></p>
-</div>
-    </body>
-  </text>
+                </div>
+            </div>
+            <div type="2">
+                <head>Next Steps</head>
+                <p>In this short tutorial we have explored some basic ways in which textual data may be analyzed within the R programming language. There are several directions one can pursue to dive further into the cutting edge techniques in text analysis. Three particularly interesting examples are:</p>
+                <list type="unordered">
+                    <item>running a full NLP annotation pipeline on the text to extract features such as named entities, part of speech tags, and dependency relationship. These are available in several R packages, including <hi rend="bold">cleanNLP</hi>.<ref type="footnotemark" target="#en_note_6"/>
+                    </item>
+                    <item>fitting topic models to detect particular discourses in the corpus using packages such as <hi rend="bold">mallet</hi>
+                        <ref type="footnotemark" target="#en_note_10"/> and <hi rend="bold">topicmodels</hi>.<ref type="footnotemark" target="#en_note_11"/>
+                    </item>
+                    <item>applying dimensionality reduction techniques to plot stylistic tendencies over time or across multiple authors. For example, the package <hi rend="bold">tsne</hi> performs a powerful form of dimensionality reduction particularly amenable to insightful plots.</item>
+                </list>
+                <p>Many generic tutorials exist for all three of these, as well as extensive package documentation.<ref type="footnotemark" target="#en_note_7"/> We hope to offer tutorials particularly focused on historical applications on these in the near future.</p>
+            </div>
+            <div type="2">
+                <head>Endnotes</head>
+                <p>
+                    <ref type="footnotemark" target="#en_note_1"/> : Taryn Dewar, "R Basics with Tabular Data," Programming Historian (05 September 2016), <ref target="/lessons/r-basics-with-tabular-data">/lessons/r-basics-with-tabular-data</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_2"/> : Our corpus has 236 State of the Union addresses. Depending on exactly what is counted, this number can be slightly higher or lower.</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_3"/> : All Presidential State of the Union Addresses were downloaded from The American Presidency Project at the University of California Santa Barbara. (Accessed 2016-11-11) <ref target="http://www.presidency.ucsb.edu/sou.php">http://www.presidency.ucsb.edu/sou.php</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_4"/> : Peter Norvig. "Google Web Trillion Word Corpus". (Accessed 2016-11-11) <ref target="http://norvig.com/ngrams/">http://norvig.com/ngrams/</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_5"/> : This does happen for a few written State of the Union addresses, where a long bulleted list gets parsed into one very long sentence.</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_6"/> : Taylor Arnold. "cleanNLP: A Tidy Data Model for Natural Language Processing". R Package, Version 0.24. <ref target="https://cran.r-project.org/web/packages/cleanNLP/index.html">https://cran.r-project.org/web/packages/cleanNLP/index.html</ref>
+                </p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_7"/> : See for example, the author's text: Taylor Arnold and Lauren Tilton. <emph>Humanities Data in R: Exploring Networks, Geospatial Data, Images, and Text</emph>. Springer, 2015.</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_8"/> : Hadley Wickham. "tidyverse: Easily Install and Load 'Tidyverse' Packages". R Package, Version 1.1.1. <ref target="https://cran.r-project.org/web/packages/tidyverse/index.html">https://cran.r-project.org/web/packages/tidyverse/index.html</ref>
+                </p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_9"/> : Lincoln Mullen and Dmitriy Selivanov. "tokenizers: A Consistent Interface to Tokenize Natural Language Text Convert". R Package, Version 0.1.4. <ref target="https://cran.r-project.org/web/packages/tokenizers/index.html">https://cran.r-project.org/web/packages/tokenizers/index.html</ref>
+                </p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_10"/> : David Mimno. "mallet: A wrapper around the Java machine learning tool MALLET". R Package, Version 1.0. <ref target="https://cran.r-project.org/web/packages/mallet/index.html">https://cran.r-project.org/web/packages/mallet/index.html</ref>
+                </p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_11"/> : Bettina Grün and Kurt Hornik. "https://cran.r-project.org/web/packages/topicmodels/index.html". R Package, Version 0.2-4. <ref target="https://cran.r-project.org/web/packages/topicmodels/index.html">https://cran.r-project.org/web/packages/topicmodels/index.html</ref>
+                </p>
+            </div>
+        </body>
+    </text>
 </TEI>

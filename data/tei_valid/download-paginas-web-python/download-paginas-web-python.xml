@@ -1,0 +1,138 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="download-paginas-web-python">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Download de páginas Web com Python</title>
+                <author role="original_author">
+                    <persName>William J. Turkel</persName>
+                    <persName>Adam Crymble</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Jim Clifford</persName>
+                    <persName>Frederik Elwert</persName>
+                </editor>
+                <author role="translators">Bruno Gasparotto Ponne</author>
+                <editor role="translation-reviewers">
+                    <persName>Felipe Lamarca</persName>
+                    <persName>Daniel Alves</persName>
+                </editor>
+                <editor role="editors">Miriam Posner</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">03/26/2021</date>
+                <idno type="doi">10.46430/phpt0010</idno>
+                <date type="published">07/17/2012</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#working-with-web-pages"/>.</p>
+                <p>There are other translations: <ref target="#telecharger-des-pages-web-avec-python #trabajar-con-paginas-web"/>
+                </p>
+                <p>There are other translations: <ref target="#telecharger-des-pages-web-avec-python #trabajar-con-paginas-web"/>
+                </p>
+                <p>There are other translations: <ref target="#telecharger-des-pages-web-avec-python #trabajar-con-paginas-web"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Esta lição apresenta o conceito de *Localizador Uniforme de Recursos* (URL em inglês) e explica como usar o Python para fazer o download de uma página *Web* no seu disco local.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <div type="2">
+                <head>Objetivos da Lição</head>
+                <p>Esta lição apresenta o conceito de <emph>Localizador Uniforme de Recursos</emph> (URL em inglês) e explica como usar o Python para fazer o download de uma página <emph>Web</emph> no seu disco local.</p>
+            </div>
+            <div type="2">
+                <head>Sobre URLs</head>
+                <p>Uma página <emph>Web</emph> é um ficheiro hospedado noutro computador, conhecido como <emph>servidor</emph>. Quando um site é acessado, na realidade, o seu computador (o <emph>cliente</emph>) envia um pedido ao <emph>servidor de hospedagem</emph> por meio da rede e o servidor responde enviando uma cópia da página ao seu computador. Uma forma de acessar uma página por meio do seu navegador é seguir um link. É possível também colar ou digitar uma URL (localizador uniforme de recursos) diretamente no seu navegador. A URL informa ao seu navegador onde encontrar um recurso online, especificando o servidor, o diretório e o nome do ficheiro a ser recuperado, bem como o tipo de <emph>protocolo</emph> que o servidor e o seu navegador utilizarão para troca de informações (como o HTTP, <emph>protocolo de transferência de hipertexto</emph>). A estrutura básica de uma URL é</p>
+                <ab>
+                    <code xml:id="code_download-paginas-web-python_0" corresp="code_download-paginas-web-python_0.txt" rend="block"/>
+                </ab>
+                <p>Vejamos alguns exemplos:</p>
+                <ab>
+                    <code xml:id="code_download-paginas-web-python_1" corresp="code_download-paginas-web-python_1.txt" lang="language-xml" rend="block"/>
+                </ab>
+                <p>O tipo mais básico de URL especifica apenas o protocolo e o domínio. Quando inserido em seu navegador, essa URL retornará a página principal do site <ref target="https://www.oldbaileyonline.org">Old Bailey Online</ref>. O pressuposto convencional é que a página principal num determinado diretório se chamará <emph>index</emph>, geralmente <code rend="inline">index.html</code>.</p>
+                <p>A URL pode incluir também um <emph>número de porta</emph> opcional. Sem entrar em muitos detalhes, o protocolo de rede em que se baseia a troca de informações na Internet permite que computadores se conectem de diferentes maneiras. Números de portas são utilizados para distinguir esses diferentes tipos de conexão. Uma vez que a porta padrão para HTTP é a 80, a seguinte URL é equivalente à anterior. </p>
+                <ab>
+                    <code xml:id="code_download-paginas-web-python_2" corresp="code_download-paginas-web-python_2.txt" lang="language-xml" rend="block"/>
+                </ab>
+                <p>Geralmente há diversas páginas <emph>Web</emph> num determinado site. Essas páginas são armazenadas em diretórios no servidor e é possível especificar o caminho para uma página em particular. A página "About" para o site <emph>The Old Bailey Online</emph> tem a seguinte URL:</p>
+                <ab>
+                    <code xml:id="code_download-paginas-web-python_3" corresp="code_download-paginas-web-python_3.txt" lang="language-xml" rend="block"/>
+                </ab>
+                <p>Por fim, algumas páginas permitem inserir <emph>queries</emph>, termo em inglês que significa pedido, solicitação. O site <emph>The Old Bailey Online</emph>, por exemplo, foi desenvolvido de forma que é possível requisitar uma de suas páginas utilizando uma <emph>query string</emph> (conjunto de caracteres que contém uma solicitação). A seguinte URL acessará uma página de resultado de buscas por registros de julgamentos criminais contendo a palavra "arsenic".</p>
+                <ab>
+                    <code xml:id="code_download-paginas-web-python_4" corresp="code_download-paginas-web-python_4.txt" lang="language-xml" rend="block"/>
+                </ab>
+                <p>O fragmento a seguir ao sinal "?" representa a <emph>query</emph>. Aprenda mais sobre como criar <emph>queries</emph> na lição <ref target="/en/lessons/downloading-multiple-records-using-query-strings">Downloading Multiple Records Using Query Strings</ref> (em inglês).</p>
+            </div>
+            <div type="2">
+                <head>Acessando URLs com Python</head>
+                <p>Como um historiador da era digital, você frenquentemente desejará utilizar dados mantidos em sites acadêmicos. Para acessar esses dados, seria possível abrir as URLs uma por uma e copiar e colar os conteúdos num ficheiro de texto. Alternativamente, é possível utilizar Python para, automaticamente, coletar e processar os dados. Para isso, é preciso aprender como abrir uma URL por meio do seu próprio código. A linguagem Python inclui uma série de padrões para fazer isso.</p>
+                <p>Como exemplo, vamos trabalhar com o tipo de documento que provavelmente você vai encontrar ao realizar uma pesquisa na área de História. Suponhamos que haja interesse nas relações raciais na Inglaterra do século XVIII. O site <emph>The Old Bailey Online</emph> é uma fonte rica de informações históricas e disponibiliza transcrições de julgamentos que ocorreram entre 1674 e 1913.</p>
+                <figure>
+                    <desc>A homepage do site The Old Bailey Online</desc>
+                    <graphic url="old-bailey.png"/>
+                </figure>
+                <p>Para esse exemplo, utilizaremos a transcrição do julgamento de Benjamin Bowsey, um negro condenado por perturbar a paz durante os protestos de Gordon em 1780. A URL para o registro é</p>
+                <ab>
+                    <code xml:id="code_download-paginas-web-python_5" corresp="code_download-paginas-web-python_5.txt" lang="language-xml" rend="block"/>
+                </ab>
+                <p>Estudando a URL, podemos verificar algumas coisas. Primeiro, o site é programado em JSP (<emph>JavaServer Pages</emph>, uma linguagem de programação para a <emph>web</emph> cujo resultado é um ficheiro HTML). Segundo, é possível acessar registros de julgamentos individuais fazendo uso de <emph>query strings</emph>. Cada registro recebe um número único (<emph>id=t</emph> na URL), formado a partir da data da sessão de julgamento no formato (<emph>AAAAMMDD</emph>) e o número do julgamento naquela sessão do tribunal. Neste caso, <emph>33</emph>. Caso as duas ocorrências de <code rend="inline">33</code> sejam trocadas por <code rend="inline">34</code> no link acima, o seu navegador o encaminhará ao próximo julgamento. Infelizmente, nem todos os sites possuem URLs tão acessíveis e confiáveis quanto essa.</p>
+                <figure>
+                    <desc>Transcrição do julgamento de Benjamin Bowsey, 1780</desc>
+                    <graphic url="bowsey-trial-page.png"/>
+                </figure>
+                <p>Observe a página do julgamento de Benjamin Bowsey. Mais importante do que o conteúdo são os elementos presentes na página. Note o link <ref target="http://www.oldbaileyonline.org/browse.jsp?foo=bar&amp;path=sessionsPapers/17800628.xml&amp;div=t17800628-33&amp;xml=yes">View as XML</ref> na parte inferior. Esse link apresenta uma versão repleta de marcações no texto que podem ser úteis para certos tipos de pesquisa. O <ref target="http://www.oldbaileyonline.org/images.jsp?doc=178006280084">documento original digitalizado</ref> do julgamento também pode ser acessado.</p>
+                <p>Agora vamos tentar abrir a página utilizando Python. Copie o seguinte programa no <emph>Komodo Edit</emph> e salve o ficheiro como <code rend="inline">open-webpage.py</code>. Quando executar o programa, a página do julgamento será acessada, seus conteúdos serão lidos e copiados numa string chamada <code rend="inline">webContent</code>. Na sequência, os primeiros 300 caracteres serão exibidos no <emph>painel de saída de comandos</emph>. Utilize <code rend="inline">Ferramentas -&gt; Ferramentas do Navegador -&gt; Fonte da página</code> no navegador Firefox para verificar que o código HTML da página é o mesmo que o seu programa acessou. Outros navegadores podem ter caminhos distintos para acessar o código fonte. Caso não consiga encontrar o caminho no seu navegador, tente utilizar um mecanismo de busca para encontrá-lo. (Consulte a biblioteca de referência do Python para aprender mais sobre <ref target="https://docs.python.org/3/library/urllib.html?highlight=urllib">urllib</ref>.)</p>
+                <ab>
+                    <code xml:id="code_download-paginas-web-python_6" corresp="code_download-paginas-web-python_6.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Utilizando apenas essas cinco linhas de código, é possível obter resultados substanciais. Agora, vamos nos assegurar de que cada linha de código está clara e que é possível distinguir os blocos que permitem ao programa realizar a tarefa que desejamos.</p>
+                <p>
+                    <emph>url</emph>, <emph>response</emph> e <emph>webContent</emph> são todas variáveis nomeadas por nós.</p>
+                <p>
+                    <emph>url</emph> contém a URL da página que queremos baixar. Neste exemplo, trata-se do julgamento de Benjamin Bowsey.</p>
+                <p>Na linha seguinte, chamamos a função <code rend="inline">urlopen</code>, contida no módulo do Python chamado <code rend="inline">urllib.py</code>, e solicitamos que ela acesse o site especificado na variável <emph>url</emph>. Em seguida, salvamos o resultado desse processo numa variável chamada <emph>response</emph>. Essa variável contém agora uma versão aberta do site solicitado.</p>
+                <p>No próximo passo, utilizamos o método <code rend="inline">read</code>, que já utilizamos anteriormente, para copiar os conteúdos do site numa nova variável chamada <emph>webContent</emph>.</p>
+                <p>Assegure-se de ser capaz de identificar as variáveis (3), o módulo (1), os métodos (2) e os parâmetros (1) antes de prosseguir.</p>
+                <p>No resultado do código acima, alguns marcadores da linguagem HTML poderão ser identificados:</p>
+                <ab>
+                    <code xml:id="code_download-paginas-web-python_7" corresp="code_download-paginas-web-python_7.txt" lang="language-xml" rend="block"/>
+                </ab>
+                <p>O conteúdo do julgamento fica na parte inferior da página. O que vemos aqui é o código HTML no início do documento. Isso não é exatamente o que precisamos para pesquisa histórica, mas não se preocupe: aprenderemos noutra lição a eliminar o excesso de marcadores e obter o conteúdo que procuramos.</p>
+            </div>
+            <div type="2">
+                <head>Salvando uma cópia local da página</head>
+                <p>Considerando o que foi visto sobre atribuir conteúdo a um ficheiro, é bem fácil modificar o programa acima para salvar o conteúdo da variável <emph>webContent</emph> num ficheiro local no seu computador. Copie o seguinte programa no <emph>Komodo Edit</emph>, salve-o como <code rend="inline">save-webpage.py</code> e o execute. Utilizando o comando <code rend="inline">File -&gt; Open File</code> no Firefox, abra o ficheiro criado no seu disco local (<code rend="inline">obo-t17800628-33.html</code>) para confirmar que a cópia salva é a mesma que a online.</p>
+                <ab>
+                    <code xml:id="code_download-paginas-web-python_8" corresp="code_download-paginas-web-python_8.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Se é possível salvar um único ficheiro dessa maneira, seria possível escrever um programa para baixar um conjunto de ficheiros? Por exemplo, seria possível percorrer os identificadores de um conjunto de páginas e copiá-las para o seu computador? Sim. Aprenda como na lição <ref target="/en/lessons/downloading-multiple-records-using-query-strings">Downloading Multiple Files using Query Strings</ref> (em inglês), que recomendamos depois que tenha terminado as lições introdutórias dessa série.</p>
+            </div>
+            <div type="2">
+                <head>Leitura Sugerida</head>
+                <list type="unordered">
+                    <item>Mitchell, Ryan. “Web Scraping com Python: Coletando Mais Dados da Web Moderna" (O’Reilly, 2019).</item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Sincronização do Código</head>
+                <p>Para acompanhar futuras lições, é importante ter os ficheiros e programas corretos no seu diretório “programming-historian”. Ao final de cada lição, é possível baixar o ficheiro zip “programming-historian” para ter certeza de que o ficheiro correto está sendo utilizado.</p>
+                <list type="unordered">
+                    <item>programming-historian-1 (<ref target="/assets/python-lessons1.zip">zip</ref>)</item>
+                </list>
+            </div>
+        </body>
+    </text>
+</TEI>

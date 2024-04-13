@@ -1,0 +1,348 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="working-with-batches-of-pdf-files">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Working with batches of PDF files</title>
+                <author role="original_author">Moritz Mähr</author>
+                <editor role="reviewers">
+                    <persName>Catherine DeRose</persName>
+                    <persName>Jack Pay</persName>
+                </editor>
+                <editor role="editors">Anna-Maria Sichani</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0088</idno>
+                <date type="published">01/30/2020</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Learn how to perform OCR and text extraction with free command line tools like Tesseract and Poppler and how to get an overview of large numbers of PDF documents using topic modeling.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">data-management</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2">
+                <head>A Table of Contents</head>
+            </div>
+            <div type="2">
+                <head>Overview</head>
+                <div type="3">
+                    <head>Motivation</head>
+                    <p>Humanities scholars often work with text-based historical and contemporary sources. In most cases, the <ref target="https://en.wikipedia.org/wiki/PDF">Portable Document Format (PDF)</ref> is used as an exchange format. This includes digital reproductions of physical sources such as books and photographs as well as digitally created documents. The digitisation of these objects increases their accessibility and availability. Archives have begun to digitise entire collections and make them accessible via the Internet. Even more dramatic is the increase in the amount of data in digitally created sources such as those necessary for corporate and government reporting. As a result, humanities scholars are increasingly exploring larger collections by means of Distant Reading and other algorithmic tools. However, PDF documents are only suitable for digital processing to a limited extent and must first be converted into plain text files.</p>
+                </div>
+                <div type="3">
+                    <head>Scope</head>
+                    <p>If you meet one or more of the following criteria, this lesson will be instructive for you:</p>
+                    <list type="unordered">
+                        <item>You work with text-based sources and need to extract the content of the sources</item>
+                        <item>Your files are in PDF file format or can be converted to this file format</item>
+                        <item>You work with a large corpus and you do not want to touch each file individually (batch processing)</item>
+                        <item>You want to examine your corpus by the means of <ref target="/en/lessons/?topic=distant-reading">Distant Reading</ref> and therefore need it to be in plain text format</item>
+                        <item>You don’t have access to commercial software, such as Adobe Acrobat Professional or Abbyy FineReader</item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Objectives</head>
+                    <p>In more technical terms, in this lesson you will learn to:</p>
+                    <list type="unordered">
+                        <item>Recognize and extract texts in PDFs with <ref target="https://en.wikipedia.org/wiki/Optical_character_recognition">Optical Character Recognition (OCR)</ref>
+                        </item>
+                        <item>Extract embedded texts from PDFs</item>
+                        <item>Extract embedded images from PDFs</item>
+                        <item>Combine images and PDFs into a single PDF file</item>
+                        <item>Do all of the above at once (batch processing) with a large corpus.</item>
+                        <item>Analyze a large corpus using <ref target="https://en.wikipedia.org/wiki/Topic_model">Topic Modelling</ref> to get a quick overview of the topics it contains</item>
+                    </list>
+                </div>
+            </div>
+            <div type="2">
+                <head>Prerequisites</head>
+                <div type="3">
+                    <head>Skills</head>
+                    <p>You should feel comfortable using the command line of your computer. Windows users should take a look at <ref target="/en/lessons/intro-to-powershell">Introduction to the Windows Command Line with PowerShell</ref>. MacOS and Linux users should take a look at <ref target="/en/lessons/intro-to-bash">Introduction to the Bash Command Line</ref>.</p>
+                </div>
+                <div type="3">
+                    <head>Software</head>
+                    <div type="4">
+                        <head>Windows 10</head>
+                        <p>Some components of the unix-based open source software used in this lesson do not run on Windows systems natively. Fortunately, since the Windows 10 Fall Creators Update there is a workaround. Open <ref target="https://docs.microsoft.com/en-us/powershell/scripting/getting-started/starting-windows-powershell">PowerShell</ref> as administrator and run <code rend="inline">Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux</code>. Install <ref target="https://ubuntu.com/tutorials/install-ubuntu-desktop-1804#1-overview">Ubuntu 18.04 LTS</ref> from the Microsoft Store. To <ref target="https://docs.microsoft.com/en-us/windows/wsl/">initialize</ref> the Windows Subsystem for Linux (WSL) click on the Ubuntu tile in the Start Menu and create a user account.<ref type="footnotemark" target="#note_1"/>
+                        </p>
+                        <p style="alert alert-warning">
+                            <p>Follow these instructions carefully and do not lose your credentials. You will need them as soon as you run programs as administrator.</p>
+                        </p>
+                        <p>Once the WSL is up and running, navigate to your working directory (for example Downloads). Invoke <code rend="inline">bash</code> through PowerShell and install all requirements via the built-in package manager <ref target="https://wiki.debian.org/Aptitude">Aptitude</ref>.</p>
+                        <ab>
+                            <code xml:id="code_working-with-batches-of-pdf-files_0" corresp="code_working-with-batches-of-pdf-files_0.txt" lang="language-powershell" rend="block"/>
+                        </ab>
+                        <ab>
+                            <code xml:id="code_working-with-batches-of-pdf-files_1" corresp="code_working-with-batches-of-pdf-files_1.txt" lang="language-bash" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4">
+                        <head>MacOS</head>
+                        <p>Installing all the requirements without a package manager is cumbersome. Therefore install the <ref target="https://itunes.apple.com/us/app/xcode/id497799835">Command Line Tools for Xcode</ref> and <ref target="https://brew.sh">Homebrew</ref> first. It offers an easy way to install all the tools and software needed for this lesson.</p>
+                        <ab>
+                            <code xml:id="code_working-with-batches-of-pdf-files_2" corresp="code_working-with-batches-of-pdf-files_2.txt" lang="language-bash" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4">
+                        <head>Linux</head>
+                        <p>On <ref target="https://ubuntu.com/download/desktop">Ubuntu 18.04 LTS</ref> and most Debian-based Linux distributions you can install all requirements via <code rend="inline">aptitude</code>.</p>
+                        <ab>
+                            <code xml:id="code_working-with-batches-of-pdf-files_3" corresp="code_working-with-batches-of-pdf-files_3.txt" lang="language-bash" rend="block"/>
+                        </ab>
+                        <p>Even though all tools used in this lesson are shipped with Ubuntu, an update is recommended.</p>
+                    </div>
+                    <div type="4">
+                        <head>Topic Modelling</head>
+                        <p>The Topic Modelling in the case study is performed with the <ref target="https://dariah-de.github.io/TopicsExplorer/">DARIAH Topics Explorer</ref>. It is a very easy to use tool with a graphical user interface. You can download the open source program for Windows, Mac and Linux <ref target="https://github.com/DARIAH-DE/TopicsExplorer/releases">here</ref>.</p>
+                        <p style="alert alert-warning">
+                            <p>If you are using a Mac and receive an error message that the file is from an “unidentified developer,” you can overwrite it by holding control while double-clicking it. If that doesn't work, go to Systems Preferences, click on Security &amp; Privacy, and then click Open Anyway.</p>
+                        </p>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>Data</head>
+                    <p>Throughout this lesson you will work with historical documents from the <ref target="https://web.archive.org/web/20200606003222/https://ilostat.ilo.org/resources/methods/icls/icls-documents/">First International Conference of Labour Statisticians</ref> from 1923. The data of all past conferences is provided by the <ref target="https://www.ilo.org/global/about-the-ilo/history/lang--en/index.htm">International Labour Organization (ILO)</ref> and is <ref target="https://www.ilo.org/public/libdoc/ilo/ILO-SR/">publicly available</ref>.</p>
+                    <p>To make it easier for you to navigate through the file system and create folders, here are some basic commands of the Bash Command Line:</p>
+                    <list type="unordered">
+                        <item>Display the path of the current folder with <code rend="inline">pwd</code>
+                        </item>
+                        <item>Display the contents of the current folder with <code rend="inline">ls</code>
+                        </item>
+                        <item>Display only PDF files in the current folder with <code rend="inline">ls *.pdf</code>
+                        </item>
+                        <item>Create a folder named proghist with <code rend="inline">mkdir proghist</code>
+                        </item>
+                        <item>Change to this folder with <code rend="inline">cd proghist</code>
+                        </item>
+                        <item>Open your current folder with a file browser <code rend="inline">open .</code> (On Windows use <code rend="inline">explorer.exe .</code>)</item>
+                        <item>Change to the parent folder with <code rend="inline">cd ..</code>
+                        </item>
+                        <item>Change to your users home directory with <code rend="inline">cd</code>
+                        </item>
+                        <item>Paste the code snippets into <ref target="https://explainshell.com/">explainshell.com</ref> to see what the code actually does</item>
+                    </list>
+                    <p style="alert alert-warning">
+                        <p>Throughout the lesson I will assume that 'proghist' is your working directory.</p>
+                    </p>
+                    <p>Save all files below to your working directory:</p>
+                    <list type="unordered">
+                        <item>
+                            <ref target="https://www.ilo.org/public/libdoc/ilo/ILO-SR/ILO-SR_N1_engl.pdf">Classification of industries</ref>
+                            <!--text extraction-->
+                        </item>
+                        <item>
+                            <ref target="https://www.ilo.org/public/libdoc/ilo/ILO-SR/ILO-SR_N2_engl.pdf">Statistics of wages and hours of labour</ref>
+                            <!--ocr-->
+                        </item>
+                        <item>
+                            <ref target="https://www.ilo.org/public/libdoc/ilo/ILO-SR/ILO-SR_N3_engl.pdf">Statistics of industrial accidents</ref>
+                            <!--text extraction-->
+                        </item>
+                        <item>
+                            <ref target="https://www.ilo.org/public/libdoc/ilo/ILO-SR/ILO-SR_N4_engl.pdf">Report of the Conference</ref>
+                            <!--text extraction-->
+                        </item>
+                        <item>
+                            <ref target="https://www.ilo.org/public/libdoc/ilo/P/09602/09602(1924-9-1)3-30.pdf">International labour review</ref>
+                            <!--text extraction-->
+                        </item>
+                    </list>
+                    <p>To illustrate image extraction and PDF merging you will include one more files to our corpus that is not directly related to the First International Conference of Labour Statisticians from 1923.</p>
+                    <list type="unordered">
+                        <item>
+                            <ref target="https://www.ilo.org/public/libdoc/ilo/1923/23B09_5_engl.pdf">Speeches made at the ceremony on 21 October 1923</ref>
+                            <!--extract images, combine documents-->
+                        </item>
+                    </list>
+                    <p>For the Topic Modelling of the <ref target="#use-topic-modelling-to-analyze-the-corpus">case study</ref> you will download more files later in the lesson.</p>
+                    <div>
+                        <p>Always make a backup copy of your data before using the commands in this course. Text recognition and combining PDFs can change the original files.</p>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Assessing Your PDF(s)</head>
+                <p>In order to make this lesson as realistic as possible, you will be guided by a concrete historical case study. The study draws on the extensive collection of the <ref target="http://web.archive.org/web/20200606003222/https://ilostat.ilo.org/resources/methods/icls/icls-documents/">International Labour Organization (ILO)</ref>, in particular the sources of the First International Conference of Labour Statisticians.</p>
+                <p>You are interested in what topics were discussed by the labour statisticians. For this purpose you will want to analyze all available documents of this conference using Topic Modelling. This assumes that all documents are available in plain text.</p>
+                <p>First you will get an overview of our corpus. Large databases can create a false impression of evidence. Therefore, the documents must be subjected to qualitative analysis. For this you will use scientific methods such as <ref target="https://en.wikipedia.org/wiki/Source_criticism">source criticism</ref>. All documents are written in English and are set in the same font. <code rend="inline">ILO-SR_N1_engl.pdf</code>, <code rend="inline">ILO-SR_N2_engl.pdf</code>, <code rend="inline">ILO-SR_N3_engl.pdf</code> and <code rend="inline">ILO-SR_N4_engl.pdf</code> are part of the same series. In addition, you note that the <code rend="inline">ILO-SR_N2_engl.pdf</code> file does not contain any embedded text. You also note that <code rend="inline">23B09_5_engl.pdf</code> contains images. One of these images contains text.<ref type="footnotemark" target="#note_2"/>
+                </p>
+                <list type="ordered">
+                    <item>You will recognize the text of <code rend="inline">ILO-SR_N2_engl.pdf</code>
+                    </item>
+                    <item>You will extract the text from all PDF files</item>
+                    <item>You will extract images from <code rend="inline">23B09_5_engl.pdf</code>
+                    </item>
+                    <item>For illustrative purposes, you will combine different images and documents into a single PDF document. This can be helpful if the scanning process involves individual image files that are to be combined into a single document</item>
+                    <item>You will analyze a lot of plain text files using Topic Modelling</item>
+                </list>
+                <div type="3">
+                    <head>Text Recognition in PDF Files</head>
+                    <p>For the text recognition, you will use <ref target="https://ocrmypdf.readthedocs.io">OCRmyPDF</ref>. This software is based on the state-of-the-art open source text recognition software <ref target="https://github.com/tesseract-ocr/tesseract">Tesseract</ref>, which is maintained and further developed by Google. The software automatically recognizes the page orientation, corrects skewed pages, cleans up image artifacts, and adds an OCR text layer to the PDF. Only the document language must be given as a parameter.</p>
+                    <ab>
+                        <code xml:id="code_working-with-batches-of-pdf-files_4" corresp="code_working-with-batches-of-pdf-files_4.txt" lang="language-bash" rend="block"/>
+                    </ab>
+                    <figure>
+                        <desc>Figure 1: The status messages of the software indicate recognition errors in the OCR process.</desc>
+                        <graphic url="working-with-batches-of-pdf-files1.png"/>
+                    </figure>
+                    <p>The status messages of the software indicate recognition errors during the OCR process (see Figure 1). If certain errors occur systematically, it may be worthwhile to write a correction script. See <ref target="/en/lessons/cleaning-ocrd-text-with-regular-expressions">Cleaning OCR’d text with Regular Expressions</ref>.</p>
+                    <p rend="alert">OCRmyPDF has many useful parameters to optimize your results. See the <ref target="https://ocrmypdf.readthedocs.io/en/latest/cookbook.html">documentation</ref>. The output might look slightly different depending on the version used.</p>
+                    <p>To process all PDF files in your working directory at once. OCRmyPDF automatically skips PDFs that already contain embedded text.</p>
+                    <ab>
+                        <code xml:id="code_working-with-batches-of-pdf-files_5" corresp="code_working-with-batches-of-pdf-files_5.txt" lang="language-bash" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Extract Embedded Text from PDFs</head>
+                    <p>To extract the embedded texts from the PDF files use <ref target="https://en.wikipedia.org/wiki/Poppler_(software)">Poppler</ref>). It is a very powerful command line tool for processing PDF files that is used by many other programs.</p>
+                    <ab>
+                        <code xml:id="code_working-with-batches-of-pdf-files_6" corresp="code_working-with-batches-of-pdf-files_6.txt" lang="language-bash" rend="block"/>
+                    </ab>
+                    <p>To process all PDF files in your working directory at once. The status message <code rend="inline">Syntax Warning: Invalid Font Weight</code> means that the file contains formatting that does not meet the standard specifications of PDF. You can safely ignore this message.</p>
+                    <ab>
+                        <code xml:id="code_working-with-batches-of-pdf-files_7" corresp="code_working-with-batches-of-pdf-files_7.txt" lang="language-bash" rend="block"/>
+                    </ab>
+                    <p>Once you have extracted all the embedded text from the PDFs, you can easily browse the text files. You can use the Windows Explorer, MacOS Finder, or a command line program like <code rend="inline">grep</code>. You can display all the mentions of the term “statistics”.</p>
+                    <ab>
+                        <code xml:id="code_working-with-batches-of-pdf-files_8" corresp="code_working-with-batches-of-pdf-files_8.txt" lang="language-bash" rend="block"/>
+                    </ab>
+                    <p>
+                        <code rend="inline">grep</code> is also able to process complicated search queries (so-called <ref target="https://manpages.ubuntu.com/manpages/bionic/en/man1/grep.1.html#regular%20expressions">regular expressions</ref>). For example, you can also search for all files containing either “labour statistics” or “wage statistics”.</p>
+                    <ab>
+                        <code xml:id="code_working-with-batches-of-pdf-files_9" corresp="code_working-with-batches-of-pdf-files_9.txt" lang="language-bash" rend="block"/>
+                    </ab>
+                    <p>Regular expressions also include numbers. This is particularly interesting for historians. This command displays all years in the twentieth century.</p>
+                    <ab>
+                        <code xml:id="code_working-with-batches-of-pdf-files_10" corresp="code_working-with-batches-of-pdf-files_10.txt" lang="language-bash" rend="block"/>
+                    </ab>
+                    <p>Once you have successfully extracted all text from the PDF files, they can be further analyzed using methods of <ref target="/en/lessons/?topic=distant-reading">Distant Reading</ref> such as <ref target="/en/lessons/topic-modeling-and-mallet">Topic Modelling</ref>. You will apply such methods to the case study later in this lesson.</p>
+                </div>
+                <div type="3">
+                    <head>Extract Embedded Images from PDFs</head>
+                    <p>PDF is a container file format and can contain multiple embedded images per page. You can also use Poppler to extract those images. The program allows us to select a target format for the extracted images. It is recommended to you use a lossless image format like PNG when working with the images.</p>
+                    <ab>
+                        <code xml:id="code_working-with-batches-of-pdf-files_11" corresp="code_working-with-batches-of-pdf-files_11.txt" lang="language-bash" rend="block"/>
+                    </ab>
+                    <p rend="alert">For digitally created documents, Poppler extracts all embedded image files. This often includes image files that are outside the visible area or overlaid by other objects.</p>
+                    <p>To process all PDF files in your working directory at once.</p>
+                    <ab>
+                        <code xml:id="code_working-with-batches-of-pdf-files_12" corresp="code_working-with-batches-of-pdf-files_12.txt" lang="language-bash" rend="block"/>
+                    </ab>
+                    <p>Poppler can only extract illustrations if they are available as individual images in the PDF file. If you want to extract illustrations from a scanned page take a look at this lesson: <ref target="/en/lessons/extracting-illustrated-pages">Extracting Illustrated Pages from Digital Libraries with Python</ref>.</p>
+                </div>
+                <div type="3">
+                    <head>Combine Images and PDFs into a Single PDF</head>
+                    <p>Although OCRmyPDF can process image files directly, there are cases where you first want to combine the images into a PDF document. Because most image formats do not support multiple pages, each page of a document has to be saved as a single file. With the widespread command line image editing software <ref target="https://imagemagick.org/">ImageMagick</ref> you can achieve this very easily.</p>
+                    <ab>
+                        <code xml:id="code_working-with-batches-of-pdf-files_13" corresp="code_working-with-batches-of-pdf-files_13.txt" lang="language-bash" rend="block"/>
+                    </ab>
+                    <p>To combine all images into a PDF file at once use the wildcard operator <code rend="inline">*.png</code>. This step could take a few minutes.</p>
+                    <ab>
+                        <code xml:id="code_working-with-batches-of-pdf-files_14" corresp="code_working-with-batches-of-pdf-files_14.txt" lang="language-bash" rend="block"/>
+                    </ab>
+                    <p>If you want to combine different PDF files, you can rely on Poppler. Poppler does this job much faster than ImageMagick and preserves attributes of the original documents.</p>
+                    <ab>
+                        <code xml:id="code_working-with-batches-of-pdf-files_15" corresp="code_working-with-batches-of-pdf-files_15.txt" lang="language-bash" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Use Topic Modelling to Analyze the Corpus</head>
+                    <p>Now that you have performed all the steps of the PDF processing on some examples, you can return to the historical question of the case study. Which topics were discussed by the labour statisticians at the international conferences of the ILO? In order to answer this question using Topic Modelling, the following steps are necessary:</p>
+                    <list type="ordered">
+                        <item>Download the corpus</item>
+                        <item>Prepare and clean up the corpus</item>
+                        <item>Create the Topic Model</item>
+                        <item>Evaluate the Topic Model</item>
+                    </list>
+                    <div type="4">
+                        <head>Download the Corpus</head>
+                        <p>To avoid confusion create a new folder with <code rend="inline">mkdir</code> and open it with <code rend="inline">cd</code>.</p>
+                        <ab>
+                            <code xml:id="code_working-with-batches-of-pdf-files_16" corresp="code_working-with-batches-of-pdf-files_16.txt" lang="language-bash" rend="block"/>
+                        </ab>
+                        <p>You can download the corpus from the <ref target="https://www.ilo.org/public/libdoc/ilo/ILO-SR/">ILO website</ref>. All English documents contain ‘engl’ in the title. It’s over a gigabyte of data. Depending on your internet speed this may take a while.</p>
+                        <p>To automate this step you can use the following command line commands. This will download all English documents (340 files) at once.</p>
+                        <ab>
+                            <code xml:id="code_working-with-batches-of-pdf-files_17" corresp="code_working-with-batches-of-pdf-files_17.txt" lang="language-bash" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4">
+                        <head>Prepare and Clean Up the Corpus</head>
+                        <p>Now you can batch process all downloaded PDF files. First, perform text recognition on all files that don’t have embedded text. Then extract all embedded text from the files. Depending on the performance of your computer, this step may take several hours.</p>
+                        <ab>
+                            <code xml:id="code_working-with-batches-of-pdf-files_18" corresp="code_working-with-batches-of-pdf-files_18.txt" lang="language-bash" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4">
+                        <head>Create the Topic Model</head>
+                        <p>In order to create a Topic Model with the DARIAH Topics Explorer, you don’t need to have any deeper mathematical knowledge about the Latent Dirichlet Allocation (LDA) that is used.<ref type="footnotemark" target="#note_3"/> Nevertheless, it is worth clarifying some implicit assumptions of the model before you begin:</p>
+                        <list type="unordered">
+                            <item>A corpus consists of documents. Each document consists of words. Words are carriers of meaning. The order (sentences, sections, etc.) of the words is very important to understand its content. But it is not factored in for the purposes of this analysis. Only the frequency of words in a document or corpus (or more precisely the co-occurrence of words) is measured</item>
+                            <item>You determine how many topics are present in the corpus.</item>
+                            <item>Each word has a specific probability of belonging to a topic. The algorithm finds the corresponding probabilities of the individual words</item>
+                            <item>Words that occur very frequently do little to discriminate between the individual topics. They are often function words such as 'and', 'but' and so forth. Therefore, they should not be included in the analysis</item>
+                            <item>Topic modeling using LDA is non-deterministic. This means that a different result can be obtained for each run. Fortunately, the result usually converges towards a stable state. Run it several times and compare the results. You will quickly see if the topics remain stable</item>
+                        </list>
+                        <p>Now open the <ref target="https://dariah-de.github.io/TopicsExplorer/">DARIAH Topics Explorer</ref> and follow the steps given in the software. Then:</p>
+                        <list type="ordered">
+                            <item>Select all 340 text files for the analysis.</item>
+                            <item>Remove the 150 most common words. Alternatively, you can also load the file with the English stop words contained in the <ref target="https://github.com/DARIAH-DE/TopicsExplorer/tree/master/data">example Corpus</ref> of the DARIAH Topics Explorer.</item>
+                            <item>Choose 30 for the number of topics and 200 for the number of iterations. You should play with the number of topics and choose a value between 10 and 100. With the number of iterations you increase the accuracy to the price of the calculation duration.</item>
+                            <item>Click on 'Train Model'. Depending on the speed of your computer, this process may take several minutes.</item>
+                        </list>
+                    </div>
+                    <div type="4">
+                        <head>Evaluate the Topic Model</head>
+                        <p>The <ref target="https://dariah-de.github.io/TopicsExplorer/">DARIAH Topics Explorer</ref> has a graphical user interface that makes it very easy to explore and evaluate the Topic Model and its thirty topics. In this run, the second topic looks like this (see Figure 2).</p>
+                        <figure>
+                            <desc>Figure 2: DARIAH Topics Explorer showing related words, related documents and similar topics of a single topic.</desc>
+                            <graphic url="working-with-batches-of-pdf-files2.png"/>
+                        </figure>
+                        <p>This topic deals with various social insurance schemes. Both old-age provision and unemployment benefits are included. The words are sorted in descending order of relevance and give a good overview of the topic. You can also see which documents have the highest correspondence with this topic. As you can see when you look at related topics, this topic is close to accident insurance and legislation.</p>
+                        <p>To further process or visualize the results with a spreadsheet program, click on the 'Export Data' button. The paper 'Parliament’s Debates about Infrastructure' by Jo Guldi illustrates how Topic Modelling can be put to use for historical research.<ref type="footnotemark" target="#note_4"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Concluding Remarks</head>
+                <p>Over the past decades, PDF has become the de facto standard for archiving and exchanging digital text documents.<ref type="footnotemark" target="#note_5"/> However, this is not only the case for projects that focus primarily on digitized historical sources. For most digitally generated content, such as websites and interactive documents, as yet no generally accepted archiving formats have been established. Therefore, PDF is often used in these cases as well. Sometimes contemporary source documents present us with the same challenges as inferior scans of historical documents.</p>
+                <p>The Mueller Report is the official report documenting the findings and conclusions of the investigation by former Special Advisor Robert Mueller into Russian efforts to interfere in the 2016 presidential election in the United States, the allegation of conspiracy or coordination between Donald Trump's presidential campaign and Russia, and the allegation of obstruction of justice. As a technical analysis by Duff Johnson shows, the Mueller Report was digitally created, printed, scanned at least once, and sent for text recognition in an inferior version. Text and metadata were lost, which would have made working with the document much easier. It is unclear whether this deterioration in quality is intentional or due to complicated administrative procedures. In any case, it makes researchers' lives more difficult.<ref type="footnotemark" target="#note_6"/>
+                </p>
+                <div type="3">
+                    <head>Alternatives</head>
+                    <p>This lesson focused on tools that are easy to use and are available as open source software free of charge. There are a lot of open source and commercial <ref target="https://en.wikipedia.org/wiki/List_of_PDF_software">alternatives</ref> to process PDF files.<ref type="footnotemark" target="#note_7"/>
+                        <ref target="/en/lessons/topic-modeling-and-mallet">Getting Started with Topic Modeling and MALLET</ref> covers one of many alternatives for Topic Modelling.</p>
+                    <p>
+                        <ref type="footnotemark" target="#note_1"/> : If you run into troubles <ref target="https://docs.microsoft.com/en-us/windows/wsl/install-win10">activating</ref> the WSL check out the <ref target="https://docs.microsoft.com/en-us/windows/wsl/troubleshooting">troubleshooting</ref>, <ref target="https://aka.ms/wsldocs">documentation</ref>, or the <ref target="https://aka.ms/learnwsl">learning</ref> resources.</p>
+                    <p>
+                        <ref type="footnotemark" target="#note_2"/> : In the case of a larger corpus, it is advisable to carry out random sampling instead of a detailed analysis. If no text is embedded in certain files, text recognition can be run over the entire corpus. Text recognition identifies embedded text when it is missing, and attempts to recognize it.</p>
+                    <p>
+                        <ref type="footnotemark" target="#note_3"/> : If you still want to learn more, see Ganegedara, Thushan. “Intuitive Guide to Latent Dirichlet Allocation.” <emph>Medium</emph>, August 23, 2018. <ref target="https://towardsdatascience.com/light-on-math-machine-learning-intuitive-guide-to-latent-dirichlet-allocation-437c81220158">https://towardsdatascience.com/light-on-math-machine-learning-intuitive-guide-to-latent-dirichlet-allocation-437c81220158</ref>.</p>
+                    <p>
+                        <ref type="footnotemark" target="#note_4"/> : Guldi, Jo. “Parliament’s Debates about Infrastructure: An Exercise in Using Dynamic Topic Models to Synthesize Historical Change.” <emph>Technology and Culture</emph> 60, no. 1 (2019): 1–33. <ref target="https://doi.org/10.1353/tech.2019.0000">https://doi.org/10.1353/tech.2019.0000</ref>.</p>
+                    <p>
+                        <ref type="footnotemark" target="#note_5"/> : The fourth chapter describes in detail the history of the PDF file format and the associated socio-technological upheaval, see Gitelman, Lisa. <emph>Paper Knowledge: Toward a Media History of Documents.</emph> Durham: Duke University Press, 2014.</p>
+                    <p>
+                        <ref type="footnotemark" target="#note_6"/> : Johnson, Duff. “A Technical and Cultural Assessment of the Mueller Report PDF.” <emph>PDF Association</emph> (blog), April 19, 2019. <ref target="https://www.pdfa.org/a-technical-and-cultural-assessment-of-the-mueller-report-pdf/">https://www.pdfa.org/a-technical-and-cultural-assessment-of-the-mueller-report-pdf/</ref>.</p>
+                    <p>
+                        <ref type="footnotemark" target="#note_7"/> : Especially worth mentioning are the German wiki pages of the Ubuntu community about <ref target="https://wiki.ubuntuusers.de/PDF/">PDF</ref> and <ref target="https://wiki.ubuntuusers.de/Texterkennung/">OCR</ref>. These pages contain references to free software for working with PDF files and improving text recognition. Unfortunately, there are no translations into other languages for these pages, so a translation service should be used.</p>
+                </div>
+            </div>
+        </body>
+    </text>
+</TEI>

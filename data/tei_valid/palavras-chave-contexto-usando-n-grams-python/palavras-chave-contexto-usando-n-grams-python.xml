@@ -1,0 +1,124 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="palavras-chave-contexto-usando-n-grams-python">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Palavras-chave em Contexto (Usando n-gramas) com Python</title>
+                <author role="original_author">
+                    <persName>William J. Turkel</persName>
+                    <persName>Adam Crymble</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Jim Clifford</persName>
+                    <persName>Frederik Elwert</persName>
+                </editor>
+                <author role="translators">Felipe Lamarca</author>
+                <editor role="translation-reviewers">
+                    <persName>Ana Carolina Erthal</persName>
+                    <persName>Gariela Kucuruza</persName>
+                </editor>
+                <editor role="editors">Miriam Posner</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">10/31/2022</date>
+                <idno type="doi">10.46430/phpt0031</idno>
+                <date type="published">07/17/2012</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#keywords-in-context-using-n-grams"/>.</p>
+                <p>There are other translations: <ref target="#palabras-clave-en-contexto-n-grams"/>
+                </p>
+                <p>There are other translations: <ref target="#palabras-clave-en-contexto-n-grams"/>
+                </p>
+                <p>There are other translations: <ref target="#palabras-clave-en-contexto-n-grams"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Esta lição usa os pares de frequência criados na lição 'Contar Frequências de Palavras com Python' e os apresenta em formato HTML.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <div type="2">
+                <head>Objetivos da Lição</head>
+                <p>Como em <ref target="/pt/licoes/saida-dados-ficheiro-html-python">Saída de Dados como um Ficheiro HTML com Python</ref>, esta lição toma os pares de frequência criados na lição <ref target="/pt/licoes/contar-frequencias-palavras-python">Contar Frequências de Palavras com Python</ref> e os apresenta em um ficheiro HTML. Dessa vez o foco está nas palavras-chave em contexto, ou <emph>keywords in context</emph> (KWIC) no inglês, que criam n-gramas a partir do conteúdo do documento original - nesse caso, uma transcrição do julgamento do <emph>Old Bailey Online</emph>. Pode usar o seu programa para selecionar uma palavra-chave e o computador retornará todas as instâncias dessa palavra-chave, junto com as palavras à esquerda e à direita dela, tornando mais fácil visualizar rapidamente como a palavra-chave é usada.</p>
+                <p>Uma vez que as KWICs forem criadas, elas são envolvidas em HTML (isto é, passam pelo <emph>HTML wrapper</emph>) e são enviadas ao navegador, onde podem ser visualizadas. Isso reforça o que foi aprendido em <ref target="/pt/licoes/saida-dados-ficheiro-html-python">Saída de Dados como um Ficheiro HTML com Python</ref>, optando por uma saída ligeiramente diferente.</p>
+                <p>No final dessa lição, será capaz de extrair todos os n-gramas possíveis de um texto. Na próxima lição, aprenderá como gerar todos os n-gramas de uma determinada palavra-chave em um documento baixado da Internet e exibi-los claramente na janela do navegador.</p>
+            </div>
+            <div type="2">
+                <head>Ficheiros Necessários para esta Lição</head>
+                <list type="unordered">
+                    <item>
+                        <code rend="inline">obo.py</code>
+                    </item>
+                </list>
+                <p>Caso não possua esses ficheiros da lição anterior, pode fazer o <emph>download</emph> do programming-historian-7, um <ref target="/assets/python-lessons7.zip">ficheiro zip da lição anterior</ref>. </p>
+            </div>
+            <div type="2">
+                <head>De Texto para N-gramas e para KWIC</head>
+                <p>Agora que já sabe como coletar o conteúdo textual de uma página <emph>web</emph> automaticamente com Python e começou a usar strings, listas e dicionários para processamento de texto, há muitas outras coisas que pode fazer com texto além de contar frequências. Pessoas que estudam propriedades estatísticas da linguagem descobriram que estudar sequências lineares de unidades linguísticas pode nos dizer muito a respeito de um texto. Essas sequências lineares são conhecidas como bigramas (2 unidades), trigramas (3 unidades) e de forma geral como n-gramas.</p>
+                <p>Provavelmente já viu n-gramas muitas vezes antes. Eles são comumente utilizados em páginas de resultados de pesquisa para oferecer uma prévia de onde a sua palavra-chave aparece em um documento e qual é o contexto ao redor da palavra-chave. Essa aplicação de n-gramas é conhecida como palavras-chave em contexto (<emph>keywords in context</emph>, às vezes abreviada como KWIC). Por exemplo, se a string em questão fosse "<emph>it was the best of times it was the worst of times it was the age of wisdom it was the age of foolishness</emph>", então o 7-grama para a palavra-chave "<emph>wisdom</emph>" seria:</p>
+                <ab>
+                    <code xml:id="code_palavras-chave-contexto-usando-n-grams-python_0" corresp="code_palavras-chave-contexto-usando-n-grams-python_0.txt" rend="block"/>
+                </ab>
+                <p>Um n-grama poderia conter qualquer tipo de unidade linguística desejada. Para historiadores, é mais provável que use caracteres como no bigrama "qu" ou palavras como no trigrama "o cão ladrou"; no entanto, também poderia utilizar fonemas, sílabas, ou qualquer número de outras unidades dependendo da sua pergunta de investigação.</p>
+                <p>O que faremos a seguir é desenvolver a habilidade de exibir KWIC para qualquer palavra-chave em um corpo de texto, mostrando-a no contexto de um número fixo de palavras em cada um dos lados. Como antes, envolveremos a saída de modo que ela possa ser visualizada no Firefox e adicionada ao Zotero facilmente.</p>
+            </div>
+            <div type="2">
+                <head>De Texto para N-gramas</head>
+                <p>Uma vez que desejamos trabalhar com palavras ao invés de caracteres ou fonemas, será muito mais fácil criar um n-grama usando uma lista de palavras em vez de strings. Como já sabe, o Python pode facilmente transformar strings em uma lista usando a operação <code rend="inline">split</code>. Uma vez dividida, torna-se simples recuperar uma subsequência de palavras adjacentes na lista usando um <code rend="inline">slice</code>, representado por dois índices separados por dois pontos. Isso foi introduzido ao trabalhar com strings em <ref target="/pt/licoes/manipular-strings-python">Manipular strings com Python</ref>:</p>
+                <ab>
+                    <code xml:id="code_palavras-chave-contexto-usando-n-grams-python_1" corresp="code_palavras-chave-contexto-usando-n-grams-python_1.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>No entanto, também podemos utilizar essa técnica para obter um número pré-determinado de palavras vizinhas em uma lista com pouquíssimo esforço. Estude os exemplos a seguir, os quais você pode testar em um Python <emph>shell</emph>:</p>
+                <ab>
+                    <code xml:id="code_palavras-chave-contexto-usando-n-grams-python_2" corresp="code_palavras-chave-contexto-usando-n-grams-python_2.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Nesses exemplos usamos o método <code rend="inline">slice</code> para retornar partes da nossa lista. Note que há dois lados para os dois pontos em um <code rend="inline">slice</code>. Se o lado direito dos dois pontos for deixado em branco, como no último exemplo acima, o programa sabe que deve continuar até o final automaticamente - nesse caso, até o fim da lista. O penúltimo exemplo acima mostra que podemos começar no início deixando vazio o espaço antes dos dois pontos. Este é um atalho útil disponível para manter seu código mais curto.</p>
+                <p>Também pode usar variáveis para representar a posição dos índices. Usado conjuntamente com um <code rend="inline">for</code>
+                    <emph>loop</emph>, pode facilmente criar todos os n-gramas possíveis a partir da sua lista. O exemplo a seguir retorna todos os 5-gramas da nossa string do exemplo acima.</p>
+                <ab>
+                    <code xml:id="code_palavras-chave-contexto-usando-n-grams-python_3" corresp="code_palavras-chave-contexto-usando-n-grams-python_3.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Mantendo a nossa abordagem modular, criaremos e armazenaremos no módulo <code rend="inline">obo.py</code> uma função que será capaz de criar n-gramas para nós. Estude e digite ou copie o seguinte código:</p>
+                <ab>
+                    <code xml:id="code_palavras-chave-contexto-usando-n-grams-python_4" corresp="code_palavras-chave-contexto-usando-n-grams-python_4.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Essa função pode parecer um pouco confusa, pois há muita coisa acontecendo aqui em pouco código. Ela usa uma <ref target="https://pt.wikipedia.org/wiki/Compreens%C3%A3o_de_lista">compreensão de lista</ref> para manter o código compacto. O exemplo a seguir faz exatamente a mesma coisa:</p>
+                <ab>
+                    <code xml:id="code_palavras-chave-contexto-usando-n-grams-python_5" corresp="code_palavras-chave-contexto-usando-n-grams-python_5.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Use a opção que fizer mais sentido.</p>
+                <p>Um conceito que ainda pode ser confuso é a função de dois argumentos. Observe que a nossa função possui dois nomes de variáveis entre parênteses depois do seu nome quando a declaramos: <code rend="inline">wordlist</code>, <code rend="inline">n</code>. Essas duas variáveis são os argumentos da função. Quando chama (executa) a função, essas variáveis serão usadas pela função para a sua solução. Sem esses argumentos não há informação suficiente para que os cálculos sejam feitos. Nesse caso, as duas informações são a lista de palavras que você deseja transformar em n-gramas (<code rend="inline">wordlist</code>) e o número de palavras que você deseja em cada n-grama (<code rend="inline">n</code>). Para a função funcionar ela precisa das duas informações, que são chamadas da seguinte forma (armazene o código a seguir como <code rend="inline">useGetNGrams.py</code> e execute-o):</p>
+                <ab>
+                    <code xml:id="code_palavras-chave-contexto-usando-n-grams-python_6" corresp="code_palavras-chave-contexto-usando-n-grams-python_6.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Observe que os argumentos que inseriu não precisam possuir os mesmos nomes dos argumentos nomeados na declaração da função. O Python sabe utilizar a variável <code rend="inline">allMyWords</code> em todos os lugares da função em que <code rend="inline">wordlist</code> aparece, já que ela é dada como o primeiro argumento. Da mesma forma, todas as instâncias de <code rend="inline">n</code> serão substituídas pelo inteiro 5 nesse caso. Tente mudar 5 para uma string, como "elefantes", e veja o que acontece quando executa o programa. Note que, já que <code rend="inline">n</code> está sendo usado como um inteiro, precisa garantir que o argumento fornecido também é um inteiro. O mesmo vale para strings, pontos flutuantes ou qualquer outro tipo de variável fornecido como argumento.</p>
+                <p>Também pode usar um Python <emph>shell</emph> para brincar com o código e entender melhor como ele funciona. Cole a declaração da função <code rend="inline">getNGrams</code> (qualquer uma das duas funções acima) no seu Python <emph>shell</emph>:</p>
+                <ab>
+                    <code xml:id="code_palavras-chave-contexto-usando-n-grams-python_7" corresp="code_palavras-chave-contexto-usando-n-grams-python_7.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Há dois conceitos que vemos nesse exemplo para os quais precisa estar atento. Primeiro, como a nossa função espera uma lista de palavras ao invés de uma string, temos que converter as strings em listas antes que a nossa função possa manipulá-las. Nós poderíamos ter feito isso adicionando outra linha de código acima da chamada da função, mas em vez disso usamos o método <code rend="inline">split</code> diretamente no argumento da função como um atalho.</p>
+                <p>Em segundo lugar, por que o primeiro exemplo retornou uma lista vazia em vez dos n-gramas que estávamos procurando? Em <code rend="inline">test1</code>, tentamos pedir um n-grama maior que o número de palavras em nossa lista. Isso resultou em uma lista em branco. Em <code rend="inline">test2</code> não temos esse problema e recebemos todos os 5-gramas possíveis para a lista de palavras mais longa. Se desejasse, poderia adaptar a sua função para exibir uma mensagem de aviso (<emph>warning message</emph>) ou para retornar a string completa em vez de uma lista vazia.</p>
+                <p>Agora temos uma maneira de extrair todos os n-gramas possíveis de um corpo textual. Na próxima lição, poderemos concentrar a nossa atenção em isolar aqueles n-gramas que forem do nosso interesse.</p>
+            </div>
+            <div type="2">
+                <head>Sincronização de Código</head>
+                <p>Para acompanhar lições futuras, é importante ter os ficheiros e programas corretos no seu diretório “programming-historian”. Ao final de cada capítulo pode fazer o <emph>download</emph> do ficheiro zip "programming-historian" para garantir que possui o código correto. Caso esteja acompanhando com a versão para Mac / Linux, deve ter que abrir o ficheiro <code rend="inline">obo.py</code> e mudar "file:///Users/username/Desktop/programming-historian/" para o caminho até o diretório no seu próprio computador.</p>
+                <list type="unordered">
+                    <item>
+                        <ref target="/assets/python-lessons8.zip">python-lessons8.py</ref>
+                    </item>
+                </list>
+            </div>
+        </body>
+    </text>
+</TEI>

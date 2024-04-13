@@ -1,0 +1,220 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="ocr-tutorial">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>OCR Tutorial</title>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc/>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2">
+                <head>Cleaning OCR Output</head>
+                <p>It is often the case that historians involved in digital projects wish to work with digitized texts, so they think "OK, I'll just scan this fabulously rich and useful collection of original source material and do wonderful things with the digital text that results". (Those of us who have done this, now smile ruefully). Such historians quickly discover that even the best OCR results in unacceptably high error rates. So the historian now thinks "OK I'll get some grant money, and I'll enlist the help of an army of RAs/Grad students/Undergrads/Barely literate street urchins, to correct errors in my OCR output. (We smile again, even more sadly now).</p>
+                <p>A. there is little funding for this kind of thing. Creating digital texts is SO 1990s. Today, all the funding for projects in the "Digital Humanities" is devoted to NLP/Data Mining/Machine Learning/Graph Analysis, or what-have-you. And besides, Google scanned all that stuff didn't they? What's the matter with their scans? (see 2)</p>
+                <p>and </p>
+                <p>2. Even if you had such an army of helpers, proof-reading the OCR output of, say, a collection of twelfth century Italian charters transcribed and published in 1935, will quickly drive them all mad, make their eyes bleed, and the result will still be a great wadj of text containing a great many errors, and you will <hi rend="bold">still</hi> have to do <hi rend="bold">something</hi> to it before it becomes useful in any context.</p>
+                <p>Going through a text file line by line and correcting OCR errors one at a time is hugely error-prone, as any proof reader will tell you. If you are dealing with a narrative, a monograph, a diary, or something like that, a great deal of that kind of proofing will be unavoidable; however, if what you have is an ordered collection of primary source documents, a legal code say, or a cartulary, you are far better served by creating an ordered data structure out of it <hi rend="bold">first</hi>. You will wind up with data that is useful in a variety of contexts, even before your army of street urchins starts correcting specific OCR typos.</p>
+                <p>This is where a scripting language like Python comes very much in handy. For our project we wanted to prepare some of the documents from a 12th century collection of <emph>imbreviatura</emph> from the Italian scribe known as <ref target="http://www.worldcat.org/oclc/17591390">Giovanni Scriba</ref> so that they could be marked up by historians for subsequent NLP analysis or potentially for other purposes as well. The pages of the 1935 published edition look like this.</p>
+                <p>
+                    <img src="gs_pg110.png" alt="GS page 110"/>
+                </p>
+                <p>The OCR output from such scans look like this even after some substantial clean-up (I've wrapped the longest lines so that they fit here):</p>
+                <ab>
+                    <code xml:id="code_ocr-tutorial_0" corresp="code_ocr-tutorial_0.txt" rend="block"/>
+                </ab>
+                <p>Not pretty eh?</p>
+                <p>You can see from the scan that each charter has the following metadata associated with it </p>
+                <list type="unordered">
+                    <item>Charter number</item>
+                    <item>Page number</item>
+                    <item>Folio number</item>
+                    <item>An Italian summary, ending in a date of some kind</item>
+                    <item>A line, usually ending with a ']' that marks a marginal notation in the original</item>
+                    <item>Frequently a collection of in-text numbered footnote markers, whose text appears at the bottom of each page, sequentially numbered, and restarting from 1 on each new page.</item>
+                    <item>The Latin text of the charter itself</item>
+                </list>
+                <p>This is typical of such resources, though editorial conventions will vary widely. The point is: this is an <hi rend="bold">ordered</hi> data set, not just a great big string of characters. With some fairly straightforward Python scripts, we can turn our OCR output into an ordered data set, in this case, a python dictionary, <hi rend="bold">before</hi> we start trying to proofread the Latin charter texts. With such an ordered data set in hand, we can undertake that task, and potentially others as well, much more effectively.</p>
+                <div type="3">
+                    <head>A few useful functions before we start:</head>
+                    <div type="4">
+                        <head>Levenshtein distance</head>
+                        <p>You will note that some of this metadata is page-bound and some of it is charter-bound. Getting these untangled from each other is our aim. There is a class of page-bound data that is useless for our purposes, and only meaningful in the context of a physical book: page headers and footers. Unfortunately, regular expressions won't help you much here. This text can appear on any line, and the ways in which OCR software can foul it up are effectively limitless. Here are some examples of page headers, both <emph>recto</emph> and <emph>verso</emph> in our raw OCR output.</p>
+                        <ab>
+                            <code xml:id="code_ocr-tutorial_1" corresp="code_ocr-tutorial_1.txt" rend="block"/>
+                        </ab>
+                        <p>These strings are not regular enough to reliably find with regular expressions; however, if you know what the strings are supposed to look like, you can compose some kind of string similarity algorithm to test each string against an exemplar and measure the likelihood that it is a page header. Fortunately, I didn't have to compose such an algorithm, Vladimir Levenshtein did it for us in 1965 (see: <ref target="http://en.wikipedia.org/wiki/Levenshtein_distance">http://en.wikipedia.org/wiki/Levenshtein_distance</ref>). A computer language can encode this algorithm in any number of ways, here's an effective Python function that will work for us:</p>
+                        <ab>
+                            <code xml:id="code_ocr-tutorial_2" corresp="code_ocr-tutorial_2.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>There's a lot of calculation going on there. It isn't very efficient to call <code rend="inline">lev()</code> on every line in our text, but we don't really care. We've only got 803 charters in vol. 1. That's a pretty small number. If it takes 30 seconds to run our script, so be it.</p>
+                    </div>
+                    <div type="4">
+                        <head>Roman to Arabic numerals</head>
+                        <p>You'll also note that the published edition numbers the charters with roman numerals. Converting roman numerals into arabic is an instructive puzzle to work out in Python. Here's the cleanest and most elegant solution I know:</p>
+                        <ab>
+                            <code xml:id="code_ocr-tutorial_3" corresp="code_ocr-tutorial_3.txt" lang="language-python" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>A couple of other things we'll need:</head>
+                    <p>At the top of your Python module, you're going to want to <code rend="inline">import re</code>. Regular expressions are your friend. However, bear in mind Jamie Zawinski's quip: </p>
+                    <quote>
+                        <p>Some people, when confronted with a problem, think "I know, I'll use regular expressions." Now they have two problems.</p>
+                    </quote>
+                    <p>Also: <code rend="inline">from pprint import pprint</code> because python dictionaries are much easier to read if they are formatted.</p>
+                    <p>And: <code rend="inline">from collections import Counter</code>. Not really necessary, but the collections module in the standard Python library has lots of time-saving stuff like this.</p>
+                    <div type="4">
+                        <head>some global variables:</head>
+                        <p>
+                            <code rend="inline">romstr</code> is crude, You'll think of something better. By using romstr.match() we can find only matches at the beginning of lines. And searching line by line, we can find Roman numerals that are on a line by themselves, which is what we want.</p>
+                        <ab>
+                            <code xml:id="code_ocr-tutorial_4" corresp="code_ocr-tutorial_4.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>Once we've figured out our charter numbers, we're going to provide each charter with an easy-to-find slug to chunk the text up with:</p>
+                        <ab>
+                            <code xml:id="code_ocr-tutorial_5" corresp="code_ocr-tutorial_5.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>
+                            <code rend="inline">fol</code> is a description of how folio markers <hi rend="bold">should</hi> look. OCR can mangle them in surprising ways</p>
+                        <ab>
+                            <code xml:id="code_ocr-tutorial_6" corresp="code_ocr-tutorial_6.txt" lang="language-python" rend="block"/>
+                        </ab>
+                        <p>
+                            <code rend="inline">n</code> is an all-purpose counter</p>
+                        <ab>
+                            <code xml:id="code_ocr-tutorial_7" corresp="code_ocr-tutorial_7.txt" lang="language-python" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Iterative processing of text files</head>
+                <p>For the first several operations we're going to want to produce new and revised text files to use as input for our subsequent operations in order to keep track of our progress, and go back to an earlier stage when things go haywire, as they certainly will do. The code here is highly edited. As you continue to refine your text files, you will write lots of little <emph>ad hoc</emph> scripts to check on the efficacy of what you've done so far.</p>
+                <div type="3">
+                    <head>Chunk up the text by pages</head>
+                    <p>We want to find all the page headers, both <emph>recto</emph> and <emph>verso</emph> and replace them with consistent strings that we can easily find with a regular expression. The following code looks for lines that are similar to what we know are our page headers to within a certain threshold. It will take some experimentation to find what this threshold is for your text. Since my <emph>recto</emph> and <emph>verso</emph> headers are roughly the same length, both have the same similarity score of 26. Your milage will vary. Nota Bene: the shorter the page header string, the more likely it is that this trick will not work.</p>
+                    <p>the <code rend="inline">print</code> statements will write to std out. Use them to test until you have a Levenshtein score that finds all, or most, of the page headers. Once you've got that, then uncomment the <code rend="inline">fout.write()</code> lines and write your result out to a new file.</p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_8" corresp="code_ocr-tutorial_8.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Note that for many of these operations, we use <code rend="inline">GScriba = fin.readlines()</code> so <code rend="inline">GScriba</code> will be a <hi rend="bold">python list</hi> of the lines in our input text. Keep this firmly in mind, as the <code rend="inline">for</code> loops that we will use will depend on the fact that we will iterate through the lines of our text <hi rend="bold">In Document Order</hi>.</p>
+                </div>
+                <div type="3">
+                    <head>Chunk up the text by charter (or sections, or letters, or what-have-you)</head>
+                    <p>This script will look for capital roman numerals that appear on a line by itself. Many of our charter numbers will fail that test and the script will report <code rend="inline">there's a charter roman numeral missing?</code>, often because there's something before or after it on the line; or, <code rend="inline">KeyError</code>, often because the OCR has garbled the characters (e.g. CCG for 300, or XVIIl for 18 etc). Run this script repeatedly, correcting <code rend="inline">out1.txt</code> as you do until all the charters are accounted for. </p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_9" corresp="code_ocr-tutorial_9.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Then write out a new file with an easy-to-find-by-regex string for each charter in place of the bare Roman Numeral</p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_10" corresp="code_ocr-tutorial_10.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>While it's important in itself for us to have our OCR output reliably divided up by page and by charter, the most important thing about these initial operations is that you know how many pages there are, and how many charters there are, and you can use that knowledge to check on subsequent operations. If you want to do something to every charter, you can reliably test whether or not it worked because you can count the number of charters that it worked on.</p>
+                </div>
+                <div type="3">
+                    <head>A very brief review of regular expressions as they are implemented in python</head>
+                    <p>L.T. O'Hara's <ref target="/lessons/cleaning-ocrd-text-with-regular-expressions.html">introduction</ref> to using python flavored regular expressions is invaluable. In this context we should review a couple of basic facts about Python's implementation of regular expressions, the <code rend="inline">re</code> module, which is part of Python's standard library.</p>
+                    <list type="ordered">
+                        <item>
+                            <code rend="inline">re.compile()</code> creates a regular expression object that has a number of methods. You should be familiar with <code rend="inline">.match()</code>, and <code rend="inline">.search()</code>, but also <code rend="inline">.findall()</code> and <code rend="inline">.finditer()</code>
+                        </item>
+                        <item>Bear in mind the difference between <code rend="inline">.match()</code> and <code rend="inline">.search()</code>: <code rend="inline">.match()</code> will only match at the <hi rend="bold">beginning</hi> of a line, whereas <code rend="inline">.search()</code> will match anywhere in the line <hi rend="bold">but then it stops</hi>, it'll <hi rend="bold">only</hi> return the first match it finds.</item>
+                        <item>
+                            <code rend="inline">.match()</code> and <code rend="inline">.search()</code> return match objects, to retrieve the matched string you need <code rend="inline">match.group(0)</code>. If your compiled regular expression has grouping parentheses in it (like our 'slug' regex above), you can retrieve those substrings of the matched string using <code rend="inline">match.group(1)</code> etc.</item>
+                        <item>
+                            <code rend="inline">.findall()</code> and <code rend="inline">.finditer()</code> will return <hi rend="bold">all</hi> occurances of the matched string; <code rend="inline">.findall()</code> returns them as a list of strings, but .finditer() returns an <hi rend="bold">iterator of match objects</hi>.</item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Find and normalize folio markers</head>
+                    <p>Many of the folio markers (e.g. [fo. 16 v.]) appear on the same line as the roman numeral for the charter heading. To normalize those charter headings for the operation above we had to put a line break between the folio marker and the charter number, so many of the folio markers are on their own line already. However, sometimes the folio changes in the middle of the charter text somewhere. We want these markers to stay where they are. We need to make sure all the folio markers are free of errors so that we can find them by means of a regular expression. Again, since we know how many folios there are, we can know if we've found them all. Note that since we used <code rend="inline">.readlines()</code>, GScriba is a list, so the script below will print the line number from the sourcefile as well as the line itself. This will report all the correctly formated folio markers, so that you can find and fix the ones that are broken.</p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_11" corresp="code_ocr-tutorial_11.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>We would also like to ensure that no line has more than one folio marker. We can test that like this:</p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_12" corresp="code_ocr-tutorial_12.txt" lang="language-python" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Find and normalize the Italian summary lines.</head>
+                    <p>This important line is invariably the first one after the charter heading. Since those headings are now reliably findable, we can look at the line that appears immediately after it. We also know that the summaries always end with some kind of parenthesized date expression. So, we can compose a regular expression to find the slug and the line following: </p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_13" corresp="code_ocr-tutorial_13.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Because our OCR has a lot of mysterious whitespace (newlines, tabs, spaces, all mixed up without rhyme or reason), we want to hunt for these as substrings of a great big string, so we're going to use <code rend="inline">.read()</code> instead of <code rend="inline">.readlines()</code>. And we'll also need a counter to keep track of the lines we find. This script will report the charter numbers where the first line does not conform to our regex model.</p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_14" corresp="code_ocr-tutorial_14.txt" lang="language-python" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Find and normalize footnote markers and texts</head>
+                    <p>One of the trickiest bits to untangle, is the infuriating editorial convention of restarting the foonote numbering with each new page. This makes it hard to associate a footnote text (page-bound data), with a footnote marker (charter-bound data). Before we can do that we have to ensure that each footnote text that appears at the bottom of the page, appears in our sourcefile on its own separate line with no leading white-space. And that <hi rend="bold">none</hi> of the footnote markers within the text appears at the beginning of a line. And we must ensure that every footnote string, "(1)" for example, appears <hi rend="bold">exactly</hi> twice on a page: once as an in-text marker, and once at the bottom for the footnote text. The following script reports the page number of any page that fails that test, along with a list of the footnote strings it found on that page.</p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_15" corresp="code_ocr-tutorial_15.txt" lang="language-python" rend="block"/>
+                    </ab>
+                </div>
+            </div>
+            <div type="2">
+                <head>Generating an ordered data set from a text file</head>
+                <p>Now that we've cleaned up <hi rend="bold">only</hi> those OCR errors that we have to, we can sort the various bits of the meta-data, and the charter text itself into their own separate fields of a Python dictionary. We have a number of things to do: correctly number each charter as to charter number, folio, and page; separate out the Italian summary and the marginal notation lines; and associate the footnote texts with their appropriate charter.</p>
+                <p>The following <code rend="inline">for</code> loop will generate a python dictionary for each charter and then populate it with the available metadata fields. Once this loop disposes of the easily searched lines (folio, page, and charter header), the fall-through default will be to add the remaining lines to the text field, which is a python list.</p>
+                <ab>
+                    <code xml:id="code_ocr-tutorial_16" corresp="code_ocr-tutorial_16.txt" lang="language-python" rend="block"/>
+                </ab>
+                <div type="3">
+                    <head>Find and normalize the 'marginal notation' and Italian summary lines</head>
+                    <p>Now that we have a python dictionary to work with, rather than a list of lines of text, we're not bound to work in document order. Once we have a data structure like that, we can iterate through each of the charter dictionaries and look at the lines in the text field by index number. We can do that with a loop like the one below. In all cases, the first line of each charter's text field should be the Italian summary as we have insured above. The second line in MOST cases, represents a kind of marginal notation usually ended by the ']' character (which OCR misreads a lot). We have to find the cases that do not meet this criterion, supply or correct the missing ']', and in the cases where there is no marginal notation I've supplied "no marginal]" in my working text. The following script will print the charter number and first two lines of the text field for those charters that do not meet these criteria.</p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_17" corresp="code_ocr-tutorial_17.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>The <code rend="inline">try: except:</code> blocks are made necessary by the fact that in my OCR output, the data for pg 214 somehow got missed out, but they're generally a good idea. You will inevitably have anomalies in your text that you will have to isolate and work around. Python is very helpful here in that you can do a lot more in the <code rend="inline">except:</code> clause beyond just printing "oops". You could call a function that performs a whole separate operation on those anomalous bits.</p>
+                    <p>Once we're satisfied that line 1 and line 2 in the 'text' field for each charter are the Italian Summary and the marginal notation respectively, we can make another iteration of the charters dictionary, removing those lines from the text field and creating new fields in the charter entry for them. NOTA BENE: we are now modifying a data structure in memory rather than editing successive text files.</p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_18" corresp="code_ocr-tutorial_18.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>##Assign footnotes to their respective charters and add to metadata
+The trickiest part is to get the footnote texts appearing at the bottom of the page associated with their appropriate charters. For this we go back to the same list of lines that we built the dictionary from. We're depending on all the footnote markers appearing within the charter text, i.e. none of them are at the beginning of a line. And, each of the footnote texts is on a separate line beginning with '(1)' etc. We design regexes that can distinguish between the two and construct a container to hold them as we iterate over the lines. As we iterate over the lines of the text file, we find and assign markers and texts to our temporary container, and then, each time we reach a page break, we assign them to their appropriate fields in our existing Python dictionary <code rend="inline">charters</code> and reset our temporary container to the empty <code rend="inline">dict</code>.</p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_19" corresp="code_ocr-tutorial_19.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Note that we use <code rend="inline">eval()</code> because we want to turn strings like this '(1)' into integers like this: 1.</p>
+                </div>
+                <div type="3">
+                    <head>The resulting dictionary looks like this</head>
+                    <p>Print out our resulting dictionary using <code rend="inline">pprint(charters)</code> and you'll see something like this:</p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_20" corresp="code_ocr-tutorial_20.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Printing out your Python dictionary as a literal string is not a bad thing to do. For a text this size, the resulting file is perfectly manageable, can be mailed around usefully and read into a python repl session very simply using <code rend="inline">eval()</code>, or pasted directly into a Python module file. On the other hand, if you want an even more reliable way to serialize it in an exclusively Python context, look into <ref target="https://docs.python.org/2/library/pickle.html">
+                            <code rend="inline">Pickle</code>
+                        </ref>. If you need to move it to some other context, JavaScript for example, or some <code rend="inline">RDF</code> triple stores, Python's <ref target="https://docs.python.org/2/library/json.html#module-json">
+                            <code rend="inline">json</code>
+                        </ref> module will translate effectively. If you have to get some kind of XML output, I will be very sorry for you, but the <ref target="http://lxml.de/">
+                            <code rend="inline">lxml</code>
+                        </ref> python module may ease the pain a little.</p>
+                </div>
+                <div type="3">
+                    <head>Order from disorder, huzzah.</head>
+                    <p>Now that we have an ordered data structure, we can do many things with it. As a very simple example, lets just print it out as html for display on a web-site:</p>
+                    <ab>
+                        <code xml:id="code_ocr-tutorial_21" corresp="code_ocr-tutorial_21.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Drop the resulting file on a web browser, and you've got a nicely formated electronic edition. Being able to do this with your, mostly uncorrected, OCR output is not a trivial advantage. If you're serious about creating a clean, error free, electronic edition of anything, you've got to do some serious proofreading. Having a source text formatted for reading is crucial; moreover, if your proofreader can change the font, spacing, color, layout, and so forth at will, you can increase their accuracy and productivity substantially. With this example in a modern web browser, tweaking those parameters with some simple css declarations is easy. Also, with some ordered HTML to work with, you might crowd-source the OCR error correction, instead of hiring that army of illiterate street urchins.</p>
+                    <p>Beyond this though, there's lots you can do with an ordered data set, including feeding it back through a markup tool like the <ref target="http://brat.nlplab.org">brat</ref> as we did for the ChartEx project. Domain experts can then start adding layers of semantic tagging even if you don't do any further OCR error correction.</p>
+                    <p>The bits of code above are in no way a turn-key solution for cleaning arbitrary OCR output. There is no such magic wand. The Google approach to scanning the contents of research libraries threatens to drown us in an ocean of bad data. Worse, it elides a fundamental fact of digital scholarship: digital sources are hard to get. Reliable, flexible, and useful digital texts require careful redaction and persistent curation. Google, Amazon, Facebook, <emph>et alia</emph> do not have to concern themselves with the quality of their data, just its quantity. Historians, on the other hand, must care first for the integrity of their sources.</p>
+                    <p>The vast 18th and 19th century publishing projects, the <emph>Rolls Series</emph>, the <emph>Monumenta Germaniae Historica</emph>, and many others, bequeathed a treasure trove of source material to us by dint of a huge amount of very painstaking and detailed work by armies of dedicated and knowledgeable scholars. Their task was the same as ours: to faithfully transmit history's legacy from its earlier forms into a more modern form, thereby making it more widely accessible. We can do no less. We have powerful tools at our disposal, but while that may change the scale of the task, it does not change its nature.</p>
+                </div>
+            </div>
+        </body>
+    </text>
+</TEI>

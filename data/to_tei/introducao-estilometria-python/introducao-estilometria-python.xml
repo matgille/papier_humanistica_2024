@@ -1,359 +1,705 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="introducao-estilometria-python">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Introdu&#231;&#227;o &#224; estilometria com Python</title>
-  <author role="original_author">Fran&#231;ois Dominic Laram&#233;e</author><editor role="reviewers"><persName>Folgert Karsdorp</persName><persName>Jan Rybicki</persName><persName>Antonio Rojas Castro</persName></editor><author role="translators">Daniel Bonatto Seco</author><editor role="translation-reviewers"><persName>Bruno Almeida</persName><persName>Suemi HIguchi</persName></editor><editor role="editors">Adam Crymble</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phpt0024</idno><date type="published">04/21/2018</date><date type="translated">12/27/2021</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#introduction-to-stylometry-with-python"/>.</p><p>There are other translations: <ref target="#introduction-a-la-stylometrie-avec-python"/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Nesta li&#231;&#227;o, aprender&#225; a realizar an&#225;lises estilom&#233;tricas e a determinar a autoria de textos. A li&#231;&#227;o cobre tr&#234;s m&#233;todos: Curvas Caracter&#237;sticas de Composi&#231;&#227;o de Mendenhall, M&#233;todo Qui-Quadrado de Kilgariff e M&#233;todo Delta de John Burrows.</p></abstract><textClass><keywords><term xml:lang="en">distant-reading</term><term xml:lang="en">python</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="pt">
-    <body>
-      <div type="2"><head>Introdu&#231;&#227;o</head>
-<p><ref target="https://perma.cc/NYH2-KWLA">Estilometria</ref> &#233; o estudo quantitativo do estilo liter&#225;rio por meio de m&#233;todos de <ref target="https://perma.cc/XK8J-F6ZF">leitura distante</ref> computacional. &#201; baseado na observa&#231;&#227;o de que os autores tendem a escrever de maneiras relativamente consistentes, reconhec&#237;veis e &#250;nicas. Por exemplo:</p>
-<list type="unordered">
-<item>Cada pessoa tem seu pr&#243;prio vocabul&#225;rio &#250;nico, &#224;s vezes rico, &#224;s vezes limitado. Embora um vocabul&#225;rio mais amplo esteja geralmente associado &#224; qualidade liter&#225;ria, nem sempre &#233; esse o caso. Ernest Hemingway &#233; famoso por usar um n&#250;mero surpreendentemente pequeno de palavras diferentes em sua escrita,<ref type="footnotemark" target="#note_1"/> o que n&#227;o o impediu de ganhar o Pr&#234;mio Nobel de Literatura em 1954;</item>
-<item>Algumas pessoas escrevem frases curtas, enquanto outras preferem blocos longos de texto compostos por muitas frases;</item>
-<item>N&#227;o h&#225; duas pessoas que usem ponto-e-v&#237;rgulas, travess&#245;es e outras formas de pontua&#231;&#227;o exatamente da mesma maneira.</item>
-</list>
-<p>As maneiras como os escritores usam pequenas <ref target="https://perma.cc/284C-CNHD"><emph>function words</emph></ref>, como artigos, preposi&#231;&#245;es e conjun&#231;&#245;es, mostram-se particularmente reveladoras. Em uma pesquisa dos m&#233;todos estilom&#233;tricos hist&#243;ricos e atuais, Efstathios Stamatatos aponta que as palavras funcionais s&#227;o "usadas de maneira amplamente inconsciente pelos autores e s&#227;o independentes do t&#243;pico"<ref type="footnotemark" target="#note_2"/>. Para a an&#225;lise estilom&#233;trica, isso &#233; muito vantajoso, visto que esse padr&#227;o inconsciente tende a variar menos no <ref target="https://perma.cc/9XQ4-J4A5"><emph>corpus</emph></ref> de um autor do que seu vocabul&#225;rio geral (e tamb&#233;m &#233; muito dif&#237;cil para um pretenso falsificador copiar). As palavras funcionais tamb&#233;m foram identificadas como marcadores importantes do g&#234;nero liter&#225;rio e da cronologia.</p>
-<p>Os pesquisadores t&#234;m usado a estilometria como uma ferramenta para estudar uma variedade de quest&#245;es culturais. Por exemplo, uma quantidade consider&#225;vel de pesquisas estudou as diferen&#231;as entre as maneiras como homens e mulheres escrevem<ref type="footnotemark" target="#note_3"/> ou sobre o que escrevem.<ref type="footnotemark" target="#note_4"/> Outros pesquisadores estudaram as maneiras como uma mudan&#231;a repentina no estilo de escrita em um &#250;nico texto pode indicar pl&#225;gio<ref type="footnotemark" target="#note_5"/> e at&#233; mesmo a maneira como as letras dos m&#250;sicos John Lennon e Paul McCartney se tornaram cada vez menos alegres e menos ativas &#224; medida que os <ref target="https://perma.cc/DQ66-M79T">Beatles</ref> se aproximavam do fim de sua carreira de grava&#231;&#227;o na d&#233;cada de 1960.<ref type="footnotemark" target="#note_6"/></p>
-<p>No entanto, uma das aplica&#231;&#245;es mais comuns da estilometria &#233; na atribui&#231;&#227;o de autoria. Dado um texto an&#244;nimo, &#224;s vezes &#233; poss&#237;vel inferir quem o escreveu medindo certas caracter&#237;sticas, como o n&#250;mero m&#233;dio de palavras por frase ou a propens&#227;o do autor de usar "todavia" em vez de "no entanto", e comparando as medidas com outros textos escritos pelo suposto autor. Este &#233; o objetivo deste tutorial, onde a partir de um conjunto de obras cl&#225;ssicas de romancistas lusos e brasileiros do s&#233;culo XIX iremos comparar exemplares de suas obras com o estilo liter&#225;rio do conjunto de autores a fim de tentar inferir suas respectivas autorias (nota de tradu&#231;&#227;o: foi decidido mudar o <emph>corpus</emph> usado nesta li&#231;&#227;o para um que fosse culturalmente mais relevante para o p&#250;blico que fala e escreve portugu&#234;s; foi mantida a restante estrutura da li&#231;&#227;o original, com excep&#231;&#227;o de ligeiras adapta&#231;&#245;es face &#224; mudan&#231;a do <emph>corpus</emph>).</p>
-<div type="3"><head>Objetivos de aprendizado</head>
-<p>No final desta li&#231;&#227;o, teremos percorrido os seguintes t&#243;picos:</p>
-<list type="unordered">
-<item>Como aplicar v&#225;rios m&#233;todos estilom&#233;tricos para inferir a autoria de um texto an&#244;nimo ou conjunto de textos;</item>
-<item>Como usar estruturas de dados relativamente avan&#231;adas, incluindo <ref target="https://perma.cc/TTF4-SJ23">dicion&#225;rios</ref> de <ref target="https://perma.cc/7DCC-M9AT">strings</ref> e dicion&#225;rios de dicion&#225;rios, em <ref target="https://perma.cc/Z82S-3L3M">Python</ref>;</item>
-<item>O b&#225;sico do <ref target="https://perma.cc/E7LZ-WECZ">Natural Language Toolkit</ref> (NLTK), um m&#243;dulo Python popular dedicado a <ref target="https://perma.cc/MFX4-LAVZ">processamento de linguagem natural</ref>.</item>
-</list>
-</div><div type="3"><head>Leitura pr&#233;via</head>
-<p>Se voc&#234; n&#227;o tem experi&#234;ncia com a linguagem de programa&#231;&#227;o Python ou est&#225; tendo dificuldade nos exemplos apresentados neste tutorial, o autor recomenda que voc&#234; leia as li&#231;&#245;es <ref target="/pt/licoes/trabalhando-ficheiros-texto-python">Trabalhando com ficheiros de texto em Python</ref> e <ref target="/pt/licoes/manipular-strings-python">Manipular Strings com Python</ref>. Note que essas li&#231;&#245;es foram escritas em Python vers&#227;o 2, enquanto esta usa Python vers&#227;o 3. As diferen&#231;as de <ref target="https://perma.cc/E5LQ-S65P">sintaxe</ref> entre as duas vers&#245;es da linguagem podem ser sutis. Se voc&#234; ficar em d&#250;vida, siga os exemplos conforme descritos nesta li&#231;&#227;o e use as outras li&#231;&#245;es como material de apoio. (Este tutorial encontra-se atualizado at&#233; &#224; vers&#227;o <ref target="https://perma.cc/XCT2-Q4AT">Python 3.8.5</ref>; as <ref target="https://perma.cc/U6Q6-59V3">strings literais formatadas</ref> na linha <code rend="inline">with open(f'data/pg{filename}.txt', 'r', encoding='utf-8') as f:</code>, por exemplo, requerem Python 3.6 ou uma vers&#227;o mais recente da linguagem.) </p>
-</div><div type="3"><head>Materiais requeridos</head>
-<p>Este tutorial usa conjuntos de dados e software que voc&#234; ter&#225; que baixar e instalar.</p>
-<div type="4"><head>O conjunto de dados</head>
-<p>Para trabalhar nesta li&#231;&#227;o, voc&#234; precisar&#225; baixar e descompactar o ficheiro <ref target="/assets/introduction-to-stylometry-with-python/dataset_estilometria.zip">.zip</ref> contendo as 15 obras que comp&#245;em o <emph>corpus</emph> que ser&#225; utilizado neste tutorial. As obras foram originalmente extra&#237;das do <ref target="https://perma.cc/8GTT-3M9N">Projeto Gutenberg</ref>. Ao descompactar o ficheiro, ser&#225; criada uma pasta com o nome <code rend="inline">dados</code>. Este ser&#225; o seu <ref target="https://perma.cc/9KVS-T3A5">diret&#243;rio de trabalho</ref> e todo o trabalho deve ser salvo aqui durante a execu&#231;&#227;o da li&#231;&#227;o.</p>
-</div><div type="4"><head>O software</head>
-<p>Esta li&#231;&#227;o usa as seguintes vers&#245;es da linguagem Python e <ref target="https://pt.wikipedia.org/wiki/Biblioteca_(computa%C3%A7%C3%A3o)">bibliotecas</ref>:</p>
-<list type="unordered">
-<item><ref target="https://www.python.org/downloads/">Python 3.x</ref> - a &#250;ltima vers&#227;o est&#225;vel &#233; recomendada;</item>
-<item><ref target="https://www.nltk.org/">nltk</ref> - Natural Language Toolkit, geralmente abreviado <code rend="inline">nltk</code>;</item>
-<item><ref target="https://matplotlib.org/">matplotlib</ref> - visualiza&#231;&#227;o de dados e gera&#231;&#227;o de gr&#225;ficos;</item>
-<item><ref target="https://docs.python.org/pt-br/3/library/re.html">re</ref> - limpeza de dados via Regex (veremos durante o tutorial o porqu&#234;).</item>
-</list>
-<p>Alguns desses m&#243;dulos podem n&#227;o estar pr&#233;-instalados em seu computador. Se voc&#234; encontrar mensagens de erro como: "M&#243;dulo n&#227;o encontrado" ou similares, voc&#234; ter&#225; que baixar e instalar o(s) m&#243;dulo(s) ausente(s). A forma mais simples de realizar esta tarefa &#233; atrav&#233;s do comando <code rend="inline">pip</code>. Mais detalhes est&#227;o dispon&#237;veis atrav&#233;s do tutorial do <emph>Programming Historian</emph> <ref target="/pt/licoes/instalacao-modulos-python-pip">Instala&#231;&#227;o de M&#243;dulos Python com pip</ref>. </p>
-</div></div><div type="3"><head>Algumas notas sobre Independ&#234;ncia Lingu&#237;stica</head>
-<p>Este tutorial aplica a an&#225;lise estilom&#233;trica a um conjunto de textos em portugu&#234;s (PT-PT e PT-BR) usando uma biblioteca Python chamada <code rend="inline">nltk</code>. Muitas das funcionalidades fornecidas pelo <code rend="inline">nltk</code> operam com outros idiomas. Contanto que um idioma forne&#231;a uma maneira clara de distinguir os limites de uma palavra, o <code rend="inline">nltk</code> deve ter um bom desempenho. Idiomas como o chin&#234;s, para os quais n&#227;o h&#225; distin&#231;&#227;o clara entre os limites das palavras, podem ser problem&#225;ticos. O autor original desta li&#231;&#227;o utilizou <code rend="inline">nltk</code> com textos em franc&#234;s sem nenhum problema; outros idiomas que usam <ref target="https://perma.cc/7VGD-5968">diacr&#237;ticos</ref>, como espanhol e alem&#227;o, tamb&#233;m devem funcionar bem com <code rend="inline">nltk</code>. Consulte a <ref target="https://perma.cc/S4EX-2DBT">documenta&#231;&#227;o do nltk</ref> para obter detalhes. </p>
-<p>Apenas uma das tarefas neste tutorial requer c&#243;digo dependente do idioma. Para dividir um texto em um conjunto de palavras em uma l&#237;ngua diferente do ingl&#234;s, voc&#234; precisar&#225; especificar o idioma apropriado como um par&#226;metro para o <ref target="https://perma.cc/NGM5-4MED">tokenizador</ref> da biblioteca <code rend="inline">nltk</code>, que usa o ingl&#234;s como padr&#227;o. Isso ser&#225; explicado no tutorial.</p>
-<p>Por fim, observe que algumas tarefas lingu&#237;sticas, como <ref target="https://perma.cc/L9SU-PS9D"><emph>part-of-speech tagging</emph></ref>, podem n&#227;o ser suportadas pelo <code rend="inline">nltk</code> em outros idiomas al&#233;m do ingl&#234;s. Este tutorial n&#227;o cobre a aplica&#231;&#227;o de <emph>part-of-speech tagging</emph>. Se voc&#234; precisar para os seus pr&#243;prios projetos, consulte a <ref target="https://perma.cc/S4EX-2DBT">documenta&#231;&#227;o do nltk</ref> para obter orienta&#231;&#245;es.</p>
-</div></div>
-      <table>
-<row>
-<cell role="label">Autor</cell>
-<cell role="label">Obra 1</cell>
-<cell role="label">Obra 2</cell>
-<cell role="label">Obra 3</cell>
-</row>
-<row>
-<cell><ref target="https://perma.cc/8LU3-RADW">Manuel Pinheiro <hi rend="bold">Chagas</hi></ref> (Portugal)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/29394">Historia alegre de Portugal</ref> (<hi rend="bold">29394</hi>)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/23400">A Lenda da Meia-Noite</ref> (<hi rend="bold">23400</hi>)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/29342">Astucias de Namorada, e Um melodrama em Santo Thyrso</ref> (<hi rend="bold">29342</hi>)</cell>
-</row>
-<row>
-<cell><ref target="https://perma.cc/LZ9J-3H5Z">Ant&#243;nio Feliciano de <hi rend="bold">Castilho</hi></ref> (Portugal)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/32002">A Chave do Enigma</ref> (<hi rend="bold">32002</hi>)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/65021">A Primavera</ref> (<hi rend="bold">65021</hi>)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/28127">O presbyterio da montanha</ref> (<hi rend="bold">28127</hi>)</cell>
-</row>
-<row>
-<cell><ref target="https://perma.cc/Q4AJ-VZBH">Camilo <hi rend="bold">Castelo Branco</hi></ref> (Portugal)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/26025">Carlota Angela</ref> (<hi rend="bold">26025</hi>)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/26988">Amor de Salva&#231;&#227;o</ref> (<hi rend="bold">26988</hi>)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/16425">Amor de Perdi&#231;&#227;o: Memorias d'uma familia</ref> (<hi rend="bold">16425</hi>)</cell>
-</row>
-<row>
-<cell><ref target="https://perma.cc/Y3Y2-VHJ5">Jos&#233; de <hi rend="bold">Alencar</hi></ref> (Brasil)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/38496">Ubirajara</ref> (<hi rend="bold">38496</hi>)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/44540">Cinco minutos</ref> (<hi rend="bold">44540</hi>)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/29040">Como e porque sou romancista</ref> (<hi rend="bold">29040</hi>)</cell>
-</row>
-<row>
-<cell><ref target="https://perma.cc/6BMU-UKZL">Machado de <hi rend="bold">Assis</hi></ref> (Brasil)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/55682">Quincas Borba</ref> (<hi rend="bold">55682</hi>)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/54829">Memorias Posthumas de Braz Cubas</ref> (<hi rend="bold">54829</hi>)</cell>
-<cell><ref target="https://www.gutenberg.org/ebooks/55752">Dom Casmurro</ref> (<hi rend="bold">55752</hi>)</cell>
-</row>
-</table>
-      <div type="2"><head>Nossos casos de teste</head>
-<p>Nesta li&#231;&#227;o, usaremos obras de romancistas brasileiros e portugueses do s&#233;culo XIX como um estudo de caso para demonstrar tr&#234;s abordagens estilom&#233;tricas diferentes:</p>
-<list type="ordered">
-<item>Curvas caracter&#237;sticas de composi&#231;&#227;o de Mendenhall</item>
-<item>M&#233;todo Qui-Quadrado de Kilgariff </item>
-<item>M&#233;todo Delta de John Burrows</item>
-</list>
-<p>Em todas as abordagens acima mencionadas, utilizaremos os documentos das colunas <hi rend="bold">Obra 1</hi> e <hi rend="bold">Obra 2</hi> para definir o estilo de cada autor. Os documentos da coluna <hi rend="bold">Obra 3</hi> ser&#227;o testados individualmente com cada um dos 5 autores para tentarmos inferir a autoria pela proximidade de estilo. </p>
-</div>
-      <div type="2"><head>Preparando os dados para an&#225;lise</head>
-<p>Antes de prosseguirmos com a an&#225;lise estilom&#233;trica, precisamos carregar os ficheiros contendo todas as 15 obras em <ref target="https://perma.cc/P843-J4LB">estruturas de dados</ref> na mem&#243;ria do computador.</p>
-<p>O primeiro passo neste processo &#233; designar cada obra para o seu respectivo conjunto. Como cada obra est&#225; relacionada com o seu respectivo <code rend="inline">EBook-No.</code>, podemos atribuir cada obra (valor) &#224; chave do seu autor (ou a uma chave separada, se ela fizer parte da amostra de teste) usando um <emph>dicion&#225;rio</emph> Python. O dicion&#225;rio &#233; um tipo de conjunto de dados composto de um n&#250;mero arbitr&#225;rio de pares de chave-valor; neste caso, os nomes dos autores servir&#227;o como chaves (separados entre treino e teste), enquanto os <code rend="inline">EBook-No.</code> das obras ser&#227;o os valores associados a essas chaves.</p>
-<ab><code xml:id="code_introducao-estilometria-python_0" corresp="code_introducao-estilometria-python_0.txt" lang="language-python" rend="block"/></ab>
-<p>Os dicion&#225;rios Python s&#227;o muito flex&#237;veis. Por exemplo, podemos acessar um valor espec&#237;fico <emph>indexando</emph> o dicion&#225;rio com uma de suas chaves, podemos varrer o dicion&#225;rio inteiro fazendo um loop em sua lista de chaves, etc. Faremos amplo uso desta funcionalidade &#224; medida que avan&#231;armos.</p>
-<p>A seguir, como estamos interessados no vocabul&#225;rio de cada autor, definiremos uma breve <ref target="https://perma.cc/P8CA-Y43Q">fun&#231;&#227;o</ref> em Python que ir&#225; criar uma longa lista de palavras em cada uma das obras atribu&#237;das a um &#250;nico autor. Isso ser&#225; armazenado como uma <ref target="https://perma.cc/7DCC-M9AT">string</ref>.
-Abra o seu ambiente de desenvolvimento Python escolhido. Se voc&#234; n&#227;o sabe como fazer isso, leia "Configurar um ambiente de desenvolvimento integrado para Python" (<ref target="/pt/licoes/instalacao-windows">Windows</ref>, <ref target="/pt/licoes/instalacao-linux">Linux</ref>, <ref target="/pt/licoes/instalacao-mac">Mac</ref>) antes de prosseguir.</p>
-<ab><code xml:id="code_introducao-estilometria-python_1" corresp="code_introducao-estilometria-python_1.txt" lang="language-python" rend="block"/></ab>
-<p>Perceba que, dentro da fun&#231;&#227;o, temos tamb&#233;m uma etapa de limpeza dos textos usando <ref target="https://perma.cc/DT3K-XUBG">express&#245;es regulares</ref>. Isso foi necess&#225;rio para este corpus espec&#237;fico pois as obras publicadas no Projeto Gutenberg possuem uma estrutura de cabe&#231;alho e rodap&#233; de <ref target="https://perma.cc/E8P8-GKDR">metadados</ref> que n&#227;o pode ser considerada na an&#225;lise estilom&#233;trica, uma vez que n&#227;o foram redigidas pelos autores analisados. A utiliza&#231;&#227;o de express&#245;es regulares n&#227;o faz parte do escopo deste tutorial, ent&#227;o limitaremo-nos a compreender que estamos utilizando a biblioteca <code rend="inline">re</code> para capturar apenas o conjunto de caracteres entre os marcadores <code rend="inline">*** START OF THIS PROJECT GUTENBERG [NOME DA OBRA] ***</code> e <code rend="inline">*** END OF THIS PROJECT GUTENBERG [NOME DA OBRA] ***</code> presentes em cada documento do projeto. Para maiores d&#250;vidas sobre a utiliza&#231;&#227;o de express&#245;es regulares e da biblioteca <code rend="inline">re</code>, consulte a <ref target="https://perma.cc/JFP3-B4P4">documenta&#231;&#227;o</ref>.</p>
-<p>Na sequ&#234;ncia, constru&#237;mos uma nova estrutura de dados chamando repetidamente a fun&#231;&#227;o <code rend="inline">ler_ficheiros_para_string ()</code>, passando a ela uma lista diferente de documentos a cada vez. Armazenaremos os resultados em outro dicion&#225;rio, este com nomes do autor/caso de teste como chaves e todo o texto dos respectivos documentos como valores. Para simplificar, iremos nos referir &#224; string contendo uma lista de documentos como "corpus do autor".</p>
-<ab><code xml:id="code_introducao-estilometria-python_2" corresp="code_introducao-estilometria-python_2.txt" lang="language-python" rend="block"/></ab>
-<p>Para nos certificarmos de que os ficheiros foram carregados corretamente, imprima os primeiros cem caracteres de cada entrada do dicion&#225;rio na tela:</p>
-<ab><code xml:id="code_introducao-estilometria-python_3" corresp="code_introducao-estilometria-python_3.txt" lang="language-python" rend="block"/></ab>
-<p>Se esta opera&#231;&#227;o de impress&#227;o exibir quaisquer trechos de texto no console, ent&#227;o a opera&#231;&#227;o de leitura dos ficheiros funcionou conforme o esperado e voc&#234; pode prosseguir para a an&#225;lise estilom&#233;trica.</p>
-<p style="alert alert-warning">
-Se os ficheiros n&#227;o forem carregados, o motivo mais prov&#225;vel &#233; que o seu diret&#243;rio de trabalho atual n&#227;o seja o reposit&#243;rio `dados` criado ao descompactar o ficheiro da se&#231;&#227;o de Materiais Requeridos acima; mudar o seu diret&#243;rio de trabalho deve resolver o problema. Como voc&#234; faz isso depende do seu ambiente de desenvolvimento Python.
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Introdução à estilometria com Python</title>
+                <author role="original_author">François Dominic Laramée</author>
+                <editor role="reviewers">
+                    <persName>Folgert Karsdorp</persName>
+                    <persName>Jan Rybicki</persName>
+                    <persName>Antonio Rojas Castro</persName>
+                </editor>
+                <author role="translators">Daniel Bonatto Seco</author>
+                <editor role="translation-reviewers">
+                    <persName>Bruno Almeida</persName>
+                    <persName>Suemi HIguchi</persName>
+                </editor>
+                <editor role="editors">Adam Crymble</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">12/27/2021</date>
+                <idno type="doi">10.46430/phpt0024</idno>
+                <date type="published">04/21/2018</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#introduction-to-stylometry-with-python"/>.</p>
+                <p>There are other translations: <ref target="#introduction-a-la-stylometrie-avec-python"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Nesta lição, aprenderá a realizar análises estilométricas e a determinar a autoria de textos. A lição cobre três métodos: Curvas Características de Composição de Mendenhall, Método Qui-Quadrado de Kilgariff e Método Delta de John Burrows.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">distant-reading</term>
+                    <term xml:lang="en">python</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <div type="2">
+                <head>Introdução</head>
+                <p>
+                    <ref target="https://perma.cc/NYH2-KWLA">Estilometria</ref> é o estudo quantitativo do estilo literário por meio de métodos de <ref target="https://perma.cc/XK8J-F6ZF">leitura distante</ref> computacional. É baseado na observação de que os autores tendem a escrever de maneiras relativamente consistentes, reconhecíveis e únicas. Por exemplo:</p>
+                <list type="unordered">
+                    <item>Cada pessoa tem seu próprio vocabulário único, às vezes rico, às vezes limitado. Embora um vocabulário mais amplo esteja geralmente associado à qualidade literária, nem sempre é esse o caso. Ernest Hemingway é famoso por usar um número surpreendentemente pequeno de palavras diferentes em sua escrita,<ref type="footnotemark" target="#pt_note_1"/> o que não o impediu de ganhar o Prêmio Nobel de Literatura em 1954;</item>
+                    <item>Algumas pessoas escrevem frases curtas, enquanto outras preferem blocos longos de texto compostos por muitas frases;</item>
+                    <item>Não há duas pessoas que usem ponto-e-vírgulas, travessões e outras formas de pontuação exatamente da mesma maneira.</item>
+                </list>
+                <p>As maneiras como os escritores usam pequenas <ref target="https://perma.cc/284C-CNHD">
+                        <emph>function words</emph>
+                    </ref>, como artigos, preposições e conjunções, mostram-se particularmente reveladoras. Em uma pesquisa dos métodos estilométricos históricos e atuais, Efstathios Stamatatos aponta que as palavras funcionais são "usadas de maneira amplamente inconsciente pelos autores e são independentes do tópico"<ref type="footnotemark" target="#pt_note_2"/>. Para a análise estilométrica, isso é muito vantajoso, visto que esse padrão inconsciente tende a variar menos no <ref target="https://perma.cc/9XQ4-J4A5">
+                        <emph>corpus</emph>
+                    </ref> de um autor do que seu vocabulário geral (e também é muito difícil para um pretenso falsificador copiar). As palavras funcionais também foram identificadas como marcadores importantes do gênero literário e da cronologia.</p>
+                <p>Os pesquisadores têm usado a estilometria como uma ferramenta para estudar uma variedade de questões culturais. Por exemplo, uma quantidade considerável de pesquisas estudou as diferenças entre as maneiras como homens e mulheres escrevem<ref type="footnotemark" target="#pt_note_3"/> ou sobre o que escrevem.<ref type="footnotemark" target="#pt_note_4"/> Outros pesquisadores estudaram as maneiras como uma mudança repentina no estilo de escrita em um único texto pode indicar plágio<ref type="footnotemark" target="#pt_note_5"/> e até mesmo a maneira como as letras dos músicos John Lennon e Paul McCartney se tornaram cada vez menos alegres e menos ativas à medida que os <ref target="https://perma.cc/DQ66-M79T">Beatles</ref> se aproximavam do fim de sua carreira de gravação na década de 1960.<ref type="footnotemark" target="#pt_note_6"/>
+                </p>
+                <p>No entanto, uma das aplicações mais comuns da estilometria é na atribuição de autoria. Dado um texto anônimo, às vezes é possível inferir quem o escreveu medindo certas características, como o número médio de palavras por frase ou a propensão do autor de usar "todavia" em vez de "no entanto", e comparando as medidas com outros textos escritos pelo suposto autor. Este é o objetivo deste tutorial, onde a partir de um conjunto de obras clássicas de romancistas lusos e brasileiros do século XIX iremos comparar exemplares de suas obras com o estilo literário do conjunto de autores a fim de tentar inferir suas respectivas autorias (nota de tradução: foi decidido mudar o <emph>corpus</emph> usado nesta lição para um que fosse culturalmente mais relevante para o público que fala e escreve português; foi mantida a restante estrutura da lição original, com excepção de ligeiras adaptações face à mudança do <emph>corpus</emph>).</p>
+                <div type="3">
+                    <head>Objetivos de aprendizado</head>
+                    <p>No final desta lição, teremos percorrido os seguintes tópicos:</p>
+                    <list type="unordered">
+                        <item>Como aplicar vários métodos estilométricos para inferir a autoria de um texto anônimo ou conjunto de textos;</item>
+                        <item>Como usar estruturas de dados relativamente avançadas, incluindo <ref target="https://perma.cc/TTF4-SJ23">dicionários</ref> de <ref target="https://perma.cc/7DCC-M9AT">strings</ref> e dicionários de dicionários, em <ref target="https://perma.cc/Z82S-3L3M">Python</ref>;</item>
+                        <item>O básico do <ref target="https://perma.cc/E7LZ-WECZ">Natural Language Toolkit</ref> (NLTK), um módulo Python popular dedicado a <ref target="https://perma.cc/MFX4-LAVZ">processamento de linguagem natural</ref>.</item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Leitura prévia</head>
+                    <p>Se você não tem experiência com a linguagem de programação Python ou está tendo dificuldade nos exemplos apresentados neste tutorial, o autor recomenda que você leia as lições <ref target="/pt/licoes/trabalhando-ficheiros-texto-python">Trabalhando com ficheiros de texto em Python</ref> e <ref target="/pt/licoes/manipular-strings-python">Manipular Strings com Python</ref>. Note que essas lições foram escritas em Python versão 2, enquanto esta usa Python versão 3. As diferenças de <ref target="https://perma.cc/E5LQ-S65P">sintaxe</ref> entre as duas versões da linguagem podem ser sutis. Se você ficar em dúvida, siga os exemplos conforme descritos nesta lição e use as outras lições como material de apoio. (Este tutorial encontra-se atualizado até à versão <ref target="https://perma.cc/XCT2-Q4AT">Python 3.8.5</ref>; as <ref target="https://perma.cc/U6Q6-59V3">strings literais formatadas</ref> na linha <code rend="inline">with open(f'data/pg{filename}.txt', 'r', encoding='utf-8') as f:</code>, por exemplo, requerem Python 3.6 ou uma versão mais recente da linguagem.) </p>
+                </div>
+                <div type="3">
+                    <head>Materiais requeridos</head>
+                    <p>Este tutorial usa conjuntos de dados e software que você terá que baixar e instalar.</p>
+                    <div type="4">
+                        <head>O conjunto de dados</head>
+                        <p>Para trabalhar nesta lição, você precisará baixar e descompactar o ficheiro <ref target="/assets/introduction-to-stylometry-with-python/dataset_estilometria.zip">.zip</ref> contendo as 15 obras que compõem o <emph>corpus</emph> que será utilizado neste tutorial. As obras foram originalmente extraídas do <ref target="https://perma.cc/8GTT-3M9N">Projeto Gutenberg</ref>. Ao descompactar o ficheiro, será criada uma pasta com o nome <code rend="inline">dados</code>. Este será o seu <ref target="https://perma.cc/9KVS-T3A5">diretório de trabalho</ref> e todo o trabalho deve ser salvo aqui durante a execução da lição.</p>
+                    </div>
+                    <div type="4">
+                        <head>O software</head>
+                        <p>Esta lição usa as seguintes versões da linguagem Python e <ref target="https://pt.wikipedia.org/wiki/Biblioteca_(computa%C3%A7%C3%A3o)">bibliotecas</ref>:</p>
+                        <list type="unordered">
+                            <item>
+                                <ref target="https://www.python.org/downloads/">Python 3.x</ref> - a última versão estável é recomendada;</item>
+                            <item>
+                                <ref target="https://www.nltk.org/">nltk</ref> - Natural Language Toolkit, geralmente abreviado <code rend="inline">nltk</code>;</item>
+                            <item>
+                                <ref target="https://matplotlib.org/">matplotlib</ref> - visualização de dados e geração de gráficos;</item>
+                            <item>
+                                <ref target="https://docs.python.org/pt-br/3/library/re.html">re</ref> - limpeza de dados via Regex (veremos durante o tutorial o porquê).</item>
+                        </list>
+                        <p>Alguns desses módulos podem não estar pré-instalados em seu computador. Se você encontrar mensagens de erro como: "Módulo não encontrado" ou similares, você terá que baixar e instalar o(s) módulo(s) ausente(s). A forma mais simples de realizar esta tarefa é através do comando <code rend="inline">pip</code>. Mais detalhes estão disponíveis através do tutorial do <emph>Programming Historian</emph>
+                            <ref target="/pt/licoes/instalacao-modulos-python-pip">Instalação de Módulos Python com pip</ref>. </p>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>Algumas notas sobre Independência Linguística</head>
+                    <p>Este tutorial aplica a análise estilométrica a um conjunto de textos em português (PT-PT e PT-BR) usando uma biblioteca Python chamada <code rend="inline">nltk</code>. Muitas das funcionalidades fornecidas pelo <code rend="inline">nltk</code> operam com outros idiomas. Contanto que um idioma forneça uma maneira clara de distinguir os limites de uma palavra, o <code rend="inline">nltk</code> deve ter um bom desempenho. Idiomas como o chinês, para os quais não há distinção clara entre os limites das palavras, podem ser problemáticos. O autor original desta lição utilizou <code rend="inline">nltk</code> com textos em francês sem nenhum problema; outros idiomas que usam <ref target="https://perma.cc/7VGD-5968">diacríticos</ref>, como espanhol e alemão, também devem funcionar bem com <code rend="inline">nltk</code>. Consulte a <ref target="https://perma.cc/S4EX-2DBT">documentação do nltk</ref> para obter detalhes. </p>
+                    <p>Apenas uma das tarefas neste tutorial requer código dependente do idioma. Para dividir um texto em um conjunto de palavras em uma língua diferente do inglês, você precisará especificar o idioma apropriado como um parâmetro para o <ref target="https://perma.cc/NGM5-4MED">tokenizador</ref> da biblioteca <code rend="inline">nltk</code>, que usa o inglês como padrão. Isso será explicado no tutorial.</p>
+                    <p>Por fim, observe que algumas tarefas linguísticas, como <ref target="https://perma.cc/L9SU-PS9D">
+                            <emph>part-of-speech tagging</emph>
+                        </ref>, podem não ser suportadas pelo <code rend="inline">nltk</code> em outros idiomas além do inglês. Este tutorial não cobre a aplicação de <emph>part-of-speech tagging</emph>. Se você precisar para os seus próprios projetos, consulte a <ref target="https://perma.cc/S4EX-2DBT">documentação do nltk</ref> para obter orientações.</p>
+                </div>
+            </div>
+            <head>O <emph>corpus</emph> - Contextualização</head>
+            <p>No <ref target="/en/lessons/introduction-to-stylometry-with-python">exemplo original deste tutorial em inglês</ref>, utilizaram-se os <ref target="https://perma.cc/DW5V-MH5W">papéis federalistas</ref> como um exemplo de aplicação de estilometria, utilizando as técnicas que serão apresentadas para inferir a autoria dos textos contestados dentro do conjunto de documentos que configura o <emph>corpus</emph>.<ref type="footnotemark" target="#pt_note_7"/>
+Como na língua portuguesa não temos um conjunto de textos que possua estas mesmas características, no exemplo que apresentaremos traremos um total de 15 obras completas de 5 autores diferentes, três deles portugueses e dois brasileiros, todos romancistas do século XIX, disponibilizadas pelo <ref target="https://perma.cc/5PRR-TM3D">Projeto Gutenberg</ref>. Utilizaremos duas obras de cada autor para definir seus respectivos estilos e uma terceira para constituir o conjunto de testes, para avaliarmos se as técnicas utilizadas realizarão a inferência correta de autoria através do grau de similaridade de cada obra deste conjunto com o estilo obtido de cada autor.</p>
+            <p>Os autores e obras utilizadas são os seguintes:</p>
+            <table>
+                <row>
+                    <cell role="label">Autor</cell>
+                    <cell role="label">Obra 1</cell>
+                    <cell role="label">Obra 2</cell>
+                    <cell role="label">Obra 3</cell>
+                </row>
+                <row>
+                    <cell>
+                        <ref target="https://perma.cc/6BMU-UKZL">Machado de <hi rend="bold">Assis</hi>
+                        </ref> (Brasil)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/55682">Quincas Borba</ref> (<hi rend="bold">55682</hi>)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/54829">Memorias Posthumas de Braz Cubas</ref> (<hi rend="bold">54829</hi>)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/55752">Dom Casmurro</ref> (<hi rend="bold">55752</hi>)</cell>
+                </row>
+                <row>
+                    <cell>
+                        <ref target="https://perma.cc/Y3Y2-VHJ5">José de <hi rend="bold">Alencar</hi>
+                        </ref> (Brasil)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/38496">Ubirajara</ref> (<hi rend="bold">38496</hi>)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/44540">Cinco minutos</ref> (<hi rend="bold">44540</hi>)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/29040">Como e porque sou romancista</ref> (<hi rend="bold">29040</hi>)</cell>
+                </row>
+                <row>
+                    <cell>
+                        <ref target="https://perma.cc/Q4AJ-VZBH">Camilo <hi rend="bold">Castelo Branco</hi>
+                        </ref> (Portugal)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/26025">Carlota Angela</ref> (<hi rend="bold">26025</hi>)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/26988">Amor de Salvação</ref> (<hi rend="bold">26988</hi>)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/16425">Amor de Perdição: Memorias d'uma familia</ref> (<hi rend="bold">16425</hi>)</cell>
+                </row>
+                <row>
+                    <cell>
+                        <ref target="https://perma.cc/LZ9J-3H5Z">António Feliciano de <hi rend="bold">Castilho</hi>
+                        </ref> (Portugal)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/32002">A Chave do Enigma</ref> (<hi rend="bold">32002</hi>)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/65021">A Primavera</ref> (<hi rend="bold">65021</hi>)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/28127">O presbyterio da montanha</ref> (<hi rend="bold">28127</hi>)</cell>
+                </row>
+                <row>
+                    <cell>
+                        <ref target="https://perma.cc/8LU3-RADW">Manuel Pinheiro <hi rend="bold">Chagas</hi>
+                        </ref> (Portugal)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/29394">Historia alegre de Portugal</ref> (<hi rend="bold">29394</hi>)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/23400">A Lenda da Meia-Noite</ref> (<hi rend="bold">23400</hi>)</cell>
+                    <cell>
+                        <ref target="https://www.gutenberg.org/ebooks/29342">Astucias de Namorada, e Um melodrama em Santo Thyrso</ref> (<hi rend="bold">29342</hi>)</cell>
+                </row>
+            </table>
+            <p>As partes destacadas do nome de cada autor indicam como os mesmos serão referenciados neste tutorial a partir deste ponto. Para os códigos utilizaremos o <code rend="inline">EBook-No.</code> (número de referência da obra no Projeto Gutenberg), presente no nome dos ficheiros disponibilizados.</p>
+            <div type="2">
+                <head>Nossos casos de teste</head>
+                <p>Nesta lição, usaremos obras de romancistas brasileiros e portugueses do século XIX como um estudo de caso para demonstrar três abordagens estilométricas diferentes:</p>
+                <list type="ordered">
+                    <item>Curvas características de composição de Mendenhall</item>
+                    <item>Método Qui-Quadrado de Kilgariff </item>
+                    <item>Método Delta de John Burrows</item>
+                </list>
+                <p>Em todas as abordagens acima mencionadas, utilizaremos os documentos das colunas <hi rend="bold">Obra 1</hi> e <hi rend="bold">Obra 2</hi> para definir o estilo de cada autor. Os documentos da coluna <hi rend="bold">Obra 3</hi> serão testados individualmente com cada um dos 5 autores para tentarmos inferir a autoria pela proximidade de estilo. </p>
+            </div>
+            <div type="2">
+                <head>Preparando os dados para análise</head>
+                <p>Antes de prosseguirmos com a análise estilométrica, precisamos carregar os ficheiros contendo todas as 15 obras em <ref target="https://perma.cc/P843-J4LB">estruturas de dados</ref> na memória do computador.</p>
+                <p>O primeiro passo neste processo é designar cada obra para o seu respectivo conjunto. Como cada obra está relacionada com o seu respectivo <code rend="inline">EBook-No.</code>, podemos atribuir cada obra (valor) à chave do seu autor (ou a uma chave separada, se ela fizer parte da amostra de teste) usando um <emph>dicionário</emph> Python. O dicionário é um tipo de conjunto de dados composto de um número arbitrário de pares de chave-valor; neste caso, os nomes dos autores servirão como chaves (separados entre treino e teste), enquanto os <code rend="inline">EBook-No.</code> das obras serão os valores associados a essas chaves.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_introducao-estilometria-python_0" corresp="code_introducao-estilometria-python_0.txt" rend="block"/>
+                </ab>
+                <p>Os dicionários Python são muito flexíveis. Por exemplo, podemos acessar um valor específico <emph>indexando</emph> o dicionário com uma de suas chaves, podemos varrer o dicionário inteiro fazendo um loop em sua lista de chaves, etc. Faremos amplo uso desta funcionalidade à medida que avançarmos.</p>
+                <p>A seguir, como estamos interessados no vocabulário de cada autor, definiremos uma breve <ref target="https://perma.cc/P8CA-Y43Q">função</ref> em Python que irá criar uma longa lista de palavras em cada uma das obras atribuídas a um único autor. Isso será armazenado como uma <ref target="https://perma.cc/7DCC-M9AT">string</ref>.
+Abra o seu ambiente de desenvolvimento Python escolhido. Se você não sabe como fazer isso, leia "Configurar um ambiente de desenvolvimento integrado para Python" (<ref target="/pt/licoes/instalacao-windows">Windows</ref>, <ref target="/pt/licoes/instalacao-linux">Linux</ref>, <ref target="/pt/licoes/instalacao-mac">Mac</ref>) antes de prosseguir.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_introducao-estilometria-python_1" corresp="code_introducao-estilometria-python_1.txt" rend="block"/>
+                </ab>
+                <p>Perceba que, dentro da função, temos também uma etapa de limpeza dos textos usando <ref target="https://perma.cc/DT3K-XUBG">expressões regulares</ref>. Isso foi necessário para este corpus específico pois as obras publicadas no Projeto Gutenberg possuem uma estrutura de cabeçalho e rodapé de <ref target="https://perma.cc/E8P8-GKDR">metadados</ref> que não pode ser considerada na análise estilométrica, uma vez que não foram redigidas pelos autores analisados. A utilização de expressões regulares não faz parte do escopo deste tutorial, então limitaremo-nos a compreender que estamos utilizando a biblioteca <code rend="inline">re</code> para capturar apenas o conjunto de caracteres entre os marcadores <code rend="inline">*** START OF THIS PROJECT GUTENBERG [NOME DA OBRA] ***</code> e <code rend="inline">*** END OF THIS PROJECT GUTENBERG [NOME DA OBRA] ***</code> presentes em cada documento do projeto. Para maiores dúvidas sobre a utilização de expressões regulares e da biblioteca <code rend="inline">re</code>, consulte a <ref target="https://perma.cc/JFP3-B4P4">documentação</ref>.</p>
+                <p>Na sequência, construímos uma nova estrutura de dados chamando repetidamente a função <code rend="inline">ler_ficheiros_para_string ()</code>, passando a ela uma lista diferente de documentos a cada vez. Armazenaremos os resultados em outro dicionário, este com nomes do autor/caso de teste como chaves e todo o texto dos respectivos documentos como valores. Para simplificar, iremos nos referir à string contendo uma lista de documentos como "corpus do autor".</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_introducao-estilometria-python_2" corresp="code_introducao-estilometria-python_2.txt" rend="block"/>
+                </ab>
+                <p>Para nos certificarmos de que os ficheiros foram carregados corretamente, imprima os primeiros cem caracteres de cada entrada do dicionário na tela:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_introducao-estilometria-python_3" corresp="code_introducao-estilometria-python_3.txt" rend="block"/>
+                </ab>
+                <p>Se esta operação de impressão exibir quaisquer trechos de texto no console, então a operação de leitura dos ficheiros funcionou conforme o esperado e você pode prosseguir para a análise estilométrica.</p>
+                <p style="alert alert-warning">
+Se os ficheiros não forem carregados, o motivo mais provável é que o seu diretório de trabalho atual não seja o repositório `dados` criado ao descompactar o ficheiro da seção de Materiais Requeridos acima; mudar o seu diretório de trabalho deve resolver o problema. Como você faz isso depende do seu ambiente de desenvolvimento Python.
 </p>
-</div>
-      <table>
-<row>
-<cell role="label"/>
-<cell role="label">Assis</cell>
-<cell role="label">Alencar</cell>
-<cell role="label">Castelo Branco</cell>
-<cell role="label">Castilho</cell>
-<cell role="label">Chagas</cell>
-</row>
-<row>
-<cell><hi rend="bold">Chagas (teste)</hi></cell>
-<cell>0.7746</cell>
-<cell>0.5883</cell>
-<cell>0.6636</cell>
-<cell>0.6732</cell>
-<cell><hi rend="bold"><span style="color:orange">0.5888</span></hi></cell>
-</row>
-<row>
-<cell><hi rend="bold">Castilho (teste)</hi></cell>
-<cell>0.4396</cell>
-<cell>0.4624</cell>
-<cell>0.4114</cell>
-<cell><hi rend="bold"><span style="color:green">0.1394</span></hi></cell>
-<cell>0.3184</cell>
-</row>
-<row>
-<cell><hi rend="bold">Castelo Branco (teste)</hi></cell>
-<cell>0.2812</cell>
-<cell>0.4436</cell>
-<cell><hi rend="bold"><span style="color:red">0.4761</span></hi></cell>
-<cell>0.2772</cell>
-<cell>0.2803</cell>
-</row>
-<row>
-<cell><hi rend="bold">Alencar (teste)</hi></cell>
-<cell>0.9744</cell>
-<cell><hi rend="bold"><span style="color:red">0.9844</span></hi></cell>
-<cell>0.4313</cell>
-<cell>0.6979</cell>
-<cell>0.7897</cell>
-</row>
-<row>
-<cell><hi rend="bold">Assis (teste)</hi></cell>
-<cell><hi rend="bold"><span style="color:green">0.2578</span></hi></cell>
-<cell>0.5192</cell>
-<cell>0.7410</cell>
-<cell>0.4687</cell>
-<cell>0.3466</cell>
-</row>
-</table>
-      <table>
-<row>
-<cell role="label"/>
-<cell role="label">Assis</cell>
-<cell role="label">Alencar</cell>
-<cell role="label">Castelo Branco</cell>
-<cell role="label">Castilho</cell>
-<cell role="label">Chagas</cell>
-</row>
-<row>
-<cell><hi rend="bold">Chagas (teste)</hi></cell>
-<cell>6683</cell>
-<cell>5700</cell>
-<cell>5836</cell>
-<cell>6970</cell>
-<cell><hi rend="bold"><span style="color:green">5332</span></hi></cell>
-</row>
-<row>
-<cell><hi rend="bold">Castilho (teste)</hi></cell>
-<cell>11349</cell>
-<cell>9203</cell>
-<cell>8925</cell>
-<cell><hi rend="bold"><span style="color:green">4531</span></hi></cell>
-<cell>7548</cell>
-</row>
-<row>
-<cell><hi rend="bold">Castelo Branco (teste)</hi></cell>
-<cell>17294</cell>
-<cell>12063</cell>
-<cell><hi rend="bold"><span style="color:green">11187</span></hi></cell>
-<cell>18133</cell>
-<cell>13954</cell>
-</row>
-<row>
-<cell><hi rend="bold">Alencar (teste)</hi></cell>
-<cell>2550</cell>
-<cell><hi rend="bold"><span style="color:red">3153</span></hi></cell>
-<cell>2581</cell>
-<cell>2663</cell>
-<cell>2765</cell>
-</row>
-<row>
-<cell><hi rend="bold">Assis (teste)</hi></cell>
-<cell><hi rend="bold"><span style="color:green">12266</span></hi></cell>
-<cell>13832</cell>
-<cell>15659</cell>
-<cell>19458</cell>
-<cell>13681</cell>
-</row>
-</table>
-      <div type="2"><head>Terceiro teste estilom&#233;trico: m&#233;todo Delta de John Burrows (avan&#231;ado)</head>
-<p>Os primeiros dois m&#233;todos estilom&#233;tricos foram mais f&#225;ceis de implementar. Este pr&#243;ximo, baseado na estat&#237;stica <emph>Delta</emph> de John Burrows<ref type="footnotemark" target="#note_10"/>, &#233; consideravelmente mais complexo, tanto conceitualmente (a matem&#225;tica &#233; mais complicada) quanto computacionalmente (mais c&#243;digo necess&#225;rio). &#201;, no entanto, um dos m&#233;todos estilom&#233;tricos mais proeminentes em uso hoje.</p>
-<p>Assim como o qui-quadrado de Kilgariff, o m&#233;todo Delta de Burrows &#233; uma medida da "dist&#226;ncia" entre um texto cuja autoria queremos averiguar e algum outro corpus. Ao contr&#225;rio do qui-quadrado, no entanto, o m&#233;todo Delta &#233; projetado para comparar um texto an&#244;nimo (ou conjunto de textos) com as assinaturas de v&#225;rios autores diferentes ao mesmo tempo. Mais precisamente, o m&#233;todo Delta mede como o texto an&#244;nimo <emph>e conjuntos de textos escritos por um n&#250;mero arbitr&#225;rio de autores conhecidos</emph> divergem da m&#233;dia de todos eles juntos. Al&#233;m disso, o m&#233;todo Delta atribui peso igual a todas as caracter&#237;sticas que mede, evitando assim o problema de palavras comuns sobrecarregarem os resultados, o que era um problema com os testes de qui-quadrado. Por todas essas raz&#245;es, o m&#233;todo Delta de John Burrows &#233; geralmente uma solu&#231;&#227;o mais eficaz para a quest&#227;o da autoria.</p>
-<p>O algoritmo original de Burrows pode ser resumido da seguinte forma:</p>
-<list type="unordered">
-<item>Re&#250;na um grande corpus composto por textos escritos por um n&#250;mero arbitr&#225;rio de autores; digamos que o n&#250;mero de autores seja <code rend="inline">x</code>;</item>
-<item>Encontre as <code rend="inline">n</code> palavras mais frequentes no corpus para usar como elementos;</item>
-<item>Para cada uma dessas <code rend="inline">n</code> caracter&#237;sticas, calcule a participa&#231;&#227;o de cada subcorpora dos <code rend="inline">x</code> autores, como uma porcentagem do n&#250;mero total de palavras. Por exemplo, a palavra "ele" pode representar 4,72% das palavras no subcorpus do Autor A;</item>
-<item>Em seguida, calcule a m&#233;dia e o desvio padr&#227;o desses <code rend="inline">x</code> valores e use-os como a m&#233;dia oficial e o desvio padr&#227;o para esse elemento em todo o corpus. Em outras palavras, estaremos usando uma <emph>m&#233;dia de m&#233;dias</emph> em vez de calcular um &#250;nico valor que represente a parcela de todo o corpus dado por cada palavra. Fazemos isso porque queremos evitar que um subcorpus maior tenha maior influ&#234;ncia nos resultados a seu favor e defina a norma do corpus de tal forma que se espere que tudo se pare&#231;a com ele;</item>
-<item>Para cada um dos <code rend="inline">n</code> elementos e <code rend="inline">x</code> subcorpora, calcule um <ref target="https://perma.cc/S2RH-LF9K"><code rend="inline">z-score</code></ref> descrevendo o qu&#227;o distante da norma do corpus est&#225; o uso desse elemento particular neste subcorpus espec&#237;fico. Para fazer isso, subtraia a "m&#233;dia das m&#233;dias" de um dado elemento da frequ&#234;ncia com que ela &#233; encontrada no subcorpus e divida o resultado pelo seu desvio padr&#227;o. A Figura 3 mostra a equa&#231;&#227;o de z-score para o elemento 'i', onde C(i) representa a frequ&#234;ncia observada, a letra grega mu representa a m&#233;dia das m&#233;dias e a letra grega sigma, o desvio padr&#227;o;</item>
-</list>
-<figure><desc>Imagem 3: Equa&#231;&#227;o para a estat&#237;stica de z-score.</desc><graphic url="stylometry-python-7.jpg"/></figure>
-<list type="unordered">
-<item>Em seguida, calcule os mesmos <code rend="inline">z-scores</code> para cada elemento no texto para o qual queremos determinar a autoria;</item>
-<item>Finalmente, calcule um <emph>score delta</emph> comparando o documento de teste com o subcorpus de cada candidato. Para fazer isso, tome a <emph>m&#233;dia dos valores absolutos das diferen&#231;as entre os <code rend="inline">z-scores</code> para cada elemento entre o documento de teste e o subcorpus do candidato</emph>. (leia duas vezes!) Isso d&#225; peso igual a cada elemento, n&#227;o importa a frequ&#234;ncia com que as palavras ocorram nos textos; caso contr&#225;rio, os 3 ou 4 principais elementos sobrecarregariam todo o resto. A Figura 4 mostra a equa&#231;&#227;o para Delta, onde Z(c,i) &#233; o <code rend="inline">z-score</code> para o elemento 'i' no candidato 'c', e Z(t,i) &#233; o <code rend="inline">z-score</code> para o elemento 'i' no caso de teste;</item>
-</list>
-<figure><desc>Imagem 4: Equa&#231;&#227;o para a estat&#237;stica Delta de John Burrows.</desc><graphic url="stylometry-python-8.jpg"/></figure>
-<list type="unordered">
-<item>O candidato "vencedor", assim como nas duas outras t&#233;cnicas que aplicamos, &#233; o autor para o qual a pontua&#231;&#227;o delta entre o subcorpus do autor e o documento de teste &#233; a mais baixa.</item>
-</list>
-<p>Stefan Evert <emph>et al</emph>.<ref type="footnotemark" target="#note_11"/> fornece uma discuss&#227;o aprofundada das variantes, refinamentos e complexidades do m&#233;todo, mas nos ateremos ao essencial para os prop&#243;sitos desta li&#231;&#227;o. Uma explica&#231;&#227;o diferente de Delta, escrita em espanhol, e uma aplica&#231;&#227;o a um corpus de romances espanh&#243;is tamb&#233;m podem ser encontradas em um artigo recente de Jos&#233; Calvo Tello.<ref type="footnotemark" target="#note_12"/></p>
-<div type="3"><head>Sele&#231;&#227;o de elementos</head>
-<p>Vamos combinar todos os subcorpora em um &#250;nico corpus para Delta calcular um "padr&#227;o" para trabalhar. Ent&#227;o, vamos selecionar um n&#250;mero de palavras para usar como caracter&#237;stica. Lembre-se de que usamos 500 palavras para calcular o qui-quadrado de Kilgariff; desta vez, usaremos um conjunto menor de 30 palavras (a maioria, sen&#227;o todas, palavras funcionais e verbos comuns) como nossos elementos.</p>
-<ab><code xml:id="code_introducao-estilometria-python_9" corresp="code_introducao-estilometria-python_9.txt" lang="language-python" rend="block"/></ab>
-<p>Uma amostra das palavras mais frequentes e suas respectivas ocorr&#234;ncias parece com o seguinte:</p>
-<ab><code xml:id="code_introducao-estilometria-python_10" corresp="code_introducao-estilometria-python_10.txt" rend="block"/></ab>
-</div><div type="3"><head>Calculando elementos para cada subcorpus</head>
-<p>Vejamos as frequ&#234;ncias de cada caracter&#237;stica no subcorpus de cada candidato, como uma propor&#231;&#227;o do n&#250;mero total de tokens no subcorpus. Vamos calcular esses valores e armazen&#225;-los em um dicion&#225;rio de dicion&#225;rios, uma maneira conveniente de construir um <ref target="https://perma.cc/HR9K-24MG">array bidimensional</ref> em Python.</p>
-<ab><code xml:id="code_introducao-estilometria-python_11" corresp="code_introducao-estilometria-python_11.txt" lang="language-python" rend="block"/></ab>
-</div><div type="3"><head>Calculando m&#233;dias de elementos e desvios-padr&#227;o</head>
-<p>Dadas as frequ&#234;ncias de elementos para todos os subcorpora que acabamos de calcular, podemos encontrar uma "m&#233;dia das m&#233;dias" e um desvio padr&#227;o para cada elemento. Armazenaremos esses valores em outro "dicion&#225;rio de dicion&#225;rios".</p>
-<ab><code xml:id="code_introducao-estilometria-python_12" corresp="code_introducao-estilometria-python_12.txt" lang="language-python" rend="block"/></ab>
-</div><div type="3"><head>Calculando z-scores</head>
-<p>Em seguida, transformamos as frequ&#234;ncias de caracter&#237;sticas observadas no subcorpora dos cinco candidatos em <code rend="inline">z-scores</code>, descrevendo o qu&#227;o distante da "estat&#237;stica padr&#227;o do corpus" essas observa&#231;&#245;es est&#227;o. Nada extravagante aqui: n&#243;s meramente aplicamos a defini&#231;&#227;o do <code rend="inline">z-score</code> para cada elemento e armazenamos os resultados em outro array bidimensional.</p>
-<ab><code xml:id="code_introducao-estilometria-python_13" corresp="code_introducao-estilometria-python_13.txt" lang="language-python" rend="block"/></ab>
-</div><table>
-<row>
-<cell role="label"/>
-<cell role="label">Assis</cell>
-<cell role="label">Alencar</cell>
-<cell role="label">Castelo Branco</cell>
-<cell role="label">Castilho</cell>
-<cell role="label">Chagas</cell>
-</row>
-<row>
-<cell><hi rend="bold">Chagas (teste)</hi></cell>
-<cell>1.1444</cell>
-<cell>1.0169</cell>
-<cell>0.9462</cell>
-<cell>0.9864</cell>
-<cell><hi rend="bold"><span style="color:green">0.7756</span></hi></cell>
-</row>
-<row>
-<cell><hi rend="bold">Castilho (teste)</hi></cell>
-<cell>1.5705</cell>
-<cell>1.2553</cell>
-<cell>1.0970</cell>
-<cell><hi rend="bold"><span style="color:green">0.4518</span></hi></cell>
-<cell>0.8176</cell>
-</row>
-<row>
-<cell><hi rend="bold">Castelo Branco (teste)</hi></cell>
-<cell>1.004</cell>
-<cell>1.3208</cell>
-<cell><hi rend="bold"><span style="color:green">0.8182</span></hi></cell>
-<cell>1.5202</cell>
-<cell>1.2829</cell>
-</row>
-<row>
-<cell><hi rend="bold">Alencar (teste)</hi></cell>
-<cell>1.9762</cell>
-<cell><hi rend="bold"><span style="color:green">1.3355</span></hi></cell>
-<cell>1.3878</cell>
-<cell>1.6425</cell>
-<cell>1.5042</cell>
-</row>
-<row>
-<cell><hi rend="bold">Assis (teste)</hi></cell>
-<cell><hi rend="bold"><span style="color:green">0.8715</span></hi></cell>
-<cell>1.2624</cell>
-<cell>1.2303</cell>
-<cell>1.6276</cell>
-<cell>1.0527</cell>
-</row>
-</table></div>
-      <div type="2"><head>Leituras adicionais e recursos</head>
-<div type="3"><head>Estudos de caso interessantes</head>
-<p>Estilometria e/ou atribui&#231;&#227;o de autoria t&#234;m sido utilizadas em diversos contextos, empregando diversas t&#233;cnicas. Aqui est&#227;o alguns estudos de caso interessantes:</p>
-<list type="unordered">
-<item>Javier de la Rosa e Juan Luis Su&#225;rez procuram o autor de um famoso romance espanhol do s&#233;culo XVI entre uma lista consider&#225;vel de candidatos. <ref type="footnotemark" target="#note_13"/></item>
-<item>Maria Slautina e Mikhail Marusenko usam o reconhecimento de padr&#245;es em um conjunto de recursos sint&#225;ticos, gramaticais e lexicais, desde a contagem de palavras simples (com marca&#231;&#227;o de classe gramatical) a v&#225;rios tipos de frases, a fim de estabelecer semelhan&#231;as estil&#237;sticas entre os textos medievais.<ref type="footnotemark" target="#note_14"/></item>
-<item>Ellen Jordan, Hugh Craig e Alexis Antonia examinam o caso de peri&#243;dicos brit&#226;nicos do s&#233;culo XIX, nos quais os artigos geralmente n&#227;o eram assinados, para determinar o autor de quatro resenhas de trabalhos de ou sobre as irm&#227;s Bront&#235;.<ref type="footnotemark" target="#note_15"/> Este estudo de caso aplica uma vers&#227;o inicial de outro m&#233;todo desenvolvido por John Burrows, o m&#233;todo Zeta, que se concentra nas palavras favoritas de um autor em vez de palavras de fun&#231;&#227;o comum.<ref type="footnotemark" target="#note_16"/></item>
-<item>Val&#233;rie Beaudoin e Fran&#231;ois Yvon analisaram 58 pe&#231;as em verso dos dramaturgos franceses Corneille, Racine e Moli&#232;re, descobrindo que as duas primeiras foram muito mais consistentes na maneira como estruturaram sua escrita do que as &#250;ltimas.<ref type="footnotemark" target="#note_17"/></item>
-<item>Marcelo Luiz Brocardo, Issa Traore, Sherif Saad e Isaac Woungang aplicam <ref target="https://perma.cc/7TAQ-JECD">aprendizagem supervisionada</ref> e <ref target="https://perma.cc/X34K-5R9X">modelos n-gram</ref> para determinar a autoria de mensagens curtas com um grande n&#250;mero de autores em potencial, como e-mails e tweets.<ref type="footnotemark" target="#note_18"/></item>
-<item>Moshe Koppel e Winter Yaron prop&#245;em o "m&#233;todo do impostor", que tenta determinar se dois textos foram escritos pelo mesmo autor, inserindo-os em um conjunto de textos escritos por falsos candidatos.<ref type="footnotemark" target="#note_19"/> Justin Anthony Stover <emph>et al.</emph> recentemente aplicou a t&#233;cnica para determinar a autoria de um manuscrito do s&#233;culo II rec&#233;m-descoberto.<ref type="footnotemark" target="#note_20"/></item>
-<item>Finalmente, uma equipe liderada por David I. Holmes estudou o caso peculiar de documentos escritos por um soldado da Guerra Civil ou por sua vi&#250;va que pode ter copiado intencionalmente seu estilo de escrita.<ref type="footnotemark" target="#note_21"/></item>
-</list>
-</div><div type="3"><head>Refer&#234;ncias adicionais sobre autoria e estilometria</head>
-<p>A refer&#234;ncia mais exaustiva em todos os assuntos relacionados &#224; atribui&#231;&#227;o de autoria, incluindo a hist&#243;ria do campo, seus fundamentos matem&#225;ticos e lingu&#237;sticos e seus v&#225;rios m&#233;todos, foi escrita por Patrick Juola em 2007.<ref type="footnotemark" target="#note_22"/> O Cap&#237;tulo 7, em particular, mostra como a atribui&#231;&#227;o de autoria pode servir como um marcador para v&#225;rias identidades de grupo (g&#234;nero, nacionalidade, dialeto, etc.), para mudan&#231;as na linguagem ao longo do tempo, e at&#233; mesmo para personalidade e sa&#250;de mental.</p>
-<p>Uma pesquisa mais curta pode ser encontrada em Moshe Koppel <emph>et al.</emph>, que discute casos em que h&#225; um &#250;nico autor candidato cuja autoria deve ser confirmada, um grande n&#250;mero de candidatos para os quais apenas pequenas amostras de escrita est&#227;o dispon&#237;veis para treinar um algoritmo de aprendizado de m&#225;quina, ou nenhum candidato conhecido.<ref type="footnotemark" target="#note_23"/></p>
-<p>O artigo de Stamatatos citado anteriormente<ref type="footnotemark" target="#note_2"/> tamb&#233;m cont&#233;m uma pesquisa qualitativa do campo.</p>
-</div><div type="3"><head>Varia</head>
-<p><emph>Programming historians</emph> que desejam explorar mais a estilometria podem fazer o download do pacote <ref target="https://cran.r-project.org/web/packages/stylo/index.html">Stylo</ref>,<ref type="footnotemark" target="#note_24"/> que se tornou um padr&#227;o <emph>de facto</emph>. Entre outras coisas, o pacote Stylo fornece uma implementa&#231;&#227;o do m&#233;todo Delta, funcionalidade de extra&#231;&#227;o de recursos e interfaces gr&#225;ficas de usu&#225;rio convenientes tanto para manipula&#231;&#227;o de dados quanto para produ&#231;&#227;o de resultados visualmente atraentes. Observe que o Stylo &#233; escrito em <ref target="https://www.r-project.org/">R</ref>, o que significa que voc&#234; precisar&#225; do R instalado no seu computador para execut&#225;-lo, mas entre a interface gr&#225;fica do usu&#225;rio e os tutoriais, pouco ou nenhum conhecimento pr&#233;vio de programa&#231;&#227;o R deve ser necess&#225;rio.</p>
-<p>Leitores fluentes em franc&#234;s interessados em explorar as implica&#231;&#245;es <ref target="https://perma.cc/6DFE-QTWV">epistemol&#243;gicas</ref> das intera&#231;&#245;es entre m&#233;todos quantitativos e qualitativos na an&#225;lise do estilo de escrita devem ler Cl&#233;mence Jacquot.<ref type="footnotemark" target="#note_25"/></p>
-<p>Surpreendentemente, os dados obtidos por meio de <ref target="https://perma.cc/R9U6-TRGE">reconhecimento &#243;tico de caracteres</ref> (OCR) se mostraram adequados para fins de atribui&#231;&#227;o de autoria, mesmo quando os dados sofrem de altas taxas de erro de OCR.<ref type="footnotemark" target="#note_26"/></p>
-<p>Por fim, existe um <ref target="https://www.zotero.org/groups/643516/stylometry_bibliography/items">grupo Zotero</ref> dedicado &#224; estilometria, onde voc&#234; pode encontrar muitas outras refer&#234;ncias a m&#233;todos e estudos.</p>
-</div></div>
-      <div type="2"><head>Agradecimentos</head>
-<p>Agradecimentos a St&#233;fan Sinclair e Andrew Piper, em cujos semin&#225;rios na Universidade McGill este projeto come&#231;ou. Tamb&#233;m agrade&#231;o &#224; minha orientadora de tese, Susan Dalton, cuja orienta&#231;&#227;o &#233; sempre inestim&#225;vel.</p>
-</div>
-      <div type="2"><head>Notas finais</head>
-<p><ref type="footnotemark" target="#note_1"/> : Veja, por exemplo, Justin Rice, <ref target="https://perma.cc/W8TR-UH6S">"What Makes Hemingway Hemingway? A statistical analysis of the data behind Hemingway's style"</ref> </p>
-<p><ref type="footnotemark" target="#note_2"/> : Efstathios Stamatatos, &#8220;A Survey of Modern Authorship Attribution Method,&#8221; <emph>Journal of the American Society for Information Science and Technology</emph>, vol. 60, no. 3 (December 2008), p. 538&#8211;56, citation on p. 540, <ref target="https://doi.org/10.1002/asi.21001">https://doi.org/10.1002/asi.21001</ref>.</p>
-<p><ref type="footnotemark" target="#note_3"/> : Jan Rybicki, &#8220;Vive La Diff&#233;rence: Tracing the (Authorial) Gender Signal by Multivariate Analysis of Word Frequencies,&#8221; <emph>Digital Scholarship in the Humanities</emph>, vol. 31, no. 4 (December 2016), pp. 746&#8211;61, <ref target="https://doi.org/10.1093/llc/fqv023">https://doi.org/10.1093/llc/fqv023</ref>. Sean G. Weidman e James O&#8217;Sullivan, &#8220;The Limits of Distinctive Words: Re-Evaluating Literature&#8217;s Gender Marker Debate,&#8221; <emph>Digital Scholarship in the Humanities</emph>, 2017, <ref target="https://doi.org/10.1093/llc/fqx017">https://doi.org/10.1093/llc/fqx017</ref>.</p>
-<p><ref type="footnotemark" target="#note_4"/> : Ted Underwood, David Bamman, e Sabrina Lee, &#8220;The Transformation of Gender in English-Language Fiction&#8221;, <emph>Cultural Analytics</emph>, Feb. 13, 2018, <ref target="https://doi.org/10.22148/16.019">https://doi.org/10.22148/16.019</ref>.</p>
-<p><ref type="footnotemark" target="#note_5"/> : Sven Meyer zu Eissen e Benno Stein, &#8220;Intrinsic Plagiarism Detection,&#8221; in <emph>ECIR 2006</emph>, edited by Mounia Lalmas, Andy MacFarlane, Stefan R&#252;ger, Anastasios Tombros, Theodora Tsikrika, e Alexei Yavlinsky, Berlin, Heidelberg: Springer, 2006, pp. 565&#8211;69, <ref target="https://doi.org/10.1007/11735106_66">https://doi.org/10.1007/11735106_66</ref>.</p>
-<p><ref type="footnotemark" target="#note_6"/> : Cynthia Whissell, &#8220;Traditional and Emotional Stylometric Analysis of the Songs of Beatles Paul McCartney and John Lennon,&#8221; <emph>Computers and the Humanities</emph>, vol. 30, no. 3 (1996), pp. 257&#8211;65.</p>
-<p><ref type="footnotemark" target="#note_7"/> : Douglass Adair, "The Authorship of the Disputed Federalist Papers", <emph>The William and Mary Quarterly</emph>, vol. 1, no. 2 (April 1944), pp. 97-122.</p>
-<p><ref type="footnotemark" target="#note_8"/> : T. C. Mendenhall, "The Characteristic Curves of Composition", <emph>Science</emph>, vol. 9, no. 214 (Mar. 11, 1887), pp. 237-249.</p>
-<p><ref type="footnotemark" target="#note_9"/> : Adam Kilgarriff, "Comparing Corpora", <emph>International Journal of Corpus Linguistics</emph>, vol. 6, no. 1 (2001), pp. 97-133.</p>
-<p><ref type="footnotemark" target="#note_10"/> : John Burrows, "'Delta': a Measure of Stylistic Difference and a Guide to Likely Authorship", <emph>Literary and Linguistic Computing</emph>, vol. 17, no. 3 (2002), pp. 267-287.</p>
-<p><ref type="footnotemark" target="#note_11"/> : Stefan Evert et al., "Understanding and explaining Delta measures for authorship attribution", <emph>Digital Scholarship in the Humanities</emph>, vol. 32, no. suppl_2 (2017), pp.  ii4-ii16.</p>
-<p><ref type="footnotemark" target="#note_12"/> : Jos&#233; Calvo Tello, &#8220;Entendiendo Delta desde las Humanidades,&#8221; <ref target="https://perma.cc/LNF3-QP8V"><emph>Caracteres</emph>, vol.5, no.1 (May 27 2016)</ref>, pp.140-176.</p>
-<p><ref type="footnotemark" target="#note_13"/> : Javier de la Rosa and Juan Luis Su&#225;rez, &#8220;The Life of Lazarillo de Tormes and of His Machine Learning Adversities,&#8221; <emph>Lemir</emph>, vol. 20 (2016), pp. 373-438.</p>
-<p><ref type="footnotemark" target="#note_14"/> : Maria Slautina e Mikha&#239;l Marusenko, &#8220;L&#8217;&#233;mergence du style, The emergence of style,&#8221; <emph>Les Cahiers du num&#233;rique</emph>, vol. 10, no. 4 (November 2014), pp. 179&#8211;215, <ref target="https://doi.org/10.3166/LCN.10.4.179-215">https://doi.org/10.3166/LCN.10.4.179-215</ref>.</p>
-<p><ref type="footnotemark" target="#note_15"/> : Ellen Jordan, Hugh Craig, e Alexis Antonia, &#8220;The Bront&#235; Sisters and the &#8216;Christian Remembrancer&#8217;: A Pilot Study in the Use of the &#8216;Burrows Method&#8217; to Identify the Authorship of Unsigned Articles in the Nineteenth-Century Periodical Press,&#8221; <emph>Victorian Periodicals Review</emph>, vol. 39, no. 1 (2006), pp. 21&#8211;45.</p>
-<p><ref type="footnotemark" target="#note_16"/> : John Burrows, &#8220;All the Way Through: Testing for Authorship in Different Frequency Strata,&#8221; <emph>Literary and Linguistic Computing</emph>, vol. 22, no. 1 (April 2007), pp. 27&#8211;47, <ref target="https://doi.org/10.1093/llc/fqi067">https://doi.org/10.1093/llc/fqi067</ref>.</p>
-<p><ref type="footnotemark" target="#note_17"/> : Val&#233;rie Beaudoin e Fran&#231;ois Yvon, &#8220;Contribution de La M&#233;trique &#224; La Stylom&#233;trie,&#8221; <emph>JADT 2004: 7e Journ&#233;es internationales d'Analyse statistique des Donn&#233;es Textuelles</emph>, vol. 1, Louvain La Neuve, Presses Universitaires de Louvain, 2004, pp. 107&#8211;18.</p>
-<p><ref type="footnotemark" target="#note_18"/> : Marcelo Luiz Brocardo, Issa Traore, Sherif Saad e Isaac Woungang, &#8220;Authorship Verification for Short Messages Using Stylometry,&#8221; <emph>2013 International Conference on Computer, Information and Telecommunication Systems (CITS)</emph>, 2013, <ref target="https://doi.org/10.1109/CITS.2013.6705711">https://doi.org/10.1109/CITS.2013.6705711</ref>.</p>
-<p><ref type="footnotemark" target="#note_19"/> : Moshe Koppel e Winter Yaron, &#8220;Determining If Two Documents Are Written by the Same Author,&#8221; <emph>Journal of the Association for Information Science and Technology</emph>, vol. 65, no. 1 (October 2013), pp. 178&#8211;87, <ref target="https://doi.org/10.1002/asi.22954">https://doi.org/10.1002/asi.22954</ref>.</p>
-<p><ref type="footnotemark" target="#note_20"/> : Justin Anthony Stover et al., "Computational authorship verification method attributes a new work to a major 2nd century African author", <emph>Journal of the Association for Information Science and Technology</emph>, vol. 67, no. 1 (2016), pp. 239&#8211;242.</p>
-<p><ref type="footnotemark" target="#note_21"/> : David I. Holmes, Lesley J. Gordon, e Christine Wilson, "A widow and her soldier: Stylometry and the American Civil War", <emph>Literary and Linguistic Computing</emph>, vol. 16, no 4 (2001), pp. 403&#8211;420.</p>
-<p><ref type="footnotemark" target="#note_22"/> : Patrick  Juola, &#8220;Authorship Attribution,&#8221; <emph>Foundations and Trends in Information Retrieval</emph>, vol. 1, no. 3 (2007), pp. 233&#8211;334, <ref target="https://doi.org/10.1561/1500000005">https://doi.org/10.1561/1500000005</ref>.</p>
-<p><ref type="footnotemark" target="#note_23"/> : Moshe Koppel, Jonathan Schler, e Shlomo Argamon, &#8220;Computational Methods in Authorship Attribution,&#8221; <emph>Journal of the Association for Information Science and Technology</emph>. vol. 60, no. 1 (January 2009), pp. 9&#8211;26, <ref target="https://doi.org/10.1002/asi.v60:1">https://doi.org/10.1002/asi.v60:1</ref>.</p>
-<p><ref type="footnotemark" target="#note_24"/> : Maciej Eder, Jan Rybicki, e Mike Kestemont, &#8220;Stylometry with R: A Package for Computational Text Analysis,&#8221; <emph>The R Journal</emph>, vol. 8, no. 1 (2016), pp. 107&#8211;21.</p>
-<p><ref type="footnotemark" target="#note_25"/> : Cl&#233;mence Jacquot, &#8220;R&#234;ve d'une &#233;piphanie du style: visibilit&#233; et saillance en stylistique et en stylom&#233;trie,&#8221; <emph>Revue d&#8217;Histoire Litt&#233;raire de la France</emph> , vol. 116, no. 3 (2016),  pp. 619&#8211;39.</p>
-<p><ref type="footnotemark" target="#note_26"/> : Patrick Juola, John Noecker Jr, e Michael Ryan, "Authorship Attribution and Optical Character Recognition Errors", <emph>TAL</emph>, vol. 53, no. 3 (2012), pp. 101&#8211;127.</p>
-</div>
-    </body>
-  </text>
+            </div>
+            <head>Primeiro teste estilométrico: curvas características de composição de Mendenhall</head>
+            <p>O pesquisador literário T. C. Mendenhall escreveu certa vez que a assinatura estilística de um autor pode ser encontrada contando a frequência com que usa palavras de tamanhos diferentes.<ref type="footnotemark" target="#pt_note_8"/> Por exemplo, se contarmos os tamanhos de palavras em vários segmentos de 1.000 ou 5.000 palavras de qualquer romance e, em seguida, traçarmos um gráfico das distribuições de comprimento das palavras, as curvas pareceriam praticamente as mesmas, não importando que partes do romance tivéssemos escolhido. Na verdade, Mendenhall acreditava que se alguém contasse palavras suficientes selecionadas de várias partes da obra de toda a vida de um escritor (digamos, 100.000 ou mais), a "curva característica" de uso de comprimento de palavras do autor se tornaria tão precisa que seria constante ao longo de sua vida.</p>
+            <p>Pelos padrões de hoje, contar o comprimento das palavras parece uma forma muito direta (e talvez simplista) de medir o estilo literário. O método de Mendenhall não leva em consideração as palavras do vocabulário de um autor, o que é obviamente problemático. Portanto, não devemos tratar as curvas características como uma fonte particularmente confiável de evidência estilométrica. No entanto, Mendenhall publicou a sua teoria há mais de cento e trinta anos e fez todos os cálculos à mão. É compreensível que ele tivesse optado por trabalhar com uma estatística que, embora grosseira, fosse ao menos fácil de compilar. Em honra ao valor histórico de sua tentativa inicial de estilometria, e porque a curva característica produz resultados visuais interessantes que podem ser implementados rapidamente, usaremos o método de Mendenhall como um primeiro passo em nossa exploração das técnicas de atribuição de autoria.</p>
+            <p>O trecho de código necessário para calcular e exibir as curvas características para os autores e os documentos de teste é o seguinte:</p>
+            <ab>
+                <code lang="language-python" xml:id="code_introducao-estilometria-python_4" corresp="code_introducao-estilometria-python_4.txt" rend="block"/>
+            </ab>
+            <p>Se você estiver trabalhando em um <ref target="http://jupyter.org/">Jupyter Notebook</ref>, adicione a expressão <code rend="inline">%matplotlib inline</code> após a importação das bibliotecas; caso contrário, você pode não ver os gráficos em sua tela. Se você estiver trabalhando em um <ref target="http://jupyterlab.readthedocs.io/en/stable/getting_started/installation.html">Jupyter Lab</ref>, substitua esta expressão por <code rend="inline">%matplotlib ipympl</code>.</p>
+            <p>A primeira linha no trecho de código acima carrega o módulo <emph>Natural Language Toolkit (nltk)</emph>, que contém um número enorme de funções e recursos úteis para processamento de texto. Mal tocaremos em seus fundamentos nesta lição; se você decidir explorar mais a análise de texto em Python, recomendo fortemente que comece com <ref target="https://www.nltk.org/">a documentação do nltk</ref>.</p>
+            <p>As próximas linhas configuram estruturas de dados que serão preenchidas pelo bloco de código dentro do loop <code rend="inline">for</code>. Este loop faz os mesmos cálculos para todos os nossos "autores":</p>
+            <list type="unordered">
+                <item>Invoca o método <code rend="inline">word_tokenize()</code> do <code rend="inline">nltk</code>, explicitando a linguagem do <emph>corpus</emph> para português através do argumento <code rend="inline">language="portuguese"</code>, e divide o <emph>corpus</emph> em  <emph>tokens</emph>, ou seja, palavras, números, pontuação, etc.;</item>
+                <item>Olha para esta lista de tokens e filtra as não-palavras;</item>
+                <item>Cria uma lista contendo os comprimentos de cada token de palavra restante;</item>
+                <item>Cria um objeto de <emph>distribuição de frequência</emph> a partir dessa lista de comprimentos de palavra, basicamente contando quantas palavras de uma letra, palavras de duas letras, etc., existem no <emph>corpus</emph> do autor, e em seguida realiza a normalização dessa distribuição, ou seja, ajusta todos os valores em um intervalo entre 0 e 1. Esta etapa é realizada para comparar gráficos de distribuição em <emph>corpus</emph> de tamanhos diferentes de forma mais clara;</item>
+                <item>Plota um gráfico da distribuição de comprimentos de palavras no corpus, para todas as palavras de até 15 caracteres.</item>
+            </list>
+            <p>Os resultados que obtemos são os seguintes:</p>
+            <figure>
+                <desc>Imagem 1: Comparação da curva de Mendenhall para cada corpus.</desc>
+                <graphic url="introducao-estilometria-python-01.jpeg"/>
+            </figure>
+            <p>Como podemos ver pelos gráficos, é possível notar diferenças (embora sutis) entre todas as 5 curvas características de cada autor (linha superior de gráficos). Ao compararmos os documentos de teste (linha inferior de gráficos) com os autores, podemos notar que a curva característica dos documentos de teste dos autores Assis, Castilho e Chagas se assemelham mais à curva dos seus respectivos autores que de qualquer outro, o que seriam inferências corretas. O documento de Alencar é o que mais diverge da curva característica do autor. Isso pode ocorrer pelo fato do documento de teste ser uma autobiografia do autor, enquanto os documentos de treino são duas obras de ficção, o que poderia influenciar no seu estilo de escrita. Veremos nas próximas abordagens se conseguimos contornar esta situação. O documento de Castelo Branco também parece não ter se assemelhado à curva característica do autor.</p>
+            <p>Para além desta análise meramente visual (que pode muitas vezes induzir ao erro), podemos ter um resultado quantitativo calculando a soma das distâncias entre os valores (normalizados) de frequência de cada documento de teste com os valores de frequência do <emph>corpus</emph> de cada possível autor. Por consequência, o autor que possuir a menor distância de frequência com o documento de teste seria o mais provável autor deste documento. Podemos implementar isso da seguinte forma:</p>
+            <ab>
+                <code lang="language-python" xml:id="code_introducao-estilometria-python_5" corresp="code_introducao-estilometria-python_5.txt" rend="block"/>
+            </ab>
+            <p>O resultado deste trecho serão 5 blocos, cada um comparando um documento com os 5 possíveis autores. Abaixo o exemplo de como o primeiro bloco deve parecer:</p>
+            <ab>
+                <code xml:id="code_introducao-estilometria-python_6" corresp="code_introducao-estilometria-python_6.txt" rend="block"/>
+            </ab>
+            <p>Vamos colocar os resultados dos 5 testes em uma <ref target="https://perma.cc/K42B-NQSR">matriz de confusão</ref> (limitando a 4 casas decimais) para avaliarmos:</p>
+            <table>
+                <row>
+                    <cell role="label"/>
+                    <cell role="label">Assis</cell>
+                    <cell role="label">Alencar</cell>
+                    <cell role="label">Castelo Branco</cell>
+                    <cell role="label">Castilho</cell>
+                    <cell role="label">Chagas</cell>
+                </row>
+                <row>
+                    <cell>
+                        <hi rend="bold">Assis (teste)</hi>
+                    </cell>
+                    <cell>
+                        <hi rend="bold">
+                            <span style="color:green">0.2578</span>
+                        </hi>
+                    </cell>
+                    <cell>0.5192</cell>
+                    <cell>0.7410</cell>
+                    <cell>0.4687</cell>
+                    <cell>0.3466</cell>
+                </row>
+                <row>
+                    <cell>
+                        <hi rend="bold">Alencar (teste)</hi>
+                    </cell>
+                    <cell>0.9744</cell>
+                    <cell>
+                        <hi rend="bold">
+                            <span style="color:red">0.9844</span>
+                        </hi>
+                    </cell>
+                    <cell>0.4313</cell>
+                    <cell>0.6979</cell>
+                    <cell>0.7897</cell>
+                </row>
+                <row>
+                    <cell>
+                        <hi rend="bold">Castelo Branco (teste)</hi>
+                    </cell>
+                    <cell>0.2812</cell>
+                    <cell>0.4436</cell>
+                    <cell>
+                        <hi rend="bold">
+                            <span style="color:red">0.4761</span>
+                        </hi>
+                    </cell>
+                    <cell>0.2772</cell>
+                    <cell>0.2803</cell>
+                </row>
+                <row>
+                    <cell>
+                        <hi rend="bold">Castilho (teste)</hi>
+                    </cell>
+                    <cell>0.4396</cell>
+                    <cell>0.4624</cell>
+                    <cell>0.4114</cell>
+                    <cell>
+                        <hi rend="bold">
+                            <span style="color:green">0.1394</span>
+                        </hi>
+                    </cell>
+                    <cell>0.3184</cell>
+                </row>
+                <row>
+                    <cell>
+                        <hi rend="bold">Chagas (teste)</hi>
+                    </cell>
+                    <cell>0.7746</cell>
+                    <cell>0.5883</cell>
+                    <cell>0.6636</cell>
+                    <cell>0.6732</cell>
+                    <cell>
+                        <hi rend="bold">
+                            <span style="color:orange">0.5888</span>
+                        </hi>
+                    </cell>
+                </row>
+            </table>
+            <p>Os documentos de teste de Assis e Castilho possuem menor valor com seus respectivos autores, o que indica a maior proximidade. Isso é condizente com a similaridade dos gráficos que vimos anteriormente. O documento de teste de Chagas teve um "empate técnico" entre o estilo do próprio autor (0.5888) e Alencar (0.5883). Tanto os documentos de teste de Alencar quanto Castelo Branco ficaram com o maior valor em relação aos seus respectivos autores, logo a técnica não foi eficaz para estes dois autores. </p>
+            <p>Se não tivéssemos informações adicionais para trabalharmos, poderíamos inferir corretamente 50% da atribuição de autoria (2 acertos, 2 erros e um "empate"), o que é um resultado considerável para uma técnica relativamente simples. Felizmente, a ciência estilométrica avançou muito desde a época de Mendenhall.</p>
+            <head>Segundo teste estilométrico: método qui-quadrado de Kilgariff</head>
+            <p>Em um artigo de 2001, Adam Kilgarriff<ref type="footnotemark" target="#pt_note_9"/> recomenda o uso da estatística qui-quadrado para determinar a autoria. Leitores familiarizados com métodos estatísticos podem se lembrar que o qui-quadrado às vezes é usado para testar se um conjunto de observações (digamos, as intenções dos eleitores conforme declarado em uma pesquisa) segue uma certa <ref target="https://perma.cc/668N-9GPD">distribuição de probabilidade</ref> ou padrão. Não é isso que buscamos aqui. Em vez disso, simplesmente usaremos a estatística para medir a "distância" entre os vocabulários empregados em dois conjuntos de textos. Quanto mais semelhantes os vocabulários, mais provável é que o mesmo autor tenha escrito os textos em ambos os conjuntos. Isso pressupõe que o vocabulário de uma pessoa e os padrões de uso das palavras são relativamente constantes.</p>
+            <p>Veja como aplicar a estatística para atribuição de autoria:</p>
+            <list type="unordered">
+                <item>Pegue os corpora associados a dois autores;</item>
+                <item>Junte-os em um único corpus, maior;</item>
+                <item>Conte os tokens para cada uma das palavras que podem ser encontradas neste corpus maior;</item>
+                <item>Selecione as <ref target="https://perma.cc/D9ND-3C83">
+                        <code rend="inline">n</code>
+                    </ref> palavras mais comuns no corpus maior;</item>
+                <item>Calcule quantos tokens dessas <code rend="inline">n</code> palavras mais comuns esperaríamos encontrar em cada um dos dois corpora originais se fossem do mesmo autor. Isso significa simplesmente dividir o número de tokens que observamos no corpus combinado em dois valores, com base nos tamanhos relativos das contribuições dos dois autores para o corpus comum;</item>
+                <item>Calcule uma distância qui-quadrada somando, sobre as <code rend="inline">n</code> palavras mais comuns, os <emph>quadrados das diferenças entre os números reais de tokens encontrados no corpus de cada autor e os números esperados</emph>, divididos pelos números esperados; A Figura 2 mostra a equação para a estatística qui-quadrado, onde C(i) representa o número observado de tokens para o recurso 'i' e E(i), o número esperado para esse recurso.</item>
+            </list>
+            <figure>
+                <desc>Imagem 2: Equação para a estatística qui-quadrado.</desc>
+                <graphic url="stylometry-python-6.jpg"/>
+            </figure>
+            <p>Quanto menor o valor do qui-quadrado, mais semelhantes são os dois corpora. Portanto, calcularemos o qui-quadrado de cada documento de teste com os 5 possíveis autores: os menores valores representarão a possível autoria de cada documento (assim como vimos no primeiro exemplo).</p>
+            <p>Nota: Independentemente do método estilométrico que usamos, a escolha de <code rend="inline">n</code>, o número de palavras a levar em consideração, é uma espécie de arte sombria. Na literatura pesquisada por Stamatatos<ref type="footnotemark" target="#pt_note_2"/>, pesquisadores sugeriram entre 100 e 1.000 das palavras mais comuns; um projeto chegou a usar cada palavra que aparecia no corpus pelo menos duas vezes. Como diretriz, quanto maior o corpus, maior o número de palavras que podem ser usadas como elementos sem correr o risco de dar importância indevida a uma palavra que ocorra apenas algumas vezes. Nesta lição, usaremos um <code rend="inline">n</code> relativamente grande para o método qui-quadrado e um menor para o próximo método. Mudar o valor de <code rend="inline">n</code> certamente mudará um pouco os resultados numéricos; no entanto, se uma pequena modificação de <code rend="inline">n</code> causar uma mudança na atribuição de autoria, isso é um sinal de que o teste que você está realizando não é capaz de fornecer evidências significativas sobre o seu caso de teste.</p>
+            <p>O seguinte trecho de código implementa o método de Kilgariff, com as frequências das 500 palavras mais comuns no corpus conjunto sendo usadas no cálculo:</p>
+            <ab>
+                <code lang="language-python" xml:id="code_introducao-estilometria-python_7" corresp="code_introducao-estilometria-python_7.txt" rend="block"/>
+            </ab>
+            <p>Assim como no primeiro exemplo, o resultado será 5 blocos de resultados, cada um para um documento de teste. O primeiro bloco se parecerá com isso:</p>
+            <ab>
+                <code xml:id="code_introducao-estilometria-python_8" corresp="code_introducao-estilometria-python_8.txt" rend="block"/>
+            </ab>
+            <p style="alert alert-warning">
+No código acima, convertemos os tokens em minúsculas para não contar os tokens de palavras que começam com uma letra maiúscula porque aparecem no início de uma frase e os tokens minúsculos da mesma palavra como duas palavras diferentes. Às vezes, isso pode causar alguns erros, por exemplo, quando um substantivo próprio e um substantivo comum são escritos da mesma forma, exceto para maiúsculas, mas geralmente esta técnica aumenta a precisão.
+</p>
+            <p>Agora, vamos dar uma olhada na matriz de confusão dos resultados para esta técnica:</p>
+            <table>
+                <row>
+                    <cell role="label"/>
+                    <cell role="label">Assis</cell>
+                    <cell role="label">Alencar</cell>
+                    <cell role="label">Castelo Branco</cell>
+                    <cell role="label">Castilho</cell>
+                    <cell role="label">Chagas</cell>
+                </row>
+                <row>
+                    <cell>
+                        <hi rend="bold">Assis (teste)</hi>
+                    </cell>
+                    <cell>
+                        <hi rend="bold">
+                            <span style="color:green">12266</span>
+                        </hi>
+                    </cell>
+                    <cell>13832</cell>
+                    <cell>15659</cell>
+                    <cell>19458</cell>
+                    <cell>13681</cell>
+                </row>
+                <row>
+                    <cell>
+                        <hi rend="bold">Alencar (teste)</hi>
+                    </cell>
+                    <cell>2550</cell>
+                    <cell>
+                        <hi rend="bold">
+                            <span style="color:red">3153</span>
+                        </hi>
+                    </cell>
+                    <cell>2581</cell>
+                    <cell>2663</cell>
+                    <cell>2765</cell>
+                </row>
+                <row>
+                    <cell>
+                        <hi rend="bold">Castelo Branco (teste)</hi>
+                    </cell>
+                    <cell>17294</cell>
+                    <cell>12063</cell>
+                    <cell>
+                        <hi rend="bold">
+                            <span style="color:green">11187</span>
+                        </hi>
+                    </cell>
+                    <cell>18133</cell>
+                    <cell>13954</cell>
+                </row>
+                <row>
+                    <cell>
+                        <hi rend="bold">Castilho (teste)</hi>
+                    </cell>
+                    <cell>11349</cell>
+                    <cell>9203</cell>
+                    <cell>8925</cell>
+                    <cell>
+                        <hi rend="bold">
+                            <span style="color:green">4531</span>
+                        </hi>
+                    </cell>
+                    <cell>7548</cell>
+                </row>
+                <row>
+                    <cell>
+                        <hi rend="bold">Chagas (teste)</hi>
+                    </cell>
+                    <cell>6683</cell>
+                    <cell>5700</cell>
+                    <cell>5836</cell>
+                    <cell>6970</cell>
+                    <cell>
+                        <hi rend="bold">
+                            <span style="color:green">5332</span>
+                        </hi>
+                    </cell>
+                </row>
+            </table>
+            <p>Como podemos observar, o teste de qui-quadrado obteve um resultado superior à curva característica de composição de Mendenhall. Assis e Castilho permanecem com a inferência correta de autoria. Chagas, que passou pelo "empate técnico" na curva de composição, com o qui-quadrado também faz a inferência correta com uma distância considerável entre os demais possíveis autores.  Dos autores que não haviam sido avaliados corretamente na curva de composição, Castelo Branco possui o menor valor de qui-quadrado, outra inferência correta. Alencar, no entanto, segue como o maior valor entre os 5 possíveis autores. De qualquer forma, já passamos de 50% de acerto com a curva característica de composição para 80% com o método qui-quadrado!</p>
+            <p>No entanto, o qui-quadrado ainda é um método pouco refinado. Por um lado, palavras que aparecem com muita frequência tendem a ter um peso desproporcional no cálculo final. Às vezes, isso é bom; outras vezes, diferenças sutis de estilo representadas pelas maneiras como os autores usam palavras mais incomuns passarão despercebidas.</p>
+            <div type="3">
+                <head>Uma nota sobre classes gramaticais</head>
+                <p>Em alguns casos e idiomas, pode ser útil aplicar a marcação de <ref target="https://perma.cc/ER5P-CFQE">Part-of-speech (classes gramaticais)</ref> aos tokens de palavras antes de contá-los, de modo que a mesma palavra usada como duas classes gramaticais diferentes possa contar como dois elementos diferentes (por exemplo, o termo "mais" sendo usado como substantivo ou como advérbio de intensidade). Esta lição não usa marcação de classes gramaticais, mas poderia refinar os resultados em estudos de caso mais complexos.</p>
+                <p>Se você precisar aplicar a marcação de classe gramatical aos seus próprios dados, poderá fazer o download de marcadores para outros idiomas, para trabalhar com uma ferramenta de terceiros como <ref target="https://perma.cc/DG9G-S5T2">Tree Tagger</ref>, ou mesmo para treinar o seu próprio marcador, mas essas técnicas estão muito além do escopo da lição atual.</p>
+            </div>
+            <div type="2">
+                <head>Terceiro teste estilométrico: método Delta de John Burrows (avançado)</head>
+                <p>Os primeiros dois métodos estilométricos foram mais fáceis de implementar. Este próximo, baseado na estatística <emph>Delta</emph> de John Burrows<ref type="footnotemark" target="#pt_note_10"/>, é consideravelmente mais complexo, tanto conceitualmente (a matemática é mais complicada) quanto computacionalmente (mais código necessário). É, no entanto, um dos métodos estilométricos mais proeminentes em uso hoje.</p>
+                <p>Assim como o qui-quadrado de Kilgariff, o método Delta de Burrows é uma medida da "distância" entre um texto cuja autoria queremos averiguar e algum outro corpus. Ao contrário do qui-quadrado, no entanto, o método Delta é projetado para comparar um texto anônimo (ou conjunto de textos) com as assinaturas de vários autores diferentes ao mesmo tempo. Mais precisamente, o método Delta mede como o texto anônimo <emph>e conjuntos de textos escritos por um número arbitrário de autores conhecidos</emph> divergem da média de todos eles juntos. Além disso, o método Delta atribui peso igual a todas as características que mede, evitando assim o problema de palavras comuns sobrecarregarem os resultados, o que era um problema com os testes de qui-quadrado. Por todas essas razões, o método Delta de John Burrows é geralmente uma solução mais eficaz para a questão da autoria.</p>
+                <p>O algoritmo original de Burrows pode ser resumido da seguinte forma:</p>
+                <list type="unordered">
+                    <item>Reúna um grande corpus composto por textos escritos por um número arbitrário de autores; digamos que o número de autores seja <code rend="inline">x</code>;</item>
+                    <item>Encontre as <code rend="inline">n</code> palavras mais frequentes no corpus para usar como elementos;</item>
+                    <item>Para cada uma dessas <code rend="inline">n</code> características, calcule a participação de cada subcorpora dos <code rend="inline">x</code> autores, como uma porcentagem do número total de palavras. Por exemplo, a palavra "ele" pode representar 4,72% das palavras no subcorpus do Autor A;</item>
+                    <item>Em seguida, calcule a média e o desvio padrão desses <code rend="inline">x</code> valores e use-os como a média oficial e o desvio padrão para esse elemento em todo o corpus. Em outras palavras, estaremos usando uma <emph>média de médias</emph> em vez de calcular um único valor que represente a parcela de todo o corpus dado por cada palavra. Fazemos isso porque queremos evitar que um subcorpus maior tenha maior influência nos resultados a seu favor e defina a norma do corpus de tal forma que se espere que tudo se pareça com ele;</item>
+                    <item>Para cada um dos <code rend="inline">n</code> elementos e <code rend="inline">x</code> subcorpora, calcule um <ref target="https://perma.cc/S2RH-LF9K">
+                            <code rend="inline">z-score</code>
+                        </ref> descrevendo o quão distante da norma do corpus está o uso desse elemento particular neste subcorpus específico. Para fazer isso, subtraia a "média das médias" de um dado elemento da frequência com que ela é encontrada no subcorpus e divida o resultado pelo seu desvio padrão. A Figura 3 mostra a equação de z-score para o elemento 'i', onde C(i) representa a frequência observada, a letra grega mu representa a média das médias e a letra grega sigma, o desvio padrão;</item>
+                </list>
+                <figure>
+                    <desc>Imagem 3: Equação para a estatística de z-score.</desc>
+                    <graphic url="stylometry-python-7.jpg"/>
+                </figure>
+                <list type="unordered">
+                    <item>Em seguida, calcule os mesmos <code rend="inline">z-scores</code> para cada elemento no texto para o qual queremos determinar a autoria;</item>
+                    <item>Finalmente, calcule um <emph>score delta</emph> comparando o documento de teste com o subcorpus de cada candidato. Para fazer isso, tome a <emph>média dos valores absolutos das diferenças entre os <code rend="inline">z-scores</code> para cada elemento entre o documento de teste e o subcorpus do candidato</emph>. (leia duas vezes!) Isso dá peso igual a cada elemento, não importa a frequência com que as palavras ocorram nos textos; caso contrário, os 3 ou 4 principais elementos sobrecarregariam todo o resto. A Figura 4 mostra a equação para Delta, onde Z(c,i) é o <code rend="inline">z-score</code> para o elemento 'i' no candidato 'c', e Z(t,i) é o <code rend="inline">z-score</code> para o elemento 'i' no caso de teste;</item>
+                </list>
+                <figure>
+                    <desc>Imagem 4: Equação para a estatística Delta de John Burrows.</desc>
+                    <graphic url="stylometry-python-8.jpg"/>
+                </figure>
+                <list type="unordered">
+                    <item>O candidato "vencedor", assim como nas duas outras técnicas que aplicamos, é o autor para o qual a pontuação delta entre o subcorpus do autor e o documento de teste é a mais baixa.</item>
+                </list>
+                <p>Stefan Evert <emph>et al</emph>.<ref type="footnotemark" target="#pt_note_11"/> fornece uma discussão aprofundada das variantes, refinamentos e complexidades do método, mas nos ateremos ao essencial para os propósitos desta lição. Uma explicação diferente de Delta, escrita em espanhol, e uma aplicação a um corpus de romances espanhóis também podem ser encontradas em um artigo recente de José Calvo Tello.<ref type="footnotemark" target="#pt_note_12"/>
+                </p>
+                <div type="3">
+                    <head>Seleção de elementos</head>
+                    <p>Vamos combinar todos os subcorpora em um único corpus para Delta calcular um "padrão" para trabalhar. Então, vamos selecionar um número de palavras para usar como característica. Lembre-se de que usamos 500 palavras para calcular o qui-quadrado de Kilgariff; desta vez, usaremos um conjunto menor de 30 palavras (a maioria, senão todas, palavras funcionais e verbos comuns) como nossos elementos.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_introducao-estilometria-python_9" corresp="code_introducao-estilometria-python_9.txt" rend="block"/>
+                    </ab>
+                    <p>Uma amostra das palavras mais frequentes e suas respectivas ocorrências parece com o seguinte:</p>
+                    <ab>
+                        <code xml:id="code_introducao-estilometria-python_10" corresp="code_introducao-estilometria-python_10.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Calculando elementos para cada subcorpus</head>
+                    <p>Vejamos as frequências de cada característica no subcorpus de cada candidato, como uma proporção do número total de tokens no subcorpus. Vamos calcular esses valores e armazená-los em um dicionário de dicionários, uma maneira conveniente de construir um <ref target="https://perma.cc/HR9K-24MG">array bidimensional</ref> em Python.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_introducao-estilometria-python_11" corresp="code_introducao-estilometria-python_11.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Calculando médias de elementos e desvios-padrão</head>
+                    <p>Dadas as frequências de elementos para todos os subcorpora que acabamos de calcular, podemos encontrar uma "média das médias" e um desvio padrão para cada elemento. Armazenaremos esses valores em outro "dicionário de dicionários".</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_introducao-estilometria-python_12" corresp="code_introducao-estilometria-python_12.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Calculando z-scores</head>
+                    <p>Em seguida, transformamos as frequências de características observadas no subcorpora dos cinco candidatos em <code rend="inline">z-scores</code>, descrevendo o quão distante da "estatística padrão do corpus" essas observações estão. Nada extravagante aqui: nós meramente aplicamos a definição do <code rend="inline">z-score</code> para cada elemento e armazenamos os resultados em outro array bidimensional.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_introducao-estilometria-python_13" corresp="code_introducao-estilometria-python_13.txt" rend="block"/>
+                    </ab>
+                </div>
+                <head>Calculando elementos, z-scores e Delta para nosso caso de teste</head>
+                <p>Em seguida, precisamos comparar os documentos de teste com o corpus. O seguinte trecho de código, que essencialmente recapitula tudo o que fizemos até agora, conta as frequências de cada um de nossos 30 elementos nos documentos de teste e calcula os <code rend="inline">z-scores</code> de acordo.
+Por fim, usamos a fórmula para Delta definida por Burrows para extrair uma única pontuação comparando cada documento de teste com cada um dos cinco "autores candidatos". Lembre-se: quanto menor a pontuação Delta, mais semelhante a assinatura estilométrica do documento à do candidato.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_introducao-estilometria-python_14" corresp="code_introducao-estilometria-python_14.txt" rend="block"/>
+                </ab>
+                <p>Como nas outras duas técnicas, o resultado serão 5 blocos de código dando o valor de Delta de cada documento para cada suposto autor. O primeiro bloco se parecerá com isso:</p>
+                <ab>
+                    <code xml:id="code_introducao-estilometria-python_15" corresp="code_introducao-estilometria-python_15.txt" rend="block"/>
+                </ab>
+                <p>Vamos avaliar todos os valores Delta na nossa matriz de confusão (reduzidos para 4 casas decimais):</p>
+                <table>
+                    <row>
+                        <cell role="label"/>
+                        <cell role="label">Assis</cell>
+                        <cell role="label">Alencar</cell>
+                        <cell role="label">Castelo Branco</cell>
+                        <cell role="label">Castilho</cell>
+                        <cell role="label">Chagas</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <hi rend="bold">Assis (teste)</hi>
+                        </cell>
+                        <cell>
+                            <hi rend="bold">
+                                <span style="color:green">0.8715</span>
+                            </hi>
+                        </cell>
+                        <cell>1.2624</cell>
+                        <cell>1.2303</cell>
+                        <cell>1.6276</cell>
+                        <cell>1.0527</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <hi rend="bold">Alencar (teste)</hi>
+                        </cell>
+                        <cell>1.9762</cell>
+                        <cell>
+                            <hi rend="bold">
+                                <span style="color:green">1.3355</span>
+                            </hi>
+                        </cell>
+                        <cell>1.3878</cell>
+                        <cell>1.6425</cell>
+                        <cell>1.5042</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <hi rend="bold">Castelo Branco (teste)</hi>
+                        </cell>
+                        <cell>1.004</cell>
+                        <cell>1.3208</cell>
+                        <cell>
+                            <hi rend="bold">
+                                <span style="color:green">0.8182</span>
+                            </hi>
+                        </cell>
+                        <cell>1.5202</cell>
+                        <cell>1.2829</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <hi rend="bold">Castilho (teste)</hi>
+                        </cell>
+                        <cell>1.5705</cell>
+                        <cell>1.2553</cell>
+                        <cell>1.0970</cell>
+                        <cell>
+                            <hi rend="bold">
+                                <span style="color:green">0.4518</span>
+                            </hi>
+                        </cell>
+                        <cell>0.8176</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <hi rend="bold">Chagas (teste)</hi>
+                        </cell>
+                        <cell>1.1444</cell>
+                        <cell>1.0169</cell>
+                        <cell>0.9462</cell>
+                        <cell>0.9864</cell>
+                        <cell>
+                            <hi rend="bold">
+                                <span style="color:green">0.7756</span>
+                            </hi>
+                        </cell>
+                    </row>
+                </table>
+                <p>Com o método Delta, pudemos inferir corretamente 100% da autoria dos documentos de teste! Alencar, que teve o pior valor nas duas outras técnicas, aqui aparece com o menor valor entre os 5 candidatos.
+Ao utilizarmos autores brasileiros e portugueses, tínhamos em mente também a possibilidade de que a comparação entre ficheiros de autores de uma mesma nacionalidade pudessem ter valores mais próximos que entre autores de nacionalidades distintas, em função de particularidades linguísticas, o que parece que não foi o caso aqui. Por se tratarem de obras do século XIX, poderíamos buscar explicações para isso na maior similaridade das línguas na época, na influência da Academia Portuguesa no Brasil, ou mesmo do letramento e influências dos autores. Uma segunda análise com obras mais contemporâneas seria um excelente segundo passo para esta análise, e fica como sugestão para o leitor.</p>
+            </div>
+            <div type="2">
+                <head>Leituras adicionais e recursos</head>
+                <div type="3">
+                    <head>Estudos de caso interessantes</head>
+                    <p>Estilometria e/ou atribuição de autoria têm sido utilizadas em diversos contextos, empregando diversas técnicas. Aqui estão alguns estudos de caso interessantes:</p>
+                    <list type="unordered">
+                        <item>Javier de la Rosa e Juan Luis Suárez procuram o autor de um famoso romance espanhol do século XVI entre uma lista considerável de candidatos. <ref type="footnotemark" target="#pt_note_13"/>
+                        </item>
+                        <item>Maria Slautina e Mikhail Marusenko usam o reconhecimento de padrões em um conjunto de recursos sintáticos, gramaticais e lexicais, desde a contagem de palavras simples (com marcação de classe gramatical) a vários tipos de frases, a fim de estabelecer semelhanças estilísticas entre os textos medievais.<ref type="footnotemark" target="#pt_note_14"/>
+                        </item>
+                        <item>Ellen Jordan, Hugh Craig e Alexis Antonia examinam o caso de periódicos britânicos do século XIX, nos quais os artigos geralmente não eram assinados, para determinar o autor de quatro resenhas de trabalhos de ou sobre as irmãs Brontë.<ref type="footnotemark" target="#pt_note_15"/> Este estudo de caso aplica uma versão inicial de outro método desenvolvido por John Burrows, o método Zeta, que se concentra nas palavras favoritas de um autor em vez de palavras de função comum.<ref type="footnotemark" target="#pt_note_16"/>
+                        </item>
+                        <item>Valérie Beaudoin e François Yvon analisaram 58 peças em verso dos dramaturgos franceses Corneille, Racine e Molière, descobrindo que as duas primeiras foram muito mais consistentes na maneira como estruturaram sua escrita do que as últimas.<ref type="footnotemark" target="#pt_note_17"/>
+                        </item>
+                        <item>Marcelo Luiz Brocardo, Issa Traore, Sherif Saad e Isaac Woungang aplicam <ref target="https://perma.cc/7TAQ-JECD">aprendizagem supervisionada</ref> e <ref target="https://perma.cc/X34K-5R9X">modelos n-gram</ref> para determinar a autoria de mensagens curtas com um grande número de autores em potencial, como e-mails e tweets.<ref type="footnotemark" target="#pt_note_18"/>
+                        </item>
+                        <item>Moshe Koppel e Winter Yaron propõem o "método do impostor", que tenta determinar se dois textos foram escritos pelo mesmo autor, inserindo-os em um conjunto de textos escritos por falsos candidatos.<ref type="footnotemark" target="#pt_note_19"/> Justin Anthony Stover <emph>et al.</emph> recentemente aplicou a técnica para determinar a autoria de um manuscrito do século II recém-descoberto.<ref type="footnotemark" target="#pt_note_20"/>
+                        </item>
+                        <item>Finalmente, uma equipe liderada por David I. Holmes estudou o caso peculiar de documentos escritos por um soldado da Guerra Civil ou por sua viúva que pode ter copiado intencionalmente seu estilo de escrita.<ref type="footnotemark" target="#pt_note_21"/>
+                        </item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Referências adicionais sobre autoria e estilometria</head>
+                    <p>A referência mais exaustiva em todos os assuntos relacionados à atribuição de autoria, incluindo a história do campo, seus fundamentos matemáticos e linguísticos e seus vários métodos, foi escrita por Patrick Juola em 2007.<ref type="footnotemark" target="#pt_note_22"/> O Capítulo 7, em particular, mostra como a atribuição de autoria pode servir como um marcador para várias identidades de grupo (gênero, nacionalidade, dialeto, etc.), para mudanças na linguagem ao longo do tempo, e até mesmo para personalidade e saúde mental.</p>
+                    <p>Uma pesquisa mais curta pode ser encontrada em Moshe Koppel <emph>et al.</emph>, que discute casos em que há um único autor candidato cuja autoria deve ser confirmada, um grande número de candidatos para os quais apenas pequenas amostras de escrita estão disponíveis para treinar um algoritmo de aprendizado de máquina, ou nenhum candidato conhecido.<ref type="footnotemark" target="#pt_note_23"/>
+                    </p>
+                    <p>O artigo de Stamatatos citado anteriormente<ref type="footnotemark" target="#pt_note_2"/> também contém uma pesquisa qualitativa do campo.</p>
+                </div>
+                <div type="3">
+                    <head>Varia</head>
+                    <p>
+                        <emph>Programming historians</emph> que desejam explorar mais a estilometria podem fazer o download do pacote <ref target="https://cran.r-project.org/web/packages/stylo/index.html">Stylo</ref>,<ref type="footnotemark" target="#pt_note_24"/> que se tornou um padrão <emph>de facto</emph>. Entre outras coisas, o pacote Stylo fornece uma implementação do método Delta, funcionalidade de extração de recursos e interfaces gráficas de usuário convenientes tanto para manipulação de dados quanto para produção de resultados visualmente atraentes. Observe que o Stylo é escrito em <ref target="https://www.r-project.org/">R</ref>, o que significa que você precisará do R instalado no seu computador para executá-lo, mas entre a interface gráfica do usuário e os tutoriais, pouco ou nenhum conhecimento prévio de programação R deve ser necessário.</p>
+                    <p>Leitores fluentes em francês interessados em explorar as implicações <ref target="https://perma.cc/6DFE-QTWV">epistemológicas</ref> das interações entre métodos quantitativos e qualitativos na análise do estilo de escrita devem ler Clémence Jacquot.<ref type="footnotemark" target="#pt_note_25"/>
+                    </p>
+                    <p>Surpreendentemente, os dados obtidos por meio de <ref target="https://perma.cc/R9U6-TRGE">reconhecimento ótico de caracteres</ref> (OCR) se mostraram adequados para fins de atribuição de autoria, mesmo quando os dados sofrem de altas taxas de erro de OCR.<ref type="footnotemark" target="#pt_note_26"/>
+                    </p>
+                    <p>Por fim, existe um <ref target="https://www.zotero.org/groups/643516/stylometry_bibliography/items">grupo Zotero</ref> dedicado à estilometria, onde você pode encontrar muitas outras referências a métodos e estudos.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Agradecimentos</head>
+                <p>Agradecimentos a Stéfan Sinclair e Andrew Piper, em cujos seminários na Universidade McGill este projeto começou. Também agradeço à minha orientadora de tese, Susan Dalton, cuja orientação é sempre inestimável.</p>
+            </div>
+            <div type="2">
+                <head>Notas finais</head>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_1"/> : Veja, por exemplo, Justin Rice, <ref target="https://perma.cc/W8TR-UH6S">"What Makes Hemingway Hemingway? A statistical analysis of the data behind Hemingway's style"</ref>
+                </p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_2"/> : Efstathios Stamatatos, “A Survey of Modern Authorship Attribution Method,” <emph>Journal of the American Society for Information Science and Technology</emph>, vol. 60, no. 3 (December 2008), p. 538–56, citation on p. 540, <ref target="https://doi.org/10.1002/asi.21001">https://doi.org/10.1002/asi.21001</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_3"/> : Jan Rybicki, “Vive La Différence: Tracing the (Authorial) Gender Signal by Multivariate Analysis of Word Frequencies,” <emph>Digital Scholarship in the Humanities</emph>, vol. 31, no. 4 (December 2016), pp. 746–61, <ref target="https://doi.org/10.1093/llc/fqv023">https://doi.org/10.1093/llc/fqv023</ref>. Sean G. Weidman e James O’Sullivan, “The Limits of Distinctive Words: Re-Evaluating Literature’s Gender Marker Debate,” <emph>Digital Scholarship in the Humanities</emph>, 2017, <ref target="https://doi.org/10.1093/llc/fqx017">https://doi.org/10.1093/llc/fqx017</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_4"/> : Ted Underwood, David Bamman, e Sabrina Lee, “The Transformation of Gender in English-Language Fiction”, <emph>Cultural Analytics</emph>, Feb. 13, 2018, <ref target="https://doi.org/10.22148/16.019">https://doi.org/10.22148/16.019</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_5"/> : Sven Meyer zu Eissen e Benno Stein, “Intrinsic Plagiarism Detection,” in <emph>ECIR 2006</emph>, edited by Mounia Lalmas, Andy MacFarlane, Stefan Rüger, Anastasios Tombros, Theodora Tsikrika, e Alexei Yavlinsky, Berlin, Heidelberg: Springer, 2006, pp. 565–69, <ref target="https://doi.org/10.1007/11735106_66">https://doi.org/10.1007/11735106_66</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_6"/> : Cynthia Whissell, “Traditional and Emotional Stylometric Analysis of the Songs of Beatles Paul McCartney and John Lennon,” <emph>Computers and the Humanities</emph>, vol. 30, no. 3 (1996), pp. 257–65.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_7"/> : Douglass Adair, "The Authorship of the Disputed Federalist Papers", <emph>The William and Mary Quarterly</emph>, vol. 1, no. 2 (April 1944), pp. 97-122.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_8"/> : T. C. Mendenhall, "The Characteristic Curves of Composition", <emph>Science</emph>, vol. 9, no. 214 (Mar. 11, 1887), pp. 237-249.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_9"/> : Adam Kilgarriff, "Comparing Corpora", <emph>International Journal of Corpus Linguistics</emph>, vol. 6, no. 1 (2001), pp. 97-133.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_10"/> : John Burrows, "'Delta': a Measure of Stylistic Difference and a Guide to Likely Authorship", <emph>Literary and Linguistic Computing</emph>, vol. 17, no. 3 (2002), pp. 267-287.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_11"/> : Stefan Evert et al., "Understanding and explaining Delta measures for authorship attribution", <emph>Digital Scholarship in the Humanities</emph>, vol. 32, no. suppl_2 (2017), pp.  ii4-ii16.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_12"/> : José Calvo Tello, “Entendiendo Delta desde las Humanidades,” <ref target="https://perma.cc/LNF3-QP8V">
+                        <emph>Caracteres</emph>, vol.5, no.1 (May 27 2016)</ref>, pp.140-176.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_13"/> : Javier de la Rosa and Juan Luis Suárez, “The Life of Lazarillo de Tormes and of His Machine Learning Adversities,” <emph>Lemir</emph>, vol. 20 (2016), pp. 373-438.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_14"/> : Maria Slautina e Mikhaïl Marusenko, “L’émergence du style, The emergence of style,” <emph>Les Cahiers du numérique</emph>, vol. 10, no. 4 (November 2014), pp. 179–215, <ref target="https://doi.org/10.3166/LCN.10.4.179-215">https://doi.org/10.3166/LCN.10.4.179-215</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_15"/> : Ellen Jordan, Hugh Craig, e Alexis Antonia, “The Brontë Sisters and the ‘Christian Remembrancer’: A Pilot Study in the Use of the ‘Burrows Method’ to Identify the Authorship of Unsigned Articles in the Nineteenth-Century Periodical Press,” <emph>Victorian Periodicals Review</emph>, vol. 39, no. 1 (2006), pp. 21–45.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_16"/> : John Burrows, “All the Way Through: Testing for Authorship in Different Frequency Strata,” <emph>Literary and Linguistic Computing</emph>, vol. 22, no. 1 (April 2007), pp. 27–47, <ref target="https://doi.org/10.1093/llc/fqi067">https://doi.org/10.1093/llc/fqi067</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_17"/> : Valérie Beaudoin e François Yvon, “Contribution de La Métrique à La Stylométrie,” <emph>JADT 2004: 7e Journées internationales d'Analyse statistique des Données Textuelles</emph>, vol. 1, Louvain La Neuve, Presses Universitaires de Louvain, 2004, pp. 107–18.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_18"/> : Marcelo Luiz Brocardo, Issa Traore, Sherif Saad e Isaac Woungang, “Authorship Verification for Short Messages Using Stylometry,” <emph>2013 International Conference on Computer, Information and Telecommunication Systems (CITS)</emph>, 2013, <ref target="https://doi.org/10.1109/CITS.2013.6705711">https://doi.org/10.1109/CITS.2013.6705711</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_19"/> : Moshe Koppel e Winter Yaron, “Determining If Two Documents Are Written by the Same Author,” <emph>Journal of the Association for Information Science and Technology</emph>, vol. 65, no. 1 (October 2013), pp. 178–87, <ref target="https://doi.org/10.1002/asi.22954">https://doi.org/10.1002/asi.22954</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_20"/> : Justin Anthony Stover et al., "Computational authorship verification method attributes a new work to a major 2nd century African author", <emph>Journal of the Association for Information Science and Technology</emph>, vol. 67, no. 1 (2016), pp. 239–242.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_21"/> : David I. Holmes, Lesley J. Gordon, e Christine Wilson, "A widow and her soldier: Stylometry and the American Civil War", <emph>Literary and Linguistic Computing</emph>, vol. 16, no 4 (2001), pp. 403–420.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_22"/> : Patrick  Juola, “Authorship Attribution,” <emph>Foundations and Trends in Information Retrieval</emph>, vol. 1, no. 3 (2007), pp. 233–334, <ref target="https://doi.org/10.1561/1500000005">https://doi.org/10.1561/1500000005</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_23"/> : Moshe Koppel, Jonathan Schler, e Shlomo Argamon, “Computational Methods in Authorship Attribution,” <emph>Journal of the Association for Information Science and Technology</emph>. vol. 60, no. 1 (January 2009), pp. 9–26, <ref target="https://doi.org/10.1002/asi.v60:1">https://doi.org/10.1002/asi.v60:1</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_24"/> : Maciej Eder, Jan Rybicki, e Mike Kestemont, “Stylometry with R: A Package for Computational Text Analysis,” <emph>The R Journal</emph>, vol. 8, no. 1 (2016), pp. 107–21.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_25"/> : Clémence Jacquot, “Rêve d'une épiphanie du style: visibilité et saillance en stylistique et en stylométrie,” <emph>Revue d’Histoire Littéraire de la France</emph> , vol. 116, no. 3 (2016),  pp. 619–39.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_26"/> : Patrick Juola, John Noecker Jr, e Michael Ryan, "Authorship Attribution and Optical Character Recognition Errors", <emph>TAL</emph>, vol. 53, no. 3 (2012), pp. 101–127.</p>
+            </div>
+        </body>
+    </text>
 </TEI>

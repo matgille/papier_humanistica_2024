@@ -1,114 +1,185 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="du-html-a-une-liste-de-mots-2">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Du HTML &#224; une liste de mots (partie 2)</title>
-  <author role="original_author"><persName>William J. Turkel</persName><persName>Adam Crymble</persName></author><editor role="reviewers"><persName>Jim Clifford</persName><persName>Frederik Elwert</persName></editor><author role="translators">C&#233;lian Ringwald</author><editor role="translation-reviewers"><persName>B&#233;atrice Mazoyer</persName><persName>Florian Barras</persName></editor><editor role="editors">Miriam Posner</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phfr0028</idno><date type="published">07/17/2012</date><date type="translated">11/09/2023</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#from-html-to-list-of-words-2"/>.</p><p>There are other translations: <ref target="#HTML-lista-palavras-2 #de-html-a-lista-de-palabras-2"/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Dans cette le&#231;on, nous allons impl&#233;menter l'algorithme d&#233;couvert dans la le&#231;on &amp;laquo;&amp;nbsp;Du HTML &#224; une liste de mots, partie 1&amp;nbsp;&amp;raquo;, afin d'apprendre &#224; d&#233;couper une chaine de caract&#232;res en une liste de mots.</p></abstract><textClass><keywords><term xml:lang="en">python</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="fr">
-    <body>
-      <div type="2"><head>Objectifs de la le&#231;on</head>
-<p>Dans cette le&#231;on, nous allons impl&#233;menter l&#8217;algorithme dont nous avons parl&#233; dans <ref target="/fr/lecons/du-html-a-une-liste-de-mots-1">la premi&#232;re partie</ref> de cette le&#231;on. Nous avons jusque-l&#224; pu &#233;crire une proc&#233;dure chargeant le contenu d&#8217;une page HTML et retournant le contenu pr&#233;sent entre la premi&#232;re balise <code rend="inline">&lt;p&gt;</code> et la derni&#232;re balise <code rend="inline">&lt;br/&gt;</code>. </p>
-<p>La seconde partie de notre algorithme devra inspecter un &#224; un chaque caract&#232;re de la chaine <code rend="inline">pageContents</code>&#160;:   </p>
-<list type="unordered">
-<item>Si le caract&#232;re est un crochet ouvrant (<code rend="inline">&lt;</code>), nous sommes alors &#224; l&#8217;int&#233;rieur d&#8217;une balise&#160;: nous ignorons donc ce caract&#232;re et nous ignorerons aussi les suivants jusqu&#8217;&#224; ce que nous soyons &#224; la fin de la balise&#160;;   </item>
-<item>Si le caract&#232;re est un crochet fermant (<code rend="inline">&gt;</code>) cela signifie que nous sommes toujours dans une balise mais que nous allons ressortir de celle-ci&#160;: nous ignorons ce caract&#232;re et inspecterons alors avec attention les suivants&#160;;   </item>
-<item>Si nous ne sommes pas dans une balise, nous ajoutons alors le caract&#232;re courant &#224; une variable appel&#233;e <code rend="inline">text</code>;</item>
-</list>
-<p>Nous d&#233;couperons ensuite la chaine de caract&#232;res <code rend="inline">text</code> en une liste de mots que nous manipulerons par la suite.</p>
-<div type="3"><head>Fichiers n&#233;cessaires au suivi de la le&#231;on</head>
-<list type="unordered">
-<item><code rend="inline">obo.py</code></item>
-<item><code rend="inline">trial-content.py</code></item>
-</list>
-<p>Si vous n&#8217;avez pas d&#233;j&#224; ces fichiers, vous pouvez t&#233;l&#233;charger le fichier <ref target="/assets/python-lessons2.zip"><code rend="inline">python-lessons2.zip</code></ref> issu de la le&#231;on pr&#233;c&#233;dente.</p>
-</div></div>
-      <div type="2"><head>Boucles et instructions conditionnelles en Python</head>
-<p>La prochaine &#233;tape dans l&#8217;impl&#233;mentation de l&#8217;algorithme consiste &#224; inspecter chaque caract&#232;re de la chaine <code rend="inline">pageContents</code> un &#224; un et &#224; tester si le caract&#232;re courant est un &#233;l&#233;ment d&#8217;une balise HTML ou bien le contenu de la transcription du proc&#232;s. </p>
-<p>Pour ce faire, nous allons d&#233;couvrir quelques techniques permettant de r&#233;p&#233;ter une t&#226;che et d&#8217;&#233;valuer si une condition est remplie.</p>
-<div type="3"><head>Les boucles</head>
-<p>Comme de nombreux langages de programmation, Python propose plusieurs moyens de r&#233;p&#233;ter l&#8217;ex&#233;cution d&#8217;une s&#233;quence d&#8217;instructions. Le plus adapt&#233; &#224; notre probl&#233;matique est ici la boucle <code rend="inline">for</code>, qui nous permettra de r&#233;aliser une t&#226;che sur chaque caract&#232;re de la chaine <code rend="inline">pageContents</code>. La variable <code rend="inline">char</code> contiendra alors successivement chaque caract&#232;re de la chaine <code rend="inline">pageContents</code> parcourue. </p>
-<p>Nous avons ici nomm&#233; cette variable <code rend="inline">char</code>. Toutefois, cela n&#8217;a pas d&#8217;importance particuli&#232;re dans le fonctionnement du programme, car nous aurions pu la nommer <code rend="inline">trucbidule</code> ou bien encore <code rend="inline">k</code> si nous en avions envie. Cependant certains termes ne peuvent pas &#234;tre utilis&#233;s car ils sont d&#233;j&#224; attribu&#233;s &#224; une notion sp&#233;cifique du langage Python (comme par exemple <code rend="inline">for</code>). Pour v&#233;rifier si cela est le cas, vous pouvez vous reposer sur la fonction de coloration syntaxique de votre &#233;diteur de texte afin de savoir si le nom d&#8217;une variable est possible (comme ici <code rend="inline">char</code>). Par ailleurs, il est pr&#233;f&#233;rable de donner aux variables des noms qui nous informent sur leurs contenus. Il sera ainsi plus simple de revenir sur un programme plus tard. C&#8217;est pourquoi <code rend="inline">trucbidule</code> n&#8217;est pas forc&#233;ment le meilleur choix de nom de variable.</p>
-<ab><code xml:id="code_du-html-a-une-liste-de-mots-2_0" corresp="code_du-html-a-une-liste-de-mots-2_0.txt" lang="language-python" rend="block"/></ab>
-</div><div type="3"><head>Les instructions conditionnelles</head>
-<p>Nous avons besoin de v&#233;rifier la valeur du caract&#232;re courant pour d&#233;cider quoi en faire. Pour cela, Python propose diff&#233;rents moyens de r&#233;aliser des &#171;&#160;tests conditionnels&#160;&#187;. </p>
-<p>Celui dont nous avons besoin est l&#8217;instruction conditionnelle <code rend="inline">if</code>. Le code ci-dessous utilise l&#8217;instruction <code rend="inline">if</code> pour v&#233;rifier si la chaine de caract&#232;res nomm&#233;e <code rend="inline">char</code> est &#233;gale &#224; un crochet ouvrant. Comme nous l&#8217;avons d&#233;j&#224; mentionn&#233;, l&#8217;indentation est tr&#232;s importante en Python. Si le code est bien indent&#233;, Python n&#8217;ex&#233;cutera le code indent&#233; que si la condition d&#233;finie est v&#233;rifi&#233;e.</p>
-<p>Notez que la syntaxe Python privil&#233;gie l&#8217;utilisation du signe &#233;gal (&#160;=&#160;) pour r&#233;aliser des &#171;&#160;affectations&#160;&#187;, c&#8217;est-&#224;-dire attribuer une valeur &#224; une variable. Pour tester une &#171;&#160;&#233;galit&#233;&#160;&#187;, il faut utiliser le double signe &#233;gal (&#160;==&#160;) (les programmeuses et programmeurs d&#233;butants ont souvent tendance &#224; confondre ces deux utilisations)&#160;:</p>
-<ab><code xml:id="code_du-html-a-une-liste-de-mots-2_1" corresp="code_du-html-a-une-liste-de-mots-2_1.txt" lang="language-python" rend="block"/></ab>
-<p>Une forme plus g&#233;n&#233;rale de l&#8217;instruction <code rend="inline">if</code> permet d&#8217;indiquer ce que nous souhaitons faire dans le cas o&#249; la condition sp&#233;cifi&#233;e n&#8217;est pas r&#233;alis&#233;e&#160;:</p>
-<ab><code xml:id="code_du-html-a-une-liste-de-mots-2_2" corresp="code_du-html-a-une-liste-de-mots-2_2.txt" lang="language-python" rend="block"/></ab>
-<p>Python laisse aussi la possibilit&#233; de v&#233;rifier d&#8217;autres conditions apr&#232;s la premi&#232;re instruction, et ceci en utilisant l&#8217;instruction <code rend="inline">elif</code> (qui est une contraction de <code rend="inline">else if</code>)&#160;:</p>
-<ab><code xml:id="code_du-html-a-une-liste-de-mots-2_3" corresp="code_du-html-a-une-liste-de-mots-2_3.txt" lang="language-python" rend="block"/></ab>
-</div></div>
-      <div type="2"><head>Utiliser l&#8217;algorithme pour supprimer le balisage HTML</head>
-<p>Vous en savez maintenant suffisamment pour impl&#233;menter la seconde partie de l&#8217;algorithme qui consiste &#224; supprimer toutes les balises HTML. Dans cette partie, nous souhaitons inspecter chaque caract&#232;re de la chaine <code rend="inline">pageContents</code> un &#224; un&#160;:   </p>
-<list type="unordered">
-<item>Si le caract&#232;re courant est un chevron ouvrant (<code rend="inline">&lt;</code>) cela signifie que nous entrons dans une balise, dans ce cas nous ignorons ce caract&#232;re et ignorerons les suivants&#160;;   </item>
-<item>Si le caract&#232;re courant est un chevron fermant (<code rend="inline">&gt;</code>), cela signifie que nous ressortons de la balise, nous ignorons alors seulement ce caract&#232;re et pr&#234;terons attention aux suivants&#160;;   </item>
-<item>Si nous ne sommes pas au sein d&#8217;une balise, nous ajoutons le caract&#232;re courant dans une variable nomm&#233;e <code rend="inline">text</code>.  </item>
-</list>
-<p>Pour r&#233;aliser cela, nous allons utiliser une boucle <code rend="inline">for</code> qui nous permettra d&#8217;inspecter de mani&#232;re it&#233;rative chaque caract&#232;re de la chaine. Nous utiliserons une suite d&#8217;instructions conditionnelles (<code rend="inline">if</code> / <code rend="inline">elif</code>) pour d&#233;terminer si le caract&#232;re courant est inclus dans une balise. Si, &#224; l&#8217;inverse, il fait partie du contenu &#224; extraire, nous ajouterons alors le caract&#232;re courant &#224; la variable <code rend="inline">text</code>. </p>
-<p>Comment garder en m&#233;moire le fait d&#8217;&#234;tre ou non &#224; l&#8217;int&#233;rieur d&#8217;une balise&#160;? Nous utiliserons pour cela une variable de type &#171;&#160;entier&#160;&#187;, qui vaudra 1 (vrai) si nous sommes dans une balise et qui vaudra 0 (faux) si ce n&#8217;est pas le cas (dans l&#8217;exemple plus bas nous avons appel&#233; cette variable <code rend="inline">inside</code>).</p>
-<div type="3"><head>La fonction de suppression des balises</head>
-<p>Mettons en pratique ce que nous venons d&#8217;apprendre. La version finale de la fonction <code rend="inline">stripTags()</code>, qui nous permet de r&#233;aliser notre objectif, est d&#233;crite ci-dessous. Lorsque vous remplacerez l&#8217;ancienne fonction <code rend="inline">stripTags()</code> par la nouvelle dans le fichier <code rend="inline">obo.py</code>, faites &#224; nouveau bien attention &#224; l&#8217;indentation, de mani&#232;re &#224; ce qu&#8217;elle soit identique &#224; ce qui est indiqu&#233; ci-dessous.</p>
-<p>Si vous avez tent&#233; de construire la fonction vous-m&#234;me, il est tout &#224; fait normal qu&#8217;elle puisse &#234;tre diff&#233;rente de celle que nous vous pr&#233;sentons ici. Il existe souvent plusieurs moyens d&#8217;arriver &#224; la m&#234;me fin, l&#8217;essentiel est pour le moment que cela r&#233;alise bien l&#8217;objectif que nous nous &#233;tions fix&#233;.</p>
-<p>Cependant, nous vous conseillons de v&#233;rifier que votre fonction renvoie bien le m&#234;me r&#233;sultat que la n&#244;tre&#160;:</p>
-<ab><code xml:id="code_du-html-a-une-liste-de-mots-2_4" corresp="code_du-html-a-une-liste-de-mots-2_4.txt" lang="language-python" rend="block"/></ab>
-<p>Ce code nous fait d&#233;couvrir deux nouvelles instructions&#160;: <code rend="inline">continue</code> et <code rend="inline">return</code>.</p>
-<p>L&#8217;instruction Python <code rend="inline">continue</code> est utilis&#233;e dans les boucles pour passer directement &#224; l&#8217;it&#233;ration suivante. Quand nous arrivons &#224; un caract&#232;re inclus au sein d&#8217;une balise HTML, nous pouvons par ce moyen passer au prochain caract&#232;re sans avoir &#224; ajouter celui-ci &#224; la variable <code rend="inline">text</code>.</p>
-<p>Dans la <ref target="/fr/lecons/du-html-a-une-liste-de-mots-1">premi&#232;re partie</ref> de cette le&#231;on, nous avons amplement us&#233; de la fonction <code rend="inline">print()</code>. Elle permet d&#8217;afficher &#224; l&#8217;&#233;cran le r&#233;sultat d&#8217;un programme pour qu&#8217;il puisse &#234;tre lu par l&#8217;utilisateur. Cependant, dans la majorit&#233; des cas, nous souhaitons simplement faire parvenir une information d&#8217;une partie d&#8217;un programme &#224; une autre. &#192; ce titre, quand l&#8217;ex&#233;cution d&#8217;une fonction se termine, elle peut renvoyer une valeur au code qui l&#8217;a appel&#233;e via l&#8217;instruction <code rend="inline">return</code>. </p>
-<p>Si nous souhaitons appeler la fonction <code rend="inline">stripTags()</code> dans un autre programme, voici comment nous y prendre&#160;:</p>
-<ab><code xml:id="code_du-html-a-une-liste-de-mots-2_5" corresp="code_du-html-a-une-liste-de-mots-2_5.txt" lang="language-python" rend="block"/></ab>
-<p>L&#8217;instruction <code rend="inline">return</code> nous permet de transf&#233;rer directement la valeur de sortie de la fonction <code rend="inline">stripTags()</code> dans une variable appel&#233;e <code rend="inline">theResult</code>, que nous pourrons r&#233;utiliser par la suite.</p>
-<p>Dans l&#8217;exemple ci-dessus, vous remarquerez que le contenu renvoy&#233; par la fonction <code rend="inline">stripTags()</code> n&#8217;est plus &#233;gal au contenu de <code rend="inline">myText</code> mais bien au contenu sans balises HTML.</p>
-<p>Pour tester notre nouvelle fonction <code rend="inline">stripTags()</code>, vous pouvez relancer <code rend="inline">trial-content.py</code>. Maintenant que nous avons red&#233;fini <code rend="inline">stripTags()</code>, le programme <code rend="inline">trial-content.py</code> fournit un r&#233;sultat diff&#233;rent, plus proche de notre objectif. Avant de continuer, v&#233;rifiez que vous avez bien compris pourquoi le comportement de <code rend="inline">trial-content.py</code> change lorsque l&#8217;on &#233;dite <code rend="inline">obo.py</code>.</p>
-</div></div>
-      <div type="2"><head>Les listes Python</head>
-<p>Maintenant que nous avons la possibilit&#233; d&#8217;extraire le texte d&#8217;une page web, nous souhaitons transformer ce texte de mani&#232;re &#224; ce qu&#8217;il soit plus facile &#224; traiter. </p>
-<p>Jusqu&#8217;&#224; pr&#233;sent, pour stocker de l&#8217;information dans un programme Python, nous avons choisi de le faire avec le format &#171;&#160;chaine de caract&#232;res&#160;&#187; (<ref target="https://perma.cc/D4RC-6TT4">string</ref>), que nous avons d&#233;j&#224; manipul&#233; dans une le&#231;on pr&#233;c&#233;dente (<ref target="/fr/lecons/manipuler-chaines-caracteres-python">Manipuler des chaines de caract&#232;res en Python</ref>).</p>
-<p>Cependant, il existe d&#8217;autres formats comme les &#171;&#160;entiers&#160;&#187; (<ref target="https://perma.cc/Y7DW-L6YA">integers</ref>), que nous avons utilis&#233;s dans la fonction <code rend="inline">stripTags()</code> pour stocker la valeur 1 quand nous &#233;tions au sein d&#8217;une balise et 0 lorsque ce n&#8217;&#233;tait pas le cas. Les entiers permettent de r&#233;aliser des op&#233;rations math&#233;matiques, mais il n&#8217;est pas possible d&#8217;y stocker des fractions ou des nombres d&#233;cimaux.</p>
-<ab><code xml:id="code_du-html-a-une-liste-de-mots-2_6" corresp="code_du-html-a-une-liste-de-mots-2_6.txt" lang="language-python" rend="block"/></ab>
-<p>De plus, sans le savoir, &#224; chaque fois que vous avez eu besoin de lire ou d&#8217;&#233;crire dans un fichier, vous avez utilis&#233; un objet sp&#233;cifique permettant de manipuler des fichiers, comme <code rend="inline">f</code> dans l&#8217;exemple ci-dessous&#160;:</p>
-<ab><code xml:id="code_du-html-a-une-liste-de-mots-2_7" corresp="code_du-html-a-une-liste-de-mots-2_7.txt" lang="language-python" rend="block"/></ab>
-<p>Un autre <ref target="https://perma.cc/X2M2-EWVC">type d&#8217;objets</ref> propos&#233; par Python est la &#171;&#160;[liste]&#160;&#187; (<ref target="https://perma.cc/FC9Y-JSSV">list</ref>, correspondant &#224; une collection ordonn&#233;e d&#8217;objets (pouvant inclure potentiellement d&#8217;autres listes).</p>
-<p>Convertir une chaine de caract&#232;res en liste de caract&#232;res ou de mots est assez simple. Copiez ou &#233;crivez le programme suivant dans votre &#233;diteur de texte pour comprendre les deux moyens de r&#233;aliser cette op&#233;ration. Sauvegardez le fichier en le nommant <code rend="inline">string-to-list.py</code> et ex&#233;cutez-le. Comparez ensuite les deux listes obtenues dans la sortie de la commande et &#224; la vue de ces r&#233;sultats, essayez de comprendre comment fonctionne ce bout de code&#160;:</p>
-<ab><code xml:id="code_du-html-a-une-liste-de-mots-2_8" corresp="code_du-html-a-une-liste-de-mots-2_8.txt" lang="language-python" rend="block"/></ab>
-<p>Le premier bloc de ce code d&#233;finit deux variables. La seconde partie fait intervenir une boucle <code rend="inline">for</code> pour parcourir chaque caract&#232;re de la chaine <code rend="inline">s1</code> puis ajoute chaque caract&#232;re &#224; la fin de <code rend="inline">charlist</code>. Le dernier bloc de code utilise l&#8217;op&#233;ration <code rend="inline">split</code> qui permet de d&#233;couper la chaine <code rend="inline">s2</code> l&#224; o&#249; se trouve un caract&#232;re invisible (espace, tabulation, retour charriot et autres caract&#232;res similaires). </p>
-<p>Pour le moment, nous avons simplifi&#233; un peu les choses concernant la proc&#233;dure utilis&#233;e pour le d&#233;coupage de la chaine en liste de mots. Modifiez la chaine <code rend="inline">s2</code> utilis&#233;e dans le programme et donnez-lui la valeur &#171;&#160;salut le monde!&#160;&#187; puis relancez le programme. </p>
-<p>Qu&#8217;est-il arriv&#233; au point d&#8217;exclamation&#160;? </p>
-<p>Si vous avez &#233;crit &#171;&#160;salut le monde!&#160;&#187; sans espace avant le point d&#8217;exclamation, celui-ci se retrouvera dans le m&#234;me &#233;l&#233;ment de la liste que &#171;&#160;monde&#160;&#187;, alors que si vous avez ajout&#233; une espace pour corriger cette erreur typographique, le point d&#8217;exclamation sera plac&#233; dans un &#233;l&#233;ment diff&#233;rent de la liste de mots. V&#233;rifiez si cela est bien le cas.</p>
-<p>Notez que vous devez sauvegarder les modifications apport&#233;es au programme avant de pouvoir relancer Python.</p>
-<p>En vous servant de vos nouvelles connaissances, ouvrez maintenant l&#8217;URL, t&#233;l&#233;chargez la page web, sauvegardez son contenu dans une chaine de caract&#232;res et, comme nous venons de le voir, d&#233;coupez celle-ci en une liste de mots. Essayez d&#8217;ex&#233;cuter alors le programme suivant&#160;:</p>
-<ab><code xml:id="code_du-html-a-une-liste-de-mots-2_9" corresp="code_du-html-a-une-liste-de-mots-2_9.txt" lang="language-python" rend="block"/></ab>
-<p>Le r&#233;sultat obtenu devrait ressembler &#224; la liste ci-dessous&#160;:</p>
-<ab><code xml:id="code_du-html-a-une-liste-de-mots-2_10" corresp="code_du-html-a-une-liste-de-mots-2_10.txt" lang="language-python" rend="block"/></ab>
-<p>Pour le moment, disposer d&#8217;une telle liste ne nous avance pas &#224; grand &#224; chose, surtout qu&#8217;un humain pourait facilement lire le texte initial. Cependant, comme nous le verrons dans les prochaines le&#231;ons, ce format est plus adapt&#233; pour automatiser le traitement de contenus textuels.</p>
-</div>
-      <div type="2"><head>Lectures sugg&#233;r&#233;es</head>
-<list type="unordered">
-<item>
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Du HTML à une liste de mots (partie 2)</title>
+                <author role="original_author">
+                    <persName>William J. Turkel</persName>
+                    <persName>Adam Crymble</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Jim Clifford</persName>
+                    <persName>Frederik Elwert</persName>
+                </editor>
+                <author role="translators">Célian Ringwald</author>
+                <editor role="translation-reviewers">
+                    <persName>Béatrice Mazoyer</persName>
+                    <persName>Florian Barras</persName>
+                </editor>
+                <editor role="editors">Miriam Posner</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">11/09/2023</date>
+                <idno type="doi">10.46430/phfr0028</idno>
+                <date type="published">07/17/2012</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#from-html-to-list-of-words-2"/>.</p>
+                <p>There are other translations: <ref target="#HTML-lista-palavras-2 #de-html-a-lista-de-palabras-2"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Dans cette leçon, nous allons implémenter l'algorithme découvert dans la leçon &amp;laquo;&amp;nbsp;Du HTML à une liste de mots, partie 1&amp;nbsp;&amp;raquo;, afin d'apprendre à découper une chaine de caractères en une liste de mots.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="fr">
+        <body>
+            <div type="2">
+                <head>Objectifs de la leçon</head>
+                <p>Dans cette leçon, nous allons implémenter l’algorithme dont nous avons parlé dans <ref target="/fr/lecons/du-html-a-une-liste-de-mots-1">la première partie</ref> de cette leçon. Nous avons jusque-là pu écrire une procédure chargeant le contenu d’une page HTML et retournant le contenu présent entre la première balise <code rend="inline">&lt;p&gt;</code> et la dernière balise <code rend="inline">&lt;br/&gt;</code>. </p>
+                <p>La seconde partie de notre algorithme devra inspecter un à un chaque caractère de la chaine <code rend="inline">pageContents</code> :   </p>
+                <list type="unordered">
+                    <item>Si le caractère est un crochet ouvrant (<code rend="inline">&lt;</code>), nous sommes alors à l’intérieur d’une balise : nous ignorons donc ce caractère et nous ignorerons aussi les suivants jusqu’à ce que nous soyons à la fin de la balise ;   </item>
+                    <item>Si le caractère est un crochet fermant (<code rend="inline">&gt;</code>) cela signifie que nous sommes toujours dans une balise mais que nous allons ressortir de celle-ci : nous ignorons ce caractère et inspecterons alors avec attention les suivants ;   </item>
+                    <item>Si nous ne sommes pas dans une balise, nous ajoutons alors le caractère courant à une variable appelée <code rend="inline">text</code>;</item>
+                </list>
+                <p>Nous découperons ensuite la chaine de caractères <code rend="inline">text</code> en une liste de mots que nous manipulerons par la suite.</p>
+                <div type="3">
+                    <head>Fichiers nécessaires au suivi de la leçon</head>
+                    <list type="unordered">
+                        <item>
+                            <code rend="inline">obo.py</code>
+                        </item>
+                        <item>
+                            <code rend="inline">trial-content.py</code>
+                        </item>
+                    </list>
+                    <p>Si vous n’avez pas déjà ces fichiers, vous pouvez télécharger le fichier <ref target="/assets/python-lessons2.zip">
+                            <code rend="inline">python-lessons2.zip</code>
+                        </ref> issu de la leçon précédente.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Boucles et instructions conditionnelles en Python</head>
+                <p>La prochaine étape dans l’implémentation de l’algorithme consiste à inspecter chaque caractère de la chaine <code rend="inline">pageContents</code> un à un et à tester si le caractère courant est un élément d’une balise HTML ou bien le contenu de la transcription du procès. </p>
+                <p>Pour ce faire, nous allons découvrir quelques techniques permettant de répéter une tâche et d’évaluer si une condition est remplie.</p>
+                <div type="3">
+                    <head>Les boucles</head>
+                    <p>Comme de nombreux langages de programmation, Python propose plusieurs moyens de répéter l’exécution d’une séquence d’instructions. Le plus adapté à notre problématique est ici la boucle <code rend="inline">for</code>, qui nous permettra de réaliser une tâche sur chaque caractère de la chaine <code rend="inline">pageContents</code>. La variable <code rend="inline">char</code> contiendra alors successivement chaque caractère de la chaine <code rend="inline">pageContents</code> parcourue. </p>
+                    <p>Nous avons ici nommé cette variable <code rend="inline">char</code>. Toutefois, cela n’a pas d’importance particulière dans le fonctionnement du programme, car nous aurions pu la nommer <code rend="inline">trucbidule</code> ou bien encore <code rend="inline">k</code> si nous en avions envie. Cependant certains termes ne peuvent pas être utilisés car ils sont déjà attribués à une notion spécifique du langage Python (comme par exemple <code rend="inline">for</code>). Pour vérifier si cela est le cas, vous pouvez vous reposer sur la fonction de coloration syntaxique de votre éditeur de texte afin de savoir si le nom d’une variable est possible (comme ici <code rend="inline">char</code>). Par ailleurs, il est préférable de donner aux variables des noms qui nous informent sur leurs contenus. Il sera ainsi plus simple de revenir sur un programme plus tard. C’est pourquoi <code rend="inline">trucbidule</code> n’est pas forcément le meilleur choix de nom de variable.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_du-html-a-une-liste-de-mots-2_0" corresp="code_du-html-a-une-liste-de-mots-2_0.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Les instructions conditionnelles</head>
+                    <p>Nous avons besoin de vérifier la valeur du caractère courant pour décider quoi en faire. Pour cela, Python propose différents moyens de réaliser des « tests conditionnels ». </p>
+                    <p>Celui dont nous avons besoin est l’instruction conditionnelle <code rend="inline">if</code>. Le code ci-dessous utilise l’instruction <code rend="inline">if</code> pour vérifier si la chaine de caractères nommée <code rend="inline">char</code> est égale à un crochet ouvrant. Comme nous l’avons déjà mentionné, l’indentation est très importante en Python. Si le code est bien indenté, Python n’exécutera le code indenté que si la condition définie est vérifiée.</p>
+                    <p>Notez que la syntaxe Python privilégie l’utilisation du signe égal ( = ) pour réaliser des « affectations », c’est-à-dire attribuer une valeur à une variable. Pour tester une « égalité », il faut utiliser le double signe égal ( == ) (les programmeuses et programmeurs débutants ont souvent tendance à confondre ces deux utilisations) :</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_du-html-a-une-liste-de-mots-2_1" corresp="code_du-html-a-une-liste-de-mots-2_1.txt" rend="block"/>
+                    </ab>
+                    <p>Une forme plus générale de l’instruction <code rend="inline">if</code> permet d’indiquer ce que nous souhaitons faire dans le cas où la condition spécifiée n’est pas réalisée :</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_du-html-a-une-liste-de-mots-2_2" corresp="code_du-html-a-une-liste-de-mots-2_2.txt" rend="block"/>
+                    </ab>
+                    <p>Python laisse aussi la possibilité de vérifier d’autres conditions après la première instruction, et ceci en utilisant l’instruction <code rend="inline">elif</code> (qui est une contraction de <code rend="inline">else if</code>) :</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_du-html-a-une-liste-de-mots-2_3" corresp="code_du-html-a-une-liste-de-mots-2_3.txt" rend="block"/>
+                    </ab>
+                </div>
+            </div>
+            <div type="2">
+                <head>Utiliser l’algorithme pour supprimer le balisage HTML</head>
+                <p>Vous en savez maintenant suffisamment pour implémenter la seconde partie de l’algorithme qui consiste à supprimer toutes les balises HTML. Dans cette partie, nous souhaitons inspecter chaque caractère de la chaine <code rend="inline">pageContents</code> un à un :   </p>
+                <list type="unordered">
+                    <item>Si le caractère courant est un chevron ouvrant (<code rend="inline">&lt;</code>) cela signifie que nous entrons dans une balise, dans ce cas nous ignorons ce caractère et ignorerons les suivants ;   </item>
+                    <item>Si le caractère courant est un chevron fermant (<code rend="inline">&gt;</code>), cela signifie que nous ressortons de la balise, nous ignorons alors seulement ce caractère et prêterons attention aux suivants ;   </item>
+                    <item>Si nous ne sommes pas au sein d’une balise, nous ajoutons le caractère courant dans une variable nommée <code rend="inline">text</code>.  </item>
+                </list>
+                <p>Pour réaliser cela, nous allons utiliser une boucle <code rend="inline">for</code> qui nous permettra d’inspecter de manière itérative chaque caractère de la chaine. Nous utiliserons une suite d’instructions conditionnelles (<code rend="inline">if</code> / <code rend="inline">elif</code>) pour déterminer si le caractère courant est inclus dans une balise. Si, à l’inverse, il fait partie du contenu à extraire, nous ajouterons alors le caractère courant à la variable <code rend="inline">text</code>. </p>
+                <p>Comment garder en mémoire le fait d’être ou non à l’intérieur d’une balise ? Nous utiliserons pour cela une variable de type « entier », qui vaudra 1 (vrai) si nous sommes dans une balise et qui vaudra 0 (faux) si ce n’est pas le cas (dans l’exemple plus bas nous avons appelé cette variable <code rend="inline">inside</code>).</p>
+                <div type="3">
+                    <head>La fonction de suppression des balises</head>
+                    <p>Mettons en pratique ce que nous venons d’apprendre. La version finale de la fonction <code rend="inline">stripTags()</code>, qui nous permet de réaliser notre objectif, est décrite ci-dessous. Lorsque vous remplacerez l’ancienne fonction <code rend="inline">stripTags()</code> par la nouvelle dans le fichier <code rend="inline">obo.py</code>, faites à nouveau bien attention à l’indentation, de manière à ce qu’elle soit identique à ce qui est indiqué ci-dessous.</p>
+                    <p>Si vous avez tenté de construire la fonction vous-même, il est tout à fait normal qu’elle puisse être différente de celle que nous vous présentons ici. Il existe souvent plusieurs moyens d’arriver à la même fin, l’essentiel est pour le moment que cela réalise bien l’objectif que nous nous étions fixé.</p>
+                    <p>Cependant, nous vous conseillons de vérifier que votre fonction renvoie bien le même résultat que la nôtre :</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_du-html-a-une-liste-de-mots-2_4" corresp="code_du-html-a-une-liste-de-mots-2_4.txt" rend="block"/>
+                    </ab>
+                    <p>Ce code nous fait découvrir deux nouvelles instructions : <code rend="inline">continue</code> et <code rend="inline">return</code>.</p>
+                    <p>L’instruction Python <code rend="inline">continue</code> est utilisée dans les boucles pour passer directement à l’itération suivante. Quand nous arrivons à un caractère inclus au sein d’une balise HTML, nous pouvons par ce moyen passer au prochain caractère sans avoir à ajouter celui-ci à la variable <code rend="inline">text</code>.</p>
+                    <p>Dans la <ref target="/fr/lecons/du-html-a-une-liste-de-mots-1">première partie</ref> de cette leçon, nous avons amplement usé de la fonction <code rend="inline">print()</code>. Elle permet d’afficher à l’écran le résultat d’un programme pour qu’il puisse être lu par l’utilisateur. Cependant, dans la majorité des cas, nous souhaitons simplement faire parvenir une information d’une partie d’un programme à une autre. À ce titre, quand l’exécution d’une fonction se termine, elle peut renvoyer une valeur au code qui l’a appelée via l’instruction <code rend="inline">return</code>. </p>
+                    <p>Si nous souhaitons appeler la fonction <code rend="inline">stripTags()</code> dans un autre programme, voici comment nous y prendre :</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_du-html-a-une-liste-de-mots-2_5" corresp="code_du-html-a-une-liste-de-mots-2_5.txt" rend="block"/>
+                    </ab>
+                    <p>L’instruction <code rend="inline">return</code> nous permet de transférer directement la valeur de sortie de la fonction <code rend="inline">stripTags()</code> dans une variable appelée <code rend="inline">theResult</code>, que nous pourrons réutiliser par la suite.</p>
+                    <p>Dans l’exemple ci-dessus, vous remarquerez que le contenu renvoyé par la fonction <code rend="inline">stripTags()</code> n’est plus égal au contenu de <code rend="inline">myText</code> mais bien au contenu sans balises HTML.</p>
+                    <p>Pour tester notre nouvelle fonction <code rend="inline">stripTags()</code>, vous pouvez relancer <code rend="inline">trial-content.py</code>. Maintenant que nous avons redéfini <code rend="inline">stripTags()</code>, le programme <code rend="inline">trial-content.py</code> fournit un résultat différent, plus proche de notre objectif. Avant de continuer, vérifiez que vous avez bien compris pourquoi le comportement de <code rend="inline">trial-content.py</code> change lorsque l’on édite <code rend="inline">obo.py</code>.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Les listes Python</head>
+                <p>Maintenant que nous avons la possibilité d’extraire le texte d’une page web, nous souhaitons transformer ce texte de manière à ce qu’il soit plus facile à traiter. </p>
+                <p>Jusqu’à présent, pour stocker de l’information dans un programme Python, nous avons choisi de le faire avec le format « chaine de caractères » (<ref target="https://perma.cc/D4RC-6TT4">string</ref>), que nous avons déjà manipulé dans une leçon précédente (<ref target="/fr/lecons/manipuler-chaines-caracteres-python">Manipuler des chaines de caractères en Python</ref>).</p>
+                <p>Cependant, il existe d’autres formats comme les « entiers » (<ref target="https://perma.cc/Y7DW-L6YA">integers</ref>), que nous avons utilisés dans la fonction <code rend="inline">stripTags()</code> pour stocker la valeur 1 quand nous étions au sein d’une balise et 0 lorsque ce n’était pas le cas. Les entiers permettent de réaliser des opérations mathématiques, mais il n’est pas possible d’y stocker des fractions ou des nombres décimaux.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_du-html-a-une-liste-de-mots-2_6" corresp="code_du-html-a-une-liste-de-mots-2_6.txt" rend="block"/>
+                </ab>
+                <p>De plus, sans le savoir, à chaque fois que vous avez eu besoin de lire ou d’écrire dans un fichier, vous avez utilisé un objet spécifique permettant de manipuler des fichiers, comme <code rend="inline">f</code> dans l’exemple ci-dessous :</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_du-html-a-une-liste-de-mots-2_7" corresp="code_du-html-a-une-liste-de-mots-2_7.txt" rend="block"/>
+                </ab>
+                <p>Un autre <ref target="https://perma.cc/X2M2-EWVC">type d’objets</ref> proposé par Python est la « [liste] » (<ref target="https://perma.cc/FC9Y-JSSV">list</ref>, correspondant à une collection ordonnée d’objets (pouvant inclure potentiellement d’autres listes).</p>
+                <p>Convertir une chaine de caractères en liste de caractères ou de mots est assez simple. Copiez ou écrivez le programme suivant dans votre éditeur de texte pour comprendre les deux moyens de réaliser cette opération. Sauvegardez le fichier en le nommant <code rend="inline">string-to-list.py</code> et exécutez-le. Comparez ensuite les deux listes obtenues dans la sortie de la commande et à la vue de ces résultats, essayez de comprendre comment fonctionne ce bout de code :</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_du-html-a-une-liste-de-mots-2_8" corresp="code_du-html-a-une-liste-de-mots-2_8.txt" rend="block"/>
+                </ab>
+                <p>Le premier bloc de ce code définit deux variables. La seconde partie fait intervenir une boucle <code rend="inline">for</code> pour parcourir chaque caractère de la chaine <code rend="inline">s1</code> puis ajoute chaque caractère à la fin de <code rend="inline">charlist</code>. Le dernier bloc de code utilise l’opération <code rend="inline">split</code> qui permet de découper la chaine <code rend="inline">s2</code> là où se trouve un caractère invisible (espace, tabulation, retour charriot et autres caractères similaires). </p>
+                <p>Pour le moment, nous avons simplifié un peu les choses concernant la procédure utilisée pour le découpage de la chaine en liste de mots. Modifiez la chaine <code rend="inline">s2</code> utilisée dans le programme et donnez-lui la valeur « salut le monde! » puis relancez le programme. </p>
+                <p>Qu’est-il arrivé au point d’exclamation ? </p>
+                <p>Si vous avez écrit « salut le monde! » sans espace avant le point d’exclamation, celui-ci se retrouvera dans le même élément de la liste que « monde », alors que si vous avez ajouté une espace pour corriger cette erreur typographique, le point d’exclamation sera placé dans un élément différent de la liste de mots. Vérifiez si cela est bien le cas.</p>
+                <p>Notez que vous devez sauvegarder les modifications apportées au programme avant de pouvoir relancer Python.</p>
+                <p>En vous servant de vos nouvelles connaissances, ouvrez maintenant l’URL, téléchargez la page web, sauvegardez son contenu dans une chaine de caractères et, comme nous venons de le voir, découpez celle-ci en une liste de mots. Essayez d’exécuter alors le programme suivant :</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_du-html-a-une-liste-de-mots-2_9" corresp="code_du-html-a-une-liste-de-mots-2_9.txt" rend="block"/>
+                </ab>
+                <p>Le résultat obtenu devrait ressembler à la liste ci-dessous :</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_du-html-a-une-liste-de-mots-2_10" corresp="code_du-html-a-une-liste-de-mots-2_10.txt" rend="block"/>
+                </ab>
+                <p>Pour le moment, disposer d’une telle liste ne nous avance pas à grand à chose, surtout qu’un humain pourait facilement lire le texte initial. Cependant, comme nous le verrons dans les prochaines leçons, ce format est plus adapté pour automatiser le traitement de contenus textuels.</p>
+            </div>
+            <div type="2">
+                <head>Lectures suggérées</head>
+                <list type="unordered">
+                    <item>
 Lutz, Mark. <emph>Learning python: Powerful object-oriented programming</emph>. O'Reilly Media, Inc., 2013.<list type="unordered">
-<item>Ch. 7&#160;: &#171;&#160;Strings&#160;&#187;</item>
-<item>Ch. 8&#160;: &#171;&#160;Lists and Dictionaries&#160;&#187;</item>
-<item>Ch. 10&#160;: &#171;&#160;Introducing Python Statements&#160;&#187;</item>
-<item>Ch. 15&#160;: &#171;&#160;Function Basics&#160;&#187;</item>
-</list>
-</item>
-</list>
-</div>
-      <div type="2"><head>Synchronisation du code</head>
-<p>Pour suivre les le&#231;ons &#224; venir, il est important que vous ayez les bons fichiers et programmes dans votre r&#233;pertoire <code rend="inline">programming-historian</code>. &#192; la fin de chaque chapitre, vous pouvez t&#233;l&#233;charger le fichier <code rend="inline">.zip</code> contenant le mat&#233;riel de cours afin de vous assurer d&#8217;avoir une version mise &#224; jour du code.</p>
-<list type="unordered">
-<item>python-lessons3.zip (<ref target="/assets/python-lessons3.zip">zip sync</ref>)</item>
-</list>
-</div>
-    </body>
-  </text>
+                            <item>Ch. 7 : « Strings »</item>
+                            <item>Ch. 8 : « Lists and Dictionaries »</item>
+                            <item>Ch. 10 : « Introducing Python Statements »</item>
+                            <item>Ch. 15 : « Function Basics »</item>
+                        </list>
+                    </item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Synchronisation du code</head>
+                <p>Pour suivre les leçons à venir, il est important que vous ayez les bons fichiers et programmes dans votre répertoire <code rend="inline">programming-historian</code>. À la fin de chaque chapitre, vous pouvez télécharger le fichier <code rend="inline">.zip</code> contenant le matériel de cours afin de vous assurer d’avoir une version mise à jour du code.</p>
+                <list type="unordered">
+                    <item>python-lessons3.zip (<ref target="/assets/python-lessons3.zip">zip sync</ref>)</item>
+                </list>
+            </div>
+        </body>
+    </text>
 </TEI>

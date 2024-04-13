@@ -1,443 +1,572 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="fetch-and-parse-data-with-openrefine">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Fetching and Parsing Data from the Web with OpenRefine</title>
-  <author role="original_author">Evan Peter Williamson</author><editor role="reviewers"><persName>Peggy Griesinger</persName><persName>Lisa Lowry</persName></editor><editor role="editors">Jeri Wieringa</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phen0065</idno><date type="published">08/12/2017</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. This lesson is original.</p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>OpenRefine is a powerful tool for exploring, cleaning, and transforming data. In this lesson you will learn how to use Refine to fetch URLs and parse web content.</p></abstract><textClass><keywords><term xml:lang="en">data-manipulation</term><term xml:lang="en">web-scraping</term><term xml:lang="en">api</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="en">
-    <body>
-      <div type="2"><head>Lesson Goals</head>
-<p>OpenRefine is a powerful tool for exploring, cleaning, and transforming data.
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Fetching and Parsing Data from the Web with OpenRefine</title>
+                <author role="original_author">Evan Peter Williamson</author>
+                <editor role="reviewers">
+                    <persName>Peggy Griesinger</persName>
+                    <persName>Lisa Lowry</persName>
+                </editor>
+                <editor role="editors">Jeri Wieringa</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0065</idno>
+                <date type="published">08/12/2017</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>OpenRefine is a powerful tool for exploring, cleaning, and transforming data. In this lesson you will learn how to use Refine to fetch URLs and parse web content.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">web-scraping</term>
+                    <term xml:lang="en">api</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2">
+                <head>Lesson Goals</head>
+                <p>OpenRefine is a powerful tool for exploring, cleaning, and transforming data.
 An earlier Programming Historian lesson, <ref target="/lessons/cleaning-data-with-openrefine">"Cleaning Data with OpenRefine"</ref>, introduced the basic functionality of Refine to efficiently discover and correct inconsistency in a data set.
 Building on those essential data wrangling skills, this lesson focuses on Refine's ability to fetch URLs and parse web content.
 Examples introduce some of the advanced features to transform and enhance a data set including:</p>
-<list type="unordered">
-<item>fetch URLs using Refine</item>
-<item>construct URL queries to retrieve information from a simple web API</item>
-<item>parse HTML and JSON responses to extract relevant data</item>
-<item>use array functions to manipulate string values</item>
-<item>use Jython to extend Refine's functionality</item>
-</list>
-<p>It will be helpful to have basic familiarity with <ref target="/lessons/cleaning-data-with-openrefine">OpenRefine</ref>, <ref target="/lessons/viewing-html-files">HTML</ref>, and programming concepts such as variables and loops to complete this lesson.</p>
-<div type="3"><head>Why Use OpenRefine?</head>
-<p>The ability to create data sets from unstructured documents available on the web opens possibilities for research using digitized primary materials, web archives, texts, and contemporary media streams.
+                <list type="unordered">
+                    <item>fetch URLs using Refine</item>
+                    <item>construct URL queries to retrieve information from a simple web API</item>
+                    <item>parse HTML and JSON responses to extract relevant data</item>
+                    <item>use array functions to manipulate string values</item>
+                    <item>use Jython to extend Refine's functionality</item>
+                </list>
+                <p>It will be helpful to have basic familiarity with <ref target="/lessons/cleaning-data-with-openrefine">OpenRefine</ref>, <ref target="/lessons/viewing-html-files">HTML</ref>, and programming concepts such as variables and loops to complete this lesson.</p>
+                <div type="3">
+                    <head>Why Use OpenRefine?</head>
+                    <p>The ability to create data sets from unstructured documents available on the web opens possibilities for research using digitized primary materials, web archives, texts, and contemporary media streams.
 Programming Historian lessons introduce a number of methods to gather and interact with this content, from <ref target="/lessons/applied-archival-downloading-with-wget">wget</ref> to <ref target="/lessons/intro-to-beautiful-soup">Python</ref>.
 When working with text documents, Refine is particularly suited for this task, allowing users to fetch urls and directly process the results in an iterative, exploratory manner.</p>
-<p>David Huynh, the creator of Freebase Gridworks (2009) which became GoogleRefine (2010) and then OpenRefine (2012+), describes Refine as:</p>
-<list type="unordered">
-<item>more powerful than a spreadsheet</item>
-<item>more interactive and visual than scripting</item>
-<item>more provisional / exploratory / experimental / playful than a database <ref type="footnotemark" target="#note_huynh"/></item>
-</list>
-<p>Refine is a unique tool that combines the power of databases and scripting languages into an interactive and user friendly visual interface.
+                    <p>David Huynh, the creator of Freebase Gridworks (2009) which became GoogleRefine (2010) and then OpenRefine (2012+), describes Refine as:</p>
+                    <list type="unordered">
+                        <item>more powerful than a spreadsheet</item>
+                        <item>more interactive and visual than scripting</item>
+                        <item>more provisional / exploratory / experimental / playful than a database <ref type="footnotemark" target="#en_note_huynh"/>
+                        </item>
+                    </list>
+                    <p>Refine is a unique tool that combines the power of databases and scripting languages into an interactive and user friendly visual interface.
 Because of this flexibility it has been embraced by <ref target="https://www.propublica.org/nerds/item/using-google-refine-for-data-cleaning">journalists</ref>, <ref target="http://web.archive.org/web/20180129051941/http://data-lessons.github.io/library-openrefine/">librarians</ref>, <ref target="http://www.datacarpentry.org/OpenRefine-ecology-lesson/">scientists</ref>, and others needing to wrangle data from diverse sources and formats into structured information.</p>
-<figure><desc>OpenRefine terminal and GUI</desc><graphic url="openrefine.png"/></figure>
-<quote>
-<p>OpenRefine is a <ref target="https://www.gnu.org/philosophy/free-sw.en.html">free</ref> and <ref target="https://github.com/OpenRefine/OpenRefine">open source</ref> Java application.
+                    <figure>
+                        <desc>OpenRefine terminal and GUI</desc>
+                        <graphic url="openrefine.png"/>
+                    </figure>
+                    <quote>
+                        <p>OpenRefine is a <ref target="https://www.gnu.org/philosophy/free-sw.en.html">free</ref> and <ref target="https://github.com/OpenRefine/OpenRefine">open source</ref> Java application.
 The user interface is rendered by your web browser, but Refine is not a web application. No information is sent online and no internet connection is necessary.
 Full documentation is available on the <ref target="https://github.com/OpenRefine/OpenRefine/wiki/">official wiki</ref>.
 For installation and staring Refine check this <ref target="https://uidaholib.github.io/clean-your-data/3-start.html">workshop page</ref>.</p>
-<p>Note: this lesson was written using openrefine-2.7. Although almost all functionality is interchangeable between versions, I suggest using the newest version.</p>
-</quote>
-</div><div type="3"><head>Lesson Outline</head>
-<p>This lesson presents three examples demonstrating workflows to harvest and process data from the web:</p>
-<list type="ordered">
-<item><emph><ref target="#example-1-fetching-and-parsing-html">Example 1: Fetching and Parsing HTML</ref></emph> transforms an ebook into a structured data set by parsing the HTML and using string array functions.</item>
-<item><emph><ref target="#example-2-url-queries-and-parsing-json">Example 2: URL Queries and Parsing JSON</ref></emph> interacts with a simple web API to construct a full text data set of historic newspaper front pages.</item>
-<item><emph><ref target="#example-3-advanced-apis">Example 3: Advanced APIs</ref></emph> demonstrates using Jython to implement a POST request to a natural language processing web service.</item>
-</list>
-</div></div>
-      <div type="2"><head>Example 1: Fetching and Parsing HTML</head>
-<p>This example downloads a single web page and parses it into a structured table using Refine's built in functions.
+                        <p>Note: this lesson was written using openrefine-2.7. Although almost all functionality is interchangeable between versions, I suggest using the newest version.</p>
+                    </quote>
+                </div>
+                <div type="3">
+                    <head>Lesson Outline</head>
+                    <p>This lesson presents three examples demonstrating workflows to harvest and process data from the web:</p>
+                    <list type="ordered">
+                        <item>
+                            <emph>
+                                <ref target="#example-1-fetching-and-parsing-html">Example 1: Fetching and Parsing HTML</ref>
+                            </emph> transforms an ebook into a structured data set by parsing the HTML and using string array functions.</item>
+                        <item>
+                            <emph>
+                                <ref target="#example-2-url-queries-and-parsing-json">Example 2: URL Queries and Parsing JSON</ref>
+                            </emph> interacts with a simple web API to construct a full text data set of historic newspaper front pages.</item>
+                        <item>
+                            <emph>
+                                <ref target="#example-3-advanced-apis">Example 3: Advanced APIs</ref>
+                            </emph> demonstrates using Jython to implement a POST request to a natural language processing web service.</item>
+                    </list>
+                </div>
+            </div>
+            <div type="2">
+                <head>Example 1: Fetching and Parsing HTML</head>
+                <p>This example downloads a single web page and parses it into a structured table using Refine's built in functions.
 A similar workflow can be applied to a list of URLs, often generated by parsing another web page, creating a flexible web harvesting tool.</p>
-<p>The raw data for this example is an HTML copy of Shakespeare's <ref target="http://www.gutenberg.org/ebooks/1105">Sonnets</ref> from <ref target="http://www.gutenberg.org/">Project Gutenberg</ref>.
+                <p>The raw data for this example is an HTML copy of Shakespeare's <ref target="http://www.gutenberg.org/ebooks/1105">Sonnets</ref> from <ref target="http://www.gutenberg.org/">Project Gutenberg</ref>.
 Processing a book of poems into structured data enables new ways of reading text, allowing us to sort, manipulate, and connect with other information.</p>
-<p style="alert alert-warning">
+                <p style="alert alert-warning">
 Please note that Project Gutenberg provides <ref target="http://www.gutenberg.org/wiki/Gutenberg:Feeds">feeds</ref> to bulk download catalog data.
 Their public website should not be used for web scraping purposes.
 A copy of the HTML ebook is hosted on GitHub for this example to avoid redirects built in to the Gutenberg site.
 </p>
-<div type="3"><head>Start "Sonnets" Project</head>
-<p>Start OpenRefine and select <emph>Create Project</emph>.
+                <div type="3">
+                    <head>Start "Sonnets" Project</head>
+                    <p>Start OpenRefine and select <emph>Create Project</emph>.
 Refine can import data from a wide variety of formats and sources, from a local Excel file to web accessible RDF.
 One often over looked method is the <emph>Clipboard</emph>, which allows entering data via copy &amp; paste.
 Under "Get Data From", click <emph>Clipboard</emph>, and paste this URL into the text box:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_0" corresp="code_fetch-and-parse-data-with-openrefine_0.txt" rend="block"/></ab>
-<figure><desc>Start project with clipboard</desc><graphic url="refine-clipboard1.png"/></figure>
-<p>After clicking <emph>Next</emph>, Refine should automatically identify the content as a line-based text file and the default parsing options should be correct.
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_0" corresp="code_fetch-and-parse-data-with-openrefine_0.txt" rend="block"/>
+                    </ab>
+                    <figure>
+                        <desc>Start project with clipboard</desc>
+                        <graphic url="refine-clipboard1.png"/>
+                    </figure>
+                    <p>After clicking <emph>Next</emph>, Refine should automatically identify the content as a line-based text file and the default parsing options should be correct.
 Add the project name "Sonnets" at the top right and click <emph>Create project</emph>.
 This will result in a project with one column and one row.</p>
-</div><div type="3"><head>Fetch HTML</head>
-<p>Refine's built-in function to retrieve a list of URLs is done by creating a new column.
+                </div>
+                <div type="3">
+                    <head>Fetch HTML</head>
+                    <p>Refine's built-in function to retrieve a list of URLs is done by creating a new column.
 Click on the menu arrow of <emph>Column 1</emph> &gt; <emph>Edit column</emph> &gt; <emph>Add column by fetching urls</emph>.</p>
-<p>{% include figure.html caption="Edit column &gt; Add column by fetching URL" filename="refine-fetch1.png" %}</p>
-<p>Name the new column "fetch".
+                    <p>{% include figure.html caption="Edit column &gt; Add column by fetching URL" filename="refine-fetch1.png" %}</p>
+                    <p>Name the new column "fetch".
 The <emph>Throttle delay</emph> option sets a pause time between requests to avoid being blocked by a server.
 The default is conservative.</p>
-<p>{% include figure.html caption="Add column by fetch dialog box" filename="refine-fetch1.2.png" %}</p>
-<p>After clicking "OK", Refine will start requesting the URLs from the base column as if you were opening the pages in your browser, and will store each response in the cells of the new column.
+                    <p>{% include figure.html caption="Add column by fetch dialog box" filename="refine-fetch1.2.png" %}</p>
+                    <p>After clicking "OK", Refine will start requesting the URLs from the base column as if you were opening the pages in your browser, and will store each response in the cells of the new column.
 In this case, there is one URL in <emph>Column 1</emph> resulting in one cell in the <emph>fetch</emph> column containing the full HTML source for the Sonnets web page.</p>
-<p>{% include figure.html caption="Fetch results" filename="refine-fetch1.3.png" %}</p>
-</div><div type="3"><head>Parse HTML</head>
-<p>Much of the web page is not sonnet text and must be removed to create a clean data set.
+                    <p>{% include figure.html caption="Fetch results" filename="refine-fetch1.3.png" %}</p>
+                </div>
+                <div type="3">
+                    <head>Parse HTML</head>
+                    <p>Much of the web page is not sonnet text and must be removed to create a clean data set.
 First, it is necessary to identify a pattern that can isolate the desired content.
 Items will often be nested in a unique container or given a meaningful class or id.</p>
-<p>To make examining the HTML easier, click on the URL in <emph>Column 1</emph> to open the link in a new tab, then right click on the page to "View Page Source".
+                    <p>To make examining the HTML easier, click on the URL in <emph>Column 1</emph> to open the link in a new tab, then right click on the page to "View Page Source".
 In this case the sonnets page does not have distinctive semantic markup, but each poem is contained inside a single <code rend="inline">&lt;p&gt;</code> element.
 Thus, if all the paragraphs are selected, the sonnets can be extracted from the group.</p>
-<p>{% include figure.html caption="Each sonnet is a &lt;p&gt; with lines separated by &lt;br /&gt;" filename="refine-sonnet-markup.png" %}</p>
-<p>On the <emph>fetch</emph> column, click on the menu arrow &gt; <emph>edit column</emph> &gt; <emph>Add column based on this column</emph>.
+                    <p>{% include figure.html caption="Each sonnet is a &lt;p&gt; with lines separated by &lt;br /&gt;" filename="refine-sonnet-markup.png" %}</p>
+                    <p>On the <emph>fetch</emph> column, click on the menu arrow &gt; <emph>edit column</emph> &gt; <emph>Add column based on this column</emph>.
 Give the new column the name "parse", then click in the <emph>Expression</emph> text box.</p>
-<p>{% include figure.html caption="Edit column &gt; Add column based on this column" filename="refine-expression-box.png" %}</p>
-<p>Data in Refine can be transformed using the <ref target="https://github.com/OpenRefine/OpenRefine/wiki/General-Refine-Expression-Language">General Refine Expression Language</ref> (GREL).
+                    <p>{% include figure.html caption="Edit column &gt; Add column based on this column" filename="refine-expression-box.png" %}</p>
+                    <p>Data in Refine can be transformed using the <ref target="https://github.com/OpenRefine/OpenRefine/wiki/General-Refine-Expression-Language">General Refine Expression Language</ref> (GREL).
 The <emph>Expression</emph> box accepts GREL functions that will be applied to each cell in the existing column to create values for the new one.
 The <emph>Preview</emph> window below the <emph>Expression</emph> box displays the current value on the left and the value for the new column on the right.</p>
-<p>The default expression is <code rend="inline">value</code>, the <ref target="https://github.com/OpenRefine/OpenRefine/wiki/Variables">GREL variable</ref> representing the current contents of a cell.
+                    <p>The default expression is <code rend="inline">value</code>, the <ref target="https://github.com/OpenRefine/OpenRefine/wiki/Variables">GREL variable</ref> representing the current contents of a cell.
 This means that each cell is simply copied to the new column, which is reflected in the <emph>Preview</emph>.
 GREL variables and functions are strung together in sequence using a period, called dot notation.
 This allows complex operations to be constructed by passing the results of each function to the next.</p>
-<p>GREL's <code rend="inline">parseHtml()</code> function can read HTML content, allowing elements to be accessed using the <code rend="inline">select()</code> function and the <ref target="https://jsoup.org/cookbook/extracting-data/selector-syntax">jsoup selector syntax</ref>.
+                    <p>GREL's <code rend="inline">parseHtml()</code> function can read HTML content, allowing elements to be accessed using the <code rend="inline">select()</code> function and the <ref target="https://jsoup.org/cookbook/extracting-data/selector-syntax">jsoup selector syntax</ref>.
 Starting with <code rend="inline">value</code>, add the functions <code rend="inline">parseHtml()</code> and <code rend="inline">select("p")</code> in the <emph>Expression</emph> box using dot notation, resulting in:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_1" corresp="code_fetch-and-parse-data-with-openrefine_1.txt" rend="block"/></ab>
-<p>Do not click <emph>OK</emph> at this point, simply look at the <emph>Preview</emph> to see the result of the expression.</p>
-<p>{% include figure.html caption="Edit the GREL expression, parseHtml function" filename="refine-parse-html.png" %}</p>
-<p>Notice that the output on the right no longer starts with the HTML root elements (<code rend="inline">&lt;!DOCTYPE html</code> etc.) seen on the left.
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_1" corresp="code_fetch-and-parse-data-with-openrefine_1.txt" rend="block"/>
+                    </ab>
+                    <p>Do not click <emph>OK</emph> at this point, simply look at the <emph>Preview</emph> to see the result of the expression.</p>
+                    <p>{% include figure.html caption="Edit the GREL expression, parseHtml function" filename="refine-parse-html.png" %}</p>
+                    <p>Notice that the output on the right no longer starts with the HTML root elements (<code rend="inline">&lt;!DOCTYPE html</code> etc.) seen on the left.
 Instead, it starts with a square bracket <code rend="inline">[</code>, displaying an <ref target="https://en.wikipedia.org/wiki/Array_data_type">array</ref> of all the <code rend="inline">p</code> elements found in the page.
 Refine represents an array as a comma separated list enclosed in square brackets, for example <code rend="inline">[ "one", "two", "three" ]</code>.</p>
-<p>Refine is visual and iterative; it is common to gradually build up an expression while checking the preview to see the result.
+                    <p>Refine is visual and iterative; it is common to gradually build up an expression while checking the preview to see the result.
 In addition to helping debug your GREL, this provides an opportunity learn more about the data set before adding more functions.
 Try the following GREL statements in the <emph>Expression</emph> box without clicking <emph>OK</emph>.
 Watch the preview window to understand how they function:</p>
-<list type="unordered">
-<item>Adding an index number to the expression selects one element from the array, for example <code rend="inline">value.parseHtml().select("p")[0]</code>. The beginning of the sonnets file contains many paragraphs of license information that are unnecessary for the data set. Skipping ahead through the index numbers, the first sonnet is found at <code rend="inline">value.parseHtml().select("p")[37]</code>.</item>
-<item>GREL also supports using negative index numbers, thus <code rend="inline">value.parseHtml().select("p")[-1]</code> will return the last item in the array. Working backwards, the last sonnet is at index <code rend="inline">[-3]</code>.</item>
-<item>Using these index numbers, it is possible to slice the array, extracting only the range of <code rend="inline">p</code> that contain sonnets. Add the <code rend="inline">slice()</code> function to the expression to preview the sub-set: <code rend="inline">value.parseHtml().select("p").slice(37,-2)</code>.</item>
-</list>
-<p>Clicking <emph>OK</emph> with the expression above will result in a blank column, a common cause of confusion when working with arrays.
+                    <list type="unordered">
+                        <item>Adding an index number to the expression selects one element from the array, for example <code rend="inline">value.parseHtml().select("p")[0]</code>. The beginning of the sonnets file contains many paragraphs of license information that are unnecessary for the data set. Skipping ahead through the index numbers, the first sonnet is found at <code rend="inline">value.parseHtml().select("p")[37]</code>.</item>
+                        <item>GREL also supports using negative index numbers, thus <code rend="inline">value.parseHtml().select("p")[-1]</code> will return the last item in the array. Working backwards, the last sonnet is at index <code rend="inline">[-3]</code>.</item>
+                        <item>Using these index numbers, it is possible to slice the array, extracting only the range of <code rend="inline">p</code> that contain sonnets. Add the <code rend="inline">slice()</code> function to the expression to preview the sub-set: <code rend="inline">value.parseHtml().select("p").slice(37,-2)</code>.</item>
+                    </list>
+                    <p>Clicking <emph>OK</emph> with the expression above will result in a blank column, a common cause of confusion when working with arrays.
 Refine will not store an array object as a cell value.
 It is necessary to use <code rend="inline">toString()</code> or <code rend="inline">join()</code> to convert the array into a string variable.
 The <code rend="inline">join()</code> function concatenates an array with the specified separator.
 For example, the expression <code rend="inline">[ "one", "two", "three" ].join(";")</code> will result in the string "one;two;three".
 Thus, the final expression to create the <emph>parse</emph> column is:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_2" corresp="code_fetch-and-parse-data-with-openrefine_2.txt" rend="block"/></ab>
-<p>Click <emph>OK</emph> to create the new column using the expression.</p>
-<p style="alert alert-warning">
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_2" corresp="code_fetch-and-parse-data-with-openrefine_2.txt" rend="block"/>
+                    </ab>
+                    <p>Click <emph>OK</emph> to create the new column using the expression.</p>
+                    <p style="alert alert-warning">
 Test out a transformation to see what happens--it is very easy to undo!
 The full history of operations is recorded in the "Undo / Redo" tab.
 </p>
-</div><div type="3"><head>Split Cells</head>
-<p>The <emph>parse</emph> column now contains all the sonnets separated by "|", but the project still contains only one row.
+                </div>
+                <div type="3">
+                    <head>Split Cells</head>
+                    <p>| The <emph>parse</emph> column now contains all the sonnets separated by "|", but the project still contains only one row. |
 Individual rows for each sonnet can be created by splitting the cell.
 Click the menu arrow on the <emph>parse</emph> column &gt; <emph>Edit cells</emph> &gt; <emph>Split multi-valued cells</emph>.
-Enter the separator <code rend="inline">|</code> that was used to <code rend="inline">join</code> in the last step.</p>
-<p>{% include figure.html caption="Edit cells &gt; Split multivalued cells" filename="refine-split-multivalued.png" %}</p>
-<p>After this operation, the top of the project table should now read 154 rows.
-Below the number is an option toggle "Show as: <emph>rows</emph> <emph>records</emph>".
+| Enter the separator <code rend="inline">|</code> that was used to <code rend="inline">join</code> in the last step. |</p>
+                    <p>{% include figure.html caption="Edit cells &gt; Split multivalued cells" filename="refine-split-multivalued.png" %}</p>
+                    <p>After this operation, the top of the project table should now read 154 rows.
+Below the number is an option toggle "Show as: <emph>rows</emph>
+                        <emph>records</emph>".
 Clicking on <emph>records</emph> will group the rows based on the original table, in this case it will read 1.
 Keeping track of these numbers is an important "sanity check" when transforming data in Refine.
 The 154 rows make sense because the ebook contained 154 sonnets, while 1 record represents the original table with only one row.
 An unexpected number would indicate a problem with the transformation.</p>
-<p>{% include figure.html caption="Project rows" filename="refine-rows.png" %}</p>
-<p>Each cell in the <emph>parse</emph> column now contains one sonnet surround by a <code rend="inline">&lt;p&gt;</code> tag.
+                    <p>{% include figure.html caption="Project rows" filename="refine-rows.png" %}</p>
+                    <p>Each cell in the <emph>parse</emph> column now contains one sonnet surround by a <code rend="inline">&lt;p&gt;</code> tag.
 The tags can be cleaned up by parsing the HTML again.
 Click on the <emph>parse</emph> column and select <emph>Edit cells</emph> &gt; <emph>Transform</emph>.
 This will bring up a dialog box similar to creating a new column.
 Transform will overwrite the cells of the current column rather than creating a new one.</p>
-<p>In the expression box, type <code rend="inline">value.parseHtml()</code>.
+                    <p>In the expression box, type <code rend="inline">value.parseHtml()</code>.
 The preview will show a complete HTML tree starting with the <code rend="inline">&lt;html&gt;</code> element.
 It is important to note that <code rend="inline">parseHtml()</code> will automatically fill in missing tags, allowing it to parse these cell values despite not being valid HTML documents.
 Select the <code rend="inline">p</code> tag, add an index number, and use the function <code rend="inline">innerHtml()</code> to extract the sonnet text:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_3" corresp="code_fetch-and-parse-data-with-openrefine_3.txt" rend="block"/></ab>
-<p>Click <emph>OK</emph> to transform all 154 cells in the column.</p>
-<p>{% include figure.html caption="Edit cells &gt; Transform" filename="refine-innerhtml.png" %}</p>
-<p style="alert alert-warning">
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_3" corresp="code_fetch-and-parse-data-with-openrefine_3.txt" rend="block"/>
+                    </ab>
+                    <p>Click <emph>OK</emph> to transform all 154 cells in the column.</p>
+                    <p>{% include figure.html caption="Edit cells &gt; Transform" filename="refine-innerhtml.png" %}</p>
+                    <p style="alert alert-warning">
 In the expression above <code rend="inline">select</code> returns an array of <code rend="inline">p</code> elements even though there is only one in each cell.
 Attempting to pass an array to <code rend="inline">innerHtml()</code> will raise an error.
 Thus, an index number is necessary to select the first (and only) item in the array to pass the correct object type to <code rend="inline">innerHtml()</code>.
-<br/>Keep data object types in mind when debugging GREL expressions!
 </p>
-</div><div type="3"><head>Unescape</head>
-<p>Notice that each cell has dozens of <code rend="inline">&amp;nbsp;</code>, an HTML entity used to represent "no-break space" since browsers ignore extra white space in the source.
+                </div>
+                <div type="3">
+                    <head>Unescape</head>
+                    <p>Notice that each cell has dozens of <code rend="inline">&amp;nbsp;</code>, an HTML entity used to represent "no-break space" since browsers ignore extra white space in the source.
 These entities are common when harvesting web pages and can be quickly replaced with the corresponding plain text characters using the <code rend="inline">unescape()</code> function.
 On the <emph>parse</emph> column, select <emph>Edit cells</emph> &gt; <emph>Transform</emph> and type the following in the expression box:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_4" corresp="code_fetch-and-parse-data-with-openrefine_4.txt" rend="block"/></ab>
-<p>The entities will be replaced with normal whitespace.</p>
-</div><div type="3"><head>Extract Information with Array Functions</head>
-<p><ref target="https://github.com/OpenRefine/OpenRefine/wiki/GREL-Array-Functions">GREL array functions</ref> provide a powerful way to manipulate text data and can be used to finish processing the sonnets.
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_4" corresp="code_fetch-and-parse-data-with-openrefine_4.txt" rend="block"/>
+                    </ab>
+                    <p>The entities will be replaced with normal whitespace.</p>
+                </div>
+                <div type="3">
+                    <head>Extract Information with Array Functions</head>
+                    <p>
+                        <ref target="https://github.com/OpenRefine/OpenRefine/wiki/GREL-Array-Functions">GREL array functions</ref> provide a powerful way to manipulate text data and can be used to finish processing the sonnets.
 Any string value can be turned into an array using the <code rend="inline">split()</code> function by providing the character or expression that separates the items (basically the opposite of <code rend="inline">join()</code>).</p>
-<p>In the sonnets each line ends with <code rend="inline">&lt;br&gt;</code>, providing a convenient separator for splitting.
+                    <p>In the sonnets each line ends with <code rend="inline">&lt;br&gt;</code>, providing a convenient separator for splitting.
 The expression <code rend="inline">value.split("&lt;br&gt;")</code> will create an array of the lines of each sonnet.
 Index numbers and slices can then be used to populate new columns.
 Keep in mind that Refine will not output an array directly to a cell.
 Be sure to select one element from the array using an index number or convert it back to a string with <code rend="inline">join()</code>.</p>
-<p>Furthermore, the sonnet text contains a huge amount of unnecessary white space that was used to layout the poems in the ebook.
+                    <p>Furthermore, the sonnet text contains a huge amount of unnecessary white space that was used to layout the poems in the ebook.
 This can be cut from each line using the <code rend="inline">trim()</code> function.
 Trim automatically removes all leading and trailing white space in a cell, an essential for data cleaning.</p>
-<p>Using these concepts, a single line can be extracted and trimmed to create clean columns representing the sonnet number and first line.
+                    <p>Using these concepts, a single line can be extracted and trimmed to create clean columns representing the sonnet number and first line.
 Create two new columns from the <emph>parse</emph> column using these names and expressions:</p>
-<list type="unordered">
-<item>"number", <code rend="inline">value.split("&lt;br&gt;")[0].trim()</code></item>
-<item>"first", <code rend="inline">value.split("&lt;br&gt;")[1].trim()</code></item>
-</list>
-<p>{% include figure.html caption="GREL split and trim" filename="refine-add-num-column.png" %}</p>
-<p>The next column to create is the full sonnet text which contains multiple lines.
+                    <list type="unordered">
+                        <item>"number", <code rend="inline">value.split("&lt;br&gt;")[0].trim()</code>
+                        </item>
+                        <item>"first", <code rend="inline">value.split("&lt;br&gt;")[1].trim()</code>
+                        </item>
+                    </list>
+                    <p>{% include figure.html caption="GREL split and trim" filename="refine-add-num-column.png" %}</p>
+                    <p>The next column to create is the full sonnet text which contains multiple lines.
 However, <code rend="inline">trim()</code> will only clean the beginning and end of the cell, leaving unnecessary whitespace in the body of the sonnet.
-To trim each line individually use the <ref target="https://github.com/OpenRefine/OpenRefine/wiki/GREL-Controls">GREL control</ref> <code rend="inline">forEach()</code>, a handy loop that iterates over an array.</p>
-<p>From the <emph>parse</emph> column, create a new column named "text", and click in the <emph>Expression</emph> box.
+To trim each line individually use the <ref target="https://github.com/OpenRefine/OpenRefine/wiki/GREL-Controls">GREL control</ref>
+                        <code rend="inline">forEach()</code>, a handy loop that iterates over an array.</p>
+                    <p>From the <emph>parse</emph> column, create a new column named "text", and click in the <emph>Expression</emph> box.
 A <code rend="inline">forEach()</code> statement asks for an array, a variable name, and an expression applied to the variable.
 Following the form <code rend="inline">forEach(array, variable, expression)</code>, construct the loop using these parameters:</p>
-<list type="unordered">
-<item>array: <code rend="inline">value.split("&lt;br&gt;")</code>, creates an array from the lines of the sonnet in each cell.</item>
-<item>variable: <code rend="inline">line</code>, each item in the array is then represented as the variable (it could be anything, <code rend="inline">v</code> is often used).</item>
-<item>expression: <code rend="inline">line.trim()</code>, each item is then evaluated separately with the specified expression. In this case, <code rend="inline">trim()</code> cleans the white space from each sonnet line in the array.</item>
-</list>
-<p>At this point, the statement should look like <code rend="inline">forEach(value.split("&lt;br&gt;"), line, line.trim())</code> in the <emph>Expression</emph> box.
+                    <list type="unordered">
+                        <item>array: <code rend="inline">value.split("&lt;br&gt;")</code>, creates an array from the lines of the sonnet in each cell.</item>
+                        <item>variable: <code rend="inline">line</code>, each item in the array is then represented as the variable (it could be anything, <code rend="inline">v</code> is often used).</item>
+                        <item>expression: <code rend="inline">line.trim()</code>, each item is then evaluated separately with the specified expression. In this case, <code rend="inline">trim()</code> cleans the white space from each sonnet line in the array.</item>
+                    </list>
+                    <p>At this point, the statement should look like <code rend="inline">forEach(value.split("&lt;br&gt;"), line, line.trim())</code> in the <emph>Expression</emph> box.
 Notice that the <emph>Preview</emph> now shows an array where the first element is the sonnet number.
 Since the results of the <code rend="inline">forEach()</code> are returned as a new array, additional array functions can be applied, such as slice and join.
 Add <code rend="inline">slice(1)</code> to remove the sonnet number, and <code rend="inline">join("\n")</code> to concatenate the lines in to a string value (<code rend="inline">\n</code> is the symbol for new line in plain text).
 Thus, the final expression to extract and clean the full sonnet text is:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_5" corresp="code_fetch-and-parse-data-with-openrefine_5.txt" rend="block"/></ab>
-<p>{% include figure.html caption="GREL forEach expression" filename="refine-foreach.png" %}</p>
-<p>Click "OK" to create the column.
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_5" corresp="code_fetch-and-parse-data-with-openrefine_5.txt" rend="block"/>
+                    </ab>
+                    <p>{% include figure.html caption="GREL forEach expression" filename="refine-foreach.png" %}</p>
+                    <p>Click "OK" to create the column.
 Following the same technique, add another new column from <emph>parse</emph> named "last" to represent the final couplet lines using:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_6" corresp="code_fetch-and-parse-data-with-openrefine_6.txt" rend="block"/></ab>
-<p>Finally, numeric columns can be added using the <code rend="inline">length()</code> function.
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_6" corresp="code_fetch-and-parse-data-with-openrefine_6.txt" rend="block"/>
+                    </ab>
+                    <p>Finally, numeric columns can be added using the <code rend="inline">length()</code> function.
 Create new columns from <emph>text</emph> with the names and expressions below:</p>
-<list type="unordered">
-<item>"characters", <code rend="inline">value.length()</code></item>
-<item>"lines", <code rend="inline">value.split(/\n/).length()</code></item>
-</list>
-</div><div type="3"><head>Cleanup and Export</head>
-<p>In this example, we used a number of operations to create new columns with clean data.
+                    <list type="unordered">
+                        <item>"characters", <code rend="inline">value.length()</code>
+                        </item>
+                        <item>"lines", <code rend="inline">value.split(/\n/).length()</code>
+                        </item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Cleanup and Export</head>
+                    <p>In this example, we used a number of operations to create new columns with clean data.
 This is a typical Refine workflow, allowing each transformation to be easily checked against the existing data.
 At this point the unnecessary columns can be removed.
 Click on the <emph>All</emph> column &gt; <emph>Edit columns</emph> &gt; <emph>Re-order / remove columns</emph>.</p>
-<p>{% include figure.html caption="All &gt; Edit columns" filename="refine-reorder.png" %}</p>
-<p>Drag unwanted column names to the right side of the dialog box, in this case <emph>Column 1</emph>, <emph>fetch</emph>, and <emph>parse</emph>.
+                    <p>{% include figure.html caption="All &gt; Edit columns" filename="refine-reorder.png" %}</p>
+                    <p>Drag unwanted column names to the right side of the dialog box, in this case <emph>Column 1</emph>, <emph>fetch</emph>, and <emph>parse</emph>.
 Drag the remaining columns into the desired order on the left side.
 Click <emph>Ok</emph> to remove and reorder the data set.</p>
-<p>{% include figure.html caption="Re-order / Remove columns" filename="refine-reorder2.png" %}</p>
-<p>Use filters and facets to explore and subset the collection of sonnets.
+                    <p>{% include figure.html caption="Re-order / Remove columns" filename="refine-reorder2.png" %}</p>
+                    <p>Use filters and facets to explore and subset the collection of sonnets.
 Then click the export button to generate a version of the new sonnet table for use outside of Refine.
 Only the currently selected subset will be exported.</p>
-<p>{% include figure.html caption="Export CSV" filename="refine-export.png" %}</p>
-</div></div>
-      <div type="2"><head>Example 2: URL Queries and Parsing JSON</head>
-<p>Many cultural institutions provide web APIs allowing users to access information about their collections via simple <ref target="https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">HTTP</ref> requests.
+                    <p>{% include figure.html caption="Export CSV" filename="refine-export.png" %}</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Example 2: URL Queries and Parsing JSON</head>
+                <p>Many cultural institutions provide web APIs allowing users to access information about their collections via simple <ref target="https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">HTTP</ref> requests.
 These sources enable new queries and aggregations of text that were previously impossible, cutting across boundaries of repositories and collections to support large scale analysis of both content and metadata.
 This example will harvest data from the <ref target="https://chroniclingamerica.loc.gov/">Chronicling America</ref> project to assemble a small set of newspaper front pages with full text.
 Following a common web scraping workflow, Refine is used to construct the query URL, fetch the information, and parse the JSON response.</p>
-<p style="alert alert-warning">
+                <p style="alert alert-warning">
 Chronicling America is fully open, thus no key or account is needed to access the API and there are no limits on the use.
 Other aggregators are often proprietary and restricted.
 Please review the specific terms of use before web scraping or using the information in research.
 </p>
-<div type="3"><head>Start "Chronicling America" Project</head>
-<p>To get started after completing <emph>Example 1</emph>, click the <emph>Open</emph> button in the upper right.
+                <div type="3">
+                    <head>Start "Chronicling America" Project</head>
+                    <p>To get started after completing <emph>Example 1</emph>, click the <emph>Open</emph> button in the upper right.
 A new tab will open with the Refine start project view.
 The tab with the Sonnets project can be left open without impacting performance.
 Create a project from <emph>Clipboard</emph> by pasting this CSV into the text box:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_7" corresp="code_fetch-and-parse-data-with-openrefine_7.txt" rend="block"/></ab>
-<p>After clicking <emph>Next</emph>, Refine should automatically identify the content as a CSV with the correct parsing options.
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_7" corresp="code_fetch-and-parse-data-with-openrefine_7.txt" rend="block"/>
+                    </ab>
+                    <p>After clicking <emph>Next</emph>, Refine should automatically identify the content as a CSV with the correct parsing options.
 Add the <emph>Project name</emph> "ChronAm" at the top right and click <emph>Create project</emph>.</p>
-<p>{% include figure.html caption="Create project" filename="refine-start-project.png" %}</p>
-</div><div type="3"><head>Construct a Query</head>
-<p>Chronicling America provides <ref target="https://chroniclingamerica.loc.gov/about/api/">documentation</ref> for their API and URL patterns.
+                    <p>{% include figure.html caption="Create project" filename="refine-start-project.png" %}</p>
+                </div>
+                <div type="3">
+                    <head>Construct a Query</head>
+                    <p>Chronicling America provides <ref target="https://chroniclingamerica.loc.gov/about/api/">documentation</ref> for their API and URL patterns.
 In addition to formal documentation, information about alternative formats and search API are sometimes given in the <code rend="inline">&lt;head&gt;</code> element of a web page.
 Check for <code rend="inline">&lt;link rel="alternate"</code>, <code rend="inline">&lt;link rel="search"</code>, or <code rend="inline">&lt;!--</code> comments which provide hints on how to interact with the site.
 These clues provide a recipe book for interacting with the server using public links.</p>
-<p>The basic components of the ChromAm API are:</p>
-<list type="unordered">
-<item>the base URL, <code rend="inline">https://chroniclingamerica.loc.gov/</code></item>
-<item>the search service location for individual newspaper pages, <code rend="inline">search/pages/results</code></item>
-<item>a query string, starting with <code rend="inline">?</code> and made up of value pairs (<code rend="inline">fieldname=value</code>) separated by <code rend="inline">&amp;</code>. Much like using the <ref target="https://chroniclingamerica.loc.gov/#tab=tab_advanced_search">advanced search form</ref>, the value pairs of the query string set the <ref target="https://chroniclingamerica.loc.gov/search/pages/opensearch.xml">search options</ref>.</item>
-</list>
-<p>Using a GREL expression, these components can be combined with the values in the "ChronAm" project to construct a search query URL.
+                    <p>The basic components of the ChromAm API are:</p>
+                    <list type="unordered">
+                        <item>the base URL, <code rend="inline">https://chroniclingamerica.loc.gov/</code>
+                        </item>
+                        <item>the search service location for individual newspaper pages, <code rend="inline">search/pages/results</code>
+                        </item>
+                        <item>a query string, starting with <code rend="inline">?</code> and made up of value pairs (<code rend="inline">fieldname=value</code>) separated by <code rend="inline">&amp;</code>. Much like using the <ref target="https://chroniclingamerica.loc.gov/#tab=tab_advanced_search">advanced search form</ref>, the value pairs of the query string set the <ref target="https://chroniclingamerica.loc.gov/search/pages/opensearch.xml">search options</ref>.</item>
+                    </list>
+                    <p>Using a GREL expression, these components can be combined with the values in the "ChronAm" project to construct a search query URL.
 The contents of the data table can be accessed using <ref target="https://github.com/OpenRefine/OpenRefine/wiki/Variables">GREL variables</ref>.
 As introduced in <emph>Example 1</emph>, the value of each cell in the current column is represented by <code rend="inline">value</code>.
 Values in the same row can be retrieved using the <code rend="inline">cells</code> variable plus the column name.
 There are two ways to write a <code rend="inline">cells</code> statement: bracket notation <code rend="inline">cells['column name'].value</code> which allows column names that include a space, or dot notation <code rend="inline">cells.column_name.value</code> which allows only single word column names.</p>
-<p>In GREL, strings are concatenated using the plus sign.
+                    <p>In GREL, strings are concatenated using the plus sign.
 For example, the expression <code rend="inline">"one" + "two"</code> would result in "onetwo".</p>
-<p>To create the set of search queries, from the <emph>state</emph> column, add a column named "url" with this expression:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_8" corresp="code_fetch-and-parse-data-with-openrefine_8.txt" rend="block"/></ab>
-<p>{% include figure.html caption="Create query URL" filename="refine-chronam-url.png" %}</p>
-<p>The expression concatenates the constants (base URL, search service, and query field names) together with the values in each row.
+                    <p>To create the set of search queries, from the <emph>state</emph> column, add a column named "url" with this expression:</p>
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_8" corresp="code_fetch-and-parse-data-with-openrefine_8.txt" rend="block"/>
+                    </ab>
+                    <p>{% include figure.html caption="Create query URL" filename="refine-chronam-url.png" %}</p>
+                    <p>The expression concatenates the constants (base URL, search service, and query field names) together with the values in each row.
 The <code rend="inline">escape()</code> function is added to the cell variables to ensure the string will be safe in a URL (the opposite of the <code rend="inline">unescape()</code> function introduced in <emph>Example 1</emph>).</p>
-<p>Look at the value pairs after the <code rend="inline">?</code> to understand the parameters of the search.
+                    <p>Look at the value pairs after the <code rend="inline">?</code> to understand the parameters of the search.
 Explicitly, the first query URL will ask for newspapers:</p>
-<list type="unordered">
-<item>from Idaho (<code rend="inline">state=Idaho</code>)</item>
-<item>from the year 1865, (<code rend="inline">date1=1865&amp;date2=1865&amp;dateFilterType=yearRange</code>)</item>
-<item>only the front pages (<code rend="inline">sequence=1</code>)</item>
-<item>sorting by date (<code rend="inline">sort=date</code>)</item>
-<item>returning a maximum of five (<code rend="inline">rows=5</code>)</item>
-<item>in JSON (<code rend="inline">format=json</code>)</item>
-</list>
-</div><div type="3"><head>Fetch URLs</head>
-<p>The <emph>url</emph> column is a list of web queries that could be accessed with a browser.
+                    <list type="unordered">
+                        <item>from Idaho (<code rend="inline">state=Idaho</code>)</item>
+                        <item>from the year 1865, (<code rend="inline">date1=1865&amp;date2=1865&amp;dateFilterType=yearRange</code>)</item>
+                        <item>only the front pages (<code rend="inline">sequence=1</code>)</item>
+                        <item>sorting by date (<code rend="inline">sort=date</code>)</item>
+                        <item>returning a maximum of five (<code rend="inline">rows=5</code>)</item>
+                        <item>in JSON (<code rend="inline">format=json</code>)</item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Fetch URLs</head>
+                    <p>The <emph>url</emph> column is a list of web queries that could be accessed with a browser.
 To test, click one of the links.
 The url will open in a new tab, returning a JSON response.</p>
-<p>Fetch the URLs using <emph>url</emph> column by selecting <emph>Edit column</emph> &gt; <emph>Add column by fetching urls</emph>.
+                    <p>Fetch the URLs using <emph>url</emph> column by selecting <emph>Edit column</emph> &gt; <emph>Add column by fetching urls</emph>.
 Name the new column "fetch" and click <emph>OK</emph>.
 In a few seconds, the operation should complete and the <emph>fetch</emph> column will be filled with <ref target="http://www.json.org/">JSON</ref> data.</p>
-</div><div type="3"><head>Parse JSON to Get Items</head>
-<p>The first name/value pairs of the query response look like <code rend="inline">"totalItems": 52, "endIndex": 5</code>.
+                </div>
+                <div type="3">
+                    <head>Parse JSON to Get Items</head>
+                    <p>The first name/value pairs of the query response look like <code rend="inline">"totalItems": 52, "endIndex": 5</code>.
 This indicates that the search resulted in 52 total items, but the response contains only five (since it was limited by the <code rend="inline">rows=5</code> option).
 The JSON key <code rend="inline">items</code> contains an array of the individual newspapers returned by the search.
 To construct a orderly data set, it is necessary to parse the JSON and split each newspaper into its own row.</p>
-<p>GREL's <code rend="inline">parseJson()</code> function allows us to select a key name to retrieve the corresponding values.
+                    <p>GREL's <code rend="inline">parseJson()</code> function allows us to select a key name to retrieve the corresponding values.
 Add a new column based on <emph>fetch</emph> with the name "items" and enter this expression:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_9" corresp="code_fetch-and-parse-data-with-openrefine_9.txt" rend="block"/></ab>
-<p>{% include figure.html caption="parse json items" filename="refine-parse-items.png" %}</p>
-<p>Selecting <code rend="inline">['items']</code> exposes the array of newspaper records nested inside the JSON response.
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_9" corresp="code_fetch-and-parse-data-with-openrefine_9.txt" rend="block"/>
+                    </ab>
+                    <p>{% include figure.html caption="parse json items" filename="refine-parse-items.png" %}</p>
+                    <p>Selecting <code rend="inline">['items']</code> exposes the array of newspaper records nested inside the JSON response.
 The <code rend="inline">join()</code> function concatenates the array with the given separator resulting in a string value.
 Since the newspaper records contain an OCR text field, the strange separator "^^^" is necessary to ensure that it is unique and can be used to split the values.</p>
-</div><div type="3"><head>Split Multivalued Cells</head>
-<p>With the individual newspapers isolated, separate rows can be created by splitting the cells.
+                </div>
+                <div type="3">
+                    <head>Split Multivalued Cells</head>
+                    <p>With the individual newspapers isolated, separate rows can be created by splitting the cells.
 On the <emph>items</emph> column, select <emph>Edit cells</emph> &gt;  <emph>Split multivalued cells</emph>, and enter the join used in the last step, <code rend="inline">^^^</code>.
 After the operation, the top of the project table should read 20 rows.
 Clicking on Show as <emph>records</emph> should read 4, representing the original CSV rows.</p>
-<p>Notice that the new rows are empty in all columns except <emph>items</emph>.
+                    <p>Notice that the new rows are empty in all columns except <emph>items</emph>.
 To ensure the state is available with each newspaper issue, the empty values can be filled using the <code rend="inline">Fill down</code> function.
 Click on the <emph>state</emph> column &gt; <emph>Edit cells</emph> &gt; <emph>Fill down</emph>.</p>
-<p>{% include figure.html caption="fill down" filename="refine-fill-down.png" %}</p>
-<p>This is a good point to clean up the unnecessary columns.
+                    <p>{% include figure.html caption="fill down" filename="refine-fill-down.png" %}</p>
+                    <p>This is a good point to clean up the unnecessary columns.
 Click on the <emph>All</emph> column &gt; <emph>Edit columns</emph> &gt; <emph>Re-order / remove columns</emph>.
 Drag all columns except <emph>state</emph> and <emph>items</emph> to the right side, then click <emph>OK</emph> to remove them.</p>
-<p>{% include figure.html caption="Re-order / remove columns" filename="refine-chronam-reorder.png" %}</p>
-<p>Sanity check: with the original columns removed, both <emph>records</emph> and <emph>rows</emph> will read 20.
+                    <p>{% include figure.html caption="Re-order / remove columns" filename="refine-chronam-reorder.png" %}</p>
+                    <p>Sanity check: with the original columns removed, both <emph>records</emph> and <emph>rows</emph> will read 20.
 This makes sense, as the project started with four states and fetched five records for each.</p>
-</div><div type="3"><head>Parse JSON Values</head>
-<p>To complete the data set, it is necessary to parse each newspaper's JSON record into individual columns.
+                </div>
+                <div type="3">
+                    <head>Parse JSON Values</head>
+                    <p>To complete the data set, it is necessary to parse each newspaper's JSON record into individual columns.
 This is a common task, as many web APIs return information in JSON format.
 Again, GREL's <code rend="inline">parseJson()</code> function makes this easy.
 Create a new column from <emph>items</emph> for each newspaper metadata element by parsing the JSON and selecting the key:</p>
-<list type="unordered">
-<item>"date", <code rend="inline">value.parseJson()['date']</code></item>
-<item>"title", <code rend="inline">value.parseJson()['title']</code></item>
-<item>"city", <code rend="inline">value.parseJson()['city'].join(", ")</code></item>
-<item>"lccn", <code rend="inline">value.parseJson()['lccn']</code></item>
-<item>"text", <code rend="inline">value.parseJson()['ocr_eng']</code></item>
-</list>
-<p style="alert alert-info">
+                    <list type="unordered">
+                        <item>"date", <code rend="inline">value.parseJson()['date']</code>
+                        </item>
+                        <item>"title", <code rend="inline">value.parseJson()['title']</code>
+                        </item>
+                        <item>"city", <code rend="inline">value.parseJson()['city'].join(", ")</code>
+                        </item>
+                        <item>"lccn", <code rend="inline">value.parseJson()['lccn']</code>
+                        </item>
+                        <item>"text", <code rend="inline">value.parseJson()['ocr_eng']</code>
+                        </item>
+                    </list>
+                    <p style="alert alert-info">
 Some users of this lesson have noted that a recent change to the output of OCR'ed text from the Library of Congress introduces unexpected line breaks in the text column. These can be removed using the Expression <code rend="inline">value.replace("\n","")</code>. (Nov. 2022)
 </p>
-<p>After the desired information is extracted, the <emph>items</emph> column can be removed by selecting <emph>Edit column</emph> &gt; <emph>Remove this column</emph>.</p>
-<p>{% include figure.html caption="Final ChronAm project columns" filename="refine-chronam-final.png" %}</p>
-<p>Each column could be further refined using other GREL transformations.
+                    <p>After the desired information is extracted, the <emph>items</emph> column can be removed by selecting <emph>Edit column</emph> &gt; <emph>Remove this column</emph>.</p>
+                    <p>{% include figure.html caption="Final ChronAm project columns" filename="refine-chronam-final.png" %}</p>
+                    <p>Each column could be further refined using other GREL transformations.
 For example, to convert <emph>date</emph> to a more readable format, use <ref target="https://github.com/OpenRefine/OpenRefine/wiki/GREL-Date-Functions">GREL date functions</ref>.
 Transform the <emph>date</emph> column with the expression <code rend="inline">value.toDate("yyyymmdd").toString("yyyy-MM-dd")</code>.</p>
-<p>Another common workflow is to extend the data with further URL queries.
+                    <p>Another common workflow is to extend the data with further URL queries.
 For example, a link to full information about each issue can be formed based on the <emph>lccn</emph>.
 Create a new column based on <emph>lccn</emph> using the expression <code rend="inline">"https://chroniclingamerica.loc.gov/lccn/" + value + "/" + cells['date'].value + "/ed-1.json"</code>.
 Fetching this URL returns a complete list of the issue's pages, which could in turn be harvested.</p>
-<p>For now, the headlines of 1865 from the Northwest are ready to enjoy!</p>
-</div></div>
-      <div type="2"><head>Example 3: Advanced APIs</head>
-<p><emph><ref target="#example-2-url-queries-and-parsing-json">Example 2</ref></emph> demonstrated Refine's fetch function with a simple web API, essentially utilizing URL patterns to request information from a server.
+                    <p>For now, the headlines of 1865 from the Northwest are ready to enjoy!</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Example 3: Advanced APIs</head>
+                <p>
+                    <emph>
+                        <ref target="#example-2-url-queries-and-parsing-json">Example 2</ref>
+                    </emph> demonstrated Refine's fetch function with a simple web API, essentially utilizing URL patterns to request information from a server.
 This workflow uses the HTTP GET protocol, meaning the query is encoded in the URL string, thus limited in length (2048 ASCII characters), complexity, and security.
 Instead, many API services used to enhance text data, such as <ref target="https://en.wikipedia.org/wiki/Geocoding">geocoding</ref> or <ref target="https://en.wikipedia.org/wiki/Named-entity_recognition">named entity recognition</ref>, use HTTP POST to transfer information to the server for processing.</p>
-<p>GREL does not have a built in function to use this type of API.
+                <p>GREL does not have a built in function to use this type of API.
 However, the expression window language can be changed to <ref target="http://www.jython.org/">Jython</ref>, providing a more complete scripting environment where it is possible to implement a POST request.</p>
-<quote>
-<p><ref target="http://www.jython.org/">Jython</ref> is Python implemented for the Java VM and comes bundled with Refine.
+                <quote>
+                    <p>
+                        <ref target="http://www.jython.org/">Jython</ref> is Python implemented for the Java VM and comes bundled with Refine.
 This means <ref target="https://docs.python.org/2.7/">Python 2</ref> scripts using the Standard Library can be written or loaded into the expression window, and Refine will apply them to each cell in the transformation.
 The <ref target="https://github.com/OpenRefine/OpenRefine/wiki/Jython">official documentation</ref> is sparse, but the built-in Jython can be extended with non-standard libraries using a <ref target="https://github.com/OpenRefine/OpenRefine/wiki/Extending-Jython-with-pypi-modules">work around</ref>.</p>
-<p>Keep in mind that spending time writing complex scripts moves away from the strengths of Refine.
+                    <p>Keep in mind that spending time writing complex scripts moves away from the strengths of Refine.
 If it is necessary to develop a lengthy Jython routine, it will likely be more efficient to process the data directly in Python.
 On the other hand, if you know a handy method to process data in Python 2, Jython is a easy way to apply it in a Refine project.</p>
-</quote>
-<div type="3"><head>Jython in the Expression Window</head>
-<p>Return to the "Sonnets" project completed in <emph><ref target="#example-1-fetching-and-parsing-html">Example 1</ref></emph>.
+                </quote>
+                <div type="3">
+                    <head>Jython in the Expression Window</head>
+                    <p>Return to the "Sonnets" project completed in <emph>
+                            <ref target="#example-1-fetching-and-parsing-html">Example 1</ref>
+                        </emph>.
 If the tab was closed, click <emph>Open</emph> &gt; <emph>Open Project</emph> and find the Sonnets example (Refine saves everything for you!).</p>
-<p>Add a new column based on the <emph>first</emph> column named "sentiment".
+                    <p>Add a new column based on the <emph>first</emph> column named "sentiment".
 We will use this window to test out a series of expressions, so leave it open until we get to the final iteration of the request.</p>
-<p>On the right side of the <emph>Expression</emph> box is a drop down to change the expression language.
+                    <p>On the right side of the <emph>Expression</emph> box is a drop down to change the expression language.
 Select <emph>Python / Jython</emph> from the list.</p>
-<p>{% include figure.html caption="Jython expression" filename="refine-jython.png" %}</p>
-<p>Notice that the preview now shows <code rend="inline">null</code> for the output.
+                    <p>{% include figure.html caption="Jython expression" filename="refine-jython.png" %}</p>
+                    <p>Notice that the preview now shows <code rend="inline">null</code> for the output.
 A Jython expression in Refine must have a <code rend="inline">return</code> statement to add the output to the new cells in the transformation.
 Type <code rend="inline">return value</code> into the <emph>Expression</emph> box.
 The preview will update showing the current cells copied to the output.
 The basic <ref target="https://github.com/OpenRefine/OpenRefine/wiki/Variables">GREL variables</ref> can be used in Jython by substituting brackets instead of periods.
 For example, the GREL <code rend="inline">cells.column-name.value</code> would be Jython <code rend="inline">cells['column-name']['value']</code>.</p>
-</div><div type="3"><head>Jython GET Request</head>
-<p>To create a HTTP request in Jython, use the standard library <ref target="https://docs.python.org/2/library/urllib2.html">urllib2</ref>.
+                </div>
+                <div type="3">
+                    <head>Jython GET Request</head>
+                    <p>To create a HTTP request in Jython, use the standard library <ref target="https://docs.python.org/2/library/urllib2.html">urllib2</ref>.
 Refine's fetch function can be recreated with Jython to demonstrate the basics of the library.
 In the expression box, type:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_10" corresp="code_fetch-and-parse-data-with-openrefine_10.txt" rend="block"/></ab>
-<p>{% include figure.html caption="Jython GET request" filename="refine-jython-expression.png" %}</p>
-<p>The preview should display the HTML source of the Jython home page, this is an HTTP GET request as in previous fetch examples.
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_10" corresp="code_fetch-and-parse-data-with-openrefine_10.txt" rend="block"/>
+                    </ab>
+                    <p>{% include figure.html caption="Jython GET request" filename="refine-jython-expression.png" %}</p>
+                    <p>The preview should display the HTML source of the Jython home page, this is an HTTP GET request as in previous fetch examples.
 Notice that similar to opening and reading a text file with Python, <code rend="inline">urlopen()</code> returns a file-like object that must be <code rend="inline">read()</code> into a string.
 The URL could be replaced with cell variables to construct a query similar to the fetch used in <emph>Example 2</emph>.</p>
-</div><div type="3"><head>POST Request</head>
-<p>Urllib2 will automatically send a POST if data is added to the request object.
+                </div>
+                <div type="3">
+                    <head>POST Request</head>
+                    <p>Urllib2 will automatically send a POST if data is added to the request object.
 For example, <ref target="http://text-processing.com/">Text Processing</ref> provides natural language processing APIs based on <ref target="http://www.nltk.org/">Python NLTK</ref>.
 The documentation for the <ref target="http://text-processing.com/docs/sentiment.html">Sentiment Analysis service</ref> provides a base URL and the name of the key used for the data to be analyzed.
-No authentication is required and 1,000 calls per day are free for non-commercial use.<ref type="footnotemark" target="#note_use"/></p>
-<p>This type of API is often demonstrated using <ref target="https://curl.haxx.se/">curl</ref> on the commandline.
+No authentication is required and 1,000 calls per day are free for non-commercial use.<ref type="footnotemark" target="#en_note_use"/>
+                    </p>
+                    <p>This type of API is often demonstrated using <ref target="https://curl.haxx.se/">curl</ref> on the commandline.
 Text Processing gives the example <code rend="inline">curl -d "text=great" http://text-processing.com/api/sentiment/</code> which can be recreated in Jython to test the service.
 Building on the GET expression above, the POST data is added as the second parameter of <emph>urlopen</emph>, thus the request will be in the form <code rend="inline">urllib2.urlopen(url, data)</code>.
 Type this script into the expression window:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_11" corresp="code_fetch-and-parse-data-with-openrefine_11.txt" rend="block"/></ab>
-<p>The preview should show a JSON response with sentiment probability values.
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_11" corresp="code_fetch-and-parse-data-with-openrefine_11.txt" rend="block"/>
+                    </ab>
+                    <p>The preview should show a JSON response with sentiment probability values.
 To retrieve sentiment analysis data for the first lines of the sonnets (remember we are still adding a column based on <emph>first</emph>!), put the basic Jython pattern together with the values of the cells:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_12" corresp="code_fetch-and-parse-data-with-openrefine_12.txt" rend="block"/></ab>
-<p>{% include figure.html caption="jython request" filename="refine-jython-request.png" %}</p>
-<p>Click <emph>OK</emph> and the Jython script will run for every row in the column.
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_12" corresp="code_fetch-and-parse-data-with-openrefine_12.txt" rend="block"/>
+                    </ab>
+                    <p>{% include figure.html caption="jython request" filename="refine-jython-request.png" %}</p>
+                    <p>Click <emph>OK</emph> and the Jython script will run for every row in the column.
 The JSON response can then be parsed with GREL using the methods demonstrated in <emph>Example 2</emph> (for example, <code rend="inline">value.parseJson()['label']</code>).</p>
-<p>Given the small expression window and uniform data, the script above is pragmatically simplified and compressed.
+                    <p>Given the small expression window and uniform data, the script above is pragmatically simplified and compressed.
 When Refine is encountering problems, it is better to implement a more complete script with error handling.
 If necessary, a throttle delay can be implemented by importing <code rend="inline">time</code> and adding <code rend="inline">time.sleep()</code> to the script.
 For example, the POST request could be rewritten:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_13" corresp="code_fetch-and-parse-data-with-openrefine_13.txt" rend="block"/></ab>
-<quote>
-<p>Some APIs require authentication tokens to be passed with the POST request as data or headers.
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_13" corresp="code_fetch-and-parse-data-with-openrefine_13.txt" rend="block"/>
+                    </ab>
+                    <quote>
+                        <p>Some APIs require authentication tokens to be passed with the POST request as data or headers.
 Headers can be added as the third parameter of <code rend="inline">urllib2.Request()</code> similar to how data was added in the example above.
 Check the Python <ref target="https://docs.python.org/2/library/urllib2.html">urllib2 documentation</ref> and <ref target="https://docs.python.org/2/howto/urllib2.html">how-to</ref> for advanced options.</p>
-<p>When harvesting web content, character encoding issues commonly produce errors in Python.
+                        <p>When harvesting web content, character encoding issues commonly produce errors in Python.
 Trimming whitespace, using GREL <code rend="inline">escape()</code> / <code rend="inline">unescape()</code>, or Jython <code rend="inline">encode("utf-8")</code> will often fix the problem.</p>
-</quote>
-</div><div type="3"><head>Compare Sentiment</head>
-<p>To practice constructing a POST request, read the documentation for <ref target="http://sentiment.vivekn.com/docs/api/">Sentiment Tool</ref>, another free API.
+                    </quote>
+                </div>
+                <div type="3">
+                    <head>Compare Sentiment</head>
+                    <p>To practice constructing a POST request, read the documentation for <ref target="http://sentiment.vivekn.com/docs/api/">Sentiment Tool</ref>, another free API.
 Find the service URL and data key necessary to modify the Jython pattern above.
 Create a new column from <emph>first</emph> named <code rend="inline">sentiment2</code> and test the script.</p>
-<p>There are many possible ways to create the request, for example:</p>
-<ab><code xml:id="code_fetch-and-parse-data-with-openrefine_14" corresp="code_fetch-and-parse-data-with-openrefine_14.txt" rend="block"/></ab>
-<p>The JSON response contains different metrics, but it will be obvious that the APIs disagree on many of the sentiment "labels" (for example, use <code rend="inline">value.parseJson()['result']['sentiment']</code> to extract a label comparable to the first API).
+                    <p>There are many possible ways to create the request, for example:</p>
+                    <ab>
+                        <code xml:id="code_fetch-and-parse-data-with-openrefine_14" corresp="code_fetch-and-parse-data-with-openrefine_14.txt" rend="block"/>
+                    </ab>
+                    <p>The JSON response contains different metrics, but it will be obvious that the APIs disagree on many of the sentiment "labels" (for example, use <code rend="inline">value.parseJson()['result']['sentiment']</code> to extract a label comparable to the first API).
 These are simple free APIs for demonstration purposes, but it is important to critically investigate services to more fully understand the potential of the metrics.</p>
-<p>Both APIs use a <ref target="https://en.wikipedia.org/wiki/Naive_Bayes_classifier">naive bayes classifier</ref> to categorize text input.
+                    <p>Both APIs use a <ref target="https://en.wikipedia.org/wiki/Naive_Bayes_classifier">naive bayes classifier</ref> to categorize text input.
 These models must be trained on pre-labeled data and will be most accurate on similar content.
-Text Processing is trained on twitter and movie reviews<ref type="footnotemark" target="#note_1"/>, and Sentiment Tool on IMDb movie reviews<ref type="footnotemark" target="#note_2"/>.
+Text Processing is trained on twitter and movie reviews<ref type="footnotemark" target="#en_note_1"/>, and Sentiment Tool on IMDb movie reviews<ref type="footnotemark" target="#en_note_2"/>.
 Thus both are optimized for small chunks of modern English language similar to a review, with a limited bag of words used to determine the sentiment probabilities.</p>
-<p>Archaic words and phrases contribute significantly to the sonnets' sentiment, yet are unlikely to be given any weight in these models since they are not present in the training data.
+                    <p>Archaic words and phrases contribute significantly to the sonnets' sentiment, yet are unlikely to be given any weight in these models since they are not present in the training data.
 While comparing the metrics is fascinating, neither is likely to produce quality results for this data set.
 Rather than an accurate sentiment, we might be surprised to find a quantifiable dissonance between the sonnet's English and our modern web usage.
 However, a model optimized to Shakespeare's words could be developed using more appropriate training data.
 To learn more about classifiers and how to implement one, see Vilja Hulden's PH lesson <ref target="/lessons/naive-bayesian">"Supervised Classification: The Naive Bayesian Returns to the Old Bailey"</ref> or Steven Bird, Ewan Klein, and Edward Loper's <ref target="http://www.nltk.org/book/ch06.html">"Learning to Classify Text"</ref> in the <ref target="http://www.nltk.org/book/">NTLK Book</ref>.</p>
-<p>Accessing data and services on the web opens new possibilities and efficiencies for humanities research.
+                    <p>Accessing data and services on the web opens new possibilities and efficiencies for humanities research.
 While powerful, these APIs are often not aimed at humanities scholarship and may not be appropriate or optimized for our inquiries.
 The training data may be incomplete, biased, or secret.
 We should always be asking questions about these aggregations and algorithms, thinking critically about the metrics they are capable of producing.
 This is not a new technical skill, but an application of the historian's traditional expertise, not unlike interrogating physical primary materials to unravel bias and read between the lines.
 Humanities scholars routinely synthesize and evaluate convoluted sources to tell important narratives, and must carry that skill into digital realm.
 We can critically evaluate data sources, algorithms, and API services, as well as create new ones more suited to our questions and methods.</p>
-<p>With its unique ability to interactively wrangle data from raw aggregation to analysis, Refine supports exploratory research and offers a wonderfully fluid and playful approach to tabular data.
+                    <p>With its unique ability to interactively wrangle data from raw aggregation to analysis, Refine supports exploratory research and offers a wonderfully fluid and playful approach to tabular data.
 OpenRefine is a flexible, pragmatic tool that simplifies routine tasks and, when combined with domain knowledge, extends research capabilities.</p>
-<p><note xml:id="note_huynh"> David Huynh, "Google Refine", Computer-Assisted Reporting Conference 2011, <ref target="http://web.archive.org/web/20150528125345/http://davidhuynh.net/spaces/nicar2011/tutorial.pdf">http://web.archive.org/web/20150528125345/http://davidhuynh.net/spaces/nicar2011/tutorial.pdf</ref>.</note>
-<note xml:id="note_use"> As of July 2017, see <ref target="http://text-processing.com/docs/index.html">API Documentation</ref>.</note>
-<ref type="footnotemark" target="#note_1"/> : Jacob Perkins, "Sentiment Analysis with Python NLTK Text Classification", <ref target="http://text-processing.com/demo/sentiment/">http://text-processing.com/demo/sentiment/</ref>.
-<ref type="footnotemark" target="#note_2"/> : Vivek Narayanan, Ishan Arora, and Arjun Bhatia, "Fast and accurate sentiment classification using an enhanced Naive Bayes model", 2013, <ref target="https://arxiv.org/abs/1305.6143">arXiv:1305.6143</ref>.</p>
-</div></div>
-    </body>
-  </text>
+                    <p>
+                        <note xml:id="en_note_huynh"> David Huynh, "Google Refine", Computer-Assisted Reporting Conference 2011, <ref target="http://web.archive.org/web/20150528125345/http://davidhuynh.net/spaces/nicar2011/tutorial.pdf">http://web.archive.org/web/20150528125345/http://davidhuynh.net/spaces/nicar2011/tutorial.pdf</ref>.</note>
+                        <note xml:id="en_note_use"> As of July 2017, see <ref target="http://text-processing.com/docs/index.html">API Documentation</ref>.</note>
+                        <ref type="footnotemark" target="#en_note_1"/> : Jacob Perkins, "Sentiment Analysis with Python NLTK Text Classification", <ref target="http://text-processing.com/demo/sentiment/">http://text-processing.com/demo/sentiment/</ref>.
+<ref type="footnotemark" target="#en_note_2"/> : Vivek Narayanan, Ishan Arora, and Arjun Bhatia, "Fast and accurate sentiment classification using an enhanced Naive Bayes model", 2013, <ref target="https://arxiv.org/abs/1305.6143">arXiv:1305.6143</ref>.</p>
+                </div>
+            </div>
+        </body>
+    </text>
 </TEI>

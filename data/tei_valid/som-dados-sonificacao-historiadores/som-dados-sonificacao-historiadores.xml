@@ -1,0 +1,309 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="som-dados-sonificacao-historiadores">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Sonificação de dados (uma introdução à sonificação para historiadores)</title>
+                <author role="original_author">Shawn Graham</author>
+                <editor role="reviewers">
+                    <persName>Jeff Veitch</persName>
+                    <persName>Tim Compeau</persName>
+                </editor>
+                <author role="translators">Gabriela Kucuruza</author>
+                <editor role="translation-reviewers">
+                    <persName>Samuel Van Ransbeeck</persName>
+                    <persName>Juliana Marques da Silva</persName>
+                </editor>
+                <editor role="editors">Ian Milligan</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">03/26/2021</date>
+                <idno type="doi">10.46430/phpt0020</idno>
+                <date type="published">06/07/2016</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#sonification"/>.</p>
+                <p>There are other translations: <ref target=""/>
+                </p>
+                <p>There are other translations: <ref target=""/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Existem inúmeras lições que o ajudarão a visualizar o passado, mas esta lição o ajudará a ouvir o passado.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">distant-reading</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <div type="1">
+                <head>Introdução</head>
+                <p>ποίησις - fabricação, criação, produção</p>
+                <p>Eu estou muito cansado de ver o passado. Existem diversos guias que irão ajudar a  <emph>visualizar</emph> o passado que não podemos ver, mas muitas vezes nós esquecemos que a visualização é um ato de criatividade. Nós talvez estejamos muito ligados às nossas telas, muito focados em "ver". Ao invés disso, deixe-me ouvir algo do passado.</p>
+                <p>Enquanto existe uma história e uma literatura profundas sobre arqueoacústica e paisagens sonoras que tentam capturar o som de um lugar  <emph>como ele era</emph> (<ref target="https://www.digitalstudies.org/articles/10.16995/dscn.58">veja por exemplo a Virtual St. Paul's</ref> ou o trabalho de <ref target="https://jeffdveitch.wordpress.com/">Jeff Veitch em Ostia antiga</ref>), eu tenho interesse em 'sonificar' o que eu tenho <emph>agora</emph>, os dados eles mesmos. Eu quero descobrir uma gramática para representar dados em som que seja apropriada para História. <ref target="#Drucker">Drucker</ref>
+                    <ref target="http://www.digitalhumanities.org/dhq/vol/5/1/000091/000091.html">notoriamente nos lembra</ref> que ‘dados’ não são coisas dadas, mas ao invés disso, coisas capturadas, coisas transformadas. Na sonificação de dados, eu literalmente realizo o passado no presente, e então as suposições e as transformações que faço estão em primeiro plano. A experiência auditiva resultante é uma "deformação" literal que nos faz ouvir as camadas modernas do passado de uma nova maneira.</p>
+                <p>Eu quero ouvir os significados do passado, mas eu sei que não posso. No entanto, quando ouço um instrumento, posso imaginar a materialidade do músico tocando; posso discernir o espaço físico em seus ecos e ressonâncias. Eu posso sentir o som, eu posso me mover no ritmo. A música engaja o meu corpo inteiro, minha imaginação inteira. As suas associações com sons, música e tons que eu ouvi antes criam uma experiência temporal profunda, um sistema de relações incorporadas entre eu e o passado. Visual? Nós temos representações visuais do passado há tanto tempo, que nós quase nos esquecemos dos aspectos artístico e performativo dessas gramáticas de expressão.</p>
+                <p>Nesse tutorial, você aprenderá a fazer um pouco de barulho a partir dos seus dados sobre o passado. O <emph>significado</emph> desse barulho, bem... isso depende de você. Parte do objetivo desse tutorial é te fazer estranhar os seus dados. Traduzindo-o, transcodificando-o, <ref target="http://blog.taracopplestone.co.uk/making-things-photobashing-as-archaeological-remediation/">remediando-o</ref> (em inglês), nós começaremos a ver elementos dos dados que a nossa familiaridade com modelos visuais nos impediu de enxergar. Essa deformação está de acordo com os argumentos apresentados por, por exemplo, Mark Sample sobre <ref target="http://www.samplereality.com/2012/05/02/notes-towards-a-deformed-humanities/">quebrar coisas</ref> (em inglês), ou Bethany Nowviskie sobre a '<ref target="http://nowviskie.org/2013/resistance-in-the-materials/">resistência nos materiais</ref>' (em inglês). Sonificação nos move através do continuum de dados para captação, ciências sociais para arte, <ref target="http://nooart.org/post/73353953758/temkin-glitchhumancomputerinteraction">falha para estética</ref> (em inglês). Então vamos ver como isso tudo soa.</p>
+                <div type="2">
+                    <head>Objetivos</head>
+                    <p>Nesse tutorial, apresentarei três maneiras diferentes de gerar som ou música a partir de seus dados.</p>
+                    <p>Na primeira, usaremos um sistema desenvolvido por Jonathan Middleton, disponível gratuitamente para uso, chamado  <emph>Musicalgorithms</emph> (Algorítmos Musicais) a fim de introduzir algumas das questões e termos-chaves envolvidos. Na segunda, usaremos uma pequena biblioteca do Python para 'mapear por parâmetro' os nossos dados contra o teclado de 88 teclas e introduzir um pouco de arte em nosso trabalho. Finalmente, aprenderemos como carregar nossos dados no ambiente de codificação ao vivo de código aberto para som e música, <emph>Sonic Pi</emph>, momento em que te deixarei para que explore os abundantes tutoriais e recursos desse projeto.</p>
+                    <p>Você verá que "sonificação" nos movimenta através do espectro partindo de simples 'visualização/auralização' para performance real.  </p>
+                    <div type="3">
+                        <head>Ferramentas</head>
+                        <list type="unordered">
+                            <item>Musicalgorithms <ref target="http://musicalgorithms.org/">http://musicalgorithms.org/</ref>
+                            </item>
+                            <item>MIDITime <ref target="https://github.com/cirlabs/miditime">https://github.com/cirlabs/miditime</ref> (Eu bifurquei uma cópia no GitHub <ref target="https://github.com/shawngraham/miditime">aqui</ref>)</item>
+                            <item>Sonic Pi <ref target="http://sonic-pi.net/">http://sonic-pi.net/</ref>
+                            </item>
+                        </list>
+                    </div>
+                    <div type="3">
+                        <head>Dados de Exemplo</head>
+                        <list type="unordered">
+                            <item>
+                                <ref target="/assets/sonification-roman-data.csv">Dados sobre artefatos romanos</ref>
+                            </item>
+                            <item>
+                                <ref target="/assets/sonification-diary.csv">Excerto do modelo de tópicos do diário de John Adams</ref>
+                            </item>
+                            <item>
+                                <ref target="/assets/sonification-jesuittopics.csv">Excerto do modelo de tópicos das relações jesuíticas</ref>
+                            </item>
+                        </list>
+                    </div>
+                </div>
+            </div>
+            <div type="1">
+                <head>Um pouco de contexto sobre  sonificação</head>
+                <p>Sonificação é a prática de mapear aspectos dos dados para produzir sinais sonoros. Em geral, uma técnica pode ser chamada de "sonificação" se cumprir certas condições. Elas incluem reprodutibilidade (os mesmos dados podem ser transformados da mesma maneira por outros pesquisadores de forma que produzam os mesmos resultados) e o que pode ser chamado de inteligibilidade - que os elementos "objetivos" dos dados originais sejam sistematicamente refletidos no som resultante (veja <ref target="http://www.icad.org/Proceedings/2008/Hermann2008.pdf">Hermann (2008)</ref> (em inglês) para uma taxonomia da sonificação). <ref target="https://www.researchgate.net/publication/282504359_Listen_to_the_Sound_of_Data">Last e Usyskin (2015)</ref> (em inglês) realizaram uma série de experimentos para determinar quais tarefas de análise de dados poderiam ser performadas quando os dados eram sonificados.  Os seus resultados experimentais mostraram que mesmo um grupo de ouvintes não-treinados (sem treinamento formal em música) podem fazer distinções úteis nos dados. Eles encontraram ouvintes que conseguiam distinguir tarefas comuns de exploração de dados nos dados sonificados, como classificação e agrupamento. Os seus resultados sonificados mapearam os dados fundamentais da escala musical ocidental.</p>
+                <p>Last e Usyskin focaram em dados de séries temporais. Eles argumentam que dados de séries temporais são particularmente bons para sonificação, pois há paralelos naturais com sons musicais. Música é sequencial, ela tem duração e ela se desenvolve ao longo do tempo, assim como dados de séries temporais. <ref target="https://www.researchgate.net/publication/282504359_Listen_to_the_Sound_of_Data">(Last e Usyskin 2015, p. 424)</ref>. Torna-se um problema combinar os dados com as saídas sônicas apropriadas. Em muitas aplicações de sonificação, uma técnica chamada "mapeamento de parâmetros" é usada para combinar aspectos dos dados ao longo de várias dimensões da audição, como  <ref target="#tom">tom</ref>, variação, brilho e início. O problema com esta abordagem é que onde não há relação temporal (ou melhor, nenhuma relação não linear) entre os pontos de dados originais, o som resultante pode ser "confuso" (2015, p. 422).</p>
+                <h2>Escutando as lacunas</h2>
+                <p>Há também o modo que preenchemos as lacunas do som com as nossas expectativas. Considere esse vídeo em que <ref target="#mp3">mp3</ref> foi convertido para <ref target="#midi">MIDI</ref> e  de volta para mp3; a  música foi 'achatada' para que todas as informações sonoras sejam tocadas por apenas um instrumento. (Gerar esse efeito é como salvar uma página da web como .txt, abri-la no Word e, então, salvá-la novamente como .html). Todos os sons (inclusive vocais) foram traduzidos para os seus valores de nota correspondentes e, em seguida, transformados de volta em mp3.</p>
+                <p>É barulhento, entretanto percebemos o significado. Considere o vídeo abaixo:</p>
+                <iframe src="https://player.vimeo.com/video/149070596" width="640" height="360" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""/>
+                <p>O que está acontecendo aqui? Se já conhecia essa música, provavelmente ouviu as 'palavras'. No entanto, nenhuma palavra está presente na música! Se você não conhecia esse música, deve ter soado como um absurdo inaudível (veja mais exemplos no website de <ref target="http://waxy.org/2015/12/if_drake_was_born_a_piano/">Andy Baio</ref>). Esse efeito é, às vezes, chamado de 'alucinação auditiva' (cf. <ref target="#Koebler">Koebler, 2015</ref>). Esses exemplos mostram como qualquer representação de dados que podemos ouvir/ver não está lá, estritamente falando. Nós preenchemos as lacunas com as nossas próprias expectativas.</p>
+                <p>Considere as implicações para a História. Se sonificarmos nossos dados e começarmos a ouvir padrões no som, ou pontos fora da curva, nossas expectativas culturais sobre como a música funciona (nossas memórias de fragmentos musicais semelhantes, ouvidos em contextos específicos) irão colorir nossa interpretação. Isso, eu argumentaria, é verdadeiro para todas as representações do passado, mas sonificar é apenas estranho o suficiente em relação aos nossos métodos regulares, de forma que essa autoconsciência nos ajudará a identificar ou comunicar os padrões críticos nos dados do passado.</p>
+                <p>Iremos progredir por meio de três ferramentas diferentes para sonificação de dados, observando como as escolhas em uma ferramenta afetam o resultado e podem ser atenuadas imaginando novamente os dados por meio de outra ferramenta. No fim das contas, não há nada mais objetivo em 'sonificação' do que há em 'visualização', então quem pesquisa deve estar preparado para justificar as suas escolhas, e fazer escolhas transparentes e reprodutíveis para outros. E para que não pensemos que a sonificação e a música gerada por algoritmos são de alguma forma algo "novo", indico ao leitor interessado <ref target="http://www.icad.org/Proceedings/2008/Hermann2008.pdf">Hedges, (1978)</ref>.</p>
+                <p>Em cada seção, irei dar uma introdução conceitual, seguida por um passo a passo usando dados arqueológicos ou históricos de amostra.</p>
+            </div>
+            <div type="1">
+                <head>Musicalgorithms</head>
+                <p>Há uma grande variedade de ferramentas para sonificar dados. Algumas, por exemplo, são pacotes amplamente usadas do <ref target="https://cran.r-project.org/">ambiente de estatística R</ref>, como ‘<ref target="https://cran.r-project.org/web/packages/playitbyr/index.html">playitbyR</ref>’ e ‘<ref target="https://cran.r-project.org/web/packages/audiolyzR/index.html">AudiolyzR</ref>’. O primeiro desses pacotes, entretanto, não tem sido mantido ou atualizado para as versões atuais do R (sua última atualização foi muitos anos atrás) e o segundo precisa de um número considerável de configurações adicionais de software para que funcione adequadamente.  </p>
+                <p>Por outro lado, o site <ref target="http://musicalgorithms.org/">Musicalgorithms</ref> é bem fácil de usar. O site Musicalgorithms está online há mais de uma década. Embora não seja código aberto, ele é um projeto de pesquisa de longa-duração em música computacional do seu criador, Jonathan Middleton. Ele está atualmente em sua terceira maior iteração (interações anteriores permanecem disponíveis para uso online). Começaremos com o Musicalalgorithms porque ele nos permite entrar e ajustar os nossos dados para produzir um ficheiro de representação MIDI. Tenha atenção e seleccione a '<ref target="http://musicalgorithms.org/3.0/index.html">Versão 3</ref>'.</p>
+                <figure>
+                    <desc>O site Musicalgorithms como aparecia em 2 de agosto de 2016</desc>
+                    <graphic url="sonification-musicalgorithms-main-site-1.png"/>
+                </figure>
+                <quote>
+                    <p>Nota da tradução: há novas versões disponíveis para uso, mas de forma a seguir o tutorial, seguimos a versão 3 do Musicallgorithms, usada em 2016, e ainda disponível no site para uso.</p>
+                </quote>
+                <p>O Musicalgorithms efetua uma série de transformações nos dados. Nos dados de amostra abaixo (o padrão do próprio site), há apenas uma linha de dados, mesmo que pareça várias linhas. Os dados de amostra são compostos de campos separados por vírgula que são delimitados por espaço.</p>
+                <ab>
+                    <code xml:id="code_som-dados-sonificacao-historiadores_0" corresp="code_som-dados-sonificacao-historiadores_0.txt" rend="block"/>
+                </ab>
+                <p>Esses dados representam os dados de origem e as suas transformações; compartilhar esses dados permitiria a outro pesquisador replicar ou estender a sonificação usando outras ferramentas. No entanto, quando se começa, apenas os dados básicos abaixo são necessários (uma lista de pontos de dados):</p>
+                <ab>
+                    <code xml:id="code_som-dados-sonificacao-historiadores_1" corresp="code_som-dados-sonificacao-historiadores_1.txt" rend="block"/>
+                </ab>
+                <p>O campo-chave para nós é ‘areaPitch1’, que contém os dados de entrada delimitados por espaço. Os outros campos serão preenchidos à medida que avançamos pelas várias configurações de Musicalgorithms. Nos dados acima (por exemplo, 24 72 12 84 etc.), os valores são contagens brutas de inscrições de uma série de locais ao longo de uma estrada romana na Grã-Bretanha. (Vamos praticar com outros dados em breve, abaixo).</p>
+                <figure>
+                    <desc>Depois de carregar seus dados, é possível selecionar as diferentes operações na barra de menu superior do site. Na captura de tela, o mouseover de informações está explicando o que acontece com o dimensionamento de seus dados se você selecionar a operação de divisão para dimensionar os seus dados para o intervalo de notas selecionado.</desc>
+                    <graphic url="sonification-musicalgorithms-pitch-mapping-2.png"/>
+                </figure>
+                <p>Agora, conforme se percorre as várias guias da interface ‘duration input’ (entrada de duração) , ‘pitch mapping' (mapeamento de tom), ‘duration mapping’ (mapeamento de duração), ‘scale options’ (opções de escala musical) é possível realizar várias transformações.  Em ‘pitch mapping’ (mapeamento de tom), há uma série de opções matemáticas para mapear os dados contra as 88 teclas/tons completos de um teclado de piano (em um mapeamento linear, a <emph>média</emph> dos dados de alguém seria mapeado para dó médio, ou 40). Também é possível escolher o tipo de escala, se é um tom maior ou menor. Nesse ponto, uma vez que se tenha selecionado várias transformações, salve o ficheiro de texto. No menu 'play' é possível realizar o download de um ficheiro MIDI. O seu programa de áudio padrão pode tocar ficheiros MIDI (geralmente padronizando para um tom de piano). Uma instrumentação mais complicada pode ser atribuída abrindo o ficheiro MIDI em programas de mixagem de música, como GarageBand (Mac) ou <ref target="https://lmms.io/">LMMS</ref> (Windows, Mac, Linux). (O uso do Garageband ou LMMS está fora do escopo desse tutorial. Um tutorial em vídeo sobre LMMS está disponível <ref target="https://youtu.be/4dYxV3tqTUc">aqui</ref>, enquanto há muitos tutoriais do Garageband online. Lynda.com tem <ref target="http://www.lynda.com/GarageBand-tutorials/Importing-audio-tracks/156620/164050-4.html">um tutorial excelente</ref>).</p>
+                <p>Se tivesse várias colunas de dados para os mesmos pontos - digamos, em nosso exemplo da Grã-Bretanha romana, também queríamos sonificar contagens de um tipo de cerâmica para essas mesmas cidades - é possível recarregar sua próxima série de dados, efetuar as transformações e mapeamentos, e gerar outro ficheiro MIDI. Como o Garageband e o LMMS permitem a sobreposição de vozes, você pode começar a criar sequências musicais complicadas.</p>
+                <figure>
+                    <desc>Captura de tela do Garageband, onde os ficheiros MIDI são tópicos sonorizados do Diário de John Adams. Na interface do Garageband (o LMMS é semelhante), cada ficheiro MIDI é arrastado e solto no lugar. A instrumentação para cada ficheiro MIDI (ou seja, trilha) pode ser selecionada nos menus do Garageband. Os rótulos de cada faixa foram alterados aqui para refletir as palavras-chave em cada tópico. A área verde à direita representa uma visualização das notas em cada faixa. Você pode ver esta interface em ação e ouvir a música [aqui](https://youtu.be/ikqRXtI3JeA) (em inglês)</desc>
+                    <graphic url="sonification-garageband-john-adams-3.png"/>
+                </figure>
+                <p>Quais transformações devem ser usadas? Se tiver duas colunas de dados, terá duas vozes. Pode fazer sentido, em nossos dados hipotéticos, tocar a primeira voz bem alto, em uma tonalidade maior: as inscrições 'falam' conosco, afinal de contas. (As inscrições romanas de fato se dirigem ao leitor, o transeunte, literalmente: 'Ó tu que passas ...'). Então, se acaso as cerâmicas de interesse forem mercadorias mais despretensiosas, talvez elas possam ser mapeadas em relação à extremidade inferior da escala ou receberem notas de duração mais longas para representar sua onipresença nas classes nessa região.</p>
+                <p>
+                    <emph>Não há forma 'certa' de representar os seus dados como som, ao menos não por enquanto</emph>, mas mesmo com essa amostra de exemplo, começamos a ver como sombras de significado e interpretação podem ser atribuídas aos nossos dados e à nossa experiência dos dados.  </p>
+                <p>Mas e o tempo? Dados históricos usualmente têm um ponto de inflexão, um distinto "tempo quando" algo aconteceu. Então, a quantidade de tempo entre dois pontos de dados precisa ser considerada. É nesse ponto que a nossa próxima ferramenta se torna bem útil, para quando nossos pontos de dados tiverem uma relação com outro espaço temporal. Começamos a nos mover de sonificação (pontos de dados) para música (relações entre pontos).</p>
+                <h3>Prática</h3>
+                <p>O <ref target="/assets/sonification-roman-data.csv">conjunto de dados de amostra</ref> apresentado contém a contagem de moedas romanas na sua primeira coluna e a contagem de materiais romanos dos mesmos locais, conforme contido no banco de dados do Portable Antiquities Scheme (Esquema de Antiguidades Portáveis) do British Museum. A sonificação desses dados pode revelar ou acentuar aspectos da situação econômica ao longo da rua Watling, uma grande rota através da Britânia Romana. Esses pontos de dados estão organizados geograficamente do Noroeste ao Sudeste; então, na medida em que o som toca, nós estamos escutando movimento através do espaço. Cada nota representa outro passo no caminho.</p>
+                <list type="ordered">
+                    <item>Abra o <ref target="/assets/sonification-roman-data.csv">dados-sonificação-romana.csv</ref> em uma tabela. Copie a primeira coluna em um editor de texto. Delete os finais das linhas de forma que os dados fiquem todos em uma linha única.</item>
+                    <item>Adicione a seguinte informação de coluna assim:</item>
+                </list>
+                <ab>
+                    <code xml:id="code_som-dados-sonificacao-historiadores_2" corresp="code_som-dados-sonificacao-historiadores_2.txt" rend="block"/>
+                </ab>
+                <p>...para que os seus dados sigam imediatamente depois da última vírgula (como <ref target="/assets/sonification-romancoin-data-music.csv">esse exemplo</ref>). Salve o ficheiro com um nome útil como <code rend="inline">sonsdasmoedas1.csv</code>.</p>
+                <list type="ordered">
+                    <item>Acesse o site do <ref target="http://musicalgorithms.org/3.0/index.html">Musicalgorithms</ref> (versão 3) e clique no botão "load" (carregar). No pop-up, clique no botão azul "load" (carregar) e selecione o ficheiro salvo no passo 2. O site carregará os seus materiais e exibirá uma marca de seleção verde se tiver sido carregado com êxito. Caso contrário, certifique-se de que os seus valores estejam separados por espaços e que sigam imediatamente a última vírgula no bloco de código na etapa 2. Também é possível tentar carregar o <ref target="/assets/sonification-romancoin-data-music.csv">ficheiro de demonstração desse tutorial</ref> ao invés.</item>
+                </list>
+                <figure>
+                    <desc>Clique em 'load' na tela principal para acessar essa caixa de diálogo. Então 'load csv'. (carregue o csv) Selecione o ficheiro; ele aparecerá na caixa. Então clique no botão 'load' (carregar).</desc>
+                    <graphic url="sonification-musicalgorithms-upload-4.png"/>
+                </figure>
+                <list type="ordered">
+                    <item>
+                        <p>Clique em 'Pitch Input'. Os valores dos seus dados serão exibidos. Por enquanto,  <hi rend="bold">não selecione</hi> nenhuma outra opção nesse página (consequentemente, usaremos os valores padrão do site).  </p>
+                    </item>
+                    <item>
+                        <p>Clique em 'Duration Input'. <hi rend="bold">Não selecione nenhuma opção aqui por enquanto</hi>. As opções aqui irão mapear várias transformações em relação aos dados que alterarão a duração para cada nota. Não se preocupe com as opções por enquanto: siga adiante.  </p>
+                    </item>
+                    <item>
+                        <p>Clique em 'Pitch Mapping'. Essa é a escolha mais crucial, pois irá transformar (isso é, escalar) os seus dados brutos para um mapeamento em relação às teclas do teclado. Deixe a configuração de <code rend="inline">mapping</code> em 'division'.  (As outras opções são módulo e logarítmico). A opção <code rend="inline">Range</code> 1 a 88 usa todas as 88 teclas do teclado, assim, seu valor mais baixo estaria de acordo com a nota mais profunda do piano e seu valor mais alto com a nota mais alta. Em vez disso, você pode restringir sua música em torno de dó médio, então insira 25 a 60 como seu intervalo. O resultado deveria mudar para: <code rend="inline">31,34,34,34,25,28,30,60,28,25,26,26,25,25,60,25,25,38,33,26,25,25,25</code> Essas não são mais suas contagens; são as notas do teclado.</p>
+                    </item>
+                </list>
+                <figure>
+                    <desc>Clique na caixa 'range' e defina-o para 25. Os valores abaixo serão alterados automaticamente. Clique na caixa 'to' e defina-o para 60. Clique novamente na outra caixa; os valores serão atualizados.</desc>
+                    <graphic url="sonification-musicalgorithms-settings-for-pitch-mapping-5.png"/>
+                </figure>
+                <list type="ordered">
+                    <item>Clique em 'Duration Mapping'. Como Pitch Mapping, isso pega o intervalo de tempo especificado e usa várias opções matemáticas para mapear o intervalo de possibilidade contra as suas notas. Se passar o seu cursor por cima de <code rend="inline">i</code> verá como os números correspondem com notas inteiras, semínimas, colcheias e assim por diante. Deixe os valores padrão por enquanto.</item>
+                    <item>Clique em 'Scale Options'. Aqui nós podemos começar a selecionar o que pode ser chamado de aspecto 'emocional' do som. Nós geralmente pensamos que escalas maiores são 'alegres' enquanto escalas menores são 'tristes'; para uma discussão acessível acesse esse <ref target="http://www.ethanhein.com/wp/2010/scales-and-emotions/">post de blog</ref> (em inglês). Por enquanto, escolha 'scale by: major' (escala maior). Deixe a 'scale' (escala) como <code rend="inline">C</code>.</item>
+                </list>
+                <p>Agora sonificamos uma coluna de dados! Clique no botão 'save' (salvar), então 'save csv' (salvar csv).</p>
+                <figure>
+                    <desc>A caixa de diálogo salvar dados.</desc>
+                    <graphic url="sonification-musicalgorithms-save-6.png"/>
+                </figure>
+Haverá um ficheiro que se parecerá com isso:
+<ab>
+                    <code xml:id="code_som-dados-sonificacao-historiadores_3" corresp="code_som-dados-sonificacao-historiadores_3.txt" rend="block"/>
+                </ab>
+                <p>É possível ver os dados originais no campo 'areaPitch1' e os subsequentes mapeamentos. O site permite que sejam geradas até quatro vozes por vez em um ficheiro MIDI; dependendo de como se quer adicionar instrumentação depois, pode-se querer gerar um ficheiro MIDI por vez. Vamos tocar a música - clique em 'Play'. É possível selecionar o tempo aqui, e um instrumento. É possível ouvir os seus dados no navegador, ou salvá-los como um ficheiro MIDI clicando no botão azul 'Save MIDI file'.</p>
+                <p>Retorne ao começo e carregue as duas colunas de dados nesse modelo:</p>
+                <ab>
+                    <code xml:id="code_som-dados-sonificacao-historiadores_4" corresp="code_som-dados-sonificacao-historiadores_4.txt" rend="block"/>
+                </ab>
+                <figure>
+                    <desc>Coloque 2 na caixa de vozes no topo da interface. Quando você for para qualquer uma das páginas de opção - aqui, nós estamos em 'pitch input' - dois monitores abrem para mostrar os dados das duas vozes. Carregue os seus dados do csv como antes, mas formate o seu csv para ter o 'areaPitch1' e o 'areaPitch2' como descrito no texto principal. Os dados para a primeira voz irão aparecer na esquerda, e a segunda voz na direita.</desc>
+                    <graphic url="sonification-2voices-7.png"/>
+                </figure>
+                <p>Quando se tem dados com várias vozes, o que se destaca? Observe que, nessa abordagem, a distância entre os pontos no mundo real não é considerada em nossa sonificação. Essa distância, se fosse considerada, poderia ser crucial. A distância, é claro, não precisa ser geográfica - pode ser temporal. A próxima ferramenta que exploraremos nos permite abordar isso em nossa sonificação explicitamente.</p>
+            </div>
+            <div type="1">
+                <head>Algumas palavras sobre configurar o Python</head>
+                <p>A próxima seção desse tutorial precisa de Python. Se não usou Python ainda, será preciso passar algum tempo <ref target="/en/lessons/intro-to-bash">se familiarizando com a linha de comando (PC) ou terminal (OS)</ref> (em inglês). Você pode achar esse rápido <ref target="/pt/licoes/instalacao-modulos-python-pip">guia de instalação dos módulos do python</ref> útil (mas retorne para ele depois de ler o resto da seção).</p>
+                <p>Usuários do Mac já possuirão o Python instalado na máquina deles. É possível testar isso apertando o botão COMMAND e a barra de espaço; na janela de pesquisa, digite <code rend="inline">terminal</code> e clique na aplicação do terminal. No prompt de comando, por exemplo, no cursor piscando em <code rend="inline">$</code> digite <code rend="inline">python --version</code> e o computador responderá com a versão do python existente no seu computador. <emph>A próxima seção desse tutorial usa a versão Python 2.7; ela não foi testada em Python 3</emph>.  </p>
+                <p>Para usuários do Windows, Python não é instalado por padrão na sua máquina então <ref target="http://docs.python-guide.org/en/latest/starting/install/win/">essa página</ref> te ajudará a iniciar, apesar das coisas serem um pouco mais complicadas do que parece de acordo com a página (nota de tradução: pode usar também a <ref target="/pt/licoes/introducao-instalacao-python">lição de instalação do Python</ref> do <emph>Programming Historian em português</emph>, mas tenha em atenção que nessa lição é instalada a versão 3 do Python). Primeiro, realize o download do ficheiro <code rend="inline">.msi</code> que a página recomenda (Python 2.7). Clique duas vezes no ficheiro e ele deve se instalar em um novo diretório, por exemplo, <code rend="inline">C:\Python27\</code>. Então, nós temos de dizer para o Windows a localização para onde buscar pelo Python sempre que um programa em python for executado; ou seja, colocaremos a localização do diretório no seu 'path', ou a variável do ambiente que o Windows sempre apresenta quando confrontado com um novo comando. Existem algumas formas de fazer isso, mas talvez a mais fácil seja buscar no seu computador pelo programa <code rend="inline">Powershell</code> (digite 'powershell' na janela de pesquisa do seu computador). Abra o Powershell e, no <code rend="inline">&gt;</code> prompt, copie essa linha inteira:</p>
+                <p>
+                    <code rend="inline">[Environment]::SetEnvironmentVariable("Path", "$env:Path;C:\Python27\;C:\Python27\Scripts\", "User")</code>
+                </p>
+                <p>Feche o powershell quando terminar. Você saberá que funcionou se nada acontecer quando clicar em 'enter'. Para testar se tudo está funcionando, abra o prompt de comando (aqui há <ref target="http://www.howtogeek.com/235101/10-ways-to-open-the-command-prompt-in-windows-10/">10 forma de fazer isso</ref>) (em inglês) e digite no prompt <code rend="inline">&gt;</code>, <code rend="inline">python --version</code>. Ele deve retornar <code rend="inline">Python 2.7.10</code> ou algo similar.</p>
+                <p>A última peça do quebra-cabeça que todos os usuários precisarão é um programa chamado <code rend="inline">Pip</code>. Os usuários de Mac podem instalá-lo digitando no terminal: :<code rend="inline">sudo easy_install pip</code>. Usuários do Windows terão um pouco mais de dificuldade (nota de tradução: pode usar também a <ref target="/pt/licoes/instalacao-modulos-python-pip">lição de instalação de módulos Python com pip</ref> do <emph>Programming Historian em português</emph>, mas tenha em atenção que nessa lição é usada a versão 3 do Python). Primeiro, clique no botão direito do seu cursor e salve esse link: <ref target="https://bootstrap.pypa.io/get-pip.py">https://bootstrap.pypa.io/get-pip.py</ref> (Se apenas clicar no link, ele irá te mostrar o código no seu navegador). Salve em algum lugar útil. Abra o prompt de comando no diretório em que salvou <code rend="inline">get-pip.py</code>. Então, digite no prompt de comando, <code rend="inline">python get-pip.py</code>. Convencionalmente, nos tutoriais, verá <code rend="inline">&gt;</code> ou <code rend="inline">$</code> em lugares em que é preciso digitar algo no prompt de comando ou no terminal. Nunca é necessário digitar esses dois caracteres.</p>
+                <p>Finalmente, quando você tem um código python que deseja executar, pode inseri-lo em seu editor de texto e salvá-lo com a extensão <code rend="inline">.py</code> (nota de tradução: pode também seguir as indicações das lições “Configurar um ambiente de desenvolvimento integrado para Python”, do <emph>Programming Historian em português</emph>, nas suas versões <ref target="/pt/licoes/instalacao-windows">Windows</ref> ou <ref target="/pt/licoes/instalacao-mac">Mac</ref>, mas tenha em atenção que nessas lições é usada a versão 3 do Python). O seu ficheiro é um ficheiro de texto, mas a <hi rend="bold">extensão</hi> do ficheiro diz para o seu computador para usar o Python para interpretá-lo; mas lembre, digite <code rend="inline">python</code> no prompt primeiro, por exemplo: <code rend="inline">$ python meu-script-legal.py</code>.</p>
+            </div>
+            <table>
+                <row>
+                    <cell role="label"/>
+                    <cell role="label">A</cell>
+                    <cell role="label">B</cell>
+                    <cell role="label">C</cell>
+                    <cell role="label">D</cell>
+                    <cell role="label">E</cell>
+                </row>
+                <row>
+                    <cell>3</cell>
+                    <cell/>
+                    <cell/>
+                    <cell/>
+                    <cell/>
+                    <cell/>
+                </row>
+                <row>
+                    <cell>2</cell>
+                    <cell/>
+                    <cell/>
+                    <cell/>
+                    <cell/>
+                    <cell/>
+                </row>
+                <row>
+                    <cell>1</cell>
+                    <cell>{'data_evento': datetime</cell>
+                    <cell>(1753,6,8)</cell>
+                    <cell>, 'magnitude':</cell>
+                    <cell>0.0024499630</cell>
+                    <cell>},</cell>
+                </row>
+            </table>
+            <div type="1">
+                <head>Sonic Pi</head>
+                <p>Harmonizar ficheiros MIDI únicos (no Garageband ou em algum outro programa de composição musical) nos leva de sonificação para composição e arte sonora. Nessa seção final, não será oferecido um tutorial completo sobre como usar o <ref target="http://sonic-pi.net">Sonic Pi</ref>, mas um direcionamento para um ambiente que permite a performance da codificação dos seus dados ao vivo (veja <ref target="https://www.youtube.com/watch?v=oW-3HVOeUQA">esse vídeo</ref> para uma performance ao vivo real de codificação). Os tutoriais do próprio Sonic Pi's mostrarão o potencial do uso do computador como um instrumento musical (em que você digita código em Ruby no editor interno enquanto o interpretador toca o que está sendo codificado).</p>
+                <p>Por que alguém iria querer fazer isso? Como progressivamente ficou evidente no tutorial, quando os seus dados são sonificados, escolhas passam a ser feitas sobre como mapear os dados em som, e essas escolhas refletem implícita ou explicitamente decisões sobre quais dados importam. Existe um <emph>continuum</emph> de 'objetividade', se quiser. Em uma extremidade, uma sonificação que apoia uma discussão sobre o passado; do outro, uma apresentação sobre o passado tão fascinante e pessoal quanto qualquer palestra pública bem-feita. A sonificação tira nossos dados das páginas e os leva aos ouvidos de nossos ouvintes: é uma espécie de história pública. Apresentando nossos dados ... imagine só!</p>
+                <p>Aqui, eu ofereço simplesmente um trecho de código que possibilitará a importação dos seus dados, que aqui são simplesmente uma lista de valores salvos como csv. Estou em dívida com a bibliotecária da George Washington University, Laura Wrubel, que postou em <ref target="https://gist.github.com/lwrubel">gist.github.com</ref> os experimentos dela de sonificação das transações de circulação de sua biblioteca.</p>
+                <p>Nesse <ref target="/assets/sonification-jesuittopics.csv">ficheiro de amostra</ref> (um modelo de tópicos gerado do <ref target="http://puffin.creighton.edu/jesuit/relations/">Jesuit Relations</ref>, (Relações Jesuítas)), há dois tópicos. A primeira linha contem os cabeçalhos: topic1 (em PT-BR, tópico1), topic2 (em PT-BR, tópico2).</p>
+                <h3>Prática</h3>
+                <p>Siga os tutoriais iniciais que o Sonic Pi oferece até se sentir confortável com a interface e algumas das suas possibilidades. (Esses tutoriais também estão agrupados <ref target="https://gist.github.com/jwinder/e59be201082cca694df9">aqui</ref>; também é possível escutar uma entrevista com Sam Aaron, o criador do Sonic Pi, <ref target="https://devchat.cachefly.net/rubyrogues/RR215SonicPi.mp3?rss=true">aqui</ref>). Então, em uma nova janela de edição, copie o seguinte (novamente, o trecho de código a seguir eventualmente será agrupado em um script único na sua janela do Sonic Pi):</p>
+                <ab>
+                    <code xml:id="code_som-dados-sonificacao-historiadores_15" corresp="code_som-dados-sonificacao-historiadores_15.txt" rend="block"/>
+                </ab>
+                <p>Lembre, <code rend="inline">path/to/your/directory/</code> é a localização real dos seus dados na sua máquina. Tenha certeza de que eles estão nomeados como <code rend="inline">dados.csv</code> ou altere a linha acima de forma que o seu ficheiro seja carregado!</p>
+                <p>Agora, vamos carregar esses dados na nossa música:</p>
+                <ab>
+                    <code xml:id="code_som-dados-sonificacao-historiadores_16" corresp="code_som-dados-sonificacao-historiadores_16.txt" rend="block"/>
+                </ab>
+                <p>As primeiras linhas carregam as colunas de dados; então dizemos qual amostra de som que desejamos usar (piano) e, em seguida, dizemos ao Sonic Pi para tocar o tópico 1 de acordo com os seguintes critérios (um valor aleatório menor que 0,5 para o ataque; um decaimento usando um valor aleatório menor que 1; e uma <ref target="#amplitude">amplitude</ref> com um valor aleatório menor que 0.25). Vê o x 100 na linha? Isso pega os valores dos nossos dados (que são um decimal, lembre) e torna-os em um número inteiro. Nessa parte do código, (do modo que eu escrevi), aquele número equivale diretamente a nota. Se 88 é a menor nota e 1 é a maior, é possível ver que essa abordagem é um pouco problemática: nós não fizemos nenhum mapeamento de tom aqui! Nesse caso, é possível usar o Musicalgorithms para fazer o seu mapeamento de tom, e então inserir esses valores no Sonic Pi. Alternativamente, uma vez que esse código é praticamente em Ruby, é possível buscar como normalizar os dados e então realizar um mapeamento linear dos valores entre 1 - 88. Um bom lugar para começar seria estudar <ref target="https://github.com/stevelloyd/Learn-sonification-with-Sonic-Pi">essa tabela do Steve Lloyd</ref> sobre sonificação de dados de clima com Sonic Pi. Finalmente, outra coisa a se notar é que o valor 'rand' (random, aleatório) permite que se adiciona um pouco de 'humanidade' na música em termos de dinâmicas. Então nós faremos a mesma coisa novamente para o topic2 (tópico2).</p>
+                <p>É possível adicionar batidas, loops, amostras, e toda a parafernália que o Sonic Pi permite. Onde você coloca os seus pedaços de código afeta a reprodução, se os loops forem colocados antes dos dados acima, ele será reproduzido primeiro. Por exemplo, se o trecho a seguir for inserido depois da linha <code rend="inline">use_bpm 100</code>,</p>
+                <ab>
+                    <code xml:id="code_som-dados-sonificacao-historiadores_17" corresp="code_som-dados-sonificacao-historiadores_17.txt" rend="block"/>
+                </ab>
+                <p>Haverá um pouco de uma introdução na sua obra. Há uma pausa de 2 segundos, a amostra 'ambi_choir' é reproduzida, então há uma pausa de mais 6 segundos antes dos seus dados serem tocados. Se quiser adicionar um pouco de um som de bateria sinistro ao longo da sua obra, insira esse trecho a seguir (e antes de seus próprios dados):</p>
+                <ab>
+                    <code xml:id="code_som-dados-sonificacao-historiadores_18" corresp="code_som-dados-sonificacao-historiadores_18.txt" rend="block"/>
+                </ab>
+                <p>O código é bem simples: realize um loop da amostra 'bd_boom' com o efeito de som de ressonância, em um ritmo particular. Pause por 2 segundos entre os loops.</p>
+                <p>A propósito, 'codificação ao vivo'? O que torna esse ambiente um espaço de 'codificação ao vivo' é a possibilidade de se fazer alterações no código <emph>enquanto o Sonic Pi o transforma em música</emph>. Não gosta do que está ouvindo? Altere o código na hora!</p>
+                <p>Para mais sobre o Sonic Pi, <ref target="https://www.miskatonic.org/music/access2015/">esse site de workshop</ref> (em inglês) é um bom lugar para começar. Veja também o <ref target="http://library.gwu.edu/scholarly-technology-group/posts/sound-library-work">relatório de Laura Wrubel sobre participar desse worksop, e o trabalho dela e de seus colegas na área</ref> (em inglês).</p>
+            </div>
+            <div type="1">
+                <head>Nihil Novi Sub Sole</head>
+                <p>Mais uma vez, para que não pensemos que estamos na vanguarda através da nossa geração algorítmica de música, um lembrete foi publicado em 1978 sobre 'jogos de música de dados' no século XVIII, em que o lançamento de dados determinava a recombinação de trechos pré-escritos de música. <ref target="https://rbnrpi.wordpress.com/project-list/mozart-dice-generated-waltz-revisited-with-sonic-pi/">Alguns desses jogos foram explorados e recodificados para o Sonic-Pi por Robin Newman</ref>. Newman também usa uma ferramenta que poderia ser descrita como um Markdown+Pandoc da  notação musical, <ref target="http://www.lilypond.org/">Lilypond</ref> para pontuar essas composições. Os antecedentes para tudo que pode ser encontrado no  <emph>The Programming Historian</emph> são mais profundos do que se pode suspeitar!</p>
+            </div>
+            <div type="1">
+                <head>Conclusão</head>
+                <p>Sonificar os nossos dados nos faz confrontar os modos como os nossos dados são, muitas vezes, não sobre o passado, mas sobre o que construímos dele. Isso ocorre em parte em virtude de sua novidade, e da arte e do artifício necessários para mapear os dados para o som. Mas isso também acontece pelo contraste com as nossas noções pré-concebidas sobre visualização de dados. Pode ser que os sons gerados por alguém nunca cheguem ao nível da 'música'; mas se ajudar a transformar como nós encontramos o passado, e como outros engajam com o passado, então o esforço terá sido frutífero. Como Trevor Owens pode ter colocado, 'Sonificação é sobre <ref target="http://www.trevorowens.org/2012/11/discovery-and-justification-are-different-notes-on-sciencing-the-humanities/">descoberta, não justificação</ref>'.</p>
+                <h2>Termos</h2>
+                <list type="unordered">
+                    <item>
+                        <hi rend="bold">MIDI</hi>,</item>
+                    <item>
+                        <hi rend="bold">MP3</hi>,</item>
+                    <item>
+                        <hi rend="bold">Tom</hi>,</item>
+                    <item>
+                        <hi rend="bold">Ataque</hi>,</item>
+                    <item>
+                        <hi rend="bold">Duração</hi>,</item>
+                    <item>
+                        <hi rend="bold">Mapeamento do Tom e Mapeamento da Duração</hi>, </item>
+                    <item>
+                        <hi rend="bold">Amplitude</hi>, </item>
+                </list>
+            </div>
+            <div type="1">
+                <head>Referências</head>
+                <p>
+                    <ref target="https://waxy.org/2015/12/if_drake_was_born_a_piano/">http://waxy.org/2015/12/if_drake_was_born_a_piano/</ref>
+                </p>
+                <p>
+                    <ref target="http://www.digitalhumanities.org/dhq/vol/5/1/000091/000091.html">http://www.digitalhumanities.org/dhq/vol/5/1/000091/000091.html</ref>
+                </p>
+                <p>
+                    <ref target="http://www.jstor.org/stable/734136">http://www.jstor.org/stable/734136</ref>.</p>
+                <p>
+                    <ref target="http://www.icad.org/Proceedings/2008/Hermann2008.pdf">http://www.icad.org/Proceedings/2008/Hermann2008.pdf</ref>
+                </p>
+                <p>
+                    <ref target="http://motherboard.vice.com/read/the-strange-acoustic-phenomenon-behind-these-wacked-out-versions-of-pop-songs">http://motherboard.vice.com/read/the-strange-acoustic-phenomenon-behind-these-wacked-out-versions-of-pop-songs</ref>
+                </p>
+                <p>
+                    <ref target="https://www.researchgate.net/publication/282504359_Listen_to_the_Sound_of_Data">https://www.researchgate.net/publication/282504359_Listen_to_the_Sound_of_Data</ref>
+                </p>
+            </div>
+        </body>
+    </text>
+</TEI>

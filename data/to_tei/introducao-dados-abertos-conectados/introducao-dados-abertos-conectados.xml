@@ -1,184 +1,406 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="introducao-dados-abertos-conectados">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Introdu&#231;&#227;o aos Dados Abertos Conectados</title>
-  <author role="original_author">Jonathan Blaney</author><editor role="reviewers"><persName>Terhi Nurmikko-Fuller</persName><persName>Matthew Lincoln</persName></editor><author role="translators">Francisco Nabais</author><editor role="translation-reviewers"><persName>Bruno Almeida</persName><persName>Daniel Bonatto Seco</persName></editor><editor role="editors">Adam Crymble</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phpt0033</idno><date type="published">08/05/2013</date><date type="translated">11/21/2022</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#intro-to-linked-data"/>.</p><p>There are other translations: <ref target="#introduccion-datos-abiertos-enlazados"/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Este tutorial apresenta os principais conceitos de dados abertos conectados (*Linked Open Data*), incluindo URIs, ontologias, formatos RDF e uma breve introdu&#231;&#227;o &#224; linguagem de consulta de gr&#225;ficos SPARQL.</p></abstract><textClass><keywords><term xml:lang="en">lod</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="pt">
-    <body><p>Nota de Tradu&#231;&#227;o: Alguns termos, por aparecerem constantemente e facilitarem a interpreta&#231;&#227;o das imagens, apenas foram propositadamente traduzidos uma vez e ser&#227;o colocados entre par&#234;nteses. Alertamos tamb&#233;m para a exist&#234;ncia de alguns exemplos que n&#227;o foram propositadamente traduzidos para facilitar a sua introdu&#231;&#227;o nos programas apresentados.</p>
-<div type="2"><head>Introdu&#231;&#227;o e &#194;mbito da li&#231;&#227;o</head>
-<p>Esta li&#231;&#227;o oferece uma breve e concisa introdu&#231;&#227;o aos <ref target="https://pt.wikipedia.org/wiki/Linked_data#The_Linking_Open_Data_Project">dados abertos conectados</ref> (<emph>Linked Open Data</emph> ou LOD). N&#227;o &#233; necess&#225;rio conhecimento pr&#233;vio para realizar este tutorial. Os leitores dever&#227;o obter uma compreens&#227;o clara dos conceitos por detr&#225;s dos dados abertos conectados, como s&#227;o utilizados e como s&#227;o criados. O tutorial est&#225; dividido em cinco partes, al&#233;m de leituras adicionais:</p>
-<list type="ordered">
-<item>Dados abertos conectados: o que s&#227;o?</item>
-<item>O papel do <ref target="https://pt.wikipedia.org/wiki/URI">Identificador Uniforme de Recurso</ref> (<emph>Uniform Resource Identifier</emph> ou URI)</item>
-<item>Como o LOD organiza o conhecimento: <ref target="https://pt.wikipedia.org/wiki/Ontologia_(ci%C3%AAncia_da_computa%C3%A7%C3%A3o)">ontologias</ref></item>
-<item>A <ref target="https://pt.wikipedia.org/wiki/Resource_Description_Framework">Estrutura de Descri&#231;&#227;o de Recursos</ref> (<emph>Resource Description Framework</emph> ou RDF) e formatos de dados</item>
-<item>Consulta de dados abertos conectados com <ref target="https://pt.wikipedia.org/wiki/SPARQL">SPARQL</ref></item>
-<item>Outras leituras e recursos</item>
-</list>
-<p>A conclus&#227;o deste tutorial poder&#225; levar algumas horas e poder&#225; ser &#250;til reler algumas sec&#231;&#245;es para solidificar a sua compreens&#227;o. Os termos t&#233;cnicos foram ligados &#224; sua p&#225;gina correspondente na Wikipedia e encoraja-se a que fa&#231;a uma pausa e leia sobre termos que considere desafiadores. Depois de ter aprendido alguns dos princ&#237;pios-chave do LOD, a melhor maneira de melhorar e solidificar esse conhecimento &#233; praticar. Este tutorial fornece oportunidades para faz&#234;-lo. No final da li&#231;&#227;o, dever&#225; compreender os princ&#237;pios b&#225;sicos de LOD, incluindo termos e conceitos-chave.</p>
-<p>Se precisar aprender a como explorar LOD usando a linguagem de consulta <ref target="https://pt.wikipedia.org/wiki/SPARQL">SPARQL</ref>, recomenda-se a li&#231;&#227;o de Matthew Lincoln <ref target="/en/lessons/retired/graph-databases-and-SPARQL">'<emph>Using SPARQL to access Linked Open Data</emph>'</ref> (em ingl&#234;s) (Nota: a li&#231;&#227;o deste link encontra-se desatualizada e j&#225; n&#227;o &#233; mantida pelo <emph>Programming Historian</emph>. Por favor veja a nota inicial dessa p&#225;gina sobre a raz&#227;o dessa li&#231;&#227;o ter sido retirada), que segue praticamente a vis&#227;o geral fornecida nesta li&#231;&#227;o.</p>
-<p>Para proporcionar aos leitores uma base s&#243;lida dos princ&#237;pios b&#225;sicos de LOD, este tutorial n&#227;o oferecer&#225; uma cobertura abrangente de todos os seus conceitos. Estes <hi rend="bold">n&#227;o</hi> ser&#227;o o foco desta li&#231;&#227;o:</p>
-<list type="ordered">
-<item><ref target="https://pt.wikipedia.org/wiki/Web_sem%C3%A2ntica">Web Sem&#226;ntica</ref> e <ref target="https://en.wikipedia.org/wiki/Semantic_reasoner">racioc&#237;nio sem&#226;ntico</ref> (em ingl&#234;s) de <ref target="https://pt.wikipedia.org/wiki/Conjunto_de_dados">datasets</ref>. Um raciocinador sem&#226;ntico deduziria que Jorge VI &#233; o irm&#227;o ou meio-irm&#227;o de Eduardo VIII, dado que: a) Eduardo VIII &#233; o filho de Jorge V e b) Jorge VI &#233; o filho de Jorge V. Este tutorial n&#227;o se foca neste tipo de tarefa.</item>
-<item>Cria&#231;&#227;o e <emph>upload</emph> de conjuntos de dados abertos conectados ligados &#224; <ref target="http://linkeddatacatalog.dws.informatik.uni-mannheim.de/state/">Nuvem de dados conectados</ref> (em ingl&#234;s). Partilhar LOD &#233; um princ&#237;pio importante, que &#233; encorajado abaixo. Contudo, os aspetos pr&#225;ticos de contribuir com LOD para a nuvem de dados conectados est&#227;o al&#233;m do &#226;mbito desta li&#231;&#227;o. Alguns recursos que podem ajudar a come&#231;ar esta tarefa est&#227;o dispon&#237;veis no final deste tutorial.</item>
-</list>
-</div><table>
-<row>
-<cell role="label">o sujeito</cell>
-<cell role="label">o predicado</cell>
-<cell role="label">o objeto</cell>
-</row>
-<row>
-<cell>pessoa 64183282</cell>
-<cell>representadaNoParlamentoBrit&#226;nico</cell>
-<cell>"blackburn1955-presente"</cell>
-</row>
-</table><div type="2"><head>O papel do <emph>Uniform Resource Identifier</emph> (URI)</head>
-<p>Uma parte essencial de LOD &#233; o <ref target="https://pt.wikipedia.org/wiki/URI">Identificador Uniforme de Recurso</ref>(<emph>Uniform Resource Identifier</emph> ou URI). O URI &#233; uma forma &#250;nica e fi&#225;vel de representar uma entidade (uma pessoa, um objeto, uma rela&#231;&#227;o, etc.), de uma forma que &#233; utiliz&#225;vel por todos no mundo.</p>
-<p>Na sec&#231;&#227;o anterior, utilizamos dois n&#250;meros diferentes para identificar os diferentes Jack Straws.</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_6" corresp="code_introducao-dados-abertos-conectados_6.txt" rend="block"/></ab>
-<p>O problema &#233; que em todo o mundo existem muitas bases de dados que cont&#234;m pessoas com estes n&#250;meros e s&#227;o, provavelmente, todas pessoas diferentes. Fora do nosso contexto imediato, estes n&#250;meros n&#227;o identificam indiv&#237;duos &#250;nicos. Vamos tentar resolver isso. Aqui est&#227;o estes mesmos identificadores, mas como URIs:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_7" corresp="code_introducao-dados-abertos-conectados_7.txt" rend="block"/></ab>
-<p>Tal como o n&#250;mero &#250;nico desambiguou os nossos dois Jack Straws, o URI completo acima ajuda-nos a desambiguar entre todos os diferentes ficheiros de autoridade l&#225; fora. Neste caso, &#233; evidente que estamos a utilizar o VIAF como o nosso ficheiro de autoridade. Com certeza, j&#225; viu esta forma de desambigua&#231;&#227;o muitas vezes na web. Existem muitos websites em todo o mundo com p&#225;ginas chamadas <code rend="inline">/home</code> ou <code rend="inline">/faq</code>. Mas n&#227;o h&#225; confus&#227;o porque o <ref target="https://pt.wikipedia.org/wiki/Nome_de_dom%C3%ADnio">dom&#237;nio</ref> (a primeira parte do <ref target="https://pt.wikipedia.org/wiki/URL">Localizador Uniforme de Recursos</ref> (<emph>Uniform Resource Locator</emph> ou URL) - ex. <code rend="inline">bbc.co.uk</code>) &#233; &#250;nico, portanto, todas as p&#225;ginas que fazem parte desse dom&#237;nio s&#227;o &#250;nicas em outras p&#225;ginas <code rend="inline">/faq</code> de outros websites. No endere&#231;o <code rend="inline">http://www.bbc.co.uk/faqs</code> &#233; a parte <code rend="inline">bbc.co.uk</code> que torna as p&#225;ginas subsequentes &#250;nicas. Isto &#233; t&#227;o &#243;bvio para as pessoas que utilizam a web a toda a hora que n&#227;o pensam sobre isso. Provavelmente, tamb&#233;m sabe que se quiser criar um website chamado <code rend="inline">bbc.co.uk</code> n&#227;o conseguir&#225;, porque esse nome j&#225; foi registado com a autoridade apropriada, que &#233; o <ref target="https://pt.wikipedia.org/wiki/Sistema_de_Nomes_de_Dom%C3%ADnio">Sistema de Nomes de Dom&#237;nio</ref> (<emph>Domain Name System</emph>). O registo garante a singularidade. Os URIs tamb&#233;m t&#234;m de ser &#250;nicos.</p>
-<p>Embora os exemplos acima se pare&#231;am com URLs, tamb&#233;m &#233; poss&#237;vel construir um URI que n&#227;o se pare&#231;a nada com um URL. Temos muitas formas de identificar pessoas e coisas de forma &#250;nica e raramente pensamos ou nos preocupamos com isso. Os c&#243;digos de barras, n&#250;meros de passaporte, at&#233; mesmo os c&#243;digos postais s&#227;o concebidos para serem &#250;nicos. Os n&#250;meros de telefone s&#227;o frequentemente colocados como placas de loja precisamente porque s&#227;o &#250;nicos. Todos eles podem ser utilizados como URIs.</p>
-<p>Quando criamos URIs para as entidades descritas pelo projeto '<ref target="https://gtr.ukri.org/projects?ref=AH%2FN003446%2F1#/tabOverview">Tobias</ref>' (em ingl&#234;s), escolhemos uma estrutura do tipo URL e escolhemos utilizar o nosso espa&#231;o web institucional, pondo de lado <code rend="inline">data.history.ac.uk/tobias-project/</code> como um lugar dedicado &#224; hospedagem destes URIs. Ao coloc&#225;-lo em <code rend="inline">data.history.ac.uk</code> em vez de <code rend="inline">history.ac.uk</code>, houve uma separa&#231;&#227;o clara entre URIs e as p&#225;ginas do website. Por exemplo, um dos URIs do projeto Tobias era 'http://data.history.ac.uk/tobias-project/person/15601'. Embora o formato dos URIs acima mencionados seja o mesmo que um URL, eles n&#227;o se ligam a websites (tente col&#225;-lo num navegador web). Muitas pessoas novas no LOD acham isto confuso. Todos os URLs s&#227;o URIs, mas nem todos os URIs s&#227;o URLs. (nota de tradu&#231;&#227;o: tendo em conta que o site original do projeto Tobias j&#225; n&#227;o se encontra dispon&#237;vel, o leitor da li&#231;&#227;o deve entender os exemplos aqui indicados como meramente ilustrativos daquilo que o autor pretende demonstrar) Um URI pode descrever qualquer coisa, enquanto o URL descreve a localiza&#231;&#227;o de algo na web. Assim, um URL diz-lhe a localiza&#231;&#227;o de uma p&#225;gina web, de um ficheiro ou algo semelhante. Um URI faz apenas o trabalho de identificar algo. Tal como o N&#250;mero internacional Normalizado do Livro (International Standard Book Number ou <ref target="https://www.iso.org/standard/36563.html">ISBN</ref> (em ingl&#234;s) <code rend="inline">978-0-1-873354-6</code> identifica exclusivamente uma edi&#231;&#227;o de capa dura de <emph>Baptism, Brotherhood and Belief in Reformation Germany</emph>, de Kat Hill, mas n&#227;o diz onde obter uma c&#243;pia. Para isso precisaria de algo como um <ref target="https://pt.wikipedia.org/wiki/N%C3%BAmero_de_acesso_(biblioteconomia)">n&#250;mero de acesso</ref>, que lhe d&#225; uma localiza&#231;&#227;o exata de um livro numa prateleira de uma biblioteca espec&#237;fica.</p>
-<p>H&#225; um pouco de jarg&#227;o em torno de URIs. As pessoas falam sobre se s&#227;o ou n&#227;o <ref target="https://pt.wikipedia.org/wiki/Refer%C3%AAncia_(ci%C3%AAncia_da_computa%C3%A7%C3%A3o)">desreferenci&#225;veis</ref>. Isso apenas significa que <emph>podemos transformar uma refer&#234;ncia abstrata em algo diferente?</emph> Por exemplo, se colarmos um URI na barra de endere&#231;os de um browser, ser&#225; que ele encontra algo? O VIAF URI para o historiador Simon Schama &#233;:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_8" corresp="code_introducao-dados-abertos-conectados_8.txt" rend="block"/></ab>
-<p>Se o colocarmos no browser, receberemos de volta uma p&#225;gina web sobre Simon Schama que cont&#233;m dados estruturados sobre ele e a sua hist&#243;ria editorial. Isto &#233; muito &#250;til por um motivo. A partir do URI n&#227;o &#233; &#243;bvio quem ou mesmo o que &#233; que est&#225; a ser referido. Da mesma forma, se tratarmos um n&#250;mero de telefone (com c&#243;digo internacional) como o URI de uma pessoa, ent&#227;o deve ser desreferenci&#225;vel. Algu&#233;m pode atender o telefone e pode at&#233; ser Schama.</p>
-<p>Mas isto n&#227;o &#233; essencial. Muitos URIs n&#227;o s&#227;o desreferenci&#225;veis, como no exemplo acima do projeto Tobias. N&#227;o se pode encontr&#225;-lo em lado nenhum; &#233; uma conven&#231;&#227;o.</p>
-<p>O exemplo do VIAF leva-nos a outra coisa importante sobre os URIs: n&#227;o os invente a n&#227;o ser que tenha de o fazer. As pessoas e organiza&#231;&#245;es t&#234;m feito esfor&#231;os para construir boas listas de URI e o LOD n&#227;o vai funcionar eficazmente se as pessoas duplicarem esse trabalho criando novos URIs desnecessariamente. Por exemplo, o VIAF tem o apoio de muitas bibliotecas internacionais. Se quiser construir URIs para pessoas, o VIAF &#233; uma escolha muito boa. Se n&#227;o conseguir encontrar algumas pessoas no VIAF, ou noutras listas de autoridade, s&#243; ent&#227;o poder&#225; precisar fazer a sua pr&#243;pria.</p>
-</div><table>
-<row>
-<cell role="label">IDaluno</cell>
-<cell role="label">IDprofessor</cell>
-</row>
-<row>
-<cell>72</cell>
-<cell>40</cell>
-</row>
-<row>
-<cell>56</cell>
-<cell>28</cell>
-</row>
-<row>
-<cell>49</cell>
-<cell>28</cell>
-</row>
-<row>
-<cell>35</cell>
-<cell>17</cell>
-</row>
-<row>
-<cell>31</cell>
-<cell>17</cell>
-</row>
-</table><div type="2"><head>RDF e formatos de dados</head>
-<p>LOD utiliza uma norma, definida pelo <ref target="https://www.w3.org/">Cons&#243;rcio World Wide Web</ref> (em ingl&#234;s) (<emph>World Wide Web Consortium</emph> ou W3C), chamada <emph><ref target="https://pt.wikipedia.org/wiki/Resource_Description_Framework">Resource Description Framework</ref></emph> ou apenas RDF. As normas s&#227;o &#250;teis desde que sejam amplamente adotadas - pense no metro ou nos tamanhos de parafuso padr&#227;o - mesmo que sejam essencialmente arbitr&#225;rias. O RDF tem sido amplamente adotado como a norma LOD.</p>
-<p>Ouvir&#225; frequentemente o LOD referido simplesmente como RDF. Atrasamos a conversa sobre o RDF at&#233; agora porque &#233; bastante abstrato. RDF &#233; um <ref target="https://pt.wikipedia.org/wiki/Modelagem_de_dados">modelo de dados</ref> que descreve como &#233; que os dados s&#227;o estruturados num n&#237;vel te&#243;rico. Assim, a insist&#234;ncia na utiliza&#231;&#227;o de triplas sem&#226;nticas (em vez de quatro partes, ou duas ou nove, por exemplo) &#233; uma regra no RDF. Mas quando se trata de quest&#245;es mais pr&#225;ticas, h&#225; algumas escolhas quanto &#224; implementa&#231;&#227;o. Assim, o RDF diz-lhe o que tem de fazer, mas n&#227;o exatamente como o tem de fazer. Estas escolhas dividem-se em duas &#225;reas: como se escrevem as coisas (serializa&#231;&#227;o) e as rela&#231;&#245;es que as suas triplas sem&#226;nticas descrevem.</p>
-<div type="3"><head>Serializa&#231;&#227;o</head>
-<p>A <ref target="https://pt.wikipedia.org/wiki/Serializa%C3%A7%C3%A3o">Serializa&#231;&#227;o</ref> &#233; o termo t&#233;cnico para "como se escrevem as coisas". O chin&#234;s padr&#227;o (mandarim) pode ser escrito em caracteres tradicionais, caracteres simplificados ou romaniza&#231;&#227;o Pinyin e a l&#237;ngua em si n&#227;o muda. Tal como o mandarim, o RDF pode ser escrito de v&#225;rias formas. Aqui vamos olhar para duas (h&#225; outras, mas por uma quest&#227;o de simplicidade, vamos concentrar-nos nestas):</p>
-<list type="ordered">
-<item><ref target="https://en.wikipedia.org/wiki/Turtle_(syntax)">Turtle</ref> (em ingl&#234;s)</item>
-<item><ref target="https://pt.wikipedia.org/wiki/RDF/XML">RDF/XML</ref></item>
-</list>
-<p>Reconhecer a serializa&#231;&#227;o que est&#225; a ser utilizada significa que podemos ent&#227;o escolher ferramentas apropriadas concebidas para esse formato. Por exemplo, o RDF pode vir serializado no formato <ref target="https://pt.wikipedia.org/wiki/XML">XML</ref>. Podemos ent&#227;o utilizar uma ferramenta ou biblioteca de c&#243;digos concebida para analisar esse formato em particular, o que &#233; &#250;til se j&#225; souber como trabalhar com ele. O reconhecimento do formato tamb&#233;m lhe d&#225; as palavras-chave certas para procurar ajuda online. Muitos recursos permitem descarregar as suas bases de dados LOD, podendo escolher qual a serializa&#231;&#227;o que deseja fazer o <emph>Download</emph>.</p>
-<div type="4"><head>Turtle</head>
-<p>'Turtle' &#233; um jogo de palavras. 'Tur' &#233; a abreviatura de 'terse' e 'tle' - &#233; a abreviatura de '<emph>triple language</emph>' (linguagem de triplos). Turtle &#233; uma forma agradavelmente simples de escrever triplas sem&#226;nticas.</p>
-<p>O Turtle usa apelidos ou atalhos, conhecidos como <ref target="https://www.w3.org/TeamSubmission/turtle/#sec-tutorial">prefixos</ref> (em ingl&#234;s), o que nos poupa ter de escrever URIs completos todas as vezes. Voltemos ao URI que criamos na sec&#231;&#227;o anterior:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_12" corresp="code_introducao-dados-abertos-conectados_12.txt" rend="block"/></ab>
-<p>N&#227;o queremos escrever isto cada vez que nos referimos a esta pessoa (lembrar-se-&#225; de Jack Straw). Por isso, s&#243; temos de enunciar o nosso atalho:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_13" corresp="code_introducao-dados-abertos-conectados_13.txt" rend="block"/></ab>
-<p>Ent&#227;o Jack &#233; <code rend="inline">toby:15601</code>, que substitui o longo URI e &#233; mais f&#225;cil &#224; vista. Eu escolhi 'toby', mas poderia igualmente escolher qualquer sequ&#234;ncia de letras.</p>
-<p>Vamos agora passar de Jack Straw para William Shakespeare e utilizar Turtle para descrever algumas coisas sobre as suas obras. Vamos ter de decidir sobre os ficheiros de autoridade a utilizar, um processo que, como mencionado acima, &#233; melhor ser selecionado ao olhar para outros conjuntos de LOD. Aqui usaremos como um dos nossos prefixos <ref target="https://pt.wikipedia.org/wiki/Dublin_Core"><emph>Dublin Core</emph></ref>, uma norma de <ref target="https://pt.wikipedia.org/wiki/Metadados">metadados</ref> de bibliotecas <ref target="https://en.wikipedia.org/wiki/Library_of_Congress_Control_Number">(N&#250;mero de controle da Biblioteca do Congresso</ref> (<emph>Library of Congress Control Number</emph>) como outro e, o &#250;ltimo (VIAF) dever&#225; ser-lhe familiar. Juntos, estes tr&#234;s ficheiros de autoridade fornecem identificadores &#250;nicos para todas as entidades que tenciono utilizar neste exemplo:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_14" corresp="code_introducao-dados-abertos-conectados_14.txt" rend="block"/></ab>
-<p>Note o espa&#231;amento do ponto final ap&#243;s a &#250;ltima linha. Esta &#233; a forma de Turtle indicar o fim. Tecnicamente n&#227;o &#233; necess&#225;rio ter o espa&#231;o, mas facilita a leitura ap&#243;s uma longa sequ&#234;ncia de caracteres.</p>
-<p>No exemplo acima, lccn:n82011242 representa Macbeth; dc:creator liga Macbeth ao seu autor; viaf:96994048 representa William Shakespeare.</p>
-<p>O Turtle tamb&#233;m permite listar triplas sem&#226;nticas sem se preocupar em repetir cada URI quando acabou de o usar. Acrescentemos a data em que os estudiosos pensam que Macbeth foi escrito, utilizando o par atributo-valor Dublin Core: <code rend="inline">dc:create 'YYYY'</code>:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_15" corresp="code_introducao-dados-abertos-conectados_15.txt" rend="block"/></ab>
-<p>Lembra-se da estrutura da tripla sem&#226;ntica discutida na sec&#231;&#227;o 1? A&#237; demos este exemplo:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_16" corresp="code_introducao-dados-abertos-conectados_16.txt" rend="block"/></ab>
-<p>O essencial &#233; que o predicado liga o sujeito e o objeto. Ele descreve a rela&#231;&#227;o entre eles. O sujeito vem primeiro na tripla sem&#226;ntica, mas isso &#233; uma quest&#227;o de escolha, como discutimos com o exemplo de pessoas que foram ensinadas a tocar piano por Liszt.</p>
-<p>Pode-se usar um ponto e v&#237;rgula se o sujeito for o mesmo mas o predicado e o objeto forem diferentes, ou uma v&#237;rgula se o sujeito e o predicado forem o mesmo e apenas o objeto for diferente.</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_17" corresp="code_introducao-dados-abertos-conectados_17.txt" rend="block"/></ab>
-<p>Aqui estamos a dizer que Shakespeare (96994048) e John Fletcher (12323361) foram ambos os criadores da obra <emph>The Two Noble Kinsmen</emph>.</p>
-<p>Quando analisamos as ontologias anteriormente sugeri que visse a <ref target="http://web.archive.org/web/20170718143925/http://musicontology.com/docs/getting-started.html"><emph>Music Ontology</emph></ref> (em ingl&#234;s). D&#234; agora uma olhada novamente. Isto ainda &#233; complicado, mas ser&#225; que agora fazem mais sentido?</p>
-<p>Uma das ontologias mais acess&#237;veis &#233; a '<emph>Friend of a Friend</emph>' (amigo de um amigo) ou <ref target="https://en.wikipedia.org/wiki/FOAF_(ontology)">FOAF</ref> (em ingl&#234;s). Esta &#233; concebida para descrever pessoas e, talvez por essa raz&#227;o, &#233; bastante intuitiva. Se, por exemplo, quiser escrever-me para me dizer que este curso &#233; a melhor coisa que j&#225; leu, aqui est&#225; o meu email expresso como triplas sem&#226;nticas em FOAF:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_18" corresp="code_introducao-dados-abertos-conectados_18.txt" rend="block"/></ab>
-</div><div type="4"><head>RDF/XML</head>
-<p>Em contraste com o Turtle, o RDF/XML pode parecer um pouco pesado. Para come&#231;ar, vamos apenas converter uma tripla sem&#226;ntica da Turtle acima, aquela que refere que Shakespeare foi o criador de <emph>The Two Noble Kinsmen</emph>:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_19" corresp="code_introducao-dados-abertos-conectados_19.txt" rend="block"/></ab>
-<p>Em RDF/XML, com os prefixos declarados dentro do trecho de c&#243;digo de XML, fica:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_20" corresp="code_introducao-dados-abertos-conectados_20.txt" lang="language-xml" rend="block"/></ab>
-<p>O formato RDF/XML tem a mesma informa&#231;&#227;o b&#225;sica que o formato Turtle, mas &#233; escrito de forma muito diferente, baseando-se nos princ&#237;pios das etiquetas XML encaixadas.</p>
-<p>Passemos a um exemplo diferente para mostrar como o RDF/XML combina triplas sem&#226;nticas e, ao mesmo tempo, introduz o <ref target="https://pt.wikipedia.org/wiki/Simple_Knowledge_Organization_System"><emph>Simple Knowledge Organization System</emph></ref> (SKOS) (Sistema Simples de Organiza&#231;&#227;o do Conhecimento), que foi concebido para codificar tesauros ou taxonomias.</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_21" corresp="code_introducao-dados-abertos-conectados_21.txt" rend="block"/></ab>
-<p>Aqui estamos a dizer que o conceito SKOS <code rend="inline">21250</code>, <emph>markdown abdication</emph>, tem um r&#243;tulo preferido de "<emph>abdication</emph>". A forma como funciona &#233; que o elemento sujeito (incluindo a parte da '<emph>abdication</emph>', que &#233; um valor de atributo em termos de XML) tem o predicado e o objeto encaixados no seu interior. O elemento encaixado &#233; o predicado e <ref target="https://pt.wikipedia.org/wiki/%C3%81rvore_(estrutura_de_dados)#Terminologia">o n&#243; folha</ref> (em ingl&#234;s), &#233; o objeto. Este exemplo &#233; retirado de um projeto para publicar um <ref target="https://www.history.ac.uk/research/digital-history"><emph>Tesauro de Hist&#243;ria Brit&#226;nica e Irlandesa</emph></ref> (em ingl&#234;s).</p>
-<p>Tal como com o Turtle, podemos acrescentar mais triplas sem&#226;nticas. Portanto, vamos declarar que o termo mais restrito na nossa hierarquia de sujeitos, um abaixo de <emph>Abdication</emph>, vai ser <emph>Abdication crisis (1936)</emph>.</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_22" corresp="code_introducao-dados-abertos-conectados_22.txt" rend="block"/></ab>
-<p>Lembra-se de como os predicados e os objetos s&#227;o encaixados dentro do sujeito? Aqui j&#225; o fizemos duas vezes com o mesmo sujeito, para que possamos tornar isto menos prolixo, aninhando ambos os conjuntos de predicados como objetos dentro do mesmo sujeito:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_23" corresp="code_introducao-dados-abertos-conectados_23.txt" rend="block"/></ab>
-<p>Se estiver familiarizado com XML isto ser&#225; f&#225;cil. Se n&#227;o estiver, talvez prefira um formato como o Turtle. Mas a vantagem aqui &#233; que ao criar o seu RDF/XML pode usar as ferramentas habituais dispon&#237;veis com XML, como editores e analisadores dedicados ao XML, para verificar se o seu RDF/XML est&#225; corretamente formatado. Se n&#227;o for uma pessoa que use o XML recomendo o Turtle, podendo usar uma <ref target="http://www.easyrdf.org/converter">ferramenta online</ref> (em ingl&#234;s) para verificar se a sua sintaxe est&#225; correta.</p>
-</div></div></div><div type="2"><head>Consulta de RDF com SPARQL</head>
-<p>Para esta sec&#231;&#227;o final iremos interrogar algum LOD e ver o que poder&#225; ser feito com ele.</p>
-<p>A linguagem de consulta que usamos para LOD &#233; chamada <ref target="https://pt.wikipedia.org/wiki/SPARQL">SPARQL</ref>. &#201; um daqueles acr&#243;nimos recursivos amados pelos t&#233;cnicos: <emph><hi rend="bold">S</hi>PARQL <hi rend="bold">P</hi>rotocol <hi rend="bold">a</hi>nd <hi rend="bold">R</hi>DF <hi rend="bold">Q</hi>uery <hi rend="bold">L</hi>anguage</emph> (Protocolo SPARQL e Linguagem de Consulta).</p>
-<p>Como mencionado no in&#237;cio, o <emph>Programming Historian</emph> tem <ref target="/en/lessons/retired/graph-databases-and-SPARQL">uma li&#231;&#227;o completa</ref> (em ingl&#234;s), de Matthew Lincoln, sobre a utiliza&#231;&#227;o do SPARQL (embora n&#227;o seja j&#225; mantida (ver nota no in&#237;cio desta tradu&#231;&#227;o). A sec&#231;&#227;o final aqui presente &#233; apenas uma vis&#227;o geral dos conceitos b&#225;sicos. Se o SPARQL despertar o seu interesse, pode obter uma fundamenta&#231;&#227;o completa no tutorial de Lincoln.</p>
-<p>Vamos realizar as nossas consultas SPARQL na <ref target="https://www.dbpedia.org/">DBpedia</ref>, que &#233; um enorme conjunto de LOD derivado da Wikipedia. Al&#233;m de estar cheio de informa&#231;&#227;o que &#233; muito dif&#237;cil de encontrar atrav&#233;s da habitual interface da Wikip&#233;dia, tem v&#225;rios "pontos de extremidade" (end points) SPARQL - interfaces onde se podem digitar as consultas SPARQL e obter resultados a partir das triplas sem&#226;nticas da DBpedia.</p>
-<p>O end point de consulta SPARQL que &#233; utilizado chama-se <ref target="http://dbpedia.org/snorql/">snorql</ref> (em ingl&#234;s). Estes end points ocasionalmente ficam offline. Se for o seu caso, tente procurar por <emph>dbpedia sparql</emph> e dever&#225; encontrar um substituto semelhante.</p>
-<p>Se for ao URL snorql acima ver&#225;, no in&#237;cio, um n&#250;mero de prefixos que j&#225; nos foram declarados, o que &#233; &#250;til. Agora tamb&#233;m ir&#225; reconhecer alguns dos prefixos.</p>
-<figure><desc>Caixa de consulta padr&#227;o do snorql, com alguns prefixos declarados para si</desc><graphic url="intro-to-linked-data-fig1.png"/></figure>
-<p>Na caixa de consulta abaixo das declara&#231;&#245;es de prefixo, dever&#225; ver o seguinte:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_24" corresp="code_introducao-dados-abertos-conectados_24.txt" rend="block"/></ab>
-<p>Se alguma vez escreveu uma consulta de bases de dados em <emph>Structured Query Language</emph>, <ref target="https://pt.wikipedia.org/wiki/SQL">mais conhecida como SQL</ref>, isto vai parecer-lhe bastante familiar e vai ajud&#225;-lo a aprender SPARQL. Se n&#227;o, n&#227;o se preocupe. As palavras-chave aqui utilizadas, <code rend="inline">SELECT</code> (SELECIONAR) e <code rend="inline">WHERE</code> (ONDE) n&#227;o s&#227;o sens&#237;veis a mai&#250;sculas e min&#250;sculas, mas algumas partes de uma consulta SPARQL podem ser (ver abaixo), por isso recomendo que se cinja ao caso dado ao longo das consultas neste curso.</p>
-<p>Aqui <code rend="inline">SELECT</code> significa "encontrar alguma coisa" e <code rend="inline">*</code> significa "d&#225;-me tudo". <code rend="inline">WHERE</code> introduz uma condi&#231;&#227;o, que &#233; onde vamos colocar os detalhes de que tipo de coisas queremos que a consulta encontre.</p>
-<p>Vamos come&#231;ar com algo simples para ver como &#233; que isto funciona. Cole (ou, melhor, escreva) isto na caixa de consulta:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_25" corresp="code_introducao-dados-abertos-conectados_25.txt" rend="block"/></ab>
-<p>Clique em '<emph>go</emph>' (ir). Se deixar o menu <emph>drop-down</emph> como '<emph>browse</emph>' (navegar) dever&#225; obter duas colunas com os r&#243;tulos "b" e "c". (Note que aqui, ao procurar uma cadeia de caracteres, as mai&#250;sculas/min&#250;sculas importam: lyndal_roper n&#227;o lhe dar&#225; resultados).</p>
-<figure><desc>Topo das listas de resultados de uma consulta com todas as triplas sem&#226;nticas com 'Lyndal_Roper' como sujeito</desc><graphic url="intro-to-linked-data-fig2.png"/></figure>
-<p>Ent&#227;o o que &#233; que acabou de acontecer? E como &#233; que soubemos o que escrever?</p>
-<p>Na verdade, n&#227;o sab&#237;amos. Esse &#233; um dos problemas com end points do SPARQL. Quando se conhece um dataset, &#233; preciso experimentar coisas e descobrir que termos s&#227;o utilizados. Porque isto vem da <emph>Wikipedia</emph> e n&#243;s est&#225;vamos interessados sobre que informa&#231;&#227;o sobre historiadores pod&#237;amos encontrar. Ent&#227;o vamos &#224; p&#225;gina da <emph>Wikipedia</emph> da historiadora <ref target="https://en.wikipedia.org/wiki/Lyndal_Roper">Lyndal Roper</ref> (em ingl&#234;s).</p>
-<p>A parte final do URL &#233; <code rend="inline">Lyndal_Roper</code> e conclu&#237;mos ent&#227;o que &#233; prov&#225;vel que esta cadeia de caracteres seja a forma como Roper &#233; referida na DBpedia. Porque n&#227;o sabemos o que mais poderia estar em triplas sem&#226;nticas que mencionam Roper, n&#243;s utilizamos <code rend="inline">?a</code> e <code rend="inline">?b</code>: estes s&#227;o apenas marcadores de posi&#231;&#227;o. Poderia igualmente ter digitado <code rend="inline">?whatever</code> e <code rend="inline">?you_like</code> e as colunas teriam esses r&#243;tulos. Quando quiser ser mais preciso sobre o que se est&#225; a pesquisar, ser&#225; importante etiquetar as colunas de forma significativa.</p>
-<p>Experimente agora a sua pr&#243;pria consulta SPARQL: escolha uma p&#225;gina <emph>Wikipedia</emph> e copie a parte final do URL, ap&#243;s a barra final, e coloque-a no lugar de Lyndal_Roper. Depois clique em 'go'.</p>
-<p>A partir da informa&#231;&#227;o que se obt&#233;m destes resultados &#233; poss&#237;vel gerar <emph>queries</emph> mais precisas. Isto pode ser pouco fi&#225;vel, por isso n&#227;o se preocupe se algumas n&#227;o funcionarem.</p>
-<p>Vamos voltar aos resultados para a consulta que fizemos h&#225; momentos:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_26" corresp="code_introducao-dados-abertos-conectados_26.txt" rend="block"/></ab>
-<p>Podemos ver uma longa lista na coluna etiquetada <emph>c</emph>. Estes s&#227;o todos os atributos que Roper tem na <emph>DBpedia</emph> e que nos ajudar&#227;o a encontrar outras pessoas com estes atributos. Por exemplo, podemos ver <code rend="inline">http://dbpedia.org/class/yago/Historian110177150</code>. Poderemos utilizar isto para obter uma lista de historiadores? Vamos coloc&#225;-lo na nossa pergunta, mas em terceiro lugar, porque era onde estava quando a encontrei nos resultados da Lyndal Roper. A minha consulta tem este aspecto:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_27" corresp="code_introducao-dados-abertos-conectados_27.txt" rend="block"/></ab>
-<p>Fizemos uma pequena mudan&#231;a aqui. Se esta consulta funcionar de todo, ent&#227;o esperemos que os nossos historiadores estejam na primeira coluna, porque 'historiador' n&#227;o parece poder ser um predicado: n&#227;o funciona como um verbo numa frase; por isso vamos chamar &#224; nossa primeira coluna de resultados 'historian_name' e &#224; minha segunda (sobre a qual n&#227;o sabemos nada) 'predicate' (predicado).</p>
-<p>Execute a <emph>querie</emph>. Dever&#225; encontrar uma grande lista de historiadores.</p>
-<figure><desc>Historiadores de acordo com a DBpedia</desc><graphic url="intro-to-linked-data-fig3.png"/></figure>
-<p>Assim, esta ferramenta funciona para criar listas, o que &#233; &#250;til, mas seria muito mais poderoso combinar listas para obter intersec&#231;&#245;es de conjuntos. Encontrei mais algumas coisas que podem ser interessantes consultar nos atributos DBpedia de Lyndal Roper: <ref target="http://dbpedia.org/class/yago/WikicatBritishHistorians">http://dbpedia.org/class/yago/WikicatBritishHistorians</ref> e <ref target="http://dbpedia.org/class/yago/WikicatWomenHistorians">http://dbpedia.org/class/yago/WikicatWomenHistorians</ref>. &#201; muito f&#225;cil combin&#225;-los pedindo uma vari&#225;vel a ser devolvida (no nosso caso isto &#233; <code rend="inline">?name</code> (nome)) e depois utilizando-a em m&#250;ltiplas linhas de uma <emph>querie</emph>. Note tamb&#233;m o espa&#231;o e o ponto completo no final da primeira linha que come&#231;a com <code rend="inline">?name</code>:</p>
-<ab><code xml:id="code_introducao-dados-abertos-conectados_28" corresp="code_introducao-dados-abertos-conectados_28.txt" rend="block"/></ab>
-<p>Funciona! Devemos obter cinco resultados. Na altura em que escrevo, h&#225; cinco historiadoras brit&#226;nicas na <emph>DBpedia</emph>...</p>
-<figure><desc>Historiadoras brit&#226;nicas segundo a DBpedia</desc><graphic url="intro-to-linked-data-fig4.png"/></figure>
-<p>Apenas cinco historiadoras brit&#226;nicas? Claro que h&#225;, na realidade, muitas mais do que isso, como poder&#237;amos facilmente mostr&#225;-lo substituindo o nome de, digamos, Alison Weir na nossa primeira consulta sobre Lyndal Roper. Isto leva-nos ao problema com a <emph>Dbpedia</emph> que mencionamos anteriormente: n&#227;o &#233; muito consistentemente marcado com informa&#231;&#227;o estrutural do tipo que a <emph>DBpedia</emph> que utiliza. A nossa consulta pode listar algumas historiadoras brit&#226;nicas mas acontece que n&#227;o podemos utiliz&#225;-la para gerar uma lista significativa de pessoas nesta categoria. Tudo o que encontr&#225;mos foram as pessoas nas entradas da <emph>Wikipedia</emph> que algu&#233;m decidiu classificar como "historiadora brit&#226;nica" e "historiadora".</p>
-<p>Com SPARQL na <emph>DBpedia</emph>, &#233; preciso ter cuidado com as inconsist&#234;ncias do material de origem coletiva. Poder&#225; usar o SPARQL exatamente da mesma forma num dataset mais confi&#225;vel, por exemplo, os dados do governo brit&#226;nico: <ref target="https://data-gov.tw.rpi.edu//sparql">https://data-gov.tw.rpi.edu//sparql</ref> (em ingl&#234;s) e esperar obter resultados mais robustos (h&#225; aqui um breve tutorial para este dataset: <ref target="https://data-gov.tw.rpi.edu/wiki/A_crash_course_in_SPARQL">https://data-gov.tw.rpi.edu/wiki/A_crash_course_in_SPARQL</ref> (em ingl&#234;s).</p>
-<p>No entanto, apesar das suas inconsist&#234;ncias, a <emph>DBpedia</emph> &#233; um &#243;timo local para aprender SPARQL. Esta foi apenas uma breve introdu&#231;&#227;o, mas h&#225; muito mais em <ref target="/en/lessons/retired/graph-databases-and-SPARQL">Usando SPARQL para aceder ao Linked Open Data</ref> (em ingl&#234;s).</p>
-</div><div type="2"><head>Leituras e recursos adicionais</head>
-<list type="unordered">
-<item>Dean Allemang e James Hendler, <emph>Semantic Web for the Working Ontologist</emph>, 2nd edn, Elsevier, 2011</item>
-<item>Tim Berners-Lee <ref target="https://www.w3.org/DesignIssues/LinkedData.html"><emph>Linked Data</emph></ref> (em ingl&#234;s)</item>
-<item>Bob DuCharme, <emph>Learning SPARQL</emph>, O'Reilly, 2011</item>
-<item><ref target="http://www.snee.com/bobdc.blog/">Blog de Bob DuCharme</ref> (em ingl&#234;s) tamb&#233;m vale a pena ler</item>
-<item>Richard Gartner, <emph>Metadata: Shaping Knowledge from Antiquity to the Semantic Web</emph>, Springer, 2016</item>
-<item>Seth van Hooland and Ruben Verborgh, <emph>Linked Data for Libraries, Archives and Museums</emph>, 2015</item>
-<item>Ver tamb&#233;m <ref target="http://freeyourmetadata.org/"><emph>companion website</emph></ref> (em ingl&#234;s)</item>
-<item>Matthew Lincoln <ref target="/en/lessons/retired/graph-databases-and-SPARQL">'<emph>Using SPARQL to access Linked Open Data</emph>'</ref> (em ingl&#234;s)</item>
-<item><ref target="http://linkeddata.org/guides-and-tutorials"><emph>Linked Data guides and tutorials</emph></ref> (em ingl&#234;s)</item>
-<item>Dominic Oldman, Martin Doerr e Stefan Gradmann, '<emph>Zen and the Art of Linked Data: New Strategies for a Semantic Web of Humanist Knowledge</emph>', em <emph>A New Companion to Digital Humanities</emph>, editado por Susan Schreibman et al.</item>
-<item>Max Schmachtenberg, Christian Bizer e Heiko Paulheim, <ref target="http://linkeddatacatalog.dws.informatik.uni-mannheim.de/state/"><emph>State of the LOD Cloud 2017</emph></ref> (em ingl&#234;s)</item>
-<item>David Wood, Marsha Zaidman e Luke Ruth, <emph>Linked Data: Structured data on the Web</emph>, Manning, 2014</item>
-</list>
-</div><div type="2"><head>Agradecimentos</head>
-<p>Gostaria de agradecer aos meus dois colegas revisores, Matthew Lincoln e Terhi Nurmikko-Fuller e ao meu editor, Adam Crymble, por me ajudarem generosamente a melhorar esta li&#231;&#227;o com numerosas sugest&#245;es, esclarecimentos e corre&#231;&#245;es. Este tutorial baseia-se num outro escrito como parte do '<emph>Thesaurus of British and Irish History as SKOS</emph>' <ref target="https://gtr.ukri.org/projects?ref=AH%2FN003446%2F1#/tabOverview"><emph>(Tobias) project</emph></ref> (em ingl&#234;s), financiado pelo <ref target="http://www.ahrc.ac.uk/">AHRC</ref> (em ingl&#234;s). A li&#231;&#227;o foi revista para o projeto <emph>Programming Historian</emph>.</p>
-</div></body>
-  </text>
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Introdução aos Dados Abertos Conectados</title>
+                <author role="original_author">Jonathan Blaney</author>
+                <editor role="reviewers">
+                    <persName>Terhi Nurmikko-Fuller</persName>
+                    <persName>Matthew Lincoln</persName>
+                </editor>
+                <author role="translators">Francisco Nabais</author>
+                <editor role="translation-reviewers">
+                    <persName>Bruno Almeida</persName>
+                    <persName>Daniel Bonatto Seco</persName>
+                </editor>
+                <editor role="editors">Adam Crymble</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">11/21/2022</date>
+                <idno type="doi">10.46430/phpt0033</idno>
+                <date type="published">08/05/2013</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#intro-to-linked-data"/>.</p>
+                <p>There are other translations: <ref target="#introduccion-datos-abiertos-enlazados"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Este tutorial apresenta os principais conceitos de dados abertos conectados (*Linked Open Data*), incluindo URIs, ontologias, formatos RDF e uma breve introdução à linguagem de consulta de gráficos SPARQL.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">lod</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <p>Nota de Tradução: Alguns termos, por aparecerem constantemente e facilitarem a interpretação das imagens, apenas foram propositadamente traduzidos uma vez e serão colocados entre parênteses. Alertamos também para a existência de alguns exemplos que não foram propositadamente traduzidos para facilitar a sua introdução nos programas apresentados.</p>
+            <div type="2">
+                <head>Introdução e Âmbito da lição</head>
+                <p>Esta lição oferece uma breve e concisa introdução aos <ref target="https://pt.wikipedia.org/wiki/Linked_data#The_Linking_Open_Data_Project">dados abertos conectados</ref> (<emph>Linked Open Data</emph> ou LOD). Não é necessário conhecimento prévio para realizar este tutorial. Os leitores deverão obter uma compreensão clara dos conceitos por detrás dos dados abertos conectados, como são utilizados e como são criados. O tutorial está dividido em cinco partes, além de leituras adicionais:</p>
+                <list type="ordered">
+                    <item>Dados abertos conectados: o que são?</item>
+                    <item>O papel do <ref target="https://pt.wikipedia.org/wiki/URI">Identificador Uniforme de Recurso</ref> (<emph>Uniform Resource Identifier</emph> ou URI)</item>
+                    <item>Como o LOD organiza o conhecimento: <ref target="https://pt.wikipedia.org/wiki/Ontologia_(ci%C3%AAncia_da_computa%C3%A7%C3%A3o)">ontologias</ref>
+                    </item>
+                    <item>A <ref target="https://pt.wikipedia.org/wiki/Resource_Description_Framework">Estrutura de Descrição de Recursos</ref> (<emph>Resource Description Framework</emph> ou RDF) e formatos de dados</item>
+                    <item>Consulta de dados abertos conectados com <ref target="https://pt.wikipedia.org/wiki/SPARQL">SPARQL</ref>
+                    </item>
+                    <item>Outras leituras e recursos</item>
+                </list>
+                <p>A conclusão deste tutorial poderá levar algumas horas e poderá ser útil reler algumas secções para solidificar a sua compreensão. Os termos técnicos foram ligados à sua página correspondente na Wikipedia e encoraja-se a que faça uma pausa e leia sobre termos que considere desafiadores. Depois de ter aprendido alguns dos princípios-chave do LOD, a melhor maneira de melhorar e solidificar esse conhecimento é praticar. Este tutorial fornece oportunidades para fazê-lo. No final da lição, deverá compreender os princípios básicos de LOD, incluindo termos e conceitos-chave.</p>
+                <p>Se precisar aprender a como explorar LOD usando a linguagem de consulta <ref target="https://pt.wikipedia.org/wiki/SPARQL">SPARQL</ref>, recomenda-se a lição de Matthew Lincoln <ref target="/en/lessons/retired/graph-databases-and-SPARQL">'<emph>Using SPARQL to access Linked Open Data</emph>'</ref> (em inglês) (Nota: a lição deste link encontra-se desatualizada e já não é mantida pelo <emph>Programming Historian</emph>. Por favor veja a nota inicial dessa página sobre a razão dessa lição ter sido retirada), que segue praticamente a visão geral fornecida nesta lição.</p>
+                <p>Para proporcionar aos leitores uma base sólida dos princípios básicos de LOD, este tutorial não oferecerá uma cobertura abrangente de todos os seus conceitos. Estes <hi rend="bold">não</hi> serão o foco desta lição:</p>
+                <list type="ordered">
+                    <item>
+                        <ref target="https://pt.wikipedia.org/wiki/Web_sem%C3%A2ntica">Web Semântica</ref> e <ref target="https://en.wikipedia.org/wiki/Semantic_reasoner">raciocínio semântico</ref> (em inglês) de <ref target="https://pt.wikipedia.org/wiki/Conjunto_de_dados">datasets</ref>. Um raciocinador semântico deduziria que Jorge VI é o irmão ou meio-irmão de Eduardo VIII, dado que: a) Eduardo VIII é o filho de Jorge V e b) Jorge VI é o filho de Jorge V. Este tutorial não se foca neste tipo de tarefa.</item>
+                    <item>Criação e <emph>upload</emph> de conjuntos de dados abertos conectados ligados à <ref target="http://linkeddatacatalog.dws.informatik.uni-mannheim.de/state/">Nuvem de dados conectados</ref> (em inglês). Partilhar LOD é um princípio importante, que é encorajado abaixo. Contudo, os aspetos práticos de contribuir com LOD para a nuvem de dados conectados estão além do âmbito desta lição. Alguns recursos que podem ajudar a começar esta tarefa estão disponíveis no final deste tutorial.</item>
+                </list>
+            </div>
+            <head>Dados abertos conectados: O que são?</head>
+            <p>LOD é informação estruturada num formato destinado a máquinas e, por isso, não é necessariamente um conceito de fácil definição. É importante não perder a motivação com esta informação já que, ao compreender os princípios, pode colocar uma máquina a fazer uma leitura autónoma.</p>
+            <p>Se todos os datasets fossem publicados abertamente e utilizassem o mesmo formato para estruturar a informação, seria possível interrogá-los todos de uma só vez. A análise de grandes volumes de dados é potencialmente muito mais poderosa do que qualquer pessoa que utilize os seus próprios datasets individuais espalhados pela web nos chamados <ref target="https://en.wikipedia.org/wiki/Information_silo">silos de informação</ref> (em inglês). Estes datasets interoperáveis são aquilo para que os profissionais de LOD estão a trabalhar.</p>
+            <p>Para atingir este objetivo, ao trabalhar com LOD, é importante recordar três princípios:</p>
+            <list type="ordered">
+                <item>
+                    <hi rend="bold">Utilizar um formato padrão de LOD reconhecido</hi>. Para que o LOD funcione, os dados devem ser <ref target="https://pt.wikipedia.org/wiki/Estrutura_de_dados">estruturados</ref>, utilizando normas reconhecidas para que os computadores que interrogam os dados possam processá-los de forma consistente. Há vários formatos de LOD, alguns dos quais são discutidos abaixo.</item>
+                <item>
+                    <hi rend="bold">Referir uma entidade da mesma forma que outras pessoas o fazem</hi>. Se existirem dados sobre a mesma pessoa/local/coisa em dois ou mais locais, certifique-se de que se refere à pessoa/local/coisa da mesma forma em todos os casos.</item>
+                <item>
+                    <hi rend="bold">Publicar os seus dados abertamente</hi>. Qualquer pessoa deverá poder utilizar os seus dados sem pagar uma taxa e num formato que não exija <ref target="https://pt.wikipedia.org/wiki/Software_propriet%C3%A1rio">software proprietário</ref>.</item>
+            </list>
+            <p>Comecemos com um exemplo de dados sobre uma pessoa, utilizando uma abordagem comum <ref target="https://en.wikipedia.org/wiki/Attribute%E2%80%93value_pair">par atributo-valor</ref> (em inglês) típica em computação:</p>
+            <ab>
+                <code xml:id="code_introducao-dados-abertos-conectados_0" corresp="code_introducao-dados-abertos-conectados_0.txt" rend="block"/>
+            </ab>
+            <p>Neste caso, o 'atributo' é uma pessoa. E o valor - ou quem é essa pessoa - é representado por um número. O número pode ser atribuído aleatoriamente ou pode ser utilizado um número que já esteja associado a essa pessoa. Esta última abordagem tem grandes vantagens: se todos os que criarem um dataset que menciona essa pessoa utilizarem <emph>exatamente o mesmo número, exatamente no mesmo formato</emph>, então podemos encontrar esse indivíduo de forma fiável em qualquer dataset aderindo a essas regras. Vamos criar um exemplo usando Jack Straw: tanto o nome de um rebelde inglês do século XIV, como o de um ministro de gabinete britânico proeminente na administração de Tony Blair. É útil ser capaz de diferenciar as duas pessoas que partilham o mesmo nome.</p>
+            <p>Utilizando o modelo acima, no qual cada pessoa é representada por um número único, vamos atribuir ao ministro britânico Jack Straw o número <code rend="inline">64183282</code>. O seu par atributo-valor ficaria então com este aspeto:</p>
+            <ab>
+                <code xml:id="code_introducao-dados-abertos-conectados_1" corresp="code_introducao-dados-abertos-conectados_1.txt" rend="block"/>
+            </ab>
+            <p>E vamos atribuir a Jack Straw, descrito no <emph>
+                    <ref target="http://www.oxforddnb.com">Oxford Dictionary of National Biography</ref>
+                </emph> (em inglês) como 'o enigmático líder rebelde', o número <code rend="inline">33059614</code>, fazendo com que o seu par atributo-valor se pareça com isto:</p>
+            <ab>
+                <code xml:id="code_introducao-dados-abertos-conectados_2" corresp="code_introducao-dados-abertos-conectados_2.txt" rend="block"/>
+            </ab>
+            <p>Desde que todos os que fazem LOD utilizem estes dois números para se referirem aos respetivos Jack Straws, podemos agora procurar a pessoa <code rend="inline">64183282</code> num conjunto de dados abertos conectados e podemos estar confiantes de que estamos a obter a pessoa certa - neste caso, o ministro.</p>
+            <p>Os pares atributo-valor também podem armazenar informações sobre outros tipos de entidades: lugares, por exemplo. Jack Straw, o político moderno, era membro do Parlamento britânico, representando o assento de Blackburn. Há mais do que um lugar no Reino Unido chamado Blackburn, para não mencionar outros Blackburn em todo o mundo. Usando os mesmos princípios acima delineados, podemos desambiguar entre os vários Blackburns, atribuindo um identificador único ao lugar correto: Blackburn em Lancashire, Inglaterra.</p>
+            <ab>
+                <code xml:id="code_introducao-dados-abertos-conectados_3" corresp="code_introducao-dados-abertos-conectados_3.txt" rend="block"/>
+            </ab>
+            <p>Neste momento pode estar pensando, "isso é o que um catálogo de biblioteca faz". É verdade que a ideia-chave aqui é a do <ref target="https://pt.wikipedia.org/wiki/Controle_de_autoridade">ficheiro de autoridade</ref>, central na biblioteconomia (um ficheiro de autoridade é uma lista definitiva de termos que podem ser utilizados num contexto particular, por exemplo, quando se cataloga um livro). Nos dois exemplos acima descritos, utilizamos ficheiros de autoridade para atribuir números (os identificadores únicos) aos Jacks e ao Blackburn. Os números que utilizamos para os dois Jack Straws provêm do <ref target="https://viaf.org">Virtual International Authority File</ref> (em inglês) (VIAF) (Arquivo Internacional de Autoridade Virtual), que é mantido por um consórcio de bibliotecas de todo o mundo, de modo a tentar resolver o problema da miríade de maneiras pelas quais a mesma pessoa pode ser referida. O identificador único que utilizamos para o distrito eleitoral de Blackburn provém da <ref target="http://www.geonames.org/">GeoNames</ref> (em inglês), uma base de dados geográfica gratuita.</p>
+            <p>Vamos tentar ser mais precisos com o que, neste caso, queremos dizer com 'Blackburn'. Jack Straw representou o círculo eleitoral (uma área representada por um único membro do parlamento) de Blackburn, que mudou os seus limites ao longo do tempo. O projeto "<ref target="https://repository.jisc.ac.uk/6544/1/DiLiPaD_final_report_1.pdf">
+                    <emph>Digging Into Linked Parliamentary Data</emph>
+                </ref>" (Dilipad) (em inglês), no qual trabalhei, produziu identificadores únicos para as filiações partidárias e circunscrições eleitorais para cada membro do parlamento. Neste exemplo, Jack Straw representou o distrito eleitoral conhecido como 'Blackburn' na sua encarnação pós-1955:</p>
+            <ab>
+                <code xml:id="code_introducao-dados-abertos-conectados_4" corresp="code_introducao-dados-abertos-conectados_4.txt" rend="block"/>
+            </ab>
+            <p>Como o VIAF é um ficheiro de autoridade respeitado e bem mantido, fornece um conjunto óbvio de identificadores a utilizar para Jack Straw. Como o distrito eleitoral representado por Straw estava perfeitamente coberto pelos ficheiros de autoridade criados pelo projeto Dilipad, também era um ficheiro de autoridade lógico a utilizar. Infelizmente, nem sempre é tão óbvio qual das listas publicadas online é a melhor para se usar. Uma pode ser mais utilizada do que outra, mas esta última pode ser mais abrangente para um determinado fim. O GeoNames funcionaria melhor do que os identificadores da Dilipad em alguns casos. Haverá também casos em que não se consegue encontrar um dataset com essa informação. Por exemplo, se quiser escrever pares atributo-valor sobre si próprio e as suas relações familiares imediatas terá de inventar os seus próprios identificadores.</p>
+            <p>Esta falta de ficheiros de autoridade coerentes é um dos maiores desafios que o LOD enfrenta neste momento. <ref target="https://pt.wikipedia.org/wiki/Tim_Berners-Lee">Tim Berners-Lee</ref>, que inventou uma forma de ligar documentos em rede e criou assim a World Wide Web, um dos principais proponentes de LOD, para encorajar uma maior utilização de dados conectados, sugeriu um "<ref target="https://www.w3.org/DesignIssues/LinkedData.html">sistema de classificação de cinco estrelas</ref>" (em inglês) para que todos avançassem o mais longe possível em direção ao LOD. Essencialmente, Tim Berners-Lee apoia a publicação aberta de dados, especialmente ao utilizar formatos abertos e normas públicas, mas o melhor é que os dados se liguem também aos dados de outras pessoas.</p>
+            <p>Com os identificadores únicos atribuídos a todos os elementos, o próximo passo fundamental na criação de LOD é ter uma forma de <emph>descrição</emph> da relação entre Jack Straw (<code rend="inline">64183282</code>) e Blackburn (<code rend="inline">blackburn1955-presente</code>). Em LOD, as relações são expressas utilizando o que é conhecido como '<ref target="https://en.wikipedia.org/wiki/Semantic_triple">tripla semântica</ref>' (em inglês). Vamos fazer uma tripla semântica que represente a relação entre Jack Straw e o seu distrito eleitoral:</p>
+            <ab>
+                <code xml:id="code_introducao-dados-abertos-conectados_5" corresp="code_introducao-dados-abertos-conectados_5.txt" rend="block"/>
+            </ab>
+            <p>A apresentação (ou <ref target="https://pt.wikipedia.org/wiki/Sintaxe">sintaxe</ref>) das triplas semânticas, incluindo a pontuação utilizada acima, será discutida mais tarde, na secção sobre RDF e formatos de dados. Por agora, vamos focar-nos na estrutura básica. A tripla semântica, não surpreendentemente, tem três partes. Estas são convencionalmente referidas como sujeito (<emph>subject</emph>), predicado (<emph>predicate</emph>) e objeto (<emph>object</emph>):</p>
+            <table>
+                <row>
+                    <cell role="label">o sujeito</cell>
+                    <cell role="label">o predicado</cell>
+                    <cell role="label">o objeto</cell>
+                </row>
+                <row>
+                    <cell>pessoa 64183282</cell>
+                    <cell>representadaNoParlamentoBritânico</cell>
+                    <cell>"blackburn1955-presente"</cell>
+                </row>
+            </table>
+            <p>A forma tradicional de representar uma tripla semântica em forma esquemática é a seguinte (em inglês):</p>
+            <figure>
+                <desc>Forma tradicional de representar uma tripla semântica</desc>
+                <figDesc>Imagem com a representação de uma tripla semântica</figDesc>
+                <graphic url="introducao-dados-abertos-conectados-fig1.png"/>
+            </figure>
+            <p>Assim, a nossa tripla semântica do Jack Straw, apresentado de forma mais legível para o ser humano, poderia assumir a seguinte forma:</p>
+            <figure>
+                <desc>Diagrama da tripla semântica que demonstra que Jack Straw representava Blackburn</desc>
+                <figDesc>Imagem com a representação de uma tripla semântica aplicada ao exemplo de Jack Straw</figDesc>
+                <graphic url="introducao-dados-abertos-conectados-fig2.png"/>
+            </figure>
+            <p>Por enquanto, é importante fixar três pontos-chave:</p>
+            <list type="unordered">
+                <item>O LOD deve estar aberto e disponível para qualquer pessoa na Internet (caso contrário, não está "aberto")</item>
+                <item>Os defensores do LOD têm como objetivo normalizar as formas de referência a entidades únicas</item>
+                <item>O LOD consiste em triplas semânticas que descrevem as relações entre entidades</item>
+            </list>
+            <div type="2">
+                <head>O papel do <emph>Uniform Resource Identifier</emph> (URI)</head>
+                <p>Uma parte essencial de LOD é o <ref target="https://pt.wikipedia.org/wiki/URI">Identificador Uniforme de Recurso</ref>(<emph>Uniform Resource Identifier</emph> ou URI). O URI é uma forma única e fiável de representar uma entidade (uma pessoa, um objeto, uma relação, etc.), de uma forma que é utilizável por todos no mundo.</p>
+                <p>Na secção anterior, utilizamos dois números diferentes para identificar os diferentes Jack Straws.</p>
+                <ab>
+                    <code xml:id="code_introducao-dados-abertos-conectados_6" corresp="code_introducao-dados-abertos-conectados_6.txt" rend="block"/>
+                </ab>
+                <p>O problema é que em todo o mundo existem muitas bases de dados que contêm pessoas com estes números e são, provavelmente, todas pessoas diferentes. Fora do nosso contexto imediato, estes números não identificam indivíduos únicos. Vamos tentar resolver isso. Aqui estão estes mesmos identificadores, mas como URIs:</p>
+                <ab>
+                    <code xml:id="code_introducao-dados-abertos-conectados_7" corresp="code_introducao-dados-abertos-conectados_7.txt" rend="block"/>
+                </ab>
+                <p>Tal como o número único desambiguou os nossos dois Jack Straws, o URI completo acima ajuda-nos a desambiguar entre todos os diferentes ficheiros de autoridade lá fora. Neste caso, é evidente que estamos a utilizar o VIAF como o nosso ficheiro de autoridade. Com certeza, já viu esta forma de desambiguação muitas vezes na web. Existem muitos websites em todo o mundo com páginas chamadas <code rend="inline">/home</code> ou <code rend="inline">/faq</code>. Mas não há confusão porque o <ref target="https://pt.wikipedia.org/wiki/Nome_de_dom%C3%ADnio">domínio</ref> (a primeira parte do <ref target="https://pt.wikipedia.org/wiki/URL">Localizador Uniforme de Recursos</ref> (<emph>Uniform Resource Locator</emph> ou URL) - ex. <code rend="inline">bbc.co.uk</code>) é único, portanto, todas as páginas que fazem parte desse domínio são únicas em outras páginas <code rend="inline">/faq</code> de outros websites. No endereço <code rend="inline">http://www.bbc.co.uk/faqs</code> é a parte <code rend="inline">bbc.co.uk</code> que torna as páginas subsequentes únicas. Isto é tão óbvio para as pessoas que utilizam a web a toda a hora que não pensam sobre isso. Provavelmente, também sabe que se quiser criar um website chamado <code rend="inline">bbc.co.uk</code> não conseguirá, porque esse nome já foi registado com a autoridade apropriada, que é o <ref target="https://pt.wikipedia.org/wiki/Sistema_de_Nomes_de_Dom%C3%ADnio">Sistema de Nomes de Domínio</ref> (<emph>Domain Name System</emph>). O registo garante a singularidade. Os URIs também têm de ser únicos.</p>
+                <p>Embora os exemplos acima se pareçam com URLs, também é possível construir um URI que não se pareça nada com um URL. Temos muitas formas de identificar pessoas e coisas de forma única e raramente pensamos ou nos preocupamos com isso. Os códigos de barras, números de passaporte, até mesmo os códigos postais são concebidos para serem únicos. Os números de telefone são frequentemente colocados como placas de loja precisamente porque são únicos. Todos eles podem ser utilizados como URIs.</p>
+                <p>Quando criamos URIs para as entidades descritas pelo projeto '<ref target="https://gtr.ukri.org/projects?ref=AH%2FN003446%2F1#/tabOverview">Tobias</ref>' (em inglês), escolhemos uma estrutura do tipo URL e escolhemos utilizar o nosso espaço web institucional, pondo de lado <code rend="inline">data.history.ac.uk/tobias-project/</code> como um lugar dedicado à hospedagem destes URIs. Ao colocá-lo em <code rend="inline">data.history.ac.uk</code> em vez de <code rend="inline">history.ac.uk</code>, houve uma separação clara entre URIs e as páginas do website. Por exemplo, um dos URIs do projeto Tobias era 'http://data.history.ac.uk/tobias-project/person/15601'. Embora o formato dos URIs acima mencionados seja o mesmo que um URL, eles não se ligam a websites (tente colá-lo num navegador web). Muitas pessoas novas no LOD acham isto confuso. Todos os URLs são URIs, mas nem todos os URIs são URLs. (nota de tradução: tendo em conta que o site original do projeto Tobias já não se encontra disponível, o leitor da lição deve entender os exemplos aqui indicados como meramente ilustrativos daquilo que o autor pretende demonstrar) Um URI pode descrever qualquer coisa, enquanto o URL descreve a localização de algo na web. Assim, um URL diz-lhe a localização de uma página web, de um ficheiro ou algo semelhante. Um URI faz apenas o trabalho de identificar algo. Tal como o Número internacional Normalizado do Livro (International Standard Book Number ou <ref target="https://www.iso.org/standard/36563.html">ISBN</ref> (em inglês) <code rend="inline">978-0-1-873354-6</code> identifica exclusivamente uma edição de capa dura de <emph>Baptism, Brotherhood and Belief in Reformation Germany</emph>, de Kat Hill, mas não diz onde obter uma cópia. Para isso precisaria de algo como um <ref target="https://pt.wikipedia.org/wiki/N%C3%BAmero_de_acesso_(biblioteconomia)">número de acesso</ref>, que lhe dá uma localização exata de um livro numa prateleira de uma biblioteca específica.</p>
+                <p>Há um pouco de jargão em torno de URIs. As pessoas falam sobre se são ou não <ref target="https://pt.wikipedia.org/wiki/Refer%C3%AAncia_(ci%C3%AAncia_da_computa%C3%A7%C3%A3o)">desreferenciáveis</ref>. Isso apenas significa que <emph>podemos transformar uma referência abstrata em algo diferente?</emph> Por exemplo, se colarmos um URI na barra de endereços de um browser, será que ele encontra algo? O VIAF URI para o historiador Simon Schama é:</p>
+                <ab>
+                    <code xml:id="code_introducao-dados-abertos-conectados_8" corresp="code_introducao-dados-abertos-conectados_8.txt" rend="block"/>
+                </ab>
+                <p>Se o colocarmos no browser, receberemos de volta uma página web sobre Simon Schama que contém dados estruturados sobre ele e a sua história editorial. Isto é muito útil por um motivo. A partir do URI não é óbvio quem ou mesmo o que é que está a ser referido. Da mesma forma, se tratarmos um número de telefone (com código internacional) como o URI de uma pessoa, então deve ser desreferenciável. Alguém pode atender o telefone e pode até ser Schama.</p>
+                <p>Mas isto não é essencial. Muitos URIs não são desreferenciáveis, como no exemplo acima do projeto Tobias. Não se pode encontrá-lo em lado nenhum; é uma convenção.</p>
+                <p>O exemplo do VIAF leva-nos a outra coisa importante sobre os URIs: não os invente a não ser que tenha de o fazer. As pessoas e organizações têm feito esforços para construir boas listas de URI e o LOD não vai funcionar eficazmente se as pessoas duplicarem esse trabalho criando novos URIs desnecessariamente. Por exemplo, o VIAF tem o apoio de muitas bibliotecas internacionais. Se quiser construir URIs para pessoas, o VIAF é uma escolha muito boa. Se não conseguir encontrar algumas pessoas no VIAF, ou noutras listas de autoridade, só então poderá precisar fazer a sua própria.</p>
+            </div>
+            <head>Como o LOD organiza o conhecimento: ontologias</head>
+            <p>Pode não ter sido óbvio a partir das triplas semânticas individuais que analisamos na secção anterior, mas o LOD pode responder a perguntas complexas. Quando se juntam as triplas semânticas, estas formam um <ref target="https://pt.wikipedia.org/wiki/Mapa_conceitual">Mapa conceitual</ref>, devido à forma como as triplas semânticas se interligam. Suponhamos que queremos encontrar uma lista de todas as pessoas que foram alunos do compositor Franz Liszt. Se a informação estiver em triplas semânticas de dados conectados sobre pianistas e os seus professores, podemos descobrir o que procuramos com uma consulta (veremos esta linguagem de consulta, chamada SPARQL, na secção final).</p>
+            <p>Por exemplo, o pianista Charles Rosen foi aluno do pianista Moriz Rosenthal, que foi aluno de Franz Liszt. Vamos agora expressar isto em duas triplas semânticas (vamos cingir-nos às sequências de caracteres para os nomes em vez dos números de identificação, para tornar os exemplos mais legíveis):</p>
+            <ab>
+                <code xml:id="code_introducao-dados-abertos-conectados_9" corresp="code_introducao-dados-abertos-conectados_9.txt" rend="block"/>
+            </ab>
+            <p>Poderíamos igualmente ter criado as nossas triplas semânticas desta forma:</p>
+            <ab>
+                <code xml:id="code_introducao-dados-abertos-conectados_10" corresp="code_introducao-dados-abertos-conectados_10.txt" rend="block"/>
+            </ab>
+            <p>Estamos a inventar exemplos simplesmente para fins de ilustração, mas se quiser ligar os seus dados a outros datasets na "nuvem de dados conectados" deve olhar para as convenções que são utilizadas nesses datasets e fazer o mesmo. Na verdade, esta é uma das características mais úteis de LOD porque muito do trabalho já foi feito. As pessoas têm passado muito tempo a desenvolver formas de modelar a informação dentro de uma determinada área de estudo e a pensar sobre como as relações dentro dessa área podem ser representadas. Estes modelos são geralmente conhecidos como ontologias. Uma ontologia é uma abstração que permite a representação de um conhecimento particular sobre o mundo. Neste sentido, estas são bastante recentes e foram concebidas para fazer o que uma <ref target="https://pt.wikipedia.org/wiki/Taxonomia_(geral)">taxonomia</ref> hierárquica faz (pense na classificação das espécies na <ref target="https://pt.wikipedia.org/wiki/Taxonomia_de_Lineu">Taxonomia de Lineu</ref>, mas de uma forma mais flexível.</p>
+            <p>Uma ontologia é mais flexível porque não é hierárquica. Visa representar a fluidez do mundo real, onde as coisas podem ser relacionadas umas com as outras de formas mais complexas do que quando são representadas por uma estrutura hierárquica em forma de árvore. Em vez disso, uma ontologia é mais parecida com uma teia de aranha.</p>
+            <p>O que quer que pretenda representar com LOD, sugerimos que encontre um vocabulário existente e que o utilize, em vez de tentar escrever o seu próprio vocabulário. Esta página tem <ref target="http://semanticweb.org/wiki/Main_Page.html">uma lista de alguns dos vocabulários mais populares</ref> (em inglês).</p>
+            <p>Uma vez que o nosso exemplo acima se concentra nos pianistas, seria uma boa ideia encontrar uma ontologia apropriada em vez de criar o nosso próprio sistema. De facto, existe <ref target="http://web.archive.org/web/20170715094229/http://www.musicontology.com/">uma ontologia para música</ref> (em inglês). Para além de uma especificação bem desenvolvida, esta tem também alguns exemplos úteis da sua utilização. Pode dar uma olhada nas <ref target="http://web.archive.org/web/20170718143925/http://musicontology.com/docs/getting-started.html">páginas de iniciação</ref> (em inglês) para ter uma ideia de como se pode utilizar esta ontologia em particular.</p>
+            <p>Infelizmente, não conseguimos encontrar nada que descreva a relação entre um professor e um aluno na Ontologia da Música. Mas a ontologia é publicada abertamente, logo podemos utilizá-la para descrever outras características da música e depois criar a nossa própria extensão. Se então publicássemos a nossa extensão abertamente, outros poderiam utilizá-la se assim o desejassem e este ato pode tornar-se num padrão. Embora o projeto <emph>Music Ontology</emph> (Ontologia Musical) não tenha a relação que precisamos, o <ref target="https://linkedjazz.org/">projeto <emph>Linked Jazz</emph>
+                </ref> (em inglês) permite o uso de '<emph>mentorOf</emph>', o que parece funcionar bem no nosso caso. Embora esta não seja uma solução ideal, é uma solução que faz um esforço para utilizar o que já existe por aí.</p>
+            <p>Agora, se estivéssemos a estudar a história do pianismo, poderíamos querer identificar muitos pianistas que foram ensinados por alunos de Liszt, para estabelecer uma espécie de árvore genealógica e ver se estes 'netos' de Liszt têm algo em comum. Poderíamos pesquisar os alunos de Liszt, fazer uma grande lista deles, depois pesquisar cada um dos alunos e tentar fazer listas de quaisquer alunos que eles tivessem. Com LOD poderíamos (novamente, se as triplas semânticas existissem) escrever uma query semelhante a:</p>
+            <ab>
+                <code xml:id="code_introducao-dados-abertos-conectados_11" corresp="code_introducao-dados-abertos-conectados_11.txt" rend="block"/>
+            </ab>
+            <p>Isto encontraria todas as pessoas do dataset que eram alunos de alunos de Liszt. Não nos entusiasmemos demasiado: esta pergunta não nos dará todos os alunos de todos os alunos de Liszt que já existiram, porque essa informação provavelmente não existe e não existe dentro de nenhum conjunto de triplas semânticas existentes. Lidar com dados do mundo real mostra todo o tipo de omissões e inconsistências, que veremos quando olharmos para o maior conjunto de LOD, a <ref target="https://www.dbpedia.org/">DBpedia</ref>, na secção final.</p>
+            <p>Se tiver utilizado <ref target="https://pt.wikipedia.org/wiki/Banco_de_dados_relacional">bases de dados relacionais</ref> poderá estar a pensar que estas podem desempenhar a mesma função. No nosso caso de Liszt, a informação sobre pianistas acima descrita pode estar organizada numa <ref target="https://pt.wikipedia.org/wiki/Tabela_(banco_de_dados)">tabela</ref> de base de dados denominada por algo como 'Alunos'.</p>
+            <table>
+                <row>
+                    <cell role="label">IDaluno</cell>
+                    <cell role="label">IDprofessor</cell>
+                </row>
+                <row>
+                    <cell>31</cell>
+                    <cell>17</cell>
+                </row>
+                <row>
+                    <cell>35</cell>
+                    <cell>17</cell>
+                </row>
+                <row>
+                    <cell>49</cell>
+                    <cell>28</cell>
+                </row>
+                <row>
+                    <cell>56</cell>
+                    <cell>28</cell>
+                </row>
+                <row>
+                    <cell>72</cell>
+                    <cell>40</cell>
+                </row>
+            </table>
+            <p>Se não estiver familiarizado com bases de dados não se preocupe. Mas, provavelmente, ainda pode ver que alguns pianistas nesta tabela tinham o mesmo professor (números 17 e 28). Sem entrar em pormenores, se Liszt estiver nesta tabela de bases de dados, seria bastante fácil extrair os alunos de Liszt, ao utilizar um <code rend="inline">Join</code> (<ref target="https://pt.wikipedia.org/wiki/Join_(SQL)">
+                    <emph>join</emph>
+                </ref>).</p>
+            <p>De facto, as bases de dados relacionais podem oferecer resultados semelhantes ao LOD. A grande diferença é que o LOD pode ir mais longe: pode ligar datasets que foram criados sem intenção explícita de serem ligados entre si. A utilização do <ref target="https://pt.wikipedia.org/wiki/Resource_Description_Framework">Quadro de Descrição de Recursos</ref> (<emph>Resource Description Framework</emph> ou RDF) e URIs permite que isto aconteça.</p>
+            <div type="2">
+                <head>RDF e formatos de dados</head>
+                <p>LOD utiliza uma norma, definida pelo <ref target="https://www.w3.org/">Consórcio World Wide Web</ref> (em inglês) (<emph>World Wide Web Consortium</emph> ou W3C), chamada <emph>
+                        <ref target="https://pt.wikipedia.org/wiki/Resource_Description_Framework">Resource Description Framework</ref>
+                    </emph> ou apenas RDF. As normas são úteis desde que sejam amplamente adotadas - pense no metro ou nos tamanhos de parafuso padrão - mesmo que sejam essencialmente arbitrárias. O RDF tem sido amplamente adotado como a norma LOD.</p>
+                <p>Ouvirá frequentemente o LOD referido simplesmente como RDF. Atrasamos a conversa sobre o RDF até agora porque é bastante abstrato. RDF é um <ref target="https://pt.wikipedia.org/wiki/Modelagem_de_dados">modelo de dados</ref> que descreve como é que os dados são estruturados num nível teórico. Assim, a insistência na utilização de triplas semânticas (em vez de quatro partes, ou duas ou nove, por exemplo) é uma regra no RDF. Mas quando se trata de questões mais práticas, há algumas escolhas quanto à implementação. Assim, o RDF diz-lhe o que tem de fazer, mas não exatamente como o tem de fazer. Estas escolhas dividem-se em duas áreas: como se escrevem as coisas (serialização) e as relações que as suas triplas semânticas descrevem.</p>
+                <div type="3">
+                    <head>Serialização</head>
+                    <p>A <ref target="https://pt.wikipedia.org/wiki/Serializa%C3%A7%C3%A3o">Serialização</ref> é o termo técnico para "como se escrevem as coisas". O chinês padrão (mandarim) pode ser escrito em caracteres tradicionais, caracteres simplificados ou romanização Pinyin e a língua em si não muda. Tal como o mandarim, o RDF pode ser escrito de várias formas. Aqui vamos olhar para duas (há outras, mas por uma questão de simplicidade, vamos concentrar-nos nestas):</p>
+                    <list type="ordered">
+                        <item>
+                            <ref target="https://en.wikipedia.org/wiki/Turtle_(syntax)">Turtle</ref> (em inglês)</item>
+                        <item>
+                            <ref target="https://pt.wikipedia.org/wiki/RDF/XML">RDF/XML</ref>
+                        </item>
+                    </list>
+                    <p>Reconhecer a serialização que está a ser utilizada significa que podemos então escolher ferramentas apropriadas concebidas para esse formato. Por exemplo, o RDF pode vir serializado no formato <ref target="https://pt.wikipedia.org/wiki/XML">XML</ref>. Podemos então utilizar uma ferramenta ou biblioteca de códigos concebida para analisar esse formato em particular, o que é útil se já souber como trabalhar com ele. O reconhecimento do formato também lhe dá as palavras-chave certas para procurar ajuda online. Muitos recursos permitem descarregar as suas bases de dados LOD, podendo escolher qual a serialização que deseja fazer o <emph>Download</emph>.</p>
+                    <div type="4">
+                        <head>Turtle</head>
+                        <p>'Turtle' é um jogo de palavras. 'Tur' é a abreviatura de 'terse' e 'tle' - é a abreviatura de '<emph>triple language</emph>' (linguagem de triplos). Turtle é uma forma agradavelmente simples de escrever triplas semânticas.</p>
+                        <p>O Turtle usa apelidos ou atalhos, conhecidos como <ref target="https://www.w3.org/TeamSubmission/turtle/#sec-tutorial">prefixos</ref> (em inglês), o que nos poupa ter de escrever URIs completos todas as vezes. Voltemos ao URI que criamos na secção anterior:</p>
+                        <ab>
+                            <code xml:id="code_introducao-dados-abertos-conectados_12" corresp="code_introducao-dados-abertos-conectados_12.txt" rend="block"/>
+                        </ab>
+                        <p>Não queremos escrever isto cada vez que nos referimos a esta pessoa (lembrar-se-á de Jack Straw). Por isso, só temos de enunciar o nosso atalho:</p>
+                        <ab>
+                            <code xml:id="code_introducao-dados-abertos-conectados_13" corresp="code_introducao-dados-abertos-conectados_13.txt" rend="block"/>
+                        </ab>
+                        <p>Então Jack é <code rend="inline">toby:15601</code>, que substitui o longo URI e é mais fácil à vista. Eu escolhi 'toby', mas poderia igualmente escolher qualquer sequência de letras.</p>
+                        <p>Vamos agora passar de Jack Straw para William Shakespeare e utilizar Turtle para descrever algumas coisas sobre as suas obras. Vamos ter de decidir sobre os ficheiros de autoridade a utilizar, um processo que, como mencionado acima, é melhor ser selecionado ao olhar para outros conjuntos de LOD. Aqui usaremos como um dos nossos prefixos <ref target="https://pt.wikipedia.org/wiki/Dublin_Core">
+                                <emph>Dublin Core</emph>
+                            </ref>, uma norma de <ref target="https://pt.wikipedia.org/wiki/Metadados">metadados</ref> de bibliotecas <ref target="https://en.wikipedia.org/wiki/Library_of_Congress_Control_Number">(Número de controle da Biblioteca do Congresso</ref> (<emph>Library of Congress Control Number</emph>) como outro e, o último (VIAF) deverá ser-lhe familiar. Juntos, estes três ficheiros de autoridade fornecem identificadores únicos para todas as entidades que tenciono utilizar neste exemplo:</p>
+                        <ab>
+                            <code xml:id="code_introducao-dados-abertos-conectados_14" corresp="code_introducao-dados-abertos-conectados_14.txt" rend="block"/>
+                        </ab>
+                        <p>Note o espaçamento do ponto final após a última linha. Esta é a forma de Turtle indicar o fim. Tecnicamente não é necessário ter o espaço, mas facilita a leitura após uma longa sequência de caracteres.</p>
+                        <p>No exemplo acima, lccn:n82011242 representa Macbeth; dc:creator liga Macbeth ao seu autor; viaf:96994048 representa William Shakespeare.</p>
+                        <p>O Turtle também permite listar triplas semânticas sem se preocupar em repetir cada URI quando acabou de o usar. Acrescentemos a data em que os estudiosos pensam que Macbeth foi escrito, utilizando o par atributo-valor Dublin Core: <code rend="inline">dc:create 'YYYY'</code>:</p>
+                        <ab>
+                            <code xml:id="code_introducao-dados-abertos-conectados_15" corresp="code_introducao-dados-abertos-conectados_15.txt" rend="block"/>
+                        </ab>
+                        <p>Lembra-se da estrutura da tripla semântica discutida na secção 1? Aí demos este exemplo:</p>
+                        <ab>
+                            <code xml:id="code_introducao-dados-abertos-conectados_16" corresp="code_introducao-dados-abertos-conectados_16.txt" rend="block"/>
+                        </ab>
+                        <p>O essencial é que o predicado liga o sujeito e o objeto. Ele descreve a relação entre eles. O sujeito vem primeiro na tripla semântica, mas isso é uma questão de escolha, como discutimos com o exemplo de pessoas que foram ensinadas a tocar piano por Liszt.</p>
+                        <p>Pode-se usar um ponto e vírgula se o sujeito for o mesmo mas o predicado e o objeto forem diferentes, ou uma vírgula se o sujeito e o predicado forem o mesmo e apenas o objeto for diferente.</p>
+                        <ab>
+                            <code xml:id="code_introducao-dados-abertos-conectados_17" corresp="code_introducao-dados-abertos-conectados_17.txt" rend="block"/>
+                        </ab>
+                        <p>Aqui estamos a dizer que Shakespeare (96994048) e John Fletcher (12323361) foram ambos os criadores da obra <emph>The Two Noble Kinsmen</emph>.</p>
+                        <p>Quando analisamos as ontologias anteriormente sugeri que visse a <ref target="http://web.archive.org/web/20170718143925/http://musicontology.com/docs/getting-started.html">
+                                <emph>Music Ontology</emph>
+                            </ref> (em inglês). Dê agora uma olhada novamente. Isto ainda é complicado, mas será que agora fazem mais sentido?</p>
+                        <p>Uma das ontologias mais acessíveis é a '<emph>Friend of a Friend</emph>' (amigo de um amigo) ou <ref target="https://en.wikipedia.org/wiki/FOAF_(ontology)">FOAF</ref> (em inglês). Esta é concebida para descrever pessoas e, talvez por essa razão, é bastante intuitiva. Se, por exemplo, quiser escrever-me para me dizer que este curso é a melhor coisa que já leu, aqui está o meu email expresso como triplas semânticas em FOAF:</p>
+                        <ab>
+                            <code xml:id="code_introducao-dados-abertos-conectados_18" corresp="code_introducao-dados-abertos-conectados_18.txt" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4">
+                        <head>RDF/XML</head>
+                        <p>Em contraste com o Turtle, o RDF/XML pode parecer um pouco pesado. Para começar, vamos apenas converter uma tripla semântica da Turtle acima, aquela que refere que Shakespeare foi o criador de <emph>The Two Noble Kinsmen</emph>:</p>
+                        <ab>
+                            <code xml:id="code_introducao-dados-abertos-conectados_19" corresp="code_introducao-dados-abertos-conectados_19.txt" rend="block"/>
+                        </ab>
+                        <p>Em RDF/XML, com os prefixos declarados dentro do trecho de código de XML, fica:</p>
+                        <ab>
+                            <code lang="language-xml" xml:id="code_introducao-dados-abertos-conectados_20" corresp="code_introducao-dados-abertos-conectados_20.txt" rend="block"/>
+                        </ab>
+                        <p>O formato RDF/XML tem a mesma informação básica que o formato Turtle, mas é escrito de forma muito diferente, baseando-se nos princípios das etiquetas XML encaixadas.</p>
+                        <p>Passemos a um exemplo diferente para mostrar como o RDF/XML combina triplas semânticas e, ao mesmo tempo, introduz o <ref target="https://pt.wikipedia.org/wiki/Simple_Knowledge_Organization_System">
+                                <emph>Simple Knowledge Organization System</emph>
+                            </ref> (SKOS) (Sistema Simples de Organização do Conhecimento), que foi concebido para codificar tesauros ou taxonomias.</p>
+                        <ab>
+                            <code xml:id="code_introducao-dados-abertos-conectados_21" corresp="code_introducao-dados-abertos-conectados_21.txt" rend="block"/>
+                        </ab>
+                        <p>Aqui estamos a dizer que o conceito SKOS <code rend="inline">21250</code>, <emph>markdown abdication</emph>, tem um rótulo preferido de "<emph>abdication</emph>". A forma como funciona é que o elemento sujeito (incluindo a parte da '<emph>abdication</emph>', que é um valor de atributo em termos de XML) tem o predicado e o objeto encaixados no seu interior. O elemento encaixado é o predicado e <ref target="https://pt.wikipedia.org/wiki/%C3%81rvore_(estrutura_de_dados)#Terminologia">o nó folha</ref> (em inglês), é o objeto. Este exemplo é retirado de um projeto para publicar um <ref target="https://www.history.ac.uk/research/digital-history">
+                                <emph>Tesauro de História Britânica e Irlandesa</emph>
+                            </ref> (em inglês).</p>
+                        <p>Tal como com o Turtle, podemos acrescentar mais triplas semânticas. Portanto, vamos declarar que o termo mais restrito na nossa hierarquia de sujeitos, um abaixo de <emph>Abdication</emph>, vai ser <emph>Abdication crisis (1936)</emph>.</p>
+                        <ab>
+                            <code xml:id="code_introducao-dados-abertos-conectados_22" corresp="code_introducao-dados-abertos-conectados_22.txt" rend="block"/>
+                        </ab>
+                        <p>Lembra-se de como os predicados e os objetos são encaixados dentro do sujeito? Aqui já o fizemos duas vezes com o mesmo sujeito, para que possamos tornar isto menos prolixo, aninhando ambos os conjuntos de predicados como objetos dentro do mesmo sujeito:</p>
+                        <ab>
+                            <code xml:id="code_introducao-dados-abertos-conectados_23" corresp="code_introducao-dados-abertos-conectados_23.txt" rend="block"/>
+                        </ab>
+                        <p>Se estiver familiarizado com XML isto será fácil. Se não estiver, talvez prefira um formato como o Turtle. Mas a vantagem aqui é que ao criar o seu RDF/XML pode usar as ferramentas habituais disponíveis com XML, como editores e analisadores dedicados ao XML, para verificar se o seu RDF/XML está corretamente formatado. Se não for uma pessoa que use o XML recomendo o Turtle, podendo usar uma <ref target="http://www.easyrdf.org/converter">ferramenta online</ref> (em inglês) para verificar se a sua sintaxe está correta.</p>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Consulta de RDF com SPARQL</head>
+                <p>Para esta secção final iremos interrogar algum LOD e ver o que poderá ser feito com ele.</p>
+                <p>A linguagem de consulta que usamos para LOD é chamada <ref target="https://pt.wikipedia.org/wiki/SPARQL">SPARQL</ref>. É um daqueles acrónimos recursivos amados pelos técnicos: <emph>
+                        <hi rend="bold">S</hi>PARQL <hi rend="bold">P</hi>rotocol <hi rend="bold">a</hi>nd <hi rend="bold">R</hi>DF <hi rend="bold">Q</hi>uery <hi rend="bold">L</hi>anguage</emph> (Protocolo SPARQL e Linguagem de Consulta).</p>
+                <p>Como mencionado no início, o <emph>Programming Historian</emph> tem <ref target="/en/lessons/retired/graph-databases-and-SPARQL">uma lição completa</ref> (em inglês), de Matthew Lincoln, sobre a utilização do SPARQL (embora não seja já mantida (ver nota no início desta tradução). A secção final aqui presente é apenas uma visão geral dos conceitos básicos. Se o SPARQL despertar o seu interesse, pode obter uma fundamentação completa no tutorial de Lincoln.</p>
+                <p>Vamos realizar as nossas consultas SPARQL na <ref target="https://www.dbpedia.org/">DBpedia</ref>, que é um enorme conjunto de LOD derivado da Wikipedia. Além de estar cheio de informação que é muito difícil de encontrar através da habitual interface da Wikipédia, tem vários "pontos de extremidade" (end points) SPARQL - interfaces onde se podem digitar as consultas SPARQL e obter resultados a partir das triplas semânticas da DBpedia.</p>
+                <p>O end point de consulta SPARQL que é utilizado chama-se <ref target="http://dbpedia.org/snorql/">snorql</ref> (em inglês). Estes end points ocasionalmente ficam offline. Se for o seu caso, tente procurar por <emph>dbpedia sparql</emph> e deverá encontrar um substituto semelhante.</p>
+                <p>Se for ao URL snorql acima verá, no início, um número de prefixos que já nos foram declarados, o que é útil. Agora também irá reconhecer alguns dos prefixos.</p>
+                <figure>
+                    <desc>Caixa de consulta padrão do snorql, com alguns prefixos declarados para si</desc>
+                    <figDesc>Captura de tela com a interface de criação de consultas snorql</figDesc>
+                    <graphic url="intro-to-linked-data-fig1.png"/>
+                </figure>
+                <p>Na caixa de consulta abaixo das declarações de prefixo, deverá ver o seguinte:</p>
+                <ab>
+                    <code xml:id="code_introducao-dados-abertos-conectados_24" corresp="code_introducao-dados-abertos-conectados_24.txt" rend="block"/>
+                </ab>
+                <p>Se alguma vez escreveu uma consulta de bases de dados em <emph>Structured Query Language</emph>, <ref target="https://pt.wikipedia.org/wiki/SQL">mais conhecida como SQL</ref>, isto vai parecer-lhe bastante familiar e vai ajudá-lo a aprender SPARQL. Se não, não se preocupe. As palavras-chave aqui utilizadas, <code rend="inline">SELECT</code> (SELECIONAR) e <code rend="inline">WHERE</code> (ONDE) não são sensíveis a maiúsculas e minúsculas, mas algumas partes de uma consulta SPARQL podem ser (ver abaixo), por isso recomendo que se cinja ao caso dado ao longo das consultas neste curso.</p>
+                <p>Aqui <code rend="inline">SELECT</code> significa "encontrar alguma coisa" e <code rend="inline">*</code> significa "dá-me tudo". <code rend="inline">WHERE</code> introduz uma condição, que é onde vamos colocar os detalhes de que tipo de coisas queremos que a consulta encontre.</p>
+                <p>Vamos começar com algo simples para ver como é que isto funciona. Cole (ou, melhor, escreva) isto na caixa de consulta:</p>
+                <ab>
+                    <code xml:id="code_introducao-dados-abertos-conectados_25" corresp="code_introducao-dados-abertos-conectados_25.txt" rend="block"/>
+                </ab>
+                <p>Clique em '<emph>go</emph>' (ir). Se deixar o menu <emph>drop-down</emph> como '<emph>browse</emph>' (navegar) deverá obter duas colunas com os rótulos "b" e "c". (Note que aqui, ao procurar uma cadeia de caracteres, as maiúsculas/minúsculas importam: lyndal_roper não lhe dará resultados).</p>
+                <figure>
+                    <desc>Topo das listas de resultados de uma consulta com todas as triplas semânticas com 'Lyndal_Roper' como sujeito</desc>
+                    <figDesc>Captura de tela com a interface de resultados de consultas snorql</figDesc>
+                    <graphic url="intro-to-linked-data-fig2.png"/>
+                </figure>
+                <p>Então o que é que acabou de acontecer? E como é que soubemos o que escrever?</p>
+                <p>Na verdade, não sabíamos. Esse é um dos problemas com end points do SPARQL. Quando se conhece um dataset, é preciso experimentar coisas e descobrir que termos são utilizados. Porque isto vem da <emph>Wikipedia</emph> e nós estávamos interessados sobre que informação sobre historiadores podíamos encontrar. Então vamos à página da <emph>Wikipedia</emph> da historiadora <ref target="https://en.wikipedia.org/wiki/Lyndal_Roper">Lyndal Roper</ref> (em inglês).</p>
+                <p>A parte final do URL é <code rend="inline">Lyndal_Roper</code> e concluímos então que é provável que esta cadeia de caracteres seja a forma como Roper é referida na DBpedia. Porque não sabemos o que mais poderia estar em triplas semânticas que mencionam Roper, nós utilizamos <code rend="inline">?a</code> e <code rend="inline">?b</code>: estes são apenas marcadores de posição. Poderia igualmente ter digitado <code rend="inline">?whatever</code> e <code rend="inline">?you_like</code> e as colunas teriam esses rótulos. Quando quiser ser mais preciso sobre o que se está a pesquisar, será importante etiquetar as colunas de forma significativa.</p>
+                <p>Experimente agora a sua própria consulta SPARQL: escolha uma página <emph>Wikipedia</emph> e copie a parte final do URL, após a barra final, e coloque-a no lugar de Lyndal_Roper. Depois clique em 'go'.</p>
+                <p>A partir da informação que se obtém destes resultados é possível gerar <emph>queries</emph> mais precisas. Isto pode ser pouco fiável, por isso não se preocupe se algumas não funcionarem.</p>
+                <p>Vamos voltar aos resultados para a consulta que fizemos há momentos:</p>
+                <ab>
+                    <code xml:id="code_introducao-dados-abertos-conectados_26" corresp="code_introducao-dados-abertos-conectados_26.txt" rend="block"/>
+                </ab>
+                <p>Podemos ver uma longa lista na coluna etiquetada <emph>c</emph>. Estes são todos os atributos que Roper tem na <emph>DBpedia</emph> e que nos ajudarão a encontrar outras pessoas com estes atributos. Por exemplo, podemos ver <code rend="inline">http://dbpedia.org/class/yago/Historian110177150</code>. Poderemos utilizar isto para obter uma lista de historiadores? Vamos colocá-lo na nossa pergunta, mas em terceiro lugar, porque era onde estava quando a encontrei nos resultados da Lyndal Roper. A minha consulta tem este aspecto:</p>
+                <ab>
+                    <code xml:id="code_introducao-dados-abertos-conectados_27" corresp="code_introducao-dados-abertos-conectados_27.txt" rend="block"/>
+                </ab>
+                <p>Fizemos uma pequena mudança aqui. Se esta consulta funcionar de todo, então esperemos que os nossos historiadores estejam na primeira coluna, porque 'historiador' não parece poder ser um predicado: não funciona como um verbo numa frase; por isso vamos chamar à nossa primeira coluna de resultados 'historian_name' e à minha segunda (sobre a qual não sabemos nada) 'predicate' (predicado).</p>
+                <p>Execute a <emph>querie</emph>. Deverá encontrar uma grande lista de historiadores.</p>
+                <figure>
+                    <desc>Historiadores de acordo com a DBpedia</desc>
+                    <figDesc>Duas capturas de tela com a interface de consultas snorql e respectivos resultados</figDesc>
+                    <graphic url="intro-to-linked-data-fig3.png"/>
+                </figure>
+                <p>Assim, esta ferramenta funciona para criar listas, o que é útil, mas seria muito mais poderoso combinar listas para obter intersecções de conjuntos. Encontrei mais algumas coisas que podem ser interessantes consultar nos atributos DBpedia de Lyndal Roper: <ref target="http://dbpedia.org/class/yago/WikicatBritishHistorians">http://dbpedia.org/class/yago/WikicatBritishHistorians</ref> e <ref target="http://dbpedia.org/class/yago/WikicatWomenHistorians">http://dbpedia.org/class/yago/WikicatWomenHistorians</ref>. É muito fácil combiná-los pedindo uma variável a ser devolvida (no nosso caso isto é <code rend="inline">?name</code> (nome)) e depois utilizando-a em múltiplas linhas de uma <emph>querie</emph>. Note também o espaço e o ponto completo no final da primeira linha que começa com <code rend="inline">?name</code>:</p>
+                <ab>
+                    <code xml:id="code_introducao-dados-abertos-conectados_28" corresp="code_introducao-dados-abertos-conectados_28.txt" rend="block"/>
+                </ab>
+                <p>Funciona! Devemos obter cinco resultados. Na altura em que escrevo, há cinco historiadoras britânicas na <emph>DBpedia</emph>...</p>
+                <figure>
+                    <desc>Historiadoras britânicas segundo a DBpedia</desc>
+                    <figDesc>Duas capturas de tela com a interface de consultas snorql e respectivos resultados</figDesc>
+                    <graphic url="intro-to-linked-data-fig4.png"/>
+                </figure>
+                <p>Apenas cinco historiadoras britânicas? Claro que há, na realidade, muitas mais do que isso, como poderíamos facilmente mostrá-lo substituindo o nome de, digamos, Alison Weir na nossa primeira consulta sobre Lyndal Roper. Isto leva-nos ao problema com a <emph>Dbpedia</emph> que mencionamos anteriormente: não é muito consistentemente marcado com informação estrutural do tipo que a <emph>DBpedia</emph> que utiliza. A nossa consulta pode listar algumas historiadoras britânicas mas acontece que não podemos utilizá-la para gerar uma lista significativa de pessoas nesta categoria. Tudo o que encontrámos foram as pessoas nas entradas da <emph>Wikipedia</emph> que alguém decidiu classificar como "historiadora britânica" e "historiadora".</p>
+                <p>Com SPARQL na <emph>DBpedia</emph>, é preciso ter cuidado com as inconsistências do material de origem coletiva. Poderá usar o SPARQL exatamente da mesma forma num dataset mais confiável, por exemplo, os dados do governo britânico: <ref target="https://data-gov.tw.rpi.edu//sparql">https://data-gov.tw.rpi.edu//sparql</ref> (em inglês) e esperar obter resultados mais robustos (há aqui um breve tutorial para este dataset: <ref target="https://data-gov.tw.rpi.edu/wiki/A_crash_course_in_SPARQL">https://data-gov.tw.rpi.edu/wiki/A_crash_course_in_SPARQL</ref> (em inglês).</p>
+                <p>No entanto, apesar das suas inconsistências, a <emph>DBpedia</emph> é um ótimo local para aprender SPARQL. Esta foi apenas uma breve introdução, mas há muito mais em <ref target="/en/lessons/retired/graph-databases-and-SPARQL">Usando SPARQL para aceder ao Linked Open Data</ref> (em inglês).</p>
+            </div>
+            <div type="2">
+                <head>Leituras e recursos adicionais</head>
+                <list type="unordered">
+                    <item>Dean Allemang e James Hendler, <emph>Semantic Web for the Working Ontologist</emph>, 2nd edn, Elsevier, 2011</item>
+                    <item>Tim Berners-Lee <ref target="https://www.w3.org/DesignIssues/LinkedData.html">
+                            <emph>Linked Data</emph>
+                        </ref> (em inglês)</item>
+                    <item>Bob DuCharme, <emph>Learning SPARQL</emph>, O'Reilly, 2011</item>
+                    <item>
+                        <ref target="http://www.snee.com/bobdc.blog/">Blog de Bob DuCharme</ref> (em inglês) também vale a pena ler</item>
+                    <item>Richard Gartner, <emph>Metadata: Shaping Knowledge from Antiquity to the Semantic Web</emph>, Springer, 2016</item>
+                    <item>Seth van Hooland and Ruben Verborgh, <emph>Linked Data for Libraries, Archives and Museums</emph>, 2015</item>
+                    <item>Ver também <ref target="http://freeyourmetadata.org/">
+                            <emph>companion website</emph>
+                        </ref> (em inglês)</item>
+                    <item>Matthew Lincoln <ref target="/en/lessons/retired/graph-databases-and-SPARQL">'<emph>Using SPARQL to access Linked Open Data</emph>'</ref> (em inglês)</item>
+                    <item>
+                        <ref target="http://linkeddata.org/guides-and-tutorials">
+                            <emph>Linked Data guides and tutorials</emph>
+                        </ref> (em inglês)</item>
+                    <item>Dominic Oldman, Martin Doerr e Stefan Gradmann, '<emph>Zen and the Art of Linked Data: New Strategies for a Semantic Web of Humanist Knowledge</emph>', em <emph>A New Companion to Digital Humanities</emph>, editado por Susan Schreibman et al.</item>
+                    <item>Max Schmachtenberg, Christian Bizer e Heiko Paulheim, <ref target="http://linkeddatacatalog.dws.informatik.uni-mannheim.de/state/">
+                            <emph>State of the LOD Cloud 2017</emph>
+                        </ref> (em inglês)</item>
+                    <item>David Wood, Marsha Zaidman e Luke Ruth, <emph>Linked Data: Structured data on the Web</emph>, Manning, 2014</item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Agradecimentos</head>
+                <p>Gostaria de agradecer aos meus dois colegas revisores, Matthew Lincoln e Terhi Nurmikko-Fuller e ao meu editor, Adam Crymble, por me ajudarem generosamente a melhorar esta lição com numerosas sugestões, esclarecimentos e correções. Este tutorial baseia-se num outro escrito como parte do '<emph>Thesaurus of British and Irish History as SKOS</emph>' <ref target="https://gtr.ukri.org/projects?ref=AH%2FN003446%2F1#/tabOverview">
+                        <emph>(Tobias) project</emph>
+                    </ref> (em inglês), financiado pelo <ref target="http://www.ahrc.ac.uk/">AHRC</ref> (em inglês). A lição foi revista para o projeto <emph>Programming Historian</emph>.</p>
+            </div>
+        </body>
+    </text>
 </TEI>

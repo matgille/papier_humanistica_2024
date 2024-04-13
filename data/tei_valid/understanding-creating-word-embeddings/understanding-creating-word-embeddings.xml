@@ -1,0 +1,338 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="understanding-creating-word-embeddings">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Understanding and Creating Word Embeddings</title>
+                <author role="original_author">
+                    <persName>Avery Blankenship</persName>
+                    <persName>Sarah Connell</persName>
+                    <persName>Quinn Dombrowski</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Anne Heyer</persName>
+                    <persName>Ruben Ros</persName>
+                </editor>
+                <editor role="editors">Yann Ryan</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0116</idno>
+                <date type="published">01/31/2024</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Word embeddings allow you to analyze the usage of different terms in a corpus of texts by capturing information about their contextual usage. Through a primarily theoretical lens, this lesson will teach you how to prepare a corpus and train a word embedding model. You will explore how word vectors work, how to interpret them, and how to answer humanities research questions using them.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                    <term xml:lang="en">distant-reading</term>
+                    <term xml:lang="en">machine-learning</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2">
+                <head>Lesson Goals</head>
+                <p>This lesson is designed to get you started with word embedding models. Through a primarily theoretical lens, you will learn how to prepare your corpus, read it into your Python session, and train a model. You will explore how word vectors work, how to interpret them, and how to perform some exploratory queries using them. We will provide some introductory code to get you started with word vectors, but the main focus will be on equipping you with fundamental knowledge and core concepts to use word embedding models for your own research. </p>
+                <p>While word embeddings can be implemented in many different ways using varying algorithms, this lesson does not aim to provide an in-depth comparison of word embedding algorithms (though we may at times make reference to them). It will instead focus on the <code rend="inline">word2vec</code> algorithm, which has been used in a range of digital humanities and computational social science projects.<ref type="footnotemark" target="#note_1"/>
+                </p>
+                <p>This lesson uses as its case study a relatively small <ref target="/assets/understanding-creating-word-embeddings/ViralTexts-nineteenth-century-recipes-plaintext.zip">corpus of nineteenth-century recipes</ref>
+                    <ref type="footnotemark" target="#note_2"/>. We chose this particular case study to demonstrate some of the potential benefits of a corpus that is tightly constrained, as well as to highlight some of the specific considerations to keep in mind when working with a small corpus.</p>
+                <p>There are many further potential research applications for trained models. For example, <emph>Programming Historian</emph>'s advanced <ref target="/en/lessons/clustering-visualizing-word-embeddings">lesson on word embeddings</ref> explains how to cluster and visualize documents using word embedding models. The <ref target="https://perma.cc/9DSQ-XU4S">Women Writers Project</ref> has also published a <ref target="https://perma.cc/FM6J-Z4YS">series of tutorials in R and Python</ref> that cover the basics of running code, training and querying models, validating trained models, and producing exploratory visualizations.</p>
+                <p>By the end of this lesson, you will have learned:</p>
+                <list type="unordered">
+                    <item>What word embedding models and word vectors are, and what kinds of questions we can answer with them</item>
+                    <item>How to create and interrogate word vectors using Python</item>
+                    <item>What to consider when putting together the corpus you want to analyze using word vectors</item>
+                    <item>The limitations of word vectors as a methodology for answering common questions</item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Prerequisites</head>
+                <p>This lesson involves running some Python code: a basic familiarity with Python would be helpful, but no particular technical expertise is required. <emph>Programming Historian</emph> has a series of <ref target="/en/lessons/?topic=python&amp;sortType=difficulty&amp;sortOrder=asc">introductory lessons on Python</ref> that you may wish to review. You could also see this very brief <ref target="https://perma.cc/B9UX-MLC2">introduction to Python</ref> published by the Women Writers Project, aimed at learners getting started with word vector models.</p>
+                <p>To run the code, you can use the lesson's <ref target="https://nbviewer.org/github/programminghistorian/jekyll/blob/gh-pages/assets/understanding-creating-word-embeddings/understanding-creating-word-embeddings.ipynb">Jupyter notebook</ref> on your own computer. If you're not familiar with Jupyter notebooks, you may wish to review <emph>Programming Historian</emph>'s <ref target="/en/lessons/jupyter-notebooks">lesson on the topic</ref>. If you prefer to download the notebook alongside a structured environment with folders for sample data and related files, you can also access <ref target="https://perma.cc/9UEH-SCXM">this release</ref>.</p>
+                <div type="3">
+                    <head>System requirements</head>
+                    <p>This lesson is written with Python usage in mind, though most of the wider concepts are applicable in both Python and R. We assume that you already have some basic knowledge of Python as well as an <ref target="https://perma.cc/3UZP-ERZ3">Integrated Development Environment</ref> (IDE) — such as IDLE, Spyder, or Jupyter Notebooks — installed on your computer. Because of this, we do not walk through how to download and install Python or the relevant libraries. The code included in this lesson uses <ref target="https://perma.cc/Q8JR-CVVN">Python 3.8.3</ref> and <ref target="https://perma.cc/8BBH-QE42">Gensim 4.2.0</ref>. <ref target="https://perma.cc/E5W2-4MLD">Gensim</ref> is an open-source Python library developed by Radim Řehůřek which allows you to represent a corpus as vectors.</p>
+                    <p>The particular word vector implementation used by Gensim is <ref target="https://perma.cc/R282-M8UM">word2vec</ref>, which is an algorithm developed in 2013 by Tomáš Mikolov and a team at Google to represent words in vector space, released under an open-source <ref target="https://perma.cc/6GHE-VK73">Apache license</ref>. While much of the code will still be applicable across versions of both Python and Gensim, there may be some syntax adjustments necessary.</p>
+                </div>
+                <div type="3">
+                    <head>Corpus Size</head>
+                    <p>Word embeddings require a lot of text in order to reasonably represent these relationships — you won’t get meaningful output if you use only a couple novels, or a handful of historical documents. The algorithm learns to predict the contexts in which words might appear based on the corpus it is trained on, so fewer words in the training corpus means less information from which to learn.</p>
+                    <p>That said, there is no absolute minimum number of words required to train a word embedding model. Performance will vary depending on how the model is trained, what kinds of documents you are using, how many unique words appear in the corpus, and a variety of other factors. Although smaller corpora can produce more unstable vectors,<ref type="footnotemark" target="#note_3"/> a smaller corpus may make more sense for the kinds of questions you're interested in. If your purposes are exploratory, even a model trained on a fairly small corpus should still produce interesting results. However, if you find that the model doesn't seem to make sense, that might mean you need to add more texts to your input corpus, or adjust your settings for training the model.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Theory: Introducing Concepts</head>
+                <div type="3">
+                    <head>Word Embeddings</head>
+                    <p>When was the astronomical concept of orbital <emph>revolution</emph> supplanted by that of political uprising? How do popular methods for cooking chicken change over time? How do associations of words like <emph>grace</emph> or <emph>love</emph> vary between prayers and romance novels? Humanistic inquiries such as these that can prove to be challenging to answer through traditional methods like close reading.</p>
+                    <p>However, by using word embeddings, we can quickly identify relationships between words and begin to answer these types of questions. Word embeddings assign numerical values to words in a text based on their relation to other words. These numerical representations, or 'word vectors', allow us to measure the distance between words and gain insight into how they are used in similar ways or contexts. Scaled up to a whole corpus, word embeddings can uncover relationships between words or concepts within an entire time period, genre of writing, or author's collected works.</p>
+                    <p>Unlike <ref target="https://perma.cc/C3HV-F3GY">topic models</ref>, which rely on word frequency to better understand the general topic of a document, word embeddings are more concerned with how words are used across a whole corpus. This emphasis on relationships and contextual usage make word embeddings uniquely equipped to tackle many questions that humanists may have about a particular corpus of texts. For example, you can ask your word embedding model to identify the list of top ten words that are used in similar contexts as the word <emph>grace</emph>. You can also ask your model to produce that same list, this time removing the concept <emph>holy</emph>. You can even ask your model to show you the words in your corpus most similar to the combined concept of <emph>grace</emph> and <emph>holy</emph>. The ability to perform basic math with concepts (though much more complicated math is happening under the hood) in order to ask really complicated questions about a corpus is one of the key benefits of using word embeddings for textual analysis.</p>
+                </div>
+                <div type="3">
+                    <head>Word Vectors</head>
+                    <p>Word embedding models represent words through a series of numbers referred to as a 'word vector'. A word vector represents the positioning of a word in multi-dimensional space. Just like we could perform basic math on objects that we’ve mapped onto two-dimensional space (e.g. visualizations with an X and Y axis), we can perform slightly more complicated math on words mapped onto multi-dimensional space.</p>
+                    <p>A 'vector' is a point in space that has both 'magnitude' (or 'length') and 'direction.' This means that vectors are less like isolated points, and more like lines that trace a path from an origin point to that vector's designated position, in what is called a 'vector space.' Models created with word vectors, called 'word embedding models,' use word vectors to capture the relationships between words based on how close words are to one another in the vector space.</p>
+                    <p>This may sound complicated and abstract, but let’s start with a kind of word vector that is more straightforward: a <ref target="https://perma.cc/94L3-PQ9S">document-term matrix</ref>.</p>
+                </div>
+                <div type="3">
+                    <head>Document-Term Matrices</head>
+                    <p>One way of representing a corpus of texts is a 'document-term matrix': a large table in which each row represents a word, and each column represents a text in the corpus. The cells are filled with the count of that particular word in that specific text. If you include every single word in every single text as part of this matrix (including things like names, typos, and obscure words), you’ll have a table where most of the cells have a value of 0, because most of the words just don’t occur in most of the texts. This setup is called a 'sparse vector representation.' The matrix also becomes harder to work with as the number of words increases, filling the matrix with more and more 0s. This becomes problematic, because you need a large number of words to have enough data to meaningfully represent language.</p>
+                    <p>The innovation of algorithms like <code rend="inline">word2vec</code> is that they represent relationships between words in a 'dense' way. Different algorithms take different approaches, with consequences on the model's output, but all use a process called 'embedding' to make the vector smaller and much faster. Instead of a vector with tens of thousands of dimensions (including information about the relationship of every unique word with every other unique word), these word embedding models typically use only a few hundred abstracted dimensions, which nonetheless manage to capture the most essential information about relations between different groups of words.</p>
+                </div>
+                <div type="3">
+                    <head>word2vec</head>
+                    <p>
+                        <code rend="inline">word2vec</code> was the first algorithm invented for creating word embedding models, and it remains one of the most popular. It is a predictive model, meaning that it works out the likelihood that either 1) a word will occur in a particular context (using the Continuous Bag of Words (CBOW) method), or 2) the likelihood that a particular context will occur for a given word (using the skip-gram method).</p>
+                    <p>For this introduction, you don’t need to worry about the differences between these methods. If you would like to learn more about how word embedding models are trained, there are many useful resources online, such as the <ref target="https://perma.cc/49GV-E236">"Illustrated Word2vec"</ref> guide by Jay Alammar. The two methods tend to perform equally well, but skip-gram often works better with smaller datasets and has better success representing less common words; by contrast, CBOW tends to perform better at representing more common words.</p>
+                    <p>For instance, take this set of phrases with the word <emph>milk</emph> in the middle:</p>
+                    <list type="unordered">
+                        <item>Pour the milk into the</item>
+                        <item>Add 1c milk slowly while</item>
+                        <item>Set the milk aside to</item>
+                        <item>Bring the milk to a</item>
+                    </list>
+                    <p>
+                        <code rend="inline">word2vec</code> samples a variety of contexts around each word throughout the corpus, but also collects examples of contexts that never occur around each word, known as 'negative sampling.' Negative sampling might generate examples like:</p>
+                    <list type="unordered">
+                        <item>Colorless green milk sleeps furiously</item>
+                        <item>My horrible milk ate my</item>
+                        <item>The idealistic milk meowed all</item>
+                    </list>
+                    <p>It then takes this data and uses it to train a model that can predict the words that are likely, or unlikely, to appear around the word <emph>milk</emph>. Because the sampling is random, you will likely end up with a small amount of variation in your results if you run <code rend="inline">word2vec</code> on a corpus multiple times. </p>
+                    <p>The model learns a set of 'weights' (probabilities) which are constantly adjusted as the network is trained, in order to make the network more accurate in its predictions. At the end of training, the values of those weights become the dimensions of the word vectors which form the embedding model.</p>
+                    <p>
+                        <code rend="inline">word2vec</code> works particularly well for identifying synonyms, or words that could be substituted in a particular context. In this sense, <emph>juice</emph> will probably end up being closer to <emph>milk</emph> than <emph>cow</emph>, because it’s more feasible to substitute <emph>juice</emph> than <emph>cow</emph> in a phrase like "Pour the [<emph>WORD</emph>] into the".</p>
+                </div>
+                <div type="3">
+                    <head>Distance in Vector Space</head>
+                    <p>Recall that vectors have both a direction (where is it going?) and a length (how far does it go in that direction?). Both their direction and length reflect word associations in the corpus. If two vectors are going in the same direction, and have a similar length, that means that they are very close to each other in vector space, and they have a similar set of word associations.</p>
+                    <p>'Cosine similarity' is a common method of measuring 'closeness' between words (for more examples of measuring distance, see <ref target="/en/lessons/common-similarity-measures">this lesson</ref> by <emph>Programming Historian</emph>). When you are comparing two vectors from the same corpus, you are comparing two lines that share an origin point. In order to figure out how similar those words are, all we need to do is to connect their designated position in vector space with an additional line, forming a triangle. The distance between the two vectors can then be calculated using the <ref target="https://perma.cc/X8GT-BTWH">cosine</ref> of this new line. The larger this number, the closer those two vectors are in vector space. For example, two words that are far from each other (say, <emph>email</emph> and <emph>yeoman</emph>) might have a low cosine similarity of around 0.1, while two words that are near to each other (say <emph>happy</emph> and <emph>joyful</emph> or even <emph>happy</emph> and <emph>sad</emph>) might have a higher cosine similarity of around 0.8.</p>
+                    <p>Words that are close in vector space are those that the model predicts are likely to be used in similar contexts. It is often tempting to think of these as synonyms, but that's not always the case. In fact, antonyms are often very close to each other in <code rend="inline">word2vec</code> vector space. Words that are likely to be used in the same contexts might have some semantic relationship, but their relationship might also be structural or syntactic. For instance, if you have a collection of letters, you might find that <emph>sincerely</emph>,  <emph>yours</emph>, <emph>friend</emph>, and <emph>warmly</emph> are close because they all tend to be used in the salutations of letters. This doesn't mean that <emph>friend</emph> is a synonym of <emph>warmly</emph>! Along the same lines, days of the week and months of the year will often be very close in vector space – <emph>Friday</emph> is not a synonym for <emph>Monday</emph> but the words tend to get used in the same contexts.</p>
+                    <p>When you observe that words are close to each other in your models (high cosine similarity), you should return to your corpus to get a better understanding of how the use of language might be reinforcing this proximity.</p>
+                </div>
+                <div type="3">
+                    <head>Vector Math</head>
+                    <p>Because word vectors represent natural language numerically, it becomes possible to perform mathematical equations with them. Let's say for example that you wanted to ask your corpus the following question: "How do people in nineteenth-century novels use the word <emph>bread</emph> when they aren't referring to food?" Using vector math allows us to present this very specific query to our model.</p>
+                    <p>The equation you might use to ask your corpus that exact question might be: "bread - food = x".</p>
+                    <p>To be even more precise, what if you wanted to ask: "How do people talk about bread in kitchens when they aren't referring to food?" That equation may look like: "bread + kitchen - food = x".</p>
+                    <p>The more complex the math, the larger the corpus you’ll likely need to get sensible results. While the concepts discussed thus far might seem pretty abstract, they are easier to understand once you start looking at specific examples. Let’s now turn to a specific corpus and start running some code to train and query a <code rend="inline">word2vec</code> model.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Practice: Exploring Nineteenth-Century American Recipes</head>
+                <p>The <ref target="/assets/understanding-creating-word-embeddings/ViralTexts-nineteenth-century-recipes-plaintext.zip">corpus</ref> we are using in this lesson is built from nineteenth-century American recipes. Nineteenth-century people thought about food differently than we do today. Before modern technology like the refrigerator and the coal stove became widespread, cooks had to think about preserving ingredients or accommodating to the uneven temperatures of wood-burning stoves. Without the modern conveniences of instant cake mixes, microwaves, and electric refrigerators, nineteenth-century kitchens were much less equipped to handle food that could quickly go bad. As a result, many nineteenth-century cookbooks prioritize thriftiness and low-waste methods, though sections dedicated to more fanciful or recreational cooking increase substantially by the turn of the century. Attitudes towards food were much more conservative and practical in the nineteenth century, compared to our forms of 'stress-baking,' or cooking for fun.</p>
+                <p>Word embedding models allow us to pursue questions such as: "What does American cooking look like if you remove the more fanciful dishes like 'cake,' or low-waste techniques like 'preserves'?" Our research question for this lesson is: "How does the language of our corpus reflect attitudes towards recreational cooking and the limited lifespan of perishable ingredients (such as milk) in the nineteenth century?" Since we know milk was difficult to preserve, we can check what words are used in similar contexts to <emph>milk</emph> to see if that reveals potential substitutions. Using vector space model queries, we will be able to retrieve a list of words which do not include <emph>milk</emph> but do share its contexts, thus pointing us to possible substitutions. Similarly, by finding words which share contexts with dishes like <emph>cake</emph>, we can see how authors talk about cake and find dishes that are talked about in a similar way. This will reveal the general attitude within our corpus towards more recreational dishes. Pursuing these questions will allow us to unpack some of the complicated shifts in language and instruction that occurred in nineteenth-century kitchens.</p>
+                <div type="3">
+                    <head>Retrieving the Code and Data</head>
+                    <p>The first step in building the word embedding model is to identify the files you will be using as your corpus. We will be working with a corpus of 1,000 recipes sourced by Avery Blankenship from cookbooks on <ref target="https://www.gutenberg.org/">Project Gutenberg</ref>.<ref type="footnotemark" target="#note_2"/> The file names for each recipe are based on the Project Gutenberg ID for the cookbook from which the recipe is pulled, as well as an abbreviated title.</p>
+                    <p>You can download this lesson's <ref target="https://nbviewer.org/github/programminghistorian/jekyll/blob/gh-pages/assets/understanding-creating-word-embeddings/understanding-creating-word-embeddings.ipynb">Jupyter notebook</ref> and the <ref target="/assets/understanding-creating-word-embeddings/ViralTexts-nineteenth-century-recipes-plaintext.zip">corpus</ref> to train a model on your own computer.</p>
+                    <p>We start by importing all the Python libraries needed for this lesson. It is a good practice in programming to keep your import statements together at the top of your code. The code block below imports each Python library we will be using, then iterates through your defined directory to identify the text files that make up your corpus. </p>
+                    <ab>
+                        <code xml:id="code_understanding-creating-word-embeddings_0" corresp="code_understanding-creating-word-embeddings_0.txt" rend="block"/>
+                    </ab>
+                    <p>You might need to install some of the libraries used in this lesson. See <ref target="/en/lessons/installing-python-modules-pip">this <emph>Programming Historian</emph> lesson</ref> for more information on installing external Python libraries.</p>
+                    <p>Now that we have our libraries, we need to load our data into Python. You will need to store your dataset locally on your computer, ideally somewhere easy to navigate to. For instance, you could place your data in a folder inside your <code rend="inline">Documents</code> folder, or in the same repository as your code file. In either case, you will need to know the file path for that folder.</p>
+                    <p>The code block below reads the path to your corpus, iterates through that folder, pulls the text from each file, and stores it in a dictionary. You will provide the file path for the sample <ref target="/assets/understanding-creating-word-embeddings/ViralTexts-nineteenth-century-recipes-plaintext.zip">corpus</ref> which you should have downloaded from Github (the code can also be adjusted to reflect a different corpus). When you are inputting your file path, you should use the entire file path. For example, on a Windows computer, that file path might look something like: <code rend="inline">C:/users/admin/Documents/MY_FOLDER</code>. On a Mac, the file path might be: <code rend="inline">/Users/admin/Documents/MY_FOLDER</code>. Your files can be anywhere within this folder, including sub-folders: the code will loop through the folders and sub-folders in the filepath provided and look for all <code rend="inline">.txt</code> files. (You can use a file path to a folder full of different types of files, but this code is only going to look for <code rend="inline">.txt</code> files.)</p>
+                    <p>The code begins by first identifying those files and then reading them into memory:</p>
+                    <ab>
+                        <code xml:id="code_understanding-creating-word-embeddings_1" corresp="code_understanding-creating-word-embeddings_1.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Building your Model's Vocabulary</head>
+                    <p>Using textual data to train a model builds what is called a 'vocabulary.' The vocabulary is all of the words that the model has processed during training. This means that the model knows only the words it has been shown. If your data includes misspellings or inconsistencies in capitalization, the model won't understand that these are mistakes. Think of the model as having complete trust in you: the model will believe any misspelled words to be correct. Errors will make asking the model questions about its vocabulary difficult: the model has less data about how each spelling is used, and any query you make will only account for the unique spelling used in that query.</p>
+                    <p>It might seem, then, that regularizing the text's misspellings is always helpful, but that’s not necessarily the case. Decisions about regularization should take into account how spelling variations operate in the corpus, and should consider how original spellings and word usages could affect the model's interpretations of the corpus. For example, a collection might contain deliberate archaisms used for poetic voice, which would be flattened in the regularized text. In fact, some researchers advocate for more embracing of textual noise, and a project interested in spelling variations over time would certainly want to keep those!<ref type="footnotemark" target="#note_4"/>
+                    </p>
+                    <p>Nevertheless, regularization is worth considering, particularly for research projects exploring language usage over time: it might not be important whether the spelling is <emph>queen</emph>, <emph>quean</emph>, or <emph>queene</emph> for a project studying discourse around queenship within a broad chronological frame. As with many aspects of working with word embeddings, the right approach is whatever best matches your corpus and research goals.</p>
+                    <p>Regardless of your approach, it is generally useful to lowercase all of the words in the corpus and remove most punctuation. You can also make decisions about how to handle contractions (<emph>can't</emph>) and commonly occurring word-pairings (<emph>olive oil</emph>), which can be tokenized to be treated as either one or two objects.</p>
+                    <p>Different tokenization modules will have different options for handling contractions, so you can choose a module that allows you to preprocess your texts to best match your corpus and research needs. For more on tokenizing text with Python, see this <emph>Programming Historian</emph>
+                        <ref target="/en/lessons/normalizing-data">lesson</ref>.</p>
+                </div>
+                <div type="3">
+                    <head>Cleaning the Corpus</head>
+                    <p>The code we include in this lesson is a reasonable general-purpose starting point for 'cleaning' English-language texts. The function <code rend="inline">clean_text()</code> uses regular expressions to standardize the format of the text (lower-casing, for example) and any remove punctuation that may get in the way of the model's textual understanding. By default, this code will remove the punctuation <code rend="inline">!"#$%&amp;'()*+, -./:;&lt;=&gt;?@[\]^_`{|}~.</code> using Python 3's <code rend="inline">string.punctuation</code>. If you wanted to retain certain punctuation marks, however, you could replace <code rend="inline">string.punctuation</code> in the code with your customized string of punctuation.</p>
+                    <p>This process helps the model understand, for example, that <emph>apple</emph> and <emph>Apple</emph> are the same word. It also removes numbers from our textual data, since we are only interested in words. We end the function by checking that our cleaned data hasn't lost any words that we actually need, by making sure that the set of un-cleaned text data is the same length as the cleaned version.</p>
+                    <ab>
+                        <code xml:id="code_understanding-creating-word-embeddings_2" corresp="code_understanding-creating-word-embeddings_2.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Creating your Model</head>
+                    <p>To train a <code rend="inline">word2vec</code> model, the code first extracts the corpus vocabulary and generates from it a random set of initial word vectors. Then, it improves their predictive power by changing their weights, based on sampling contexts (where the word exists) and negative contexts (where the word doesn't exist).</p>
+                    <div type="4">
+                        <head>Parameters</head>
+                        <p>In addition to the corpus selection and cleaning described above, at certain points in the process you can decide adjust what are known as configuration 'parameters.' These are almost as essential as the texts you select for your corpus. You can think of the training process (where we take a corpus and create a model from it) as being sort of like an industrial operation:</p>
+                        <list type="unordered">
+                            <item>You take raw materials and feed them into a big machine which outputs a product on the other end</item>
+                            <item>This hypothetical machine has a whole bunch of knobs and levers on it that you use to control the settings (the parameters)</item>
+                            <item>Depending on how you adjust the parameters, you get back differeng products (differently trained models)</item>
+                        </list>
+                        <p>These parameters will have significant impact on the models you produce. They control things such as which specific algorithm to use in training, how to handle rare words in your corpus, and how many times the algorithm should pass through your corpus as it learns.</p>
+                        <p>There is no 'one size fits all' configuration approach. The most effective parameters will depend on the length of your texts, the variety of the vocabulary within those texts, their languages and structures — and, of course, on the kinds of questions you want to investigate. Part of working with word vector models is turning the knobs on that metaphorical industrial machine, to test how different parameters impact your results. It is usually best to vary parameters one at a time, so you can observe how each one impacts the resulting model.</p>
+                        <p>A particular challenge of working with word vectors is just how much the parameters impact your results. If you are sharing your research, you will need to be able to explain how you chose the parameters that you used. This is why testing different parameters and looking at multiple models is so important. Below are some parameters which may be of particular interest:</p>
+                        <p>
+                            <code rend="inline">Sentences</code>:<br/>
+The <code rend="inline">sentences</code> parameter is where you tell <code rend="inline">word2vec</code> what data to train the model with. In our case, we are going to set this attribute to our cleaned textual data.</p>
+                        <p>
+                            <code rend="inline">Mincount</code> (minimum count):<br/>
+                            <code rend="inline">Mincount</code> is how many times a word has to appear in the dictionary in order for it to 'count' as a word in the model. The default value for <code rend="inline">mincount</code> is 5. You may want to change this value depending on the size of your corpus, but in most cases, 5 is a reasonable minimum. Words that occur less frequently than that don’t have enough data to get you sensible results.</p>
+                        <p>
+                            <code rend="inline">Window</code>:<br/>
+This lets you set the size of the <code rend="inline">window</code> that is sliding along the text when the model is trained. The default is 5, which means that the window will look at five words at a time: two words before the target word, the target word, and then two words after the target word. Both the words before and after the target words will form the context of the target word. The larger the window, the more words you are including in that calculation of context. As long as they are within the window, however, all words are treated indisciminately in terms of how relevant they are to the calculated context.</p>
+                        <p>
+                            <code rend="inline">Workers</code> (optional):<br/>
+The <code rend="inline">workers</code> parameter represents how many 'threads' you want processing your text at a time. The default setting for this parameter is 3. Increasing this parameter means that your model will train faster, but will also take up more of your computer’s processing power. If you are concerned about strain on your computer, leave this parameter at the default.</p>
+                        <p>
+                            <code rend="inline">Epochs</code> (optional):<br/>
+The number of <code rend="inline">epochs</code> signifies how many iterations over the text it will take to train the model. There is no rule for what number works best. Generally, the more <code rend="inline">epochs</code> you have the better, but too many could actually decrease the quality of the model, due to 'overfitting' (your model learns the training data so well that it performs worse on any other data set). To determine what number of epochs will work best for your data, you may wish to experiment with a few settings (for example, 5, 10, 50, and 100).</p>
+                        <p>
+                            <code rend="inline">Sg</code> ('skip-gram'):<br/>
+The <code rend="inline">sg</code> parameter tells the computer what training algorithm to use. The options are CBOW (Continuous Bag of Words) or skip-gram. In order to select CBOW, you set <code rend="inline">sg</code> to the value 0 and, in order to select skip-gram, you set the <code rend="inline">sg</code> value to 1. The best choice of training algorithm really depends on what your data looks like.</p>
+                        <p>
+                            <code rend="inline">Vector_size</code> (optional):<br/>
+The <code rend="inline">vector_size</code> parameter controls the dimensionality of the trained model, with a default value of 100 dimensions. Higher numbers of dimensions can make your model more precise, but will also increase both training time and the possibility of random errors.</p>
+                        <p>Because <code rend="inline">word2vec</code> samples the data before training, you won’t end up with the same result every time. It may be worthwhile to run a <code rend="inline">word2vec</code> model a few times to make sure you don’t get dramatically different results for the things you’re interested. If you’re looking to make a fine point about shifts in language meaning or usage, you need to take special care to minimize random variation (for instance, by keeping random seeds the same and using the same skip-gram window).</p>
+                        <p>The code below will actually train the model, using some of the parameters discussed above:</p>
+                        <ab>
+                            <code xml:id="code_understanding-creating-word-embeddings_3" corresp="code_understanding-creating-word-embeddings_3.txt" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>Interrogating the Model with Exploratory Queries</head>
+                    <p>It's important to begin by checking that the word we want to examine is actually part of our model's vocabulary.</p>
+                    <ab>
+                        <code xml:id="code_understanding-creating-word-embeddings_4" corresp="code_understanding-creating-word-embeddings_4.txt" rend="block"/>
+                    </ab>
+                    <p>Now, we can use <code rend="inline">word2vec</code>'s powerful built-in functions to ask the model how it understands the provided text. Let's walk through each of these function calls below.</p>
+                    <p>One important thing to remember is that the results you get from each of these function calls do not reflect words that have similar definitions, but rather words that are used in the same contexts. While some of the words you'll get in your results are likely to have similar meanings, your model may output a few strange or confusing words. This does not necessarily indicate that something is wrong with your model or corpus, but may reflect instead that these very different words are used in similar ways in your corpus. It always helps to go back to your corpus and get a better sense of how the language is actually used in your texts.</p>
+                    <p>
+                        <code rend="inline">most_similar</code>
+This function allows you to retrieve words that are similar to your chosen word. In this case, we are asking for the top ten words in our corpus that are closest to the word <emph>milk</emph>. If you want a longer list, change the number assigned for <code rend="inline">topn</code> to the desired number. The code below will return the ten words with the highest cosine similarities to the word <emph>milk</emph> (or whatever other query term you supply). The higher the cosine similarity, the 'closer' the words are to your query term in vector space (remember that closeness in vector space means that words are used in the same kinds of contexts).</p>
+                    <ab>
+                        <code xml:id="code_understanding-creating-word-embeddings_5" corresp="code_understanding-creating-word-embeddings_5.txt" rend="block"/>
+                    </ab>
+                    <p>You can also provide the <code rend="inline">most_similar</code> function with more specific information about your word(s) of interest. In the code block below, you'll notice that one word (<emph>recipe</emph>) is tied to the positive parameter and the other (<emph>milk</emph>) is associated with negative. This call to <code rend="inline">most_similar</code> will return a list of words that are most contextually similar to <emph>recipe</emph>, but not the word <emph>milk</emph>.</p>
+                    <ab>
+                        <code xml:id="code_understanding-creating-word-embeddings_6" corresp="code_understanding-creating-word-embeddings_6.txt" rend="block"/>
+                    </ab>
+                    <p>You can also include more than one word in the positive parameter, as shown below:</p>
+                    <ab>
+                        <code xml:id="code_understanding-creating-word-embeddings_7" corresp="code_understanding-creating-word-embeddings_7.txt" rend="block"/>
+                    </ab>
+                    <p>
+                        <code rend="inline">similarity</code>
+This function will return a cosine similarity score for the two words you provide it. The higher the cosine similarity, the more similar those words are.</p>
+                    <ab>
+                        <code xml:id="code_understanding-creating-word-embeddings_8" corresp="code_understanding-creating-word-embeddings_8.txt" rend="block"/>
+                    </ab>
+                    <p>
+                        <code rend="inline">predict_output_word</code>
+This function will predict the word most likely to appear next from a set of context words, depending on the choice of words provided. This function works by inferring the vector of an unseen word.</p>
+                    <ab>
+                        <code xml:id="code_understanding-creating-word-embeddings_9" corresp="code_understanding-creating-word-embeddings_9.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Validating the Model</head>
+                    <p>Now that we have explored some of its functionalities, it is important to evaluate our working model. Does it respond to our queries the way we would expect? Is it making obvious mistakes?</p>
+                    <p>Validation of word vector models is currently an unsolved problem, especially for humanities research models trained on historical corpora. The test below provides a sample of one approach to testing a model, which involves seeing how well the model performs with word pairs that are likely to have high cosine similarities. This approach is just an example, and not a substitute for more rigorous testing processes. The word pairs will be very specific to the corpus being tested, and you would want to use many more pairs than are in this demonstration sample!</p>
+                    <p>The code below evaluates the model first by opening the folder of models you provide, and identifying all files that are of type <code rend="inline">.model</code>. Then, the code takes a list of test word pairs and calculates their cosine similarities. The word pairs are words that, as a human, you would expect to have high cosine similarity. Then, the code saves the cosine similarities for each word pair in each model in a <code rend="inline">.csv</code> file for future reference.</p>
+                    <p>If you were interested in adapting this code for your own models, you would want to select word pairs that make sense for the vocabulary of your corpus (for example, we've chosen recipe-related words we can reasonably expect to have high cosine similarities). Choosing to evaluate this particular model using words from a completely different field (e.g. looking for <emph>boat</emph> and <emph>ship</emph>) would clearly not be effective, because those terms would not appear in this corpus at all, let alone in high enough frequencies. Selecting your word pairs is a matter of judgement and knowing your own corpus.</p>
+                    <p>If you test out several pairs of similar words, and you find that their vectors are not close to each other in the model, you should check your corpus using your own eyes. Search for the words: how many times do each of the words appear in the corpus? Are they appearing in similar contexts? Is one appearing in many more contexts (or many more times) than the other? The example corpus for this lesson works, despite being quite small, because the texts belong to the fairly tightly-scoped domain of recipes from the same century. Nineteenth-century recipes from cookbooks are very different from twenty-first century recipes from the internet, so while using texts of both types in the same corpus would greatly expand the total vocabulary, you would also need to expand the corpus size in order to get enough examples of all the relevant words. If you test word pairs that should be similar and the cosine distance between them is high, you may need a larger corpus.</p>
+                    <p>In this example, we find a set of models (filename ends in <code rend="inline">.model</code>) in a specified directory, add them to a list, and then evaluate cosine distance for a set of test word pairs. We then add all the results to a dataframe.</p>
+                    <ab>
+                        <code xml:id="code_understanding-creating-word-embeddings_10" corresp="code_understanding-creating-word-embeddings_10.txt" rend="block"/>
+                    </ab>
+                    <p>The resulting <code rend="inline">.csv</code> file contains a list of the models that were tested, the word pairs tested, and the cosine similarity for each word pair in that particular model. We've saved this file as a <code rend="inline">.csv</code> for future reference, but you can also view the results inline by running the code below:</p>
+                    <ab>
+                        <code xml:id="code_understanding-creating-word-embeddings_11" corresp="code_understanding-creating-word-embeddings_11.txt" rend="block"/>
+                    </ab>
+                </div>
+            </div>
+            <div type="2">
+                <head>Application: Building a Corpus for your own Research</head>
+                <p>Now that you've had a chance to explore training and querying a model using a sample corpus, you might consider applying word embeddings to your own research.</p>
+                <div type="3">
+                    <head>Important Preliminary Considerations</head>
+                    <p>When determining whether word vectors could be useful for your research, it's important to consider whether the kinds of questions you are trying to investigate can be answered by analyzing word usage patterns across a large corpus. This means considering the following issues:</p>
+                    <list type="unordered">
+                        <item>
+                            <p>Is is possible to assemble a corpus that gives enough insight into the phenomenon you would like to investigate? For example, if you are studying how early modern British historians distinguished their work from that of their medieval predecessors, you might assemble two corpora: one of medieval histories, and another of early modern accounts.</p>
+                        </item>
+                        <item>
+                            <p>Are 'relationships between words' a useful heuristic for your research? Can you identify terms or groups of terms which represent the larger conceptual spaces you are studying? With our early modern history example, we might decide to see how closely words like <emph>fiction</emph>, <emph>lie</emph> or <emph>falsehood</emph> (suggesting untruthful accounts of the past) are associated to earlier histories (through terms such as <emph>monk</emph>, <emph>medieval</emph> or <emph>chronicler</emph>).</p>
+                        </item>
+                    </list>
+                    <p>Another important consideration for building your corpus is the composition of the texts. You should think about questions like:</p>
+                    <list type="unordered">
+                        <item>
+                            <p>Are the texts in your corpus in a single language, or more than one? If multiple languages, what is their distribution? Keep in mind that if you have multiple languages, there’s no magical translation layer in the word vector creation: the information about the contexts of <emph>gato</emph> (in Spanish) won’t merge with the contexts of <emph>cat</emph> (in English). Mixing multiple languages in a corpus might get you meaningful and interesting results if you’re studying, for instance, novels from the US borderlands where code-switching between languages can be a significant literary device. However, throwing Spanish-only documents and English-only documents together in a single corpus just gives you two sets of words that at best don’t co-occur with each other, and at worst give misleading results. For example, a model can’t differentiate between <emph>con</emph> (with) as a conjunction in Spanish and <emph>con</emph> (convict) as a noun in English. If your research question involves analyzing English words related to crime, the vector for English <emph>con</emph> will be skewed by the identically-spelled Spanish word.</p>
+                        </item>
+                        <item>
+                            <p>Do your texts vary in other features, such as length, genre, or form? Be deliberate about what you’re including in your corpus and why: if you want to work on the language of eighteenth-century poetry, and find that all your poems together don’t have enough of a word count to get decent results, don’t start adding eighteenth-century novels without adjusting your research questions accordingly. When big tech companies create giant word embeddings to help with things like machine translation, they’re working with unimaginably large corpora, at a scale where factors like genre and form have little impact. However, the smaller your data, the more careful you need to be — especially when trying to make scholarly claims about the output.</p>
+                        </item>
+                        <item>
+                            <p>What principles will you use to scope your corpus—date, publisher, publication location, author? You should make sure that your selection principles match with the kinds of questions you want to investigate. This applies even when you may be tempted to cast a wide net to get enough text.</p>
+                        </item>
+                        <item>
+                            <p>If you are not selecting all possible texts within your scope parameters — which you probably will not — how will you ensure that the texts you do select are broadly representative of the full set of potential texts? How can you at least make sure that there are no serious imbalances between the texts you include? Returning to our early modern history example, it would be problematic if a corpus of seventeenth-century histories consisted of 59 texts published in 1699 and one published in 1601.</p>
+                        </item>
+                    </list>
+                    <p>Overall, you should aim toward a balance in the salient features of the texts that you select (publication date, genre, publication location, language) and a close alignment between the texts in your corpus and your research objective. If you are comparing corpora, make sure that the only difference between them is the feature that you are investigating. Remember that word vectors are going to give you information about the relationships between words — so the actual words that go into your corpora are crucial!</p>
+                </div>
+                <div type="3">
+                    <head>Preparing the Texts in your Corpus</head>
+                    <p>When you are preparing your corpus, bear in mind that the model is trained on all the words in your corpus. Because the results depend so heavily on the input data, you should always include a data analysis phase early in your research to ensure you only include the words you really want. In fact, data preparation and analysis should be an iterative process: review the texts, identify where the data needs to be adjusted, make those changes, review the results, identify additional changes, and so on. This makes it important to keep track of all the changes you make to your texts.</p>
+                    <p>If you’re sourcing texts from Project Gutenberg, you will want to remove the project's own boilerplate description at the beginning and end of the texts. Consider removing as well: editorially-authored text (such as annotations or descriptions of images), page numbers, and labels. Removing these features is preferable because they are not likely to be of interest and they could skew the distances between related terms.</p>
+                    <p>The goals of the project will impact which document features are best kept or removed. These include paratexts — such as indices, tables of contents, and advertisements — and features like stage directions. Finally, you may choose to manipulate the language of your documents directly, such as by regularizing or modernizing the spelling, correcting errors, or lemmatizing text. Note that if you make changes to the language of your documents, you will also want to maintain an unmodified corpus, so that you can investigate the impacts of your data manipulations.</p>
+                    <p>Once you have identified a corpus and prepared your texts, you can adapt the code above to train, query, and validate your model. Remember: this is an iterative process! You will likely need to make additional changes to your data and your parameters as you better understand what your model reveals about the texts in your corpus. The more you experiment with your data and your models, the better you will understand how these methods can help you answer new kinds of questions, and the better prepared you will be to learn even more advanced applications of word vector models!</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Next Steps</head>
+                <p>Now that you've learned how to build and analyze word embeddings, you can see <emph>Programming Historian</emph>'s related <ref target="/en/lessons/clustering-visualizing-word-embeddings">Clustering and Visualizing Documents using Word Embeddings</ref> lesson to learn more advanced methods of analysis with word vectors.</p>
+                <p>Here are some other resources if you would like to learn more about word vectors:</p>
+                <list type="unordered">
+                    <item>The Women Writers Project provides a full set of tutorials for training word vector models in Python, which can be downloaded with sample data from the WWP’s <ref target="https://perma.cc/9UEH-SCXM">Public Code Share GitHub repository</ref>.</item>
+                    <item>The <ref target="https://perma.cc/9VA2-6B3F">Women Writers Vector Toolkit </ref>is a web interface for exploring word vectors, accompanied by glossaries, sources, case studies, and sample assignments. This toolkit includes links to a <ref target="https://perma.cc/FM6J-Z4YS">GitHub repository with RMD walkthroughs</ref> with code for training <code rend="inline">word2vec</code> models in R, as well as <ref target="https://wwp.northeastern.edu/lab/wwvt/resources/downloads/index.html">downloadable resources on preparing text corpora</ref>.</item>
+                    <item>The <ref target="https://perma.cc/SW5T-67MK">Women Writers Project Resources page</ref> has guides on searching your corpus; corpus analysis and preparation; model validation and assessment, and more.</item>
+                </list>
+                <p>To get a better sense of how word vectors might be used in research and the classroom, you can see this <ref target="https://perma.cc/LB57-LCGV">series of blog posts</ref>; see also this <ref target="https://perma.cc/GWH9-FR2J">annotated list of readings</ref>.</p>
+                <p>Below are individual readings and research projects that help to illuminate the applications of word vector models in humanistic research:</p>
+                <list type="unordered">
+                    <item>Ryan Heuser's <ref target="https://perma.cc/2P3E-4ASS">Word Vectors in the Eighteenth Century</ref> walks through a research project using word vector models to understand eighteenth-century conceptions of originality.</item>
+                    <item>Michael Gavin, Collin Jennings, Lauren Kersey, and Brad Pasanek. <ref target="https://perma.cc/FW5G-7RYS">Spaces of Meaning: Vector Semantics, Conceptual History, and Close Reading</ref> explores how to use word embedding models to study concepts and their history.</item>
+                    <item>Laura Nelson, <ref target="https://perma.cc/U9W5-YML5">Leveraging the alignment between machine learning and intersectionality: Using word embeddings to measure intersectional experiences of the nineteenth century U.S. South</ref> considers ways of using word embedding models in deliberately intersectional research applications, working through an example project on racialized and gendered identities in the nineteenth-century U.S. South.</item>
+                    <item>Anouk Lang, <ref target="https://perma.cc/64ZD-FNT3">Spatial Dialectics: Pursuing Geospatial Imaginaries with Word Embedding Models and Mapping</ref> uses word embedding models to explore 'spatial imaginaries' in early twentieth-century Canadian periodicals, looking at gendered discourse and also at ways to combine results word embedding models with geospatial analysis.</item>
+                    <item>Siobhan Grayson, Maria Mulvany, Karen Wade, Gerardine Meaney, and Derek Greene, <ref target="https://perma.cc/YFZ9-6BH5">Novel2Vec: Characterising 19th Century Fiction via Word Embeddings</ref> explores the use of word embedding models to study narrative formations in 19th-century novels.</item>
+                    <item>Benjamin Schmidt's <ref target="https://perma.cc/UWR5-6CFY">Vector Space Models for the Digital Humanities</ref> outlines some foundational concepts of word embeddings, walks through a sample project with periodical texts, and discusses the kinds of humanities research questions for which this method is most relevant.</item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Acknowledgements</head>
+                <p>We would like to thank Mark Algee-Hewitt and Julia Flanders for their contributions to various aspects of this lesson.</p>
+            </div>
+            <div type="2">
+                <head>Endnotes</head>
+                <p>
+                    <ref type="footnotemark" target="#note_1"/> : See, for example, work by <ref target="https://perma.cc/UWR5-6CFY">Benjamin Schmidt</ref>, <ref target="https://perma.cc/2P3E-4ASS">Ryan Heuser</ref>, and <ref target="https://doi.org/10.1016/j.poetic.2021.101539">Laura Nelson</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_2"/> : Blankenship, Avery. "A Dataset of Nineteenth-Century American Recipes," <emph>Viral Texts: Mapping Networks of Reprinting in 19th-Century Newspapers and Magazines</emph>. 2021. <ref target="https://perma.cc/9PCD-XG96">https://github.com/ViralTexts/nineteenth-century-recipes/</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_3"/> : Many research questions in the humanities address bigger-picture concepts like gender, identity, or justice. A corpus the size of the one we are using here would be poorly suited to these kinds of research questions, because relevant terms are used in a diffuse set of contexts. As a general guideline, a million words is a minimum starting point for these kinds of queries. In our example, we are looking at a set of terms that appear with some frequency in a very consistent set of contexts, which makes it possible to produce reasonable results with a smaller corpus. Weavers and Koolen lay out a set of considerations around corpus size in greater detail, and the piece is worth consulting as you consider your own corpus. See Wevers, Melvin and Koolwen, Marijn. "Digital begriffsgeschichte: Tracing semantic change using word embeddings." <emph>Historical Methods: A Journal of Quantitative and Interdisciplinary History</emph> 53, no. 4 (2020): 226-243. <ref target="https://doi.org/10.1080/01615440.2020.1760157">https://doi.org/10.1080/01615440.2020.1760157</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#note_4"/> : For example, see Cordell, Ryan. "‘Q i-Jtb the Raven’: Taking Dirty OCR Seriously." <emph>Book History</emph> 20, no. 1 (2017): 188–225. <ref target="https://doi.org/10.1353/bh.2017.0006">https://doi.org/10.1353/bh.2017.0006</ref> for a discussion of how OCR errors can provide useful information in research. See also Rawson, Katie, and Muñoz, Trevor. "Against Cleaning." <emph>Curating Menus</emph>, July 2016.<ref target="https://perma.cc/QPW7-ZJ7U">http://www.curatingmenus.org/articles/against-cleaning/</ref> for a discussion on the many and significant complexities that are often obscured under the concept of 'cleaning' data.</p>
+            </div>
+        </body>
+    </text>
+</TEI>

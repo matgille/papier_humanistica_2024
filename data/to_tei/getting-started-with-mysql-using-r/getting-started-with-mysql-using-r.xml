@@ -1,401 +1,749 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="getting-started-with-mysql-using-r">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Introduction to MySQL with R</title>
-  <author role="original_author">Jeff Blackadar</author><editor role="reviewers"><persName>Jesse Sadler</persName><persName>Simon Appleford</persName></editor><editor role="editors">Amanda Visconti</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phen0076</idno><date type="published">05/03/2018</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#introducao-mysql-r"/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>This lesson will help you store large amounts of historical data in a structured manner, search and filter that data, and visualize some of the data as a graph.</p></abstract><textClass><keywords><term xml:lang="en">data-manipulation</term><term xml:lang="en">distant-reading</term><term xml:lang="en">r</term><term xml:lang="en">data-visualization</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="en">
-    <body><p>This lesson is for you if you want to store large amounts of data from your digital history projects in a structured manner. We will use a database called MySQL to store data.</p>
-<p>R can perform analysis and data storage without the use of a relational database. However, there are times when databases are very useful including:</p>
-<list type="unordered">
-<item>Placing the results of an R script on a web site where the data can be interacted with.</item>
-<item>Handling more data than R can store in memory alone.</item>
-<item>When data is stored in a relational database already.</item>
-<item>Working with the data of different entities that are related to one another.  An example would be a database of soldiers of two different armies that fought a battle where we wanted to know what squad, platoon, company and brigade each soldier was part of.</item>
-</list>
-<p>A further short discussion of this is on <ref target="http://www.jason-french.com/blog/2014/07/03/using-r-with-mysql-databases/">Jason A. French's blog</ref><ref type="footnotemark" target="#note_2"/>.</p>
-<p>By the end of this lesson you will be able to install a database system on your computer, create a database table, store information in the table and then query the data. At the conclusion of the lesson we'll use a query of the database to make a graph.</p>
-<p>We are using the R computer language for the examples, but the techniques can be used with other languages such as Python.</p>
-<p>To do this lesson you will need a computer where you have permission to install software such as R and RStudio, if you are not running that already. In addition to programming in R, we will be installing some components of a database system called MySQL which works on Windows, Mac and Linux.</p>
-<p>Some knowledge of installing software as well as organizing data into fields is helpful for this lesson which is of medium difficulty.</p>
-<div type="2"><head>Introduction</head>
-<p>MySQL is a relational database used to store and query information. This lesson will use the R language to provide a tutorial and examples to:</p>
-<list type="unordered">
-<item>Set up and connect to a table in MySQL.</item>
-<item>Store records to the table.</item>
-<item>Query the table.</item>
-</list>
-<p>In this tutorial you will make a database of newspaper stories that contain words from a search of a newspaper archive. The program will store the title, date published and URL of each story in a database. We'll use another program to query the database and look for historically significant patterns. Sample data will be provided from the <ref target="http://newspapers.library.wales">Welsh Newspapers Online</ref> newspaper archive. We are working toward having a list of stories we can query for information. At the end of the lesson, we will run a query to generate a graph of the number of newspaper stories in the database to see if there is a pattern that is significant.</p>
-</div><div type="2"><head>Required Software</head>
-<p>R, R Studio, MySQL Server and MySQL Workbench are the pieces of software required for this lesson.  Notes on installing these software packages are below.</p>
-<div type="3"><head>R</head>
-<p>In their lesson <ref target="/lessons/basic-text-processing-in-r">Basic Text Processing in R</ref><ref type="footnotemark" target="#note_3"/>, Taylor Arnold and Lauren Tilton provide an excellent summary of the knowledge of R required for this lesson.  Only basic knowledge of R is assumed. Taryn Dewar's lesson <ref target="/lessons/r-basics-with-tabular-data">'R Basics with Tabular Data'</ref><ref type="footnotemark" target="#note_4"/>
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Introduction to MySQL with R</title>
+                <author role="original_author">Jeff Blackadar</author>
+                <editor role="reviewers">
+                    <persName>Jesse Sadler</persName>
+                    <persName>Simon Appleford</persName>
+                </editor>
+                <editor role="editors">Amanda Visconti</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0076</idno>
+                <date type="published">05/03/2018</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#introducao-mysql-r"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>This lesson will help you store large amounts of historical data in a structured manner, search and filter that data, and visualize some of the data as a graph.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">distant-reading</term>
+                    <term xml:lang="en">r</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <p>This lesson is for you if you want to store large amounts of data from your digital history projects in a structured manner. We will use a database called MySQL to store data.</p>
+            <p>R can perform analysis and data storage without the use of a relational database. However, there are times when databases are very useful including:</p>
+            <list type="unordered">
+                <item>Placing the results of an R script on a web site where the data can be interacted with.</item>
+                <item>Handling more data than R can store in memory alone.</item>
+                <item>When data is stored in a relational database already.</item>
+                <item>Working with the data of different entities that are related to one another.  An example would be a database of soldiers of two different armies that fought a battle where we wanted to know what squad, platoon, company and brigade each soldier was part of.</item>
+            </list>
+            <p>A further short discussion of this is on <ref target="http://www.jason-french.com/blog/2014/07/03/using-r-with-mysql-databases/">Jason A. French's blog</ref>
+                <ref type="footnotemark" target="#en_note_2"/>.</p>
+            <p>By the end of this lesson you will be able to install a database system on your computer, create a database table, store information in the table and then query the data. At the conclusion of the lesson we'll use a query of the database to make a graph.</p>
+            <p>We are using the R computer language for the examples, but the techniques can be used with other languages such as Python.</p>
+            <p>To do this lesson you will need a computer where you have permission to install software such as R and RStudio, if you are not running that already. In addition to programming in R, we will be installing some components of a database system called MySQL which works on Windows, Mac and Linux.</p>
+            <p>Some knowledge of installing software as well as organizing data into fields is helpful for this lesson which is of medium difficulty.</p>
+            <div type="2">
+                <head>Introduction</head>
+                <p>MySQL is a relational database used to store and query information. This lesson will use the R language to provide a tutorial and examples to:</p>
+                <list type="unordered">
+                    <item>Set up and connect to a table in MySQL.</item>
+                    <item>Store records to the table.</item>
+                    <item>Query the table.</item>
+                </list>
+                <p>In this tutorial you will make a database of newspaper stories that contain words from a search of a newspaper archive. The program will store the title, date published and URL of each story in a database. We'll use another program to query the database and look for historically significant patterns. Sample data will be provided from the <ref target="http://newspapers.library.wales">Welsh Newspapers Online</ref> newspaper archive. We are working toward having a list of stories we can query for information. At the end of the lesson, we will run a query to generate a graph of the number of newspaper stories in the database to see if there is a pattern that is significant.</p>
+            </div>
+            <div type="2">
+                <head>Required Software</head>
+                <p>R, R Studio, MySQL Server and MySQL Workbench are the pieces of software required for this lesson.  Notes on installing these software packages are below.</p>
+                <div type="3">
+                    <head>R</head>
+                    <p>In their lesson <ref target="/lessons/basic-text-processing-in-r">Basic Text Processing in R</ref>
+                        <ref type="footnotemark" target="#en_note_3"/>, Taylor Arnold and Lauren Tilton provide an excellent summary of the knowledge of R required for this lesson.  Only basic knowledge of R is assumed. Taryn Dewar's lesson <ref target="/lessons/r-basics-with-tabular-data">'R Basics with Tabular Data'</ref>
+                        <ref type="footnotemark" target="#en_note_4"/>
 covers how to install R and become familiar with it.</p>
-<div type="4"><head>Download R</head>
-<p>You can download R from the <ref target="https://cran.r-project.org/">Comprehensive R Archive Network</ref>. Click on the link that matches your computer's operating system. Select <emph>base</emph> to install R for the first time. Once downloaded, click on the file to run the installer.</p>
-</div></div><div type="3"><head>RStudio</head>
-<p>Examples in this lesson use RStudio which is software used for writing and running R programs.  This lesson was done using Version 1.0.153 of RStudio.</p>
-<div type="4"><head>Download RStudio</head>
-<p>Download and install RStudio from <ref target="https://www.rstudio.com/products/rstudio/#Desktop">rstudio.com</ref>. Since RStudio is open source, you can select the free version of RStudio Desktop then scroll down and click on one of the <emph>Installers for Supported Platforms</emph> that match your computer's operating system. Once downloaded, click on the file to run the installer.</p>
-</div></div><div type="3"><head>MySQL</head>
-<p>SQL stands for Structured Query Language which is a set of commands used to store and retrieve information using a relational database. MySQL is a type of relational database and there are many others such as Microsoft SQL Server, IBM DB2 and Microsoft Access. This lesson uses MySQL since it is open-source, used by a large community, has a long track record and has a freely downloadable version.</p>
-<div type="4"><head>Downloading and Installing MySQL</head>
-<p>In this section we are going to install MySQL, which is the system that holds the database, as well as MySQL Workbench which is where you will work to set up the structure of the database. To use MySQL, you don't need MySQL Workbench, you can use typed commands. This lesson uses MySQL Workbench since it is a GUI that facilitates learning about MySQL.</p>
-<p>Complete these instructions to install MySQL Community Server and MySQL Workbench on your computer.</p>
-</div><div type="4"><head>MySQL Community Server</head>
-<p>This is the server where the database is stored.  It needs to be installed and started for you to connect to it and store data.  Below we will download the files, install and start the server.  This lesson was done using Version 5.7 of MySQL and 6.3 of MySQL Workbench.</p>
-<div type="5"><head>Download install file for MySQL Community Server</head>
-<p>Click on this link: <ref target="https://dev.mysql.com/downloads/mysql/">https://dev.mysql.com/downloads/mysql/</ref>. Scroll down and click to <hi rend="bold">Select Operating System</hi> that matches your computer.  If necessary, <hi rend="bold">Select OS Version</hi>.  Once you have done that click the blue <hi rend="bold">Download</hi> button.  On the download page, scroll down, you have the option of starting the download by clicking <hi rend="bold">No thanks, just start my download.</hi></p>
-</div><div type="5"><head>Installation of MySQL Community Server</head>
-<p>Here are the MySQL Installation instructions:  <ref target="https://dev.mysql.com/doc/workbench/en/wb-installing.html">https://dev.mysql.com/doc/workbench/en/wb-installing.html</ref></p>
-<p>Below are tips on the installation for the PC and Mac:</p>
-<div type="6"><head>Installation tips for a PC</head>
-<p>Using the MySQL Installer for Windows is the recommended way to install the components of MySQL. Once the file is downloaded, double click on the downloaded file to install it.  Follow the prompts to accept the licence.
+                    <div type="4">
+                        <head>Download R</head>
+                        <p>You can download R from the <ref target="https://cran.r-project.org/">Comprehensive R Archive Network</ref>. Click on the link that matches your computer's operating system. Select <emph>base</emph> to install R for the first time. Once downloaded, click on the file to run the installer.</p>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>RStudio</head>
+                    <p>Examples in this lesson use RStudio which is software used for writing and running R programs.  This lesson was done using Version 1.0.153 of RStudio.</p>
+                    <div type="4">
+                        <head>Download RStudio</head>
+                        <p>Download and install RStudio from <ref target="https://www.rstudio.com/products/rstudio/#Desktop">rstudio.com</ref>. Since RStudio is open source, you can select the free version of RStudio Desktop then scroll down and click on one of the <emph>Installers for Supported Platforms</emph> that match your computer's operating system. Once downloaded, click on the file to run the installer.</p>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>MySQL</head>
+                    <p>SQL stands for Structured Query Language which is a set of commands used to store and retrieve information using a relational database. MySQL is a type of relational database and there are many others such as Microsoft SQL Server, IBM DB2 and Microsoft Access. This lesson uses MySQL since it is open-source, used by a large community, has a long track record and has a freely downloadable version.</p>
+                    <div type="4">
+                        <head>Downloading and Installing MySQL</head>
+                        <p>In this section we are going to install MySQL, which is the system that holds the database, as well as MySQL Workbench which is where you will work to set up the structure of the database. To use MySQL, you don't need MySQL Workbench, you can use typed commands. This lesson uses MySQL Workbench since it is a GUI that facilitates learning about MySQL.</p>
+                        <p>Complete these instructions to install MySQL Community Server and MySQL Workbench on your computer.</p>
+                    </div>
+                    <div type="4">
+                        <head>MySQL Community Server</head>
+                        <p>This is the server where the database is stored.  It needs to be installed and started for you to connect to it and store data.  Below we will download the files, install and start the server.  This lesson was done using Version 5.7 of MySQL and 6.3 of MySQL Workbench.</p>
+                        <div type="5">
+                            <head>Download install file for MySQL Community Server</head>
+                            <p>Click on this link: <ref target="https://dev.mysql.com/downloads/mysql/">https://dev.mysql.com/downloads/mysql/</ref>. Scroll down and click to <hi rend="bold">Select Operating System</hi> that matches your computer.  If necessary, <hi rend="bold">Select OS Version</hi>.  Once you have done that click the blue <hi rend="bold">Download</hi> button.  On the download page, scroll down, you have the option of starting the download by clicking <hi rend="bold">No thanks, just start my download.</hi>
+                            </p>
+                        </div>
+                        <div type="5">
+                            <head>Installation of MySQL Community Server</head>
+                            <p>Here are the MySQL Installation instructions:  <ref target="https://dev.mysql.com/doc/workbench/en/wb-installing.html">https://dev.mysql.com/doc/workbench/en/wb-installing.html</ref>
+                            </p>
+                            <p>Below are tips on the installation for the PC and Mac:</p>
+                            <div type="6">
+                                <head>Installation tips for a PC</head>
+                                <p>Using the MySQL Installer for Windows is the recommended way to install the components of MySQL. Once the file is downloaded, double click on the downloaded file to install it.  Follow the prompts to accept the licence.
 After the products are installed, you will be prompted for options:</p>
-<h7>1. Choosing a Setup Type</h7>
-<p>Select: <hi rend="bold">Developer Default</hi>. This <emph>installs the MySQL Server and the tools required for MySQL application development. This is useful if you intend to develop applications for an existing server.</emph>
+                            </div>
+                            <div type="6">
+                                <head>1. Choosing a Setup Type</head>
+                                <p>Select: <hi rend="bold">Developer Default</hi>. This <emph>installs the MySQL Server and the tools required for MySQL application development. This is useful if you intend to develop applications for an existing server.</emph>
 (See below)</p>
-<figure><desc>Setup Type Developer Default</desc><graphic url="getting-started-with-mysql-6.png"/></figure>
-<h7>2. Check Requirements</h7>
-<p>Click the <hi rend="bold">Execute</hi> button if you have <emph>failing requirements</emph> listed under Check Requirements. Your list of requirements may be different than what is shown here. Once the execute process installs the missing requirements click the Next button.
+                                <figure>
+                                    <desc>Setup Type Developer Default</desc>
+                                    <graphic url="getting-started-with-mysql-6.png"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>2. Check Requirements</head>
+                                <p>Click the <hi rend="bold">Execute</hi> button if you have <emph>failing requirements</emph> listed under Check Requirements. Your list of requirements may be different than what is shown here. Once the execute process installs the missing requirements click the Next button.
 (See below)</p>
-<figure><desc>Click the Execute button if needed</desc><graphic url="getting-started-with-mysql-16.png"/></figure>
-<h7>3. Type and Networking</h7>
-<p>Select: <hi rend="bold">Standalone MySQL Server</hi>
+                                <figure>
+                                    <desc>Click the Execute button if needed</desc>
+                                    <graphic url="getting-started-with-mysql-16.png"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>3. Type and Networking</head>
+                                <p>Select: <hi rend="bold">Standalone MySQL Server</hi>
 (See below)</p>
-<figure><desc>Select Standalone MySQL Server</desc><graphic url="getting-started-with-mysql-7.png"/></figure>
-<h7>4. Type and Networking</h7>
-<p>Config type: Select: <hi rend="bold">Development Machine</hi>
+                                <figure>
+                                    <desc>Select Standalone MySQL Server</desc>
+                                    <graphic url="getting-started-with-mysql-7.png"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>4. Type and Networking</head>
+                                <p>Config type: Select: <hi rend="bold">Development Machine</hi>
 Check: TCP/IP.  Port number: 3306.
 (See below)</p>
-<figure><desc>Development Machine TCPIP port 3306</desc><graphic url="getting-started-with-mysql-8.png"/></figure>
-<h7>5. Accounts and Roles</h7>
-<figure><desc>Write down and then type in a root password</desc><graphic url="getting-started-with-mysql-9.png"/></figure>
-<h7>6. Windows Service</h7>
-<p>Settings here are optional, but I find it easier to set up MySQL as a Windows Service and have it start automatically. A Windows Service is a process that runs on your computer while you are working. You can change your Windows Service settings later to start the MySQL service manually so that it does not start when you don't need it.</p>
-<figure><desc>MySQL as a Windows Service</desc><graphic url="getting-started-with-mysql-10.png"/></figure>
-<p>Click the Execute and Next buttons to finish the installation and start the server.</p>
-<h7>7. Root password</h7>
-<p>When prompted for the root password, enter the root password you wrote down in step <emph>5. Accounts and Roles</emph> above.
+                                <figure>
+                                    <desc>Development Machine TCPIP port 3306</desc>
+                                    <graphic url="getting-started-with-mysql-8.png"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>5. Accounts and Roles</head>
+                                <figure>
+                                    <desc>Write down and then type in a root password</desc>
+                                    <graphic url="getting-started-with-mysql-9.png"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>6. Windows Service</head>
+                                <p>Settings here are optional, but I find it easier to set up MySQL as a Windows Service and have it start automatically. A Windows Service is a process that runs on your computer while you are working. You can change your Windows Service settings later to start the MySQL service manually so that it does not start when you don't need it.</p>
+                                <figure>
+                                    <desc>MySQL as a Windows Service</desc>
+                                    <graphic url="getting-started-with-mysql-10.png"/>
+                                </figure>
+                                <p>Click the Execute and Next buttons to finish the installation and start the server.</p>
+                            </div>
+                            <div type="6">
+                                <head>7. Root password</head>
+                                <p>When prompted for the root password, enter the root password you wrote down in step <emph>5. Accounts and Roles</emph> above.
 (See below)</p>
-<figure><desc>Root password</desc><graphic url="getting-started-with-mysql-15.png"/></figure>
-<p>Look in the Start menu under MySQL for MySQL Workbench.  If it is there, click to launch.  If not, click on MySQL Installer - Community to re-run the installation and add MySQL Workbench to the installed products.</p>
-</div><div type="6"><head>Installation tips for a Mac</head>
-<h7>1. Install MySQL Community Server</h7>
-<p>Once the MySQL Community Server install file is downloaded, double click on the downloaded file to install it.  (See below)</p>
-<figure><desc>Install file</desc><graphic url="getting-started-with-mysql-17.png"/></figure>
-<h7>2. Write down temporary password</h7>
-<p>Follow the prompts to accept the licence and installation location.  <hi rend="bold">Important: There will be a prompt for a temporary password.  Write this down carefully.</hi>  (See below for an example.  Your temporary password will be different than what is shown below.) If you make an error, you can remove the installed server and reinstall it, but that is a minor hassle. One of the lesson reviewers found <ref target="https://stackoverflow.com/a/37524283">this StackOverflow answer</ref> helpful for this part.</p>
-<figure><desc>Temporary password</desc><graphic url="getting-started-with-mysql-18.png"/></figure>
-<p>Once installed, we are going to change the root password for the MySQL server.</p>
-<h7>3. Change the root password for the MySQL server</h7>
-<p><hi rend="bold">This section of the lesson has caused difficulty for others.  Take your time and please note that the MySQL commands end with a semicolon. Watch for them in some of the commands below.</hi></p>
-<p>3.1. Open a terminal window</p>
-<p>3.2. Add /usr/local/mysql/bin to the PATH per the command below. The PATH is a list of directories the computer looks in when you type a command to run a program.  In the next step below, when you run <emph>mysql</emph>, the PATH searches the directories it has for the <emph>mysql</emph> program.  PATH finds <emph>mysql</emph> in the directory <emph>/usr/local/mysql/bin</emph> and runs it.  PATH just saves typing the whole path, in this case  <emph>/usr/local/mysql/bin/mysql</emph>, to a program when you want to run it.</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_0" corresp="code_getting-started-with-mysql-using-r_0.txt" rend="block"/></ab>
-<p>3.3. Start the MySQL server.</p>
-<p>Go to System Preferences &gt; MySQL icon at bottom &gt; click on "Start MySQL server"</p>
-<p>3.4. Start a MySQL session. In the command below after <emph>--password</emph> enter the password you wrote down in step <emph>2. Write down temporary password</emph>.</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_1" corresp="code_getting-started-with-mysql-using-r_1.txt" rend="block"/></ab>
-<p>3.5. Set the root password to a <hi rend="bold">new</hi> password. Choose and write down a new password carefully. At the mysql&gt; prompt enter this command, replacing the password inside single quotes in the SET PASSWORD=PASSWORD('password') command with the new password you have written down.</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_2" corresp="code_getting-started-with-mysql-using-r_2.txt" rend="block"/></ab>
-<p>3.6. Restart the machine.  After restarting the machine you may need to repeat step <emph>3.3 Start the MySQL server</emph> above.</p>
-<h7>MySQL Workbench downloads</h7>
-<p>Click on this link: <ref target="http://dev.mysql.com/downloads/workbench/">http://dev.mysql.com/downloads/workbench/</ref>. Scroll down and click to <hi rend="bold">Select Operating System</hi> that matches your computer.  If necessary, <hi rend="bold">Select OS Version</hi>.  Once you have done that click the blue <hi rend="bold">Download</hi> button.  On the download page, scroll down, you have the option of starting the download by clicking <hi rend="bold">No thanks, just start my download.</hi></p>
-<p>Once the file is downloaded, double click on the downloaded file to install it. Once the installation of MySQL Workbench is done, as per the instructions on the screen, drag the icon to the Applications folder on the left. (See below)</p>
-<figure><desc>MySQL Workbench</desc><graphic url="getting-started-with-mysql-22.png"/></figure>
-</div></div></div></div></div><table>
-<row>
-<cell role="label">name</cell>
-<cell role="label">phone number</cell>
-<cell role="label">e-mail address</cell>
-</row>
-<row>
-<cell>Pat Abraham</cell>
-<cell>613-555-1212</cell>
-<cell><ref target="mailto:pat@zmail.ca">pat@zmail.ca</ref></cell>
-</row>
-</table><div type="2"><head>Add a table</head>
-<list type="ordered">
-<item>In MySQL Workbench, look in the left side in the <hi rend="bold">Navigator</hi> panel, under <hi rend="bold">SCHEMAS</hi> for <hi rend="bold">newspaper_search_results</hi>.</item>
-<item>Right-click on <hi rend="bold">Tables</hi> and click <hi rend="bold">Create Table</hi>.</item>
-<item>for <hi rend="bold">Table Name:</hi> type <hi rend="bold">tbl_newspaper_search_results</hi></item>
-</list>
-<div type="3"><head>Add columns to the table</head>
-<p>Add these columns:</p>
-<list type="ordered">
-<item><hi rend="bold">id</hi> Data type: <hi rend="bold">INT</hi>. Click PK (Primary Key), NN (Not Null) and AI (Auto Increment).  This id column will be used to relate records in this table to records in other tables.</item>
-<item><hi rend="bold">story_title</hi> Data type: <hi rend="bold">VARCHAR(99)</hi>. This column will store the title of each article result we gather from the search.</item>
-<item><hi rend="bold">story_date_published</hi> Data type: <hi rend="bold">DATETIME</hi>. This column will store the date the newspaper was published.</item>
-<item><hi rend="bold">story_url</hi> Data type: <hi rend="bold">VARCHAR(99)</hi>. This column will store the URL of each result we gather from the search.</item>
-<item><hi rend="bold">search_term_used</hi> Data type: <hi rend="bold">VARCHAR(45)</hi>. This column will store the word we used to search the newspapers.
+                                <figure>
+                                    <desc>Root password</desc>
+                                    <graphic url="getting-started-with-mysql-15.png"/>
+                                </figure>
+                                <p>Look in the Start menu under MySQL for MySQL Workbench.  If it is there, click to launch.  If not, click on MySQL Installer - Community to re-run the installation and add MySQL Workbench to the installed products.</p>
+                            </div>
+                            <div type="6">
+                                <head>Installation tips for a Mac</head>
+                            </div>
+                            <div type="6">
+                                <head>1. Install MySQL Community Server</head>
+                                <p>Once the MySQL Community Server install file is downloaded, double click on the downloaded file to install it.  (See below)</p>
+                                <figure>
+                                    <desc>Install file</desc>
+                                    <graphic url="getting-started-with-mysql-17.png"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>2. Write down temporary password</head>
+                                <p>Follow the prompts to accept the licence and installation location.  <hi rend="bold">Important: There will be a prompt for a temporary password.  Write this down carefully.</hi>  (See below for an example.  Your temporary password will be different than what is shown below.) If you make an error, you can remove the installed server and reinstall it, but that is a minor hassle. One of the lesson reviewers found <ref target="https://stackoverflow.com/a/37524283">this StackOverflow answer</ref> helpful for this part.</p>
+                                <figure>
+                                    <desc>Temporary password</desc>
+                                    <graphic url="getting-started-with-mysql-18.png"/>
+                                </figure>
+                                <p>Once installed, we are going to change the root password for the MySQL server.</p>
+                            </div>
+                            <div type="6">
+                                <head>3. Change the root password for the MySQL server</head>
+                                <p>
+                                    <hi rend="bold">This section of the lesson has caused difficulty for others.  Take your time and please note that the MySQL commands end with a semicolon. Watch for them in some of the commands below.</hi>
+                                </p>
+                                <p>3.1. Open a terminal window</p>
+                                <p>3.2. Add /usr/local/mysql/bin to the PATH per the command below. The PATH is a list of directories the computer looks in when you type a command to run a program.  In the next step below, when you run <emph>mysql</emph>, the PATH searches the directories it has for the <emph>mysql</emph> program.  PATH finds <emph>mysql</emph> in the directory <emph>/usr/local/mysql/bin</emph> and runs it.  PATH just saves typing the whole path, in this case  <emph>/usr/local/mysql/bin/mysql</emph>, to a program when you want to run it.</p>
+                                <ab>
+                                    <code xml:id="code_getting-started-with-mysql-using-r_0" corresp="code_getting-started-with-mysql-using-r_0.txt" rend="block"/>
+                                </ab>
+                                <p>3.3. Start the MySQL server.</p>
+                                <p>Go to System Preferences &gt; MySQL icon at bottom &gt; click on "Start MySQL server"</p>
+                                <p>3.4. Start a MySQL session. In the command below after <emph>--password</emph> enter the password you wrote down in step <emph>2. Write down temporary password</emph>.</p>
+                                <ab>
+                                    <code xml:id="code_getting-started-with-mysql-using-r_1" corresp="code_getting-started-with-mysql-using-r_1.txt" rend="block"/>
+                                </ab>
+                                <p>3.5. Set the root password to a <hi rend="bold">new</hi> password. Choose and write down a new password carefully. At the mysql&gt; prompt enter this command, replacing the password inside single quotes in the SET PASSWORD=PASSWORD('password') command with the new password you have written down.</p>
+                                <ab>
+                                    <code xml:id="code_getting-started-with-mysql-using-r_2" corresp="code_getting-started-with-mysql-using-r_2.txt" rend="block"/>
+                                </ab>
+                                <p>3.6. Restart the machine.  After restarting the machine you may need to repeat step <emph>3.3 Start the MySQL server</emph> above.</p>
+                            </div>
+                            <div type="6">
+                                <head>MySQL Workbench downloads</head>
+                                <p>Click on this link: <ref target="http://dev.mysql.com/downloads/workbench/">http://dev.mysql.com/downloads/workbench/</ref>. Scroll down and click to <hi rend="bold">Select Operating System</hi> that matches your computer.  If necessary, <hi rend="bold">Select OS Version</hi>.  Once you have done that click the blue <hi rend="bold">Download</hi> button.  On the download page, scroll down, you have the option of starting the download by clicking <hi rend="bold">No thanks, just start my download.</hi>
+                                </p>
+                                <p>Once the file is downloaded, double click on the downloaded file to install it. Once the installation of MySQL Workbench is done, as per the instructions on the screen, drag the icon to the Applications folder on the left. (See below)</p>
+                                <figure>
+                                    <desc>MySQL Workbench</desc>
+                                    <graphic url="getting-started-with-mysql-22.png"/>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <head>Create a database</head>
+            <p>Here we will create a database which serves as a container for the tables we will store our information into. A table is the structure that holds the data we want to store. Tables hold many rows of records. An example record of basic contact information would contain fields for name, phone number and e-mail address. In a table, fields are organized into <emph>columns</emph>.</p>
+            <p>Here is a sample table with a row of data that represents a record.</p>
+            <table>
+                <row>
+                    <cell role="label">name</cell>
+                    <cell role="label">phone number</cell>
+                    <cell role="label">e-mail address</cell>
+                </row>
+                <row>
+                    <cell>Pat Abraham</cell>
+                    <cell>613-555-1212</cell>
+                    <cell>
+                        <ref target="mailto:pat@zmail.ca">pat@zmail.ca</ref>
+                    </cell>
+                </row>
+            </table>
+            <div type="3">
+                <head>Open MySQL Workbench</head>
+                <p>Open MySQL Workbench.  Double-click on the <emph>Local Instance MySQL57</emph>. (on a Mac this may appear as <emph>Local Instance 3306</emph>.) You may be prompted for the root password created in steps above.  After opening the Local Instance MySQL57 you should see a screen similar to the picture below.  On some Macs, a Query Tab will already be open; if it is not, open a Query Tab by doing <emph>File &gt; New Query Tab</emph>.</p>
+            </div>
+            <div type="3">
+                <head>CREATE DATABASE</head>
+                <p>Now we will create a new database. Using MySQL Workbench perform these steps:</p>
+                <list type="ordered">
+                    <item>In the <hi rend="bold">Query window</hi> type:</item>
+                </list>
+                <ab>
+                    <code xml:id="code_getting-started-with-mysql-using-r_3" corresp="code_getting-started-with-mysql-using-r_3.txt" rend="block"/>
+                </ab>
+                <list type="ordered">
+                    <item>Run the CREATE DATABASE command.  Click on the <hi rend="bold">lightning bolt</hi> or using the menu, click <emph>Query</emph> and then <emph>Execute Current Statement</emph>.</item>
+                    <item>The new database <hi rend="bold">newspaper_search_results</hi> should be visible under <hi rend="bold">SCHEMAS</hi>, on the lower left of the screen. If you don't already see an item called newspaper_search_results, click the refresh icon. (See screenshot below.)</item>
+                </list>
+                <p>(See below:)</p>
+                <figure>
+                    <desc>CREATE a database in MySQL Workbench</desc>
+                    <graphic url="getting-started-with-mysql-1.png"/>
+                </figure>
+            </div>
+            <div type="3">
+                <head>USE database</head>
+                <p>Next, we will enter a USE statement to inform MySQL Workbench which database to use. This becomes more important when you have you have more than one database on your machine.</p>
+                <p>In the Query window, delete all of the CREATE DATABASE command and type:</p>
+                <ab>
+                    <code xml:id="code_getting-started-with-mysql-using-r_4" corresp="code_getting-started-with-mysql-using-r_4.txt" rend="block"/>
+                </ab>
+                <p>Again, click on the <hi rend="bold">lightning bolt</hi> or using the menu, click <emph>Query</emph> and then <emph>Execute Current Statement</emph>. You can also use a keyboard command for this. On Mac it is Command+Return. On a PC use Ctrl+Shift+Enter. From this point on in the lesson, each time you enter a command into the Query Window you will run it this way.</p>
+                <p>(See below:)</p>
+                <figure>
+                    <desc>USE a database in MySQL Workbench</desc>
+                    <graphic url="getting-started-with-mysql-25.png"/>
+                </figure>
+            </div>
+            <div type="2">
+                <head>Add a table</head>
+                <list type="ordered">
+                    <item>In MySQL Workbench, look in the left side in the <hi rend="bold">Navigator</hi> panel, under <hi rend="bold">SCHEMAS</hi> for <hi rend="bold">newspaper_search_results</hi>.</item>
+                    <item>Right-click on <hi rend="bold">Tables</hi> and click <hi rend="bold">Create Table</hi>.</item>
+                    <item>for <hi rend="bold">Table Name:</hi> type <hi rend="bold">tbl_newspaper_search_results</hi>
+                    </item>
+                </list>
+                <div type="3">
+                    <head>Add columns to the table</head>
+                    <p>Add these columns:</p>
+                    <list type="ordered">
+                        <item>
+                            <hi rend="bold">id</hi> Data type: <hi rend="bold">INT</hi>. Click PK (Primary Key), NN (Not Null) and AI (Auto Increment).  This id column will be used to relate records in this table to records in other tables.</item>
+                        <item>
+                            <hi rend="bold">story_title</hi> Data type: <hi rend="bold">VARCHAR(99)</hi>. This column will store the title of each article result we gather from the search.</item>
+                        <item>
+                            <hi rend="bold">story_date_published</hi> Data type: <hi rend="bold">DATETIME</hi>. This column will store the date the newspaper was published.</item>
+                        <item>
+                            <hi rend="bold">story_url</hi> Data type: <hi rend="bold">VARCHAR(99)</hi>. This column will store the URL of each result we gather from the search.</item>
+                        <item>
+                            <hi rend="bold">search_term_used</hi> Data type: <hi rend="bold">VARCHAR(45)</hi>. This column will store the word we used to search the newspapers.
 Click the <hi rend="bold">Apply</hi> button.</item>
-</list>
-<p>All of the above steps can be done with a command if you prefer.  This command could be run in the Query window to create the table with the columns noted below.</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_5" corresp="code_getting-started-with-mysql-using-r_5.txt" rend="block"/></ab>
-<p><emph>Tip: Take your time to think about table design and naming since a well designed database will be easier to work with and understand.</emph></p>
-</div><div type="3"><head>Add a user to connect to the database</head>
-<p>A user is an account that has permission to connect to a database. Below, we are adding a new user so that this account connects only to the new database. Using this user account for one connection to this database limits exposure to other databases in case the password for this user is compromised. Giving a user the least privileges it needs to perform what you need it to do reduces the risk if someone else learns your user's password. For example, if a user can only read a database, it is less of a risk if the password is cracked than for a user that can also change or delete the database.</p>
-<p>In the MySQL Workbench menu click <hi rend="bold">Server</hi> and then <hi rend="bold">Users and Privileges</hi></p>
-<p><hi rend="bold">Mac users</hi> Some Mac computers, like my testing laptop, don't display the <hi rend="bold">Schema Privileges</hi> panel correctly.  See the note below the screenshot if this happens to you.</p>
-<p>Click the <hi rend="bold">Add Account</hi> button and complete the Details for account newuser dialog box:</p>
-<list type="ordered">
-<item>Login Name: <hi rend="bold">newspaper_search_results_user</hi></item>
-<item>Authentication Type: select <hi rend="bold">Standard</hi></item>
-<item>Limit to Hosts Matching: <hi rend="bold">localhost</hi></item>
-<item>Enter and confirm a password <emph>SomethingDifficult</emph></item>
-<item>Click on the <hi rend="bold">Administrative Roles</hi> tab.  Make sure nothing is checked.  This account is for accessing the database only.</item>
-<item>Click on the <hi rend="bold">Schema Privileges</hi> tab and click <hi rend="bold">Add Entry</hi></item>
-<item>In the <hi rend="bold">New Schema Privilege Definition</hi> diablog box, click the <hi rend="bold">Selected schema:</hi> radio button and select <hi rend="bold">newspaper_search_results</hi>.</item>
-<item>Click all of the Object Rights: SELECT, INSERT, UPDATE, DELETE, EXECUTE, SHOW VIEW as per the image below. (This user will need to do many things later in the lesson so we are giving it many rights.)</item>
-<item>Click the <hi rend="bold">Apply</hi> button.</item>
-</list>
-<figure><desc>Setting permissions for new account</desc><graphic url="getting-started-with-mysql-2.png"/></figure>
-<div type="4"><head>Schema Privileges not displaying</head>
-<p>Some Mac computers, like my testing laptop, don't display the <hi rend="bold">Schema Privileges</hi> panel correctly.  In that case, you can accomplish the above with a script using the Query Window.</p>
-<p>If you have already created the user above run this command to grant the user privileges:</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_6" corresp="code_getting-started-with-mysql-using-r_6.txt" rend="block"/></ab>
-<p>If you have not created a user yet run these two commands to create the user and then grant the user privileges:</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_7" corresp="code_getting-started-with-mysql-using-r_7.txt" rend="block"/></ab>
-</div><div type="4"><head>MySQL version 8 and user Authentication Type.</head>
-<p>When a user is created in MySQL 8 Workbench the <hi rend="bold">Authentication Type</hi> is defaulted to <hi rend="bold">caching_sha2_password</hi>. That type of authentication causes an error for the R package we will use to connect to the database later in this lesson. The error is <emph>Authentication plugin 'caching_sha2_password' cannot be loaded</emph> and it is described in <ref target="https://stackoverflow.com/questions/49194719/authentication-plugin-caching-sha2-password-cannot-be-loaded">Stack Overflow</ref>.</p>
-<p>To avoid this error we can change the user's Authentication Type to Standard. To do this, run this command:</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_8" corresp="code_getting-started-with-mysql-using-r_8.txt" rend="block"/></ab>
-</div></div></div><div type="2"><head>Create an R Script that connects to the database</head>
-<p>Open RStudio, which you installed earlier in this lesson.  See the <ref target="#rstudio">RStudio</ref> section.</p>
-<p>We'll now use RStudio to make a new R Script and save the script with the name newspaper_search.R. (Sometimes in this lesson I will refer to an R Script as a program.)</p>
-<p>Go to File &gt; New File &gt; R Script, then save that new file with the name newspaper_search.R.</p>
-<p>We will use the RMariaDB package to connect to MySQL.  (If you're curious, documentation for the RMariaDB package is <ref target="https://cran.r-project.org/web/packages/RMariaDB/RMariaDB.pdf">here</ref>.)</p>
-<p>If you don't have the library RMariaDB installed (which is likely, if this is the first time you're using RStudio), install it using the RStudio Console.  After opening RStudio, copy and paste the following into the left window at the &gt; prompt, then press enter:</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_9" corresp="code_getting-started-with-mysql-using-r_9.txt" rend="block"/></ab>
-<p>Add this statement to the newspaper_search.R program</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_10" corresp="code_getting-started-with-mysql-using-r_10.txt" rend="block"/></ab>
-<div type="3"><head>Connecting to the database with a password</head>
-<p>We will connect to the database at first using a password. (Later we'll use a better way to connect.)  For now, we will use a variable to store the password.  Each time you start R you'll need to reset this variable, but that is better than publishing a hardcoded password if you share your programs, like you may do using GitHub.</p>
-<p>In the RStudio console type the command below, replacing <emph>SomethingDifficult</emph> with the password you created for newspaper_search_results_user in the steps you did above to add a user to connect to the database.</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_11" corresp="code_getting-started-with-mysql-using-r_11.txt" rend="block"/></ab>
-<p>Add the following R statements to your newspaper_search.R file and save it.</p>
-<p>To run this script, select all the text and click the Run button. (There are other ways to run just a part of an R script or the whole script.  If you are curious, look in the menu under Code &gt; Run Region. CTRL+ALT+R will run all of the R code in the script.)</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_12" corresp="code_getting-started-with-mysql-using-r_12.txt" rend="block"/></ab>
-<p>In the console you should see:</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_13" corresp="code_getting-started-with-mysql-using-r_13.txt" rend="block"/></ab>
-<p>Success! you have:</p>
-<list type="ordered">
-<item>Connected to the database with dbConnect.</item>
-<item>Listed the table in the database with dbListTables.</item>
-<item>Disconnected from the database using dbDisconnect.</item>
-</list>
-<div type="4"><head>Connecting to the database with a password stored in a configuration file</head>
-<p>The above example to connect is one way to make a connection.  The connection method described below stores the database connection information in a configuration file so that you do not have to type a password into a variable every time you start a new session in R. I found this to be a finicky process, but it is a more standard and secure way of protecting the credentials used to log into your database.  This connection method will be used in the code for the remainder of this tutorial, but it can be subsituted with the simpler connection method above if you prefer.</p>
-<div type="5"><head>Create the .cnf file to store the MySQL database connection information</head>
-<list type="ordered">
-<item>Open a text editor, like notepad, nano or TextEdit, and paste in the items below, changing the password to the one you created for newspaper_search_results_user in the steps you did above to add a user to connect to the database.</item>
-</list>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_14" corresp="code_getting-started-with-mysql-using-r_14.txt" rend="block"/></ab>
-<list start="2" type="ordered">
-<item>
-<p>Save this file somewhere outside of your R working directory.  I saved mine in the same folder as other MySQL settings files.  On my PC machine this was: C:\ProgramData\MySQL\MySQL Server 5.7\  Depending on your operating system and version of MySQL this location may be somewhere else. On a Mac I used /Users/blackadar/Documents/ as the folder.  I have tested putting this file in different places, it just needs to be somewhere R can locate it when the program runs. Name the file <hi rend="bold">newspaper_search_results.cnf</hi>.</p>
-</item>
-<item>
-<p>Update the newspaper_search.R program above to connect to the database using the configuration file.</p>
-</item>
-</list>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_15" corresp="code_getting-started-with-mysql-using-r_15.txt" rend="block"/></ab>
-<list start="4" type="ordered">
-<item>Run your script.</item>
-</list>
-<p>In the console, among other lines, you should see again:</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_16" corresp="code_getting-started-with-mysql-using-r_16.txt" rend="block"/></ab>
-<p>You have successfully connected to the database using a configuration file.</p>
-</div></div></div></div><div type="2"><head>Storing data in a table with SQL</head>
-<p>In this section of the lesson we'll create a SQL statement to insert a row of data into the database table about this <ref target="http://newspapers.library.wales/view/4121281/4121288/94/">newspaper story</ref>.  We'll insert the record first in MySQL workbench and later we'll do it in R.</p>
-<list type="ordered">
-<item>In MySQL Workbench, click the icon labelled SQL+ to create a new SQL tab for executing queries.</item>
-<item>Paste this statement below into the query window. This will insert a record into the table.</item>
-</list>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_17" corresp="code_getting-started-with-mysql-using-r_17.txt" rend="block"/></ab>
-<list start="3" type="ordered">
-<item>Click the lightening bolt icon in the SQL tab to execute the SQL statement.</item>
-</list>
-<figure><desc>Inserting a record into a table using MySQL Workbench</desc><graphic url="getting-started-with-mysql-3.png"/></figure>
-<table>
-<row>
-<cell role="label">SQL</cell>
-<cell role="label">Meaning</cell>
-</row>
-<row>
-<cell>'German+Submarine');</cell>
-<cell>search_term_used field</cell>
-</row>
-<row>
-<cell>LEFT(RTRIM('http://newspapers.library.wales/view/4121281/4121288/94/'),99),</cell>
-<cell>story_url field.  This field is a VARCHAR(99) so it has a maximum length of 99 characters.  Inserting a URL longer than 99 characters would cause an error and so two functions are used to control for that.  RTRIM() trims trailing spaces to the right of the URL.  LEFT(value,99) returns only the leftmost 99 characters of the trimmed URL.  This URL is much shorter than that and so these functions are here for an example only.</cell>
-</row>
-<row>
-<cell>'1915-05-21',</cell>
-<cell>story_date_published field</cell>
-</row>
-<row>
-<cell>VALUES('THE LOST LUSITANIA.',</cell>
-<cell>The value to be inserted into the story_title field</cell>
-</row>
-<row>
-<cell>search_term_used)</cell>
-<cell>"</cell>
-</row>
-<row>
-<cell>story_url,</cell>
-<cell>"</cell>
-</row>
-<row>
-<cell>story_date_published,</cell>
-<cell>"</cell>
-</row>
-<row>
-<cell>story_title,</cell>
-<cell>name of field to be populated by a value</cell>
-</row>
-<row>
-<cell>INSERT INTO tbl_newspaper_search_results (</cell>
-<cell>INSERT a record into the table named tbl_newspaper_search_results</cell>
-</row>
-</table><div type="3"><head>Querying data in a table with SQL</head>
-<p>In this section of the lesson we'll create a SQL statement to select a row of data from the database table we just inserted.  We'll select the record first in MySQL workbench and later we'll do it in R.</p>
-<list type="ordered">
-<item>Paste this statement below into a query window in MySQL workbench. This will select records from the table.</item>
-</list>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_19" corresp="code_getting-started-with-mysql-using-r_19.txt" rend="block"/></ab>
-<list start="2" type="ordered">
-<item>Highlight the SELECT statement and click the lightening bolt icon in the SQL tab to execute it. You should see the story title "THE LOST LUSITANIA." in the Result Grid. See below.</item>
-</list>
-<figure><desc>Selecting records from a table using MySQL Workbench</desc><graphic url="getting-started-with-mysql-4.png"/></figure>
-<p>Optional: Modify the SELECT statement above by changing the fields selected and run it again. Add more than one field to the SELECT statement and run it:</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_20" corresp="code_getting-started-with-mysql-using-r_20.txt" rend="block"/></ab>
-</div><div type="3"><head>Storing data in a table with SQL using R</head>
-<p>Let's do this using R! Below is an expanded version of the R Script we used above to connect to the database. For brevity, the first 3 comments we had in the R Script above are removed.  We no longer need them.</p>
-<p>In line 4 of the program below, remember to change the path to the rmariadb.settingsfile that matches your computer.</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_21" corresp="code_getting-started-with-mysql-using-r_21.txt" rend="block"/></ab>
-<p>In the script above we do two steps to insert a record:</p>
-<list type="ordered">
-<item>Define the INSERT statement in the line beginning with: query&lt;-"INSERT INTO tbl_newspaper_search_results (</item>
-<item>Execute the INSERT statement stored in the query variable with: rsInsert &lt;- dbSendQuery(storiesDb, query)</item>
-</list>
-<p>Run the script above in R Studio and then execute a SELECT in MySQL Workbench. Do you see the new record you added?</p>
-<div type="4"><head>Clean up the test data</head>
-<p>At this point you likely have more than one record with the story title of "THE LOST LUSITANIA." which is fine for testing, but we don't want duplicate data. We will remove the test data and start again.  Using the query window in MySQL Workbench run this SQL statement:</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_22" corresp="code_getting-started-with-mysql-using-r_22.txt" rend="block"/></ab>
-<p>In the Action Output pane of MySQL Workbench you should see:</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_23" corresp="code_getting-started-with-mysql-using-r_23.txt" rend="block"/></ab>
-<p>To practice what we just did:</p>
-<list type="ordered">
-<item>Run a SELECT statement again.  You should not get any rows back.</item>
-<item>Re-run the R program above to insert a record.</item>
-<item>Perform the SELECT statement.  You should see one row of data.</item>
-</list>
-</div><div type="4"><head>Change the INSERT statement to use variables</head>
-<p>We will be inserting a lot of data into the table using R, so we will change the INSERT statement to use variables. See the code below the <emph>#Assemble the query</emph> remark.</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_24" corresp="code_getting-started-with-mysql-using-r_24.txt" rend="block"/></ab>
-<p>Let's test this program:</p>
-<list type="ordered">
-<item>Run a SELECT statement and note the rows you have.</item>
-<item>Run the R program above to insert another record.</item>
-<item>Perform the SELECT statement.  You should see an additional row of data.</item>
-</list>
-</div><div type="4"><head>SQL Errors</head>
-<p>Let's create a simple error in SQL to see what happens.</p>
-<p>In R change</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_25" corresp="code_getting-started-with-mysql-using-r_25.txt" rend="block"/></ab>
-<p>to</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_26" corresp="code_getting-started-with-mysql-using-r_26.txt" rend="block"/></ab>
-<p>and re-run the program.</p>
-<p>In the R Console there is an error:</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_27" corresp="code_getting-started-with-mysql-using-r_27.txt" rend="block"/></ab>
-<p>You can check with a SELECT statement that there is no record in the table with a story title of THE LOST LUSITANIA'S RUDDER.</p>
-<p>Single apostrophes are part of SQL syntax and they indicate a text value.  If they are in the wrong place, it causes an error.  We have to handle cases where we have data with apostrophes.  SQL accepts two apostrophes in an insert statement to represent an apostrophe in data ('').</p>
-<p>We'll handle apostrophes by using a gsub function to replace a single apostrophe with a double one, as per below.</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_28" corresp="code_getting-started-with-mysql-using-r_28.txt" rend="block"/></ab>
-<p>Now that you have handled the apostrophe in the title of the story, re-run the R program and then check with a SELECT statement in MySQL workbench.</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_29" corresp="code_getting-started-with-mysql-using-r_29.txt" rend="block"/></ab>
-<p>Once you see your test record, TRUNCATE tbl_newspaper_search_results to remove this test data.</p>
-</div></div></div><table>
-<row>
-<cell role="label">Function</cell>
-<cell role="label">Meaning</cell>
-</row>
-<row>
-<cell>append = TRUE )</cell>
-<cell>Append these values to what is in the table already.  If this program is run again, all of the rows in sampleData will be appended to the same table again.</cell>
-</row>
-<row>
-<cell>name = "tbl_newspaper_search_results",</cell>
-<cell>Insert the values from sampleData into the table tbl_newspaper_search_results.</cell>
-</row>
-<row>
-<cell>row.names = FALSE,</cell>
-<cell>No row names are specified.</cell>
-</row>
-<row>
-<cell>value = sampleGardenData,</cell>
-<cell>Write the values in the sampleData data frame to the table.</cell>
-</row>
-<row>
-<cell>dbWriteTable(storiesDb,</cell>
-<cell>Use the MySQL database connection storiesDb.</cell>
-</row>
-</table><div type="2"><head>Selecting data from a table with SQL using R</head>
-<p>Our goal here is to use the table of newspaper stories we have imported and make a graph of the number of stories published in Welsh Newspapers during each month of World War I that match the search terms (allotment and garden) and (German and submarine)</p>
-<p>The script below queries the database and produces the line graph plot below.  Read through the script to see what is happening. An explanation of script follows it.</p>
-<ab><code xml:id="code_getting-started-with-mysql-using-r_35" corresp="code_getting-started-with-mysql-using-r_35.txt" rend="block"/></ab>
-<table>
-<row>
-<cell role="label">SQL</cell>
-<cell role="label">Meaning</cell>
-</row>
-<row>
-<cell>ORDER BY YEAR(story_date_published),MONTH(story_date_published);</cell>
-<cell>This puts the result set in order by date, which is useful since we want to make a graph by date.</cell>
-</row>
-<row>
-<cell>GROUP BY YEAR(story_date_published),MONTH(story_date_published)</cell>
-<cell>This GROUP BY statement is important for the COUNT above. Here the data is grouped by month and year so that we can count all of the records in the group.</cell>
-</row>
-<row>
-<cell>FROM tbl_newspaper_search_results</cell>
-<cell>This is the database table we're selecting data from.</cell>
-</row>
-<row>
-<cell>COUNT(CONCAT(MONTH(story_date_published),' ',YEAR(story_date_published))) as 'count'</cell>
-<cell>This provides a count of the number of stories published that share the same month and year publishing date. CONCAT stands for concatenate which creates a single text value from two or more separate text values, in this case the month and the year.</cell>
-</row>
-<row>
-<cell>SELECT (</cell>
-<cell>SELECT data matching the condition in the WHERE clause FROM the database table named.</cell>
-</row>
-</table></div><div type="2"><head>Going further with MySQL</head>
-<p>If you wanted to put a database on a website, using MySQL as the database and the PHP language to build the pages of the site is one way to do this. An example of this type of website is one I built to <ref target="http://www.jeffblackadar.ca/graham_fellowship/corpus_entities_equity/">search issues of the Equity newspaper</ref>. Larry Ullman's book <emph>PHP and MySQL for Dynamic Web Sites</emph> covers how to set up and connect to a database using MySQL and PHP in a hacker resistant way.</p>
-<p>For examples of using SQL to sort and group data as well as perform calculations, see:
+                    </list>
+                    <p>All of the above steps can be done with a command if you prefer.  This command could be run in the Query window to create the table with the columns noted below.</p>
+                    <ab>
+                        <code xml:id="code_getting-started-with-mysql-using-r_5" corresp="code_getting-started-with-mysql-using-r_5.txt" rend="block"/>
+                    </ab>
+                    <p>
+                        <emph>Tip: Take your time to think about table design and naming since a well designed database will be easier to work with and understand.</emph>
+                    </p>
+                </div>
+                <div type="3">
+                    <head>Add a user to connect to the database</head>
+                    <p>A user is an account that has permission to connect to a database. Below, we are adding a new user so that this account connects only to the new database. Using this user account for one connection to this database limits exposure to other databases in case the password for this user is compromised. Giving a user the least privileges it needs to perform what you need it to do reduces the risk if someone else learns your user's password. For example, if a user can only read a database, it is less of a risk if the password is cracked than for a user that can also change or delete the database.</p>
+                    <p>In the MySQL Workbench menu click <hi rend="bold">Server</hi> and then <hi rend="bold">Users and Privileges</hi>
+                    </p>
+                    <p>
+                        <hi rend="bold">Mac users</hi> Some Mac computers, like my testing laptop, don't display the <hi rend="bold">Schema Privileges</hi> panel correctly.  See the note below the screenshot if this happens to you.</p>
+                    <p>Click the <hi rend="bold">Add Account</hi> button and complete the Details for account newuser dialog box:</p>
+                    <list type="ordered">
+                        <item>Login Name: <hi rend="bold">newspaper_search_results_user</hi>
+                        </item>
+                        <item>Authentication Type: select <hi rend="bold">Standard</hi>
+                        </item>
+                        <item>Limit to Hosts Matching: <hi rend="bold">localhost</hi>
+                        </item>
+                        <item>Enter and confirm a password <emph>SomethingDifficult</emph>
+                        </item>
+                        <item>Click on the <hi rend="bold">Administrative Roles</hi> tab.  Make sure nothing is checked.  This account is for accessing the database only.</item>
+                        <item>Click on the <hi rend="bold">Schema Privileges</hi> tab and click <hi rend="bold">Add Entry</hi>
+                        </item>
+                        <item>In the <hi rend="bold">New Schema Privilege Definition</hi> diablog box, click the <hi rend="bold">Selected schema:</hi> radio button and select <hi rend="bold">newspaper_search_results</hi>.</item>
+                        <item>Click all of the Object Rights: SELECT, INSERT, UPDATE, DELETE, EXECUTE, SHOW VIEW as per the image below. (This user will need to do many things later in the lesson so we are giving it many rights.)</item>
+                        <item>Click the <hi rend="bold">Apply</hi> button.</item>
+                    </list>
+                    <figure>
+                        <desc>Setting permissions for new account</desc>
+                        <graphic url="getting-started-with-mysql-2.png"/>
+                    </figure>
+                    <div type="4">
+                        <head>Schema Privileges not displaying</head>
+                        <p>Some Mac computers, like my testing laptop, don't display the <hi rend="bold">Schema Privileges</hi> panel correctly.  In that case, you can accomplish the above with a script using the Query Window.</p>
+                        <p>If you have already created the user above run this command to grant the user privileges:</p>
+                        <ab>
+                            <code xml:id="code_getting-started-with-mysql-using-r_6" corresp="code_getting-started-with-mysql-using-r_6.txt" rend="block"/>
+                        </ab>
+                        <p>If you have not created a user yet run these two commands to create the user and then grant the user privileges:</p>
+                        <ab>
+                            <code xml:id="code_getting-started-with-mysql-using-r_7" corresp="code_getting-started-with-mysql-using-r_7.txt" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4">
+                        <head>MySQL version 8 and user Authentication Type.</head>
+                        <p>When a user is created in MySQL 8 Workbench the <hi rend="bold">Authentication Type</hi> is defaulted to <hi rend="bold">caching_sha2_password</hi>. That type of authentication causes an error for the R package we will use to connect to the database later in this lesson. The error is <emph>Authentication plugin 'caching_sha2_password' cannot be loaded</emph> and it is described in <ref target="https://stackoverflow.com/questions/49194719/authentication-plugin-caching-sha2-password-cannot-be-loaded">Stack Overflow</ref>.</p>
+                        <p>To avoid this error we can change the user's Authentication Type to Standard. To do this, run this command:</p>
+                        <ab>
+                            <code xml:id="code_getting-started-with-mysql-using-r_8" corresp="code_getting-started-with-mysql-using-r_8.txt" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Create an R Script that connects to the database</head>
+                <p>Open RStudio, which you installed earlier in this lesson.  See the <ref target="#rstudio">RStudio</ref> section.</p>
+                <p>We'll now use RStudio to make a new R Script and save the script with the name newspaper_search.R. (Sometimes in this lesson I will refer to an R Script as a program.)</p>
+                <p>Go to File &gt; New File &gt; R Script, then save that new file with the name newspaper_search.R.</p>
+                <p>We will use the RMariaDB package to connect to MySQL.  (If you're curious, documentation for the RMariaDB package is <ref target="https://cran.r-project.org/web/packages/RMariaDB/RMariaDB.pdf">here</ref>.)</p>
+                <p>If you don't have the library RMariaDB installed (which is likely, if this is the first time you're using RStudio), install it using the RStudio Console.  After opening RStudio, copy and paste the following into the left window at the &gt; prompt, then press enter:</p>
+                <ab>
+                    <code xml:id="code_getting-started-with-mysql-using-r_9" corresp="code_getting-started-with-mysql-using-r_9.txt" rend="block"/>
+                </ab>
+                <p>Add this statement to the newspaper_search.R program</p>
+                <ab>
+                    <code xml:id="code_getting-started-with-mysql-using-r_10" corresp="code_getting-started-with-mysql-using-r_10.txt" rend="block"/>
+                </ab>
+                <div type="3">
+                    <head>Connecting to the database with a password</head>
+                    <p>We will connect to the database at first using a password. (Later we'll use a better way to connect.)  For now, we will use a variable to store the password.  Each time you start R you'll need to reset this variable, but that is better than publishing a hardcoded password if you share your programs, like you may do using GitHub.</p>
+                    <p>In the RStudio console type the command below, replacing <emph>SomethingDifficult</emph> with the password you created for newspaper_search_results_user in the steps you did above to add a user to connect to the database.</p>
+                    <ab>
+                        <code xml:id="code_getting-started-with-mysql-using-r_11" corresp="code_getting-started-with-mysql-using-r_11.txt" rend="block"/>
+                    </ab>
+                    <p>Add the following R statements to your newspaper_search.R file and save it.</p>
+                    <p>To run this script, select all the text and click the Run button. (There are other ways to run just a part of an R script or the whole script.  If you are curious, look in the menu under Code &gt; Run Region. CTRL+ALT+R will run all of the R code in the script.)</p>
+                    <ab>
+                        <code xml:id="code_getting-started-with-mysql-using-r_12" corresp="code_getting-started-with-mysql-using-r_12.txt" rend="block"/>
+                    </ab>
+                    <p>In the console you should see:</p>
+                    <ab>
+                        <code xml:id="code_getting-started-with-mysql-using-r_13" corresp="code_getting-started-with-mysql-using-r_13.txt" rend="block"/>
+                    </ab>
+                    <p>Success! you have:</p>
+                    <list type="ordered">
+                        <item>Connected to the database with dbConnect.</item>
+                        <item>Listed the table in the database with dbListTables.</item>
+                        <item>Disconnected from the database using dbDisconnect.</item>
+                    </list>
+                    <div type="4">
+                        <head>Connecting to the database with a password stored in a configuration file</head>
+                        <p>The above example to connect is one way to make a connection.  The connection method described below stores the database connection information in a configuration file so that you do not have to type a password into a variable every time you start a new session in R. I found this to be a finicky process, but it is a more standard and secure way of protecting the credentials used to log into your database.  This connection method will be used in the code for the remainder of this tutorial, but it can be subsituted with the simpler connection method above if you prefer.</p>
+                        <div type="5">
+                            <head>Create the .cnf file to store the MySQL database connection information</head>
+                            <list type="ordered">
+                                <item>Open a text editor, like notepad, nano or TextEdit, and paste in the items below, changing the password to the one you created for newspaper_search_results_user in the steps you did above to add a user to connect to the database.</item>
+                            </list>
+                            <ab>
+                                <code xml:id="code_getting-started-with-mysql-using-r_14" corresp="code_getting-started-with-mysql-using-r_14.txt" rend="block"/>
+                            </ab>
+                            <list type="ordered">
+                                <item>
+                                    <p>Save this file somewhere outside of your R working directory.  I saved mine in the same folder as other MySQL settings files.  On my PC machine this was: C:\ProgramData\MySQL\MySQL Server 5.7\  Depending on your operating system and version of MySQL this location may be somewhere else. On a Mac I used /Users/blackadar/Documents/ as the folder.  I have tested putting this file in different places, it just needs to be somewhere R can locate it when the program runs. Name the file <hi rend="bold">newspaper_search_results.cnf</hi>.</p>
+                                </item>
+                                <item>
+                                    <p>Update the newspaper_search.R program above to connect to the database using the configuration file.</p>
+                                </item>
+                            </list>
+                            <ab>
+                                <code xml:id="code_getting-started-with-mysql-using-r_15" corresp="code_getting-started-with-mysql-using-r_15.txt" rend="block"/>
+                            </ab>
+                            <list type="ordered">
+                                <item>Run your script.</item>
+                            </list>
+                            <p>In the console, among other lines, you should see again:</p>
+                            <ab>
+                                <code xml:id="code_getting-started-with-mysql-using-r_16" corresp="code_getting-started-with-mysql-using-r_16.txt" rend="block"/>
+                            </ab>
+                            <p>You have successfully connected to the database using a configuration file.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Storing data in a table with SQL</head>
+                <p>In this section of the lesson we'll create a SQL statement to insert a row of data into the database table about this <ref target="http://newspapers.library.wales/view/4121281/4121288/94/">newspaper story</ref>.  We'll insert the record first in MySQL workbench and later we'll do it in R.</p>
+                <list type="ordered">
+                    <item>In MySQL Workbench, click the icon labelled SQL+ to create a new SQL tab for executing queries.</item>
+                    <item>Paste this statement below into the query window. This will insert a record into the table.</item>
+                </list>
+                <ab>
+                    <code xml:id="code_getting-started-with-mysql-using-r_17" corresp="code_getting-started-with-mysql-using-r_17.txt" rend="block"/>
+                </ab>
+                <list type="ordered">
+                    <item>Click the lightening bolt icon in the SQL tab to execute the SQL statement.</item>
+                </list>
+                <figure>
+                    <desc>Inserting a record into a table using MySQL Workbench</desc>
+                    <graphic url="getting-started-with-mysql-3.png"/>
+                </figure>
+                <head>Explanation of the INSERT statement</head>
+                <table>
+                    <row>
+                        <cell role="label">SQL</cell>
+                        <cell role="label">Meaning</cell>
+                    </row>
+                    <row>
+                        <cell>INSERT INTO tbl_newspaper_search_results (</cell>
+                        <cell>INSERT a record into the table named tbl_newspaper_search_results</cell>
+                    </row>
+                    <row>
+                        <cell>story_title,</cell>
+                        <cell>name of field to be populated by a value</cell>
+                    </row>
+                    <row>
+                        <cell>story_date_published,</cell>
+                        <cell>"</cell>
+                    </row>
+                    <row>
+                        <cell>story_url,</cell>
+                        <cell>"</cell>
+                    </row>
+                    <row>
+                        <cell>search_term_used)</cell>
+                        <cell>"</cell>
+                    </row>
+                    <row>
+                        <cell>VALUES('THE LOST LUSITANIA.',</cell>
+                        <cell>The value to be inserted into the story_title field</cell>
+                    </row>
+                    <row>
+                        <cell>'1915-05-21',</cell>
+                        <cell>story_date_published field</cell>
+                    </row>
+                    <row>
+                        <cell>LEFT(RTRIM('http://newspapers.library.wales/view/4121281/4121288/94/'),99),</cell>
+                        <cell>story_url field.  This field is a VARCHAR(99) so it has a maximum length of 99 characters.  Inserting a URL longer than 99 characters would cause an error and so two functions are used to control for that.  RTRIM() trims trailing spaces to the right of the URL.  LEFT(value,99) returns only the leftmost 99 characters of the trimmed URL.  This URL is much shorter than that and so these functions are here for an example only.</cell>
+                    </row>
+                    <row>
+                        <cell>'German+Submarine');</cell>
+                        <cell>search_term_used field</cell>
+                    </row>
+                </table>
+                <p>Optional: Modify the INSERT statement above and execute it a few more times. For example</p>
+                <ab>
+                    <code xml:id="code_getting-started-with-mysql-using-r_18" corresp="code_getting-started-with-mysql-using-r_18.txt" rend="block"/>
+                </ab>
+                <div type="3">
+                    <head>Querying data in a table with SQL</head>
+                    <p>In this section of the lesson we'll create a SQL statement to select a row of data from the database table we just inserted.  We'll select the record first in MySQL workbench and later we'll do it in R.</p>
+                    <list type="ordered">
+                        <item>Paste this statement below into a query window in MySQL workbench. This will select records from the table.</item>
+                    </list>
+                    <ab>
+                        <code xml:id="code_getting-started-with-mysql-using-r_19" corresp="code_getting-started-with-mysql-using-r_19.txt" rend="block"/>
+                    </ab>
+                    <list type="ordered">
+                        <item>Highlight the SELECT statement and click the lightening bolt icon in the SQL tab to execute it. You should see the story title "THE LOST LUSITANIA." in the Result Grid. See below.</item>
+                    </list>
+                    <figure>
+                        <desc>Selecting records from a table using MySQL Workbench</desc>
+                        <graphic url="getting-started-with-mysql-4.png"/>
+                    </figure>
+                    <p>Optional: Modify the SELECT statement above by changing the fields selected and run it again. Add more than one field to the SELECT statement and run it:</p>
+                    <ab>
+                        <code xml:id="code_getting-started-with-mysql-using-r_20" corresp="code_getting-started-with-mysql-using-r_20.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Storing data in a table with SQL using R</head>
+                    <p>Let's do this using R! Below is an expanded version of the R Script we used above to connect to the database. For brevity, the first 3 comments we had in the R Script above are removed.  We no longer need them.</p>
+                    <p>In line 4 of the program below, remember to change the path to the rmariadb.settingsfile that matches your computer.</p>
+                    <ab>
+                        <code xml:id="code_getting-started-with-mysql-using-r_21" corresp="code_getting-started-with-mysql-using-r_21.txt" rend="block"/>
+                    </ab>
+                    <p>In the script above we do two steps to insert a record:</p>
+                    <list type="ordered">
+                        <item>Define the INSERT statement in the line beginning with: query&lt;-"INSERT INTO tbl_newspaper_search_results (</item>
+                        <item>Execute the INSERT statement stored in the query variable with: rsInsert &lt;- dbSendQuery(storiesDb, query)</item>
+                    </list>
+                    <p>Run the script above in R Studio and then execute a SELECT in MySQL Workbench. Do you see the new record you added?</p>
+                    <div type="4">
+                        <head>Clean up the test data</head>
+                        <p>At this point you likely have more than one record with the story title of "THE LOST LUSITANIA." which is fine for testing, but we don't want duplicate data. We will remove the test data and start again.  Using the query window in MySQL Workbench run this SQL statement:</p>
+                        <ab>
+                            <code xml:id="code_getting-started-with-mysql-using-r_22" corresp="code_getting-started-with-mysql-using-r_22.txt" rend="block"/>
+                        </ab>
+                        <p>In the Action Output pane of MySQL Workbench you should see:</p>
+                        <ab>
+                            <code xml:id="code_getting-started-with-mysql-using-r_23" corresp="code_getting-started-with-mysql-using-r_23.txt" rend="block"/>
+                        </ab>
+                        <p>To practice what we just did:</p>
+                        <list type="ordered">
+                            <item>Run a SELECT statement again.  You should not get any rows back.</item>
+                            <item>Re-run the R program above to insert a record.</item>
+                            <item>Perform the SELECT statement.  You should see one row of data.</item>
+                        </list>
+                    </div>
+                    <div type="4">
+                        <head>Change the INSERT statement to use variables</head>
+                        <p>We will be inserting a lot of data into the table using R, so we will change the INSERT statement to use variables. See the code below the <emph>#Assemble the query</emph> remark.</p>
+                        <ab>
+                            <code xml:id="code_getting-started-with-mysql-using-r_24" corresp="code_getting-started-with-mysql-using-r_24.txt" rend="block"/>
+                        </ab>
+                        <p>Let's test this program:</p>
+                        <list type="ordered">
+                            <item>Run a SELECT statement and note the rows you have.</item>
+                            <item>Run the R program above to insert another record.</item>
+                            <item>Perform the SELECT statement.  You should see an additional row of data.</item>
+                        </list>
+                    </div>
+                    <div type="4">
+                        <head>SQL Errors</head>
+                        <p>Let's create a simple error in SQL to see what happens.</p>
+                        <p>In R change</p>
+                        <ab>
+                            <code xml:id="code_getting-started-with-mysql-using-r_25" corresp="code_getting-started-with-mysql-using-r_25.txt" rend="block"/>
+                        </ab>
+                        <p>to</p>
+                        <ab>
+                            <code xml:id="code_getting-started-with-mysql-using-r_26" corresp="code_getting-started-with-mysql-using-r_26.txt" rend="block"/>
+                        </ab>
+                        <p>and re-run the program.</p>
+                        <p>In the R Console there is an error:</p>
+                        <ab>
+                            <code xml:id="code_getting-started-with-mysql-using-r_27" corresp="code_getting-started-with-mysql-using-r_27.txt" rend="block"/>
+                        </ab>
+                        <p>You can check with a SELECT statement that there is no record in the table with a story title of THE LOST LUSITANIA'S RUDDER.</p>
+                        <p>Single apostrophes are part of SQL syntax and they indicate a text value.  If they are in the wrong place, it causes an error.  We have to handle cases where we have data with apostrophes.  SQL accepts two apostrophes in an insert statement to represent an apostrophe in data ('').</p>
+                        <p>We'll handle apostrophes by using a gsub function to replace a single apostrophe with a double one, as per below.</p>
+                        <ab>
+                            <code xml:id="code_getting-started-with-mysql-using-r_28" corresp="code_getting-started-with-mysql-using-r_28.txt" rend="block"/>
+                        </ab>
+                        <p>Now that you have handled the apostrophe in the title of the story, re-run the R program and then check with a SELECT statement in MySQL workbench.</p>
+                        <ab>
+                            <code xml:id="code_getting-started-with-mysql-using-r_29" corresp="code_getting-started-with-mysql-using-r_29.txt" rend="block"/>
+                        </ab>
+                        <p>Once you see your test record, TRUNCATE tbl_newspaper_search_results to remove this test data.</p>
+                    </div>
+                </div>
+            </div>
+            <head>Storing a comma separated value .csv file into a MySQL database</head>
+            <p>In the next part of the lesson we'll query the database table.  Our goal is to have enough data in the table to make a graph. To prepare for that let's load some sample data from comma separated value (.csv) text files.</p>
+            <p>Download these .csv files to your R working directory. These files are stored in GitHub so download the Raw version of the files.</p>
+            <list type="ordered">
+                <item>
+                    <ref target="/assets/getting-started-with-mysql-using-r/sample-data-allotment-garden.csv">sample-data-allotment-garden.csv</ref> This is a list of Welsh newspaper stories published during World War I that match the search terms allotment and garden.</item>
+                <item>
+                    <ref target="/assets/getting-started-with-mysql-using-r/sample-data-submarine.csv">sample-data-submarine.csv</ref> This is a list of Welsh newspaper stories published during World War I that match the search terms German and submarine.</item>
+            </list>
+            <p>In R, execute the following read.csv() function and then see what is in the sampleData data frame.</p>
+            <ab>
+                <code xml:id="code_getting-started-with-mysql-using-r_30" corresp="code_getting-started-with-mysql-using-r_30.txt" rend="block"/>
+            </ab>
+            <p>You should see a lot of data, including what is below. Check the Environment tab on the right side of RStudio. The sampleGardenData Data Frame should contain "1242 obs. of 4 variables".</p>
+            <ab>
+                <code xml:id="code_getting-started-with-mysql-using-r_31" corresp="code_getting-started-with-mysql-using-r_31.txt" rend="block"/>
+            </ab>
+            <p>Note that in this sample data, field names are included in the header for convenience:  story_title, story_date_published, story_url and search_term_used.</p>
+            <p>As noted above, our goal here is to insert the sample data that is now stored in the sampleGardenData data frame into the MySQL table tbl_newspaper_search_results.  We can do this a couple different ways, including looping through each row of the data frame and executing an INSERT command like we did above. Here though, we'll use one command to insert all of the rows in sampleGardenData at one time: <emph>dbWriteTable</emph>. Don't run this statement yet, just read it.</p>
+            <ab>
+                <code xml:id="code_getting-started-with-mysql-using-r_32" corresp="code_getting-started-with-mysql-using-r_32.txt" rend="block"/>
+            </ab>
+            <table>
+                <row>
+                    <cell role="label">Function</cell>
+                    <cell role="label">Meaning</cell>
+                </row>
+                <row>
+                    <cell>dbWriteTable(storiesDb,</cell>
+                    <cell>Use the MySQL database connection storiesDb.</cell>
+                </row>
+                <row>
+                    <cell>value = sampleGardenData,</cell>
+                    <cell>Write the values in the sampleData data frame to the table.</cell>
+                </row>
+                <row>
+                    <cell>row.names = FALSE,</cell>
+                    <cell>No row names are specified.</cell>
+                </row>
+                <row>
+                    <cell>name = "tbl_newspaper_search_results",</cell>
+                    <cell>Insert the values from sampleData into the table tbl_newspaper_search_results.</cell>
+                </row>
+                <row>
+                    <cell>append = TRUE )</cell>
+                    <cell>Append these values to what is in the table already.  If this program is run again, all of the rows in sampleData will be appended to the same table again.</cell>
+                </row>
+            </table>
+            <p>We're not ready to run dbWriteTable() yet, we need to connect to the database first. Here is the program to do that, as well as load sample-data-submarine.csv too. Read through this and run it.</p>
+            <ab>
+                <code xml:id="code_getting-started-with-mysql-using-r_33" corresp="code_getting-started-with-mysql-using-r_33.txt" rend="block"/>
+            </ab>
+            <p>If you run this more than once, you will have duplicate records.  If that happens, just TRUNCATE the table and run the program again, but only once.  You can check that you have the right number of records.  In MySQL Workbench run this in the query window:</p>
+            <ab>
+                <code xml:id="code_getting-started-with-mysql-using-r_34" corresp="code_getting-started-with-mysql-using-r_34.txt" rend="block"/>
+            </ab>
+            <p>You should have a count of 2880 records. 1242 from sampleGardenData and 1638 from sampleSubmarineData.</p>
+            <div type="2">
+                <head>Selecting data from a table with SQL using R</head>
+                <p>Our goal here is to use the table of newspaper stories we have imported and make a graph of the number of stories published in Welsh Newspapers during each month of World War I that match the search terms (allotment and garden) and (German and submarine)</p>
+                <p>The script below queries the database and produces the line graph plot below.  Read through the script to see what is happening. An explanation of script follows it.</p>
+                <ab>
+                    <code xml:id="code_getting-started-with-mysql-using-r_35" corresp="code_getting-started-with-mysql-using-r_35.txt" rend="block"/>
+                </ab>
+                <head>Explanation of the select and plot data program.</head>
+                <p>The method to connect to the database is explained <ref target="#connecting-to-the-database-with-a-password">above</ref>.</p>
+                <p>This program selects two result sets of data and plots them on a graph. One of the result sets is newspaper stories matching the search German+Submarine.  They are queried with this SELECT statement:</p>
+                <ab>
+                    <code xml:id="code_getting-started-with-mysql-using-r_36" corresp="code_getting-started-with-mysql-using-r_36.txt" rend="block"/>
+                </ab>
+                <table>
+                    <row>
+                        <cell role="label">SQL</cell>
+                        <cell role="label">Meaning</cell>
+                    </row>
+                    <row>
+                        <cell>SELECT (</cell>
+                        <cell>SELECT data matching the condition in the WHERE clause FROM the database table named.</cell>
+                    </row>
+                    <row>
+                        <cell>COUNT(CONCAT(MONTH(story_date_published),' ',YEAR(story_date_published))) as 'count'</cell>
+                        <cell>This provides a count of the number of stories published that share the same month and year publishing date. CONCAT stands for concatenate which creates a single text value from two or more separate text values, in this case the month and the year.</cell>
+                    </row>
+                    <row>
+                        <cell>FROM tbl_newspaper_search_results</cell>
+                        <cell>This is the database table we're selecting data from.</cell>
+                    </row>
+                    <row>
+                        <cell>GROUP BY YEAR(story_date_published),MONTH(story_date_published)</cell>
+                        <cell>This GROUP BY statement is important for the COUNT above. Here the data is grouped by month and year so that we can count all of the records in the group.</cell>
+                    </row>
+                    <row>
+                        <cell>ORDER BY YEAR(story_date_published),MONTH(story_date_published);</cell>
+                        <cell>This puts the result set in order by date, which is useful since we want to make a graph by date.</cell>
+                    </row>
+                </table>
+                <p>The statements below run the query and puts the result set <emph>rs</emph> into data frame <emph>dbRows</emph>
+                </p>
+                <ab>
+                    <code xml:id="code_getting-started-with-mysql-using-r_37" corresp="code_getting-started-with-mysql-using-r_37.txt" rend="block"/>
+                </ab>
+                <p>Below the data frame <emph>dbRows</emph> is put into a time series with the <emph>ts()</emph> function so that it can be plotted for each month, starting from August 1914.</p>
+                <ab>
+                    <code xml:id="code_getting-started-with-mysql-using-r_38" corresp="code_getting-started-with-mysql-using-r_38.txt" rend="block"/>
+                </ab>
+                <p>Below, the data in the <emph>qts1</emph> time series is plotted on a graph</p>
+                <ab>
+                    <code xml:id="code_getting-started-with-mysql-using-r_39" corresp="code_getting-started-with-mysql-using-r_39.txt" rend="block"/>
+                </ab>
+                <p>What is different about the part of the program that plots the stories matching the search "Allotment And Garden"? Not very much at all.  We just use the <emph>lines()</emph> function to plot those results on the same plot we made above.</p>
+                <ab>
+                    <code xml:id="code_getting-started-with-mysql-using-r_40" corresp="code_getting-started-with-mysql-using-r_40.txt" rend="block"/>
+                </ab>
+                <div type="4">
+                    <head>Results of the select and plot data program.</head>
+                    <p>Below is what the plot should look like:</p>
+                    <figure>
+                        <desc>Plot of number of newspaper stories published each month matching search terms</desc>
+                        <graphic url="getting-started-with-mysql-5.png"/>
+                    </figure>
+                </div>
+            </div>
+            <div type="2">
+                <head>Going further with MySQL</head>
+                <p>If you wanted to put a database on a website, using MySQL as the database and the PHP language to build the pages of the site is one way to do this. An example of this type of website is one I built to <ref target="http://www.jeffblackadar.ca/graham_fellowship/corpus_entities_equity/">search issues of the Equity newspaper</ref>. Larry Ullman's book <emph>PHP and MySQL for Dynamic Web Sites</emph> covers how to set up and connect to a database using MySQL and PHP in a hacker resistant way.</p>
+                <p>For examples of using SQL to sort and group data as well as perform calculations, see:
 <ref target="http://web.archive.org/web/20171228130133/https://www.ntu.edu.sg/home/ehchua/programming/sql/MySQL_Beginner.html">MySQL by Examples for Beginners</ref> or MySQL's <ref target="https://dev.mysql.com/doc/refman/5.7/en/examples.html">Examples of Common Queries</ref>.</p>
-</div><div type="2"><head>Conclusion</head>
-<p>I hope that you now have the knowledge to set up a database table, connect to it and store records. Although we have only scratched the surface of the different ways to query data, I also hope that you now know the technique of using SELECT statements so that you can use them in your future digital history projects.</p>
-</div><div type="2"><head>Credits</head>
-<p>I completed this lesson thanks to the support of the <ref target="http://grahamresearchfellow.org/">George Garth Graham Undergraduate Digital History Research Fellowship</ref>.</p>
-<p>Thank you to Dr. Amanda Visconti for her guidance and support during the preparation of this lesson.</p>
-</div><div type="2"><head>References</head>
-<p>Ullman, L. 2005. <emph>PHP and MySQL for Dynamic Web Sites, 2nd ed.</emph> Berkeley, Calif: Peachpit.</p>
-</div><div type="2"><head>Endnotes</head>
-<p><ref type="footnotemark" target="#note_1"/> : Lincoln Mullen, "Natural Language Processing," RPubs, <ref target="https://rpubs.com/lmullen/nlp-chapter">https://rpubs.com/lmullen/nlp-chapter</ref>.</p>
-<p><ref type="footnotemark" target="#note_2"/> : Jason A. French, "Using R With MySQL Databases," blog (3 July 2014), <ref target="http://www.jason-french.com/blog/2014/07/03/using-r-with-mysql-databases/">http://www.jason-french.com/blog/2014/07/03/using-r-with-mysql-databases/</ref>.</p>
-<p><ref type="footnotemark" target="#note_3"/> : Taylor Arnold and Lauren Tilton, "Basic Text Processing in R," Programming Historian (27 March 2017), <ref target="/lessons/basic-text-processing-in-r">/lessons/basic-text-processing-in-r</ref>.</p>
-<p><ref type="footnotemark" target="#note_4"/> : Taryn Dewar, "R Basics with Tabular Data," Programming Historian (05 September 2016), <ref target="/lessons/r-basics-with-tabular-data">/lessons/r-basics-with-tabular-data</ref>.</p>
-<p>The R program I used to gather the sample data is <ref target="https://github.com/jeffblackadar/getting-started-with-mysql/blob/master/newspaper-search-and-store.R">here</ref>.</p>
-</div></body>
-  </text>
+            </div>
+            <div type="2">
+                <head>Conclusion</head>
+                <p>I hope that you now have the knowledge to set up a database table, connect to it and store records. Although we have only scratched the surface of the different ways to query data, I also hope that you now know the technique of using SELECT statements so that you can use them in your future digital history projects.</p>
+            </div>
+            <div type="2">
+                <head>Credits</head>
+                <p>I completed this lesson thanks to the support of the <ref target="http://grahamresearchfellow.org/">George Garth Graham Undergraduate Digital History Research Fellowship</ref>.</p>
+                <p>Thank you to Dr. Amanda Visconti for her guidance and support during the preparation of this lesson.</p>
+            </div>
+            <div type="2">
+                <head>References</head>
+                <p>Ullman, L. 2005. <emph>PHP and MySQL for Dynamic Web Sites, 2nd ed.</emph> Berkeley, Calif: Peachpit.</p>
+            </div>
+            <div type="2">
+                <head>Endnotes</head>
+                <p>
+                    <ref type="footnotemark" target="#en_note_1"/> : Lincoln Mullen, "Natural Language Processing," RPubs, <ref target="https://rpubs.com/lmullen/nlp-chapter">https://rpubs.com/lmullen/nlp-chapter</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_2"/> : Jason A. French, "Using R With MySQL Databases," blog (3 July 2014), <ref target="http://www.jason-french.com/blog/2014/07/03/using-r-with-mysql-databases/">http://www.jason-french.com/blog/2014/07/03/using-r-with-mysql-databases/</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_3"/> : Taylor Arnold and Lauren Tilton, "Basic Text Processing in R," Programming Historian (27 March 2017), <ref target="/lessons/basic-text-processing-in-r">/lessons/basic-text-processing-in-r</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_4"/> : Taryn Dewar, "R Basics with Tabular Data," Programming Historian (05 September 2016), <ref target="/lessons/r-basics-with-tabular-data">/lessons/r-basics-with-tabular-data</ref>.</p>
+                <p>The R program I used to gather the sample data is <ref target="https://github.com/jeffblackadar/getting-started-with-mysql/blob/master/newspaper-search-and-store.R">here</ref>.</p>
+            </div>
+        </body>
+    </text>
 </TEI>

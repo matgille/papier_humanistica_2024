@@ -1,0 +1,403 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="generer-jeu-donnees-texte-ocr">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Générer un jeu de données structuré à partir d’un texte océrisé</title>
+                <author role="original_author">Jon Crump</author>
+                <editor role="reviewers">Brandon Hawk</editor>
+                <author role="translators">Antoine Gourlay</author>
+                <editor role="translation-reviewers">
+                    <persName>Floriane Chiffoleau</persName>
+                    <persName>Jean-Luc Mirepoix</persName>
+                </editor>
+                <editor role="editors">Fred Gibbs</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">11/19/2021</date>
+                <idno type="doi">10.46430/phfr0020</idno>
+                <date type="published">11/25/2014</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#generating-an-ordered-data-set-from-an-OCR-text-file"/>.</p>
+                <p>There are other translations: <ref target=""/>
+                </p>
+                <p>There are other translations: <ref target=""/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Ce tutoriel présente des stratégies pour traiter la sortie OCR brute issue d’un texte scanné, l’analyser afin d'isoler et de corriger les éléments essentiels des métadonnées, et générer un ensemble de données structuré (un dictionnaire Python) à partir de celle-ci.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="fr">
+        <body>
+            <div type="2">
+                <head>Objectifs de la leçon</head>
+                <p>Ce tutoriel présente des stratégies pour obtenir un jeu de données ordonné (un dictionnaire de données Python) à partir d'un document scanné qui sera traité de façon à en extraire et éventuellement à en corriger les éléments de métadonnées. Les exemples présentés sont spécifiques à un texte particulier mais la stratégie globale ainsi que certaines procédures plus caractéristiques peuvent être appliquées pour traiter n'importe quel document scanné, même si ceux-ci ne sont pas forcément similaires au document présenté ici.</p>
+            </div>
+            <div type="2">
+                <head>Introduction</head>
+                <p>On rencontre souvent le cas de l'historien(ne) impliqué(e) dans un projet numérique et désirant travailler avec des documents numérisés, se disant : « OK, je n'ai qu'à scanner l'ensemble de ces ressources documentaires d'une incroyable richesse et exploiter les documents numériques obtenus ! ». (Ceux d'entre nous qui se sont retrouvés dans ce cas de figure ont un petit sourire désabusé au coin des lèvres). Ces historien(ne)s découvrent bien vite que même les meilleurs systèmes de <ref target="https://fr.wikipedia.org/wiki/Reconnaissance_optique_de_caract%C3%A8res">reconnaissance optique de caractères</ref> ou OCR (<emph>optical character recognition</emph>) entraînent un nombre d'erreurs important. Alors les historien(ne)s se disent : « OK, je vais réunir des fonds et constituer une armée d'étudiants, diplomés ou non, ou même de n'importe quel gamin sachant lire et écrire, pour corriger les approximations de mon OCR ». (Le sourire désabusé s'accentue sur les visages).</p>
+                <list type="ordered">
+                    <item>
+                        <p>Il y a très peu de fonds accordés à ce type de recherche. De plus en plus, l'attention se porte sur les projets concernant les domaines du traitement automatique des langues (TAL), de la fouille de données (Data Mining), du Machine Learning, de l'analyse des graphes et apparentés, si bien que la question de produire de la documentation numérisée exploitable est délaissée. Sur le sujet, on a tendance à penser que Google s'occupe déjà des numérisations, n'est ce pas ? Et quel pourrait bien être le problème avec les scans de Google ? Et bien, vous trouverez la réponse à la fin...</p>
+                    </item>
+                    <item>
+                        <p>Même si vous trouviez le moyen de réunir un grand nombre de petites mains pour vous assister dans votre projet, il y a de grandes chances pour qu'une collection de chartes italiennes écrites au <span style="font-variant:small-caps;">XII</span>
+                            <sup>e</sup> siècle, traduites et publiées en 1935, les plongent dans un état de profonde dépression, fassent saigner leurs yeux et que le résultat soit toujours une grosse pile de documents contenant toujours une grande quantité d'erreurs sur lequel vous devrez encore effectuer un travail <hi rend="bold">difficile</hi> et <hi rend="bold">fastidieux</hi> afin de les rendre exploitables.</p>
+                    </item>
+                </list>
+                <p>Parcourir un document ligne par ligne et corriger les erreurs de l'OCR quand elles se présentent est une source d'erreurs inévitables. Il existe toutefois des moyens d'éviter une partie de ce travail fastidieux en automatisant certaines tâches. Un langage de script tel que Perl ou Python peut vous permettre d'identifier et de traiter les erreurs communes de l'OCR et de les corriger à l'aide des <ref target="https://fr.wikipedia.org/wiki/Expression_r%C3%A9guli%C3%A8re">expressions régulières</ref>, une façon d'identifier des motifs dans un texte (voir le tutoriel sur les <ref target="/en/lessons/cleaning-ocrd-text-with-regular-expressions">expressions régulières de L.T O'Hara)</ref>. Cependant, les expressions régulières ne vous seront utiles que si les expressions que vous recherchez sont régulières bien sûr. Malheureusement, une grande partie de ce que vous obtiendrez en sortie après avoir utilisé l'OCR sera tout sauf <emph>régulier</emph>. Si vous pouviez structurer ces données, votre outil d'analyse d'expression régulière deviendrait beaucoup plus utile.</p>
+                <p>Que se passerait-il si, par exemple, votre OCR interprétait les chaînes de caractères telles que « 21 July, 1921 » en « 2l July, 192l », remplaçant les « 1 » par des « l ». Vous apprécieriez grandement de savoir écrire un script de recherche et remplacement de toutes les instances de « 2l » en « 21 », mais que se passerait-il dans le cas où vous auriez un grand nombre d'occurences de cette chaîne de caractère dans votre document : « 2lb. hammers ». Vous obtiendriez alors des « 21b hammer », ce que vous ne souhaitiez évidemment pas. Si seulement vous pouviez dire à votre script de ne changer les « 2l » en « 21 » que dans les sections contenant des dates et non des unités de mesures. Si vous aviez à disposition un ensemble de données stucturé, vous pourriez faire ça.</p>
+                <p>Bien souvent, les documents que les historien(ne)s souhaitent numériser sont déjà des structures ordonnées de données : une collection ordonnée de documents issus d'une source primaire, un code juridique ou encore un cartulaire. Mais la structure éditoriale imposée à ces ressources est généralement conçue pour un type particulier de technologie d’extraction de données, c'est-à-dire un codex, un livre. Pour un texte numérisé, la structure utilisée sera différente. Si vous pouvez vous débarrasser de l’infrastructure liée au livre et réorganiser le texte selon les sections et les divisions qui vous intéressent, vous vous retrouverez avec des données sur lesquelles il sera beaucoup plus facile d'effectuer des recherches et des opérations de remplacement, et en bonus, votre texte deviendra immédiatement exploitable dans une multitude d’autres contextes.</p>
+                <p>C'est là qu'un langage de script comme Python devient très utile. Pour notre projet nous avons voulu préparer certains des documents d’une collection du <span style="font-variant:small-caps;">XII</span>
+                    <sup>e</sup> siècle d’<emph>imbreviatura</emph> du scribe italien connu sous le nom de <ref target="http://www.worldcat.org/oclc/17591390">Giovanni Scriba</ref> afin qu’ils puissent être traités par des historien(ne)s à des fins d’analyse TAL ou autres. Les pages de l'édition de 1935 ressemblent à cela :</p>
+                <figure>
+                    <desc>GS page 110</desc>
+                    <graphic url="gs_pg110.png"/>
+                </figure>
+                <p>Le document issu du traitement OCR à partir du fichier scanné ressemble à cela malgré les nombreuses améliorations apportées (j'ai redimensionné les lignes les plus longues afin qu'elles s'adaptent à la mise en page) :</p>
+                <ab>
+                    <code xml:id="code_generer-jeu-donnees-texte-ocr_0" corresp="code_generer-jeu-donnees-texte-ocr_0.txt" rend="block"/>
+                </ab>
+                <p>Dans le scan de l’original, l'œil du lecteur analyse facilement la page : la mise en page a un sens. Mais comme vous pouvez le voir, réduit à un texte simple comme celui-ci, aucune des métadonnées impliquées par la mise en page et la typographie ne peut être différenciée par des processus automatisés.</p>
+                <p>Vous pouvez constater à partir du scan que chaque charte comporte les métadonnées qui lui sont associées :</p>
+                <list type="unordered">
+                    <item>Numéro de charte</item>
+                    <item>Numéro de page</item>
+                    <item>Numéro de folio</item>
+                    <item>Un résumé italien, se terminant par une date quelconque</item>
+                    <item>Une ligne, qui se termine habituellement par un crochet fermant (]) qui représente une note de marge dans l’original</item>
+                    <item>Un ensemble de marqueurs de bas de page numérotés, dont la représentation textuelle apparaît au bas de chaque page de façon séquentielle, et redémarrant à partir de 1 sur chaque nouvelle page.</item>
+                    <item>Le texte latin de la charte elle-même</item>
+                </list>
+                <p>Tout cela est typique de ce type de ressources, bien que les conventions d'éditions puissent varier. Le fait est qu'il s'agit bien d'un ensemble <hi rend="bold">ordonné</hi> de données et non simplement d'une chaîne de caractères interminable. Avec des scripts Python assez simples, nous pouvons transformer notre sortie OCR en un ensemble de données ordonnées, dans ce cas un <ref target="https://docs.python.org/fr/3/tutorial/datastructures.html#dictionaries">dictionnaire Python</ref>, <hi rend="bold">avant</hi> de commencer à apporter des corrections au texte en lui-même. Avec un tel jeu de données ordonné en main, nous pouvons apporter des éléments de correction, et potentiellement effectuer beaucoup d’autres types de tâches, de manière plus efficace. </p>
+                <p>Ainsi, le but de ce tutoriel est de prendre un fichier texte brut, comme la sortie OCR ci-dessus, et de le transformer en un dictionnaire Python avec des champs pour le texte latin de la charte et pour chacun des éléments de métadonnées mentionnés ci-dessus :</p>
+                <ab>
+                    <code xml:id="code_generer-jeu-donnees-texte-ocr_1" corresp="code_generer-jeu-donnees-texte-ocr_1.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Souvenez-vous qu'il s'agit simplement d'une représentation textuelle d'une structure de données hébergée quelque part dans la mémoire de votre machine. Python désigne ce type de structure par le terme « dictionnaire », mais d'autres langages de programmation y font référence en tant que « hachage » ou « tableau associatif ». Le fait est qu’il est infiniment plus facile de faire n’importe quelle sorte d’analyse ou de manipulation d’un texte numérique s’il est sous une telle forme, plutôt que sous la forme d’un fichier texte brut. L’avantage est qu’une telle structure de données peut être interrogée, ou des calculs peuvent être effectués sur les données, sans avoir à analyser le texte.</p>
+            </div>
+            <div type="2">
+                <head>Quelques informations utiles avant de démarrer</head>
+                <p>Nous allons emprunter quelques fonctions rédigées par d’autres. Elles représentent toutes les deux des programmes assez sophistiqués. Comprendre ce qui se passe dans ces fonctions est instructif, mais pas indispensable. Lire et réutiliser le code des autres est une bonne façon d'apprendre la programmation, et représente le cœur du mouvement open source. Même si vous ne comprenez pas tout à fait comment elles fonctionnent, vous pouvez néanmoins tester des fonctions comme celle-ci pour voir si elles fonctionnent vraiment, et les adapter à votre problématique si elles sont pertinentes.</p>
+                <div type="3">
+                    <head>La distance de Levenshtein</head>
+                    <p>Vous remarquerez que certaines des métadonnées énumérées ci-dessus sont liées à des pages et que d’autres sont liées à la charte. Le but, c’est de les séparer les unes des autres. Il y a une classe de données liées à la page qui ne nous est pas utile dans ce contexte, et seulement significative dans le contexte d’un livre physique : les en-têtes et pieds de page. Dans notre document, ils prennent cette forme-ci sur les feuilles recto (dans un codex, un livre, <emph>recto</emph> est la page de droite, et <emph>verso</emph> son inverse, la page de gauche) :</p>
+                    <figure>
+                        <desc>en-tête recto</desc>
+                        <graphic url="gs_recto_header.png"/>
+                    </figure>
+                    <p>et cette forme-là sur les feuilles <emph>verso</emph> :</p>
+                    <figure>
+                        <desc>en-tête verso</desc>
+                        <graphic url="gs_verso_header.png"/>
+                    </figure>
+                    <p>Nous aimerions préserver la pagination pour chaque page de la charte, mais le texte d’en-tête ne nous est pas utile et va simplement rendre toute opération de recherche ou de remplacement plus complexe. Nous aimerions donc l'identifier et le remplacer par une chaîne qui est facile à trouver avec une expression régulière, et enfin stocker le numéro de page.
+Malheureusement, les expressions régulières ne vous seront pas d'une grande utilité dans le cas présent. Ces en-têtes peuvent apparaître sur n’importe quelle ligne du document obtenu après le traitement OCR, et l'efficacité avec laquelle le logiciel OCR peut les traiter est limitée. Voici quelques exemples d’en-têtes de page, <emph>recto</emph> et <emph>verso</emph>, dans notre sortie OCR brute.</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_2" corresp="code_generer-jeu-donnees-texte-ocr_2.txt" rend="block"/>
+                    </ab>
+                    <p>Ces chaînes de caractères ne sont pas assez régulières pour être identifiées de façon fiable avec des expressions régulières; cependant, si vous savez ce à quoi les chaînes sont censées ressembler, vous pouvez composer une sorte d’algorithme de similarité de chaîne pour tester chaque chaîne par rapport à un modèle et mesurer la probabilité qu’il s’agisse d’un en-tête de page. Heureusement, je n’ai pas eu à composer un tel algorithme, <ref target="https://fr.wikipedia.org/wiki/Distance_de_Levenshtein">Vladimir Levenshtein l’a fait pour nous en 1965</ref>. Un langage informatique peut encoder cet algorithme de plusieurs façons ; voici une fonction Python efficace qui fera très bien l'affaire :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_3" corresp="code_generer-jeu-donnees-texte-ocr_3.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Encore une fois, il s'agit d'un algorithme assez sophistiqué, mais pour notre objectif tout ce que nous avons besoin de savoir c’est que la fonction <code rend="inline">lev()</code> prend deux chaînes comme paramètres et retourne un nombre qui indique la « distance » entre les deux chaînes, ou combien de changements ont dû être apportés pour aller de la première chaîne à seconde. Donc : <code rend="inline">lev("fizz", "buzz")</code> retourne « 2 ».</p>
+                </div>
+                <div type="3">
+                    <head>Des chiffres romains aux chiffres arabes</head>
+                    <p>Vous remarquerez aussi que dans l’édition publiée, les chartes sont numérotées en chiffres romains. Convertir des chiffres romains en arabe constitue un défi très formateur en Python. Voici la solution la plus propre et la plus élégante que je connaisse :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_4" corresp="code_generer-jeu-donnees-texte-ocr_4.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Exécutez ce &lt;<ref target="/assets/chiffres_romains_arabes.txt">petit script</ref>&gt; pour voir en détail comment <code rend="inline">rome2ar</code> fonctionne. Une programmation élégante comme celle-ci peut presque s'apparenter à de la poésie.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>D'autres informations importantes</head>
+                <p>Si vous avez besoin d'importer des modules faisant partie de la bibliothèque standard de Python, il faudra que les premières lignes de votre programme soient les imports de ces modules. Si besoin, voir le tutoriel de Fred Gibbs sur <ref target="/fr/lecons/installation-modules-python-pip">
+                        <emph>l'installation des bibliothèques Python avec pip</emph>
+                    </ref>.</p>
+                <list type="ordered">
+                    <item>
+                        <p>Le premier est le module "re" (expression régulière) <code rend="inline">import re</code>. Les expressions régulières sont vos amies. Cependant, n’oubliez pas la blague de Jamie Zawinski :</p>
+                        <quote>
+                            <p>Quand elles se retrouvent confrontées à un problème, certaines personnes se disent : « Je n'ai qu'à utiliser les expressions régulières ! » Elles se retrouvent alors avec deux problèmes.</p>
+                        </quote>
+                        <p>(Je vous recommande une nouvelle fois de jeter un coup d’œil à la présentation de L.T. O’Hara ici sur le site du Programming Historian <ref target="/en/lessons/cleaning-ocrd-text-with-regular-expressions">Cleaning OCR’d text with Regular Expressions</ref>)</p>
+                    </item>
+                    <item>
+                        <p>Vous devrez réaliser l'import d'une bibliothèque Python qui nous sera utile : <code rend="inline">from pprint import pprint</code>. Il s'agit d'un outil de formatage pour les objets Python comme les listes et les dictionnaires. Vous en aurez besoin parce que les dictionnaires Python sont beaucoup plus faciles à lire s’ils sont formatés.</p>
+                    </item>
+                    <item>
+                        <p>L'import <code rend="inline">from collections import Counter</code> nous sera utile pour la section <ref target="/en/lessons/generer-jeu-donnees-texte-ocr#identifier-notes-bas-de-page">Identifier les notes de bas de page à l'aide d'une expression régulière</ref> que nous aborderons juste après. Ce n’est pas vraiment nécessaire, mais nous allons faire des opérations de comptage qui exigeraient beaucoup de lignes de code et cela nous épargnera du temps. Le module des collections a beaucoup d'utilité et vaut la peine qu'on se familiarise avec. Encore une fois, voir la présentation Pymotw de Doug Hellmann concernant le module des <ref target="https://docs.python.org/fr/3/library/collections.html">collections</ref>. Je souligne également que son livre <ref target="https://doughellmann.com/books/the-python-3-standard-library-by-example/">The Python Standard Library By Example</ref> vaut le coût.</p>
+                    </item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Un petit aperçu des expressions régulières telles qu'elles sont implémentées en Python</head>
+                <p>
+                    <ref target="/en/lessons/cleaning-ocrd-text-with-regular-expressions#introduction">L’introduction</ref> de L.T. O’Hara à l’utilisation d’expressions régulières en Python est inestimable. Dans ce contexte, nous devrions passer en revue quelques principes de base sur l’implémentation par Python d’expressions régulières, le module <code rend="inline">re</code>, qui fait partie de la bibliothèque standard de Python.</p>
+                <list type="ordered">
+                    <item>
+                        <code rend="inline">re.compile()</code> crée un objet de type expression régulière qui a un certain nombre de méthodes. Vous devriez vous familiariser avec <code rend="inline">.match()</code>, et <code rend="inline">.search()</code>, mais aussi <code rend="inline">.findall()</code> et <code rend="inline">.finditer()</code>.</item>
+                    <item>Gardez à l’esprit la différence entre <code rend="inline">.match()</code> et <code rend="inline">.search()</code>: <code rend="inline">.match()</code> ne cherche une correspondance qu’au <hi rend="bold">début</hi> d’une ligne, alors que <code rend="inline">.search()</code> parcourt toute la ligne mais <hi rend="bold">s’arrête à la première correspondance</hi> et ne retourne que la première occurrence qu’il trouve.</item>
+                    <item>
+                        <code rend="inline">.match()</code> et <code rend="inline">.search()</code> retournent les correspondances sous forme d'objets. Pour récupérer la chaîne de caractères correspondante, vous aurez besoin de <code rend="inline">mymatch.group(0)</code>. Si votre expression régulière compilée contient des parenthèses de regroupement (comme notre regex 'slug' ci-dessous), vous pouvez les récupérer sous forme de sous-chaînes de la chaîne appariée en utilisant <code rend="inline">mymatch.group(1)</code> etc.</item>
+                    <item>
+                        <code rend="inline">.findall()</code> et <code rend="inline">.finditer()</code> retourneront <hi rend="bold">toutes</hi> les occurrences de la chaîne correspondante ; <code rend="inline">.findall()</code> les retournera sous forme de liste de chaînes, mais <code rend="inline">.finditer()</code> retourne un <hi rend="bold">itérateur d’objets correspondant aux occurrences</hi>. (lisez la documentation sur la méthode <ref target="https://docs.python.org/fr/3/library/re.html#re.finditer">.finditer()</ref>.</item>
+                </list>
+                <div type="1">
+                    <head>Traitement itératif  de fichiers textes</head>
+                    <p>Nous allons commencer avec un seul fichier issu d'un traitement OCR. Nous générerons itérativement de nouvelles versions corrigées de ce fichier en l’utilisant comme entrée pour nos scripts Python. Parfois notre script va apporter des corrections automatiques mais, le plus souvent, nos scripts vont simplement nous alerter de l’endroit où se trouvent les problèmes dans le fichier d’entrée, et nous allons apporter des corrections manuellement. Ainsi, pour les premières opérations, nous voudrons produire de nouveaux fichiers textes révisés que nous utiliserons comme entrées pour les traitements à venir. Chaque fois que vous produisez un fichier texte, vous devrez le versioner et le dupliquer pour pouvoir toujours y revenir. La prochaine fois que vous exécutez votre code (au moment ou vous le développez) vous pourriez altérer le fichier et il sera toujours plus simple de restaurer l’ancienne version.</p>
+                    <p>Le code de ce tutoriel est fortement édité ; il n’est <hi rend="bold">pas</hi> exhaustif. Au fur et à mesure que vous peaufinerez vos fichiers d’entrée, vous écrirez beaucoup de petits scripts <emph>ad hoc</emph> pour vérifier l’efficacité de ce que vous avez fait jusqu’à présent. La gestion des versions vous permettra de mener vos expérimentations sans compromettre le travail déjà réalisé.</p>
+                    <h2>Un mot sur le déploiement du code dans ce tutoriel</h2>
+                    <p>Le code proposé dans ce tutoriel est valable pour la version 3 de Python.</p>
+                    <p>Lorsque vous écrivez du code dans un fichier texte et que vous l’exécutez, soit en ligne de commande, soit à partir de votre éditeur de texte ou de l’IDE, l’interpréteur Python exécute le code ligne par ligne, de haut en bas. Ainsi, le code au bas de la page dépendra souvent du code au-dessus.</p>
+                    <p>Une façon d’utiliser les extraits de code de la section 2 pourrait être de les réunir dans un seul fichier et de commenter les lignes que vous ne voulez pas exécuter. Chaque fois que vous exécuterez le fichier, vous voudrez avoir la certitude qu’il y a un déroulement logique à partir de la ligne <code rend="inline">#!</code> en haut, à travers vos différentes <code rend="inline">import</code>s et dans la déclaration de variables globales, et à chaque boucle ou bloc.</p>
+                    <p>Sinon, chacune des sous-sections de la section 2 peut également être traitée comme un script à part et chacun devra alors faire sa propre <code rend="inline">import</code>ation et déclaration de variables globales.</p>
+                    <p>Dans la section 3, « Création du dictionnaire », vous utiliserez un ensemble de données stockées en mémoire (le dictionnaire des <code rend="inline">chartes</code>) qui sera généré à partir du texte d’entrée le plus récent et cohérent que vous avez. Vous voudrez donc conserver un unique module Python dans lequel vous définirez en premier lieu le dictionnaire, avec vos déclarations d’<code rend="inline">import</code> et l’attribution de variables globales, suivi de chacune des quatre boucles qui modifieront le dictionnaire.</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_5" corresp="code_generer-jeu-donnees-texte-ocr_5.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <h2>Découpage du texte par pages</h2>
+                    <p>Tout d’abord, nous voulons trouver tous les en-têtes de page présents au <emph>recto</emph> et au <emph>verso</emph> et les remplacer par des chaînes cohérentes que nous pouvons facilement identifier avec une expression régulière. Le code suivant recherche des lignes qui sont similaires à ce que nous savons être nos en-têtes de page jusqu'à un certain seuil. Il faudra quelques expérimentations pour trouver ce seuil pour votre texte. Comme mes en-têtes <emph>recto</emph> et <emph>verso</emph> sont à peu près de la même longueur, les deux ont le même score de similitude de 26.</p>
+                    <quote>
+                        <p>NOTA BENE : la fonction <code rend="inline">lev()</code> décrite ci-dessus retourne une mesure de la « distance » entre deux chaînes, donc, plus la chaîne d’en-tête de page est courte, plus il est probable que cette technique ne fonctionnera pas. Si votre en-tête de page est simplement « en-tête », alors toute ligne composée d’un mot de sept lettres pourrait vous donner une distance de chaîne de 7, par exemple : <code rend="inline">lev("en-tête", "palavas")</code> retourne '7', ce qui ne vous éclaire pas plus. Dans notre texte, cependant, les chaînes d’en-tête sont assez longues et complexes pour vous donner des indications significatives, par exemple :</p>
+                    </quote>
+                    <p>
+                        <code rend="inline">lev("UNE CHAÎNE LAMBDA DE MÊME LONGUEUR: 38", 'IL CARTOLARE DI GIOVANNI SCRIBA')</code>
+                    </p>
+                    <p>retourne 33, mais une de nos chaînes d’en-tête, même estropiée par l’OCR, retourne 20 :</p>
+                    <p>
+                        <code rend="inline">lev("IL CIRTOL4RE DI CIOVINN1 St'Itlltl     269", 'IL CARTOLARE DI GIOVANNI SCRIBA')</code>
+                    </p>
+                    <p>Nous pouvons donc utiliser <code rend="inline">lev()</code> pour trouver et modifier nos chaînes d’en-tête ainsi :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_6" corresp="code_generer-jeu-donnees-texte-ocr_6.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Il y a beaucoup de calculs qui s'éxécutent dans la fonction <code rend="inline">lev()</code>. Il n’est pas très efficace de l’appeler sur toutes les lignes de notre texte, donc cela pourrait prendre un certain temps, selon la longueur de notre texte. Nous n’avons que 803 chartes dans le vol. 1. C’est un nombre qui reste modeste. Si cela prend 30 secondes ou même une minute pour exécuter notre scénario, alors qu’il en soit ainsi.</p>
+                    <p>Si nous exécutons ce script sur notre texte après traitement OCR, nous obtenons une sortie qui ressemble à ceci :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_7" corresp="code_generer-jeu-donnees-texte-ocr_7.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Pour chaque ligne, la sortie nous indique si c'est la page <emph>verso</emph> ou <emph>recto</emph>, le « score » de Levenshtein, puis le texte de la ligne (avec toutes les erreurs dedans). Notez que l'OCR a mal interprété le chiffre de la page pour la page 429. Plus le « score » de Levenshtein est bas, plus la ligne se rapproche du modèle que vous lui avez donné.</p>
+                    <p>Cela vous indique que le script a trouvé 430 lignes qui sont probablement des en-têtes de page. Vous savez combien de pages il devrait y avoir, donc si le script n’a pas trouvé tous les en-têtes, vous pouvez passer par la sortie en regardant les numéros de page, trouver les pages qu’il a manqué, et corriger les en-têtes manuellement, puis répéter l'opération jusqu’à ce que le script trouve tous les en-têtes de page.</p>
+                    <p>Une fois que vous avez trouvé et corrigé les en-têtes que le script n’a pas trouvés, vous pouvez alors écrire le texte corrigé dans un nouveau fichier qui servira de base pour les autres opérations ci-dessous. Donc à la place de</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_8" corresp="code_generer-jeu-donnees-texte-ocr_8.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Nous aurons le fichier texte :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_9" corresp="code_generer-jeu-donnees-texte-ocr_9.txt" lang="language-Python" rend="block"/>
+                    </ab>
+                    <p>Notez que pour beaucoup des opérations suivantes, nous utiliserons <code rend="inline">Gscriba = fin.readlines()</code> donc Gscriba sera une <hi rend="bold">liste python</hi> des lignes de notre texte d’entrée. Gardez cela à l’esprit, car les boucles <code rend="inline">for</code> que nous utiliserons dépendront du fait que nous allons itérer à travers les lignes de notre texte dans l'ordre du document.</p>
+                    <h2>Découpage du texte par charte (ou par section, lettre ou ce que vous souhaitez)</h2>
+                    <p>Le texte est découpé en plusieurs sous parties que constituent nos chartes et celles-ci sont délimitées par des chiffres romains majuscules sur une ligne à part. Nous avons donc besoin d’une regex pour trouver des chiffres romains de ce type. En voici une : <code rend="inline">romstr = re.compile(" s*[IVXLCDM]{2,}")</code>. Nous la placerons en haut de notre fichier comme variable « globale », de sorte qu’elle sera accessible à n’importe lequel des morceaux de code que nous écrirons plus tard.</p>
+                    <p>Le script ci-dessous va chercher des chiffres romains majuscules qui apparaissent sur une ligne à part. Bon nombre de nos numéros de chartes échoueront à ce test et le script indiquera qu'il manque un numéro de charte, souvent parce qu’il y a quelque chose avant ou après sur la ligne ; ou, <code rend="inline">KeyError</code>, souvent parce que l’OCR a brouillé les caractères (par ex. CCG pour 300, XOII pour 492). Exécutez ce script plusieurs fois, en corrigeant <code rend="inline">out1.txt</code> comme vous savez maintenant le faire jusqu’à ce que toutes les chartes soient prises en compte.</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_10" corresp="code_generer-jeu-donnees-texte-ocr_10.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Puisque nous savons combien de chartes il devrait y avoir. À la fin de notre boucle, la valeur de n devrait être la même que le nombre de chartes. Et, dans toute itération de la boucle, si la valeur de n ne correspond pas au numéro de la charte qui suit, alors nous savons que nous avons un problème quelque part, et les <code rend="inline">print</code> pour l'affichage en console devraient nous aider à le trouver.</p>
+                    <p>Voici un exemple de sortie que notre script devrait nous donner :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_11" corresp="code_generer-jeu-donnees-texte-ocr_11.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <quote>
+                        <p>NOTA BENE : notre regex signalera une erreur pour les chiffres romains à un chiffre (« I », « V », « X », etc.). Vous pourriez les tester dans le code, mais parfois laisser une erreur connue et commune est une aide pour vérifier l’efficacité de ce que vous faites. Notre objectif est de nous assurer que toutes les incohérences sur la ligne de numéro de la charte sont bien détectées.</p>
+                    </quote>
+                    <p>Une fois que nous avons trouvé et corrigé tous les en-têtes de charte en chiffres romains, alors nous pouvons écrire un nouveau fichier avec une chaîne facile à trouver grâce à notre regex, une « slug », pour chaque charte à la place du nombre romain de départ. Mettez la boucle <code rend="inline">for</code> ci-dessus en commentaire, et remplacez-la par celle-ci :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_12" corresp="code_generer-jeu-donnees-texte-ocr_12.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Bien qu’il soit important en soi pour nous d’avoir transformé notre sortie OCR de façon fiable et de l'avoir divisée par page et par charte, la chose la plus importante à propos de ces opérations est que vous connaissez le nombre de pages et de chartes, et que vous pouvez utiliser ces connaissances pour vérifier les opérations subséquentes. Si vous voulez réaliser une opération pour chaque charte, vous pouvez vérifier si celle-ci a fonctionné ou non parce que vous pouvez compter le nombre de chartes sur lesquelles elle aura fonctionné préalablement.</p>
+                    <h2>Identifier les marqueurs de folio à l'aide d'une expression régulière</h2>
+                    <p>Notre texte est tiré de l’édition de 1935 de Giovanni Scriba. Il s’agit d’une transcription d’un manuscrit cartulaire sous la forme d’un livre relié. L’édition publiée conserve la pagination de l'original en notant où les pages originales changent : [fo. 16 r.] le recto de la <span style="font-variant:small-caps;">16</span>
+                        <sup>e</sup> feuille du livre, suivie de son verso[fo. 16 v.]. Il s’agit de métadonnées que nous voulons préserver pour chacune des chartes afin qu’elles puissent être référencées par rapport à l’original, ainsi que par rapport à l’édition publiée par numéro de page.</p>
+                    <p>Bon nombre des marqueurs de folio (par ex. « [fo. 16 v.] ») apparaissent sur la même ligne que le chiffre romain de l’en-tête de la charte. Pour normaliser ces en-têtes de chartes pour l’opération ci-dessus, nous avons dû créer une rupture de ligne entre le marqueur de folio et le numéro de charte, de sorte que beaucoup de marqueurs de folio sont déjà sur leur propre ligne. Cependant, il arrive que le folio change quelque part au milieu du texte de la charte. Nous voulons que ces balises restent là où elles sont ; nous devrons traiter ces deux cas différemment. Dans les deux cas, nous devons nous assurer que tous les marqueurs de folio sont exempts d’erreurs afin de pouvoir les trouver de façon fiable au moyen d’une expression régulière. Encore une fois, puisque nous savons combien il y a de folios, nous pouvons savoir si nous les avons tous trouvés. Notez que parce que nous avons utilisé <code rend="inline">.readlines()</code>, <code rend="inline">Gscriba</code> est une liste, donc le script ci-dessous va afficher en console le numéro de ligne du fichier
+source ainsi que la ligne elle-même. Cela va vous permettre d'identifier tous les marqueurs de folio correctement formatés, de sorte que vous puissiez trouver et réparer ceux qui ont un problème.</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_13" corresp="code_generer-jeu-donnees-texte-ocr_13.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Nous voulons aussi nous assurer qu'aucune ligne ne possède plus d'un marqueur de folio. Nous pouvons nous en assurer en faisant ceci :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_14" corresp="code_generer-jeu-donnees-texte-ocr_14.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Comme vous l'avez fait précedemment, une fois que vous avez trouvé et corrigé tous les marqueurs de folio dans votre fichier d’entrée, enregistrez-le avec un nouveau nom et
+utilisez-le comme entrée à la section suivante.</p>
+                    <h2>Identifier le résumé de la page en italien à l'aide d'une expression régulière</h2>
+                    <p>Cette ligne est invariablement la première après l'en-tête de la charte.</p>
+                    <figure>
+                        <desc>Ligne de résumé en italien</desc>
+                        <graphic url="gs_italian_summary.png"/>
+                    </figure>
+                    <p>Étant donné que les en-têtes en chiffres romains sont maintenant facilement repérables grâce à notre regex « slug », nous pouvons maintenant isoler la ligne qui apparaît immédiatement après. Nous savons aussi que les résumés se terminent toujours par une sorte de référence datée entre parenthèses. Ainsi, nous pouvons composer une expression régulière pour trouver le « slug » et la ligne qui lui succède :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_15" corresp="code_generer-jeu-donnees-texte-ocr_15.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Décomposons cette regex en utilisant le mode verbeux (voir le tutoriel d’<ref target="/en/lessons/cleaning-ocrd-text-with-regular-expressions">O’Hara</ref>). Notre « slug » pour chaque charte prend la forme « [~~~~ Gscriba_ccvii ::: : 207 ~~~~]» par exemple. Le modèle compilé ci-dessus est exactement équivalent à celui-ci(notez le commutateur re.VERBOSE à la fin) :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_16" corresp="code_generer-jeu-donnees-texte-ocr_16.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Les parenthèses délimitent les groupes de matchs, de sorte que chaque fois que notre regex trouve une correspondance, nous pouvons nous référer dans notre code à des morceaux spécifiques de la correspondance qu’il a trouvé :</p>
+                    <list type="unordered">
+                        <item>
+                            <code rend="inline">match.group(0)</code> est l’ensemble de ce qui est capturé, à la fois notre " slug " et la ligne qui le suit.</item>
+                        <item>
+                            <code rend="inline">match.group(1)</code> = « [~~~~ Gscriba_»</item>
+                        <item>
+                            <code rend="inline">match.group(2)</code> = le numéro romain de la charte</item>
+                        <item>
+                            <code rend="inline">match.group(3)</code> = le numéro arabe de la charte </item>
+                        <item>
+                            <code rend="inline">match.group(4)</code> = l’ensemble de la ligne comprenant le résumé en italien jusqu’à la date entre parenthèses</item>
+                        <item>
+                            <code rend="inline">match.group(5)</code> = l’expression de la date entre parenthèses. Notez l'échappement des parenthèses.</item>
+                    </list>
+                    <p>Parce que notre sortie OCR contient beaucoup de ces mystérieux espaces blancs (les logiciels OCR ne sont pas bons pour interpréter les espaces blancs et vous êtes susceptible d’obtenir des nouvelles lignes, onglets, espaces, tous mélangés sans raison apparente), nous voulons identifier cette regex comme sous-chaîne d’une plus grande chaîne, donc cette fois nous allons utiliser <code rend="inline">.read()</code> au lieu de <code rend="inline">.readlines()</code>. Et nous aurons également besoin d’un compteur pour numéroter les lignes que nous trouvons. Ce script indiquera les numéros de chartes lorsque la première ligne n’est pas conforme à notre modèle regex. Cela se produit généralement s’il n’y a pas de saut de ligne après notre en-tête de charte, ou si la ligne de résumé a été divisée en plusieurs lignes.</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_17" corresp="code_generer-jeu-donnees-texte-ocr_17.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Exécutez de nouveau le script plusieurs fois jusqu’à ce que toutes les lignes de résumé soient présentes et correctes, puis enregistrez-le avec un nouveau nom et réutilisez-le comme fichier d’entrée :</p>
+                    <h2>Identifier les notes de bas de page à l'aide d'une expression régulière</h2>
+                    <p>Un des aspects les plus difficiles à gérer est la convention éditoriale exaspérante qui consiste à redémarrer la numérotation des notes de bas de page avec chaque nouvelle page. Il est donc difficile d’associer un texte de note de bas de page (données liées à la page) à un marqueur de note de bas de page (données liées à la charte). Avant de le faire, nous devons nous assurer que le texte de chaque note qui apparaît au bas de la page, apparaît aussi dans notre fichier source sur sa propre ligne distincte sans commencer par un espace blanc. Et, par ailleurs, qu’<hi rend="bold">aucun</hi> des marqueurs de note dans le texte n’apparaît au début d’une ligne. Aussi, nous devons veiller à ce que chaque chaîne de note de bas de page, par exemple « (1) » apparait <hi rend="bold">exactement</hi> deux fois sur une page, une fois comme un marqueur dans le texte, et une fois au bas du texte de la note de bas de page. Le script suivant indique le numéro de page de toute page qui échoue à ce test, ainsi qu’une liste de la note de bas de page.</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_18" corresp="code_generer-jeu-donnees-texte-ocr_18.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <quote>
+                        <p>Note : les éléments de l’itérateur « i » sont des correspondances de chaînes. Nous voulons les chaînes qui ont été appariées,  <code rend="inline">group(0)</code>, par ex. « (1) ». Et si nous faisons eval(« (1) »), nous obtenons un entier que nous pouvons ajouter à notre liste.</p>
+                    </quote>
+                    <p>Notre <code rend="inline">compteur</code> est une structure de données spéciale très pratique. Nous savons que nous voulons que chaque valeur de notre <code rend="inline">pgfnlist</code> apparaisse deux fois. Notre <code rend="inline">compteur</code> nous donnera un hash (tableau clef/valeur), équivalent d'un dictionnaire Python où les clés sont les éléments qui apparaissent, et les valeurs représentent les occurences de ces éléments. Comme ceci :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_19" corresp="code_generer-jeu-donnees-texte-ocr_19.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Donc si pour une page donnée nous obtenons une liste de marqueurs de note de bas de page comme ceci <code rend="inline">[1,2,3,1,3]</code>, alors le test <code rend="inline">if 1 in c.values()</code> indiquera une erreur parce que nous savons que chaque élément doit apparaître <hi rend="bold">exactement deux fois</hi> :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_20" corresp="code_generer-jeu-donnees-texte-ocr_20.txt" lang="language-Python" rend="block"/>
+                    </ab>
+                    <p>Tandis que, si notre liste de marqueurs de note en bas de page pour la page est complète <code rend="inline">[1,2,3,1,2,3]</code>, alors :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_21" corresp="code_generer-jeu-donnees-texte-ocr_21.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Comme précédemment, exécutez ce script plusieurs fois, corrigez votre fichier d’entrée manuellement lorsque vous découvrez des erreurs, jusqu’à ce que vous soyez satisfait(e) du résultat et que toutes les notes de bas de page soient présentes et correctes pour chaque page. Puis enregistrez votre fichier d’entrée corrigé avec un nouveau nom.</p>
+                    <p>Notre fichier texte contient encore beaucoup d’erreurs issues du traitement OCR, mais nous l’avons maintenant parcouru et avons trouvé et corrigé tous les octets de métadonnées spécifiques que nous voulons dans notre ensemble de données ordonnées. Maintenant, nous pouvons utiliser notre fichier texte corrigé pour construire un dictionnaire Python.</p>
+                </div>
+                <div type="1">
+                    <head>Créer le dictionnaire de données</head>
+                    <p>Maintenant que nous avons suffisamment nettoyé l'OCR pour pouvoir différencier les parties constitutives de chacune des pages, nous pouvons trier les différents éléments de métadonnées, et le texte de la charte elle-même, dans leurs propres champs d’un dictionnaire Python.</p>
+                    <p>Nous avons un certain nombre de choses à faire : numéroter correctement chaque charte, chaque folio et chaque page ; séparer le résumé des annotations de la marge ; et, enfin, associer les textes de note de bas de page à leur charte respective. Pour faire tout cela, il peut être commode de décomposer les tâches :</p>
+                    <h2>Créer la structure du dictionnaire de données</h2>
+                    <p>Nous allons commencer par générer un dictionnaire Python dont les clés sont les numéros de charte, et dont les valeurs sont un dictionnaire imbriqué qui a des champs pour certaines des métadonnées que nous voulons stocker pour chaque charte. Le dictionnaire aura la forme suivante :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_22" corresp="code_generer-jeu-donnees-texte-ocr_22.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Pour ce premier passage, nous allons simplement créer cette structure de base puis, dans les boucles suivantes, nous ajouterons et modifierons ce dictionnaire jusqu’à ce que nous obtenions un dictionnaire pour chaque charte, et des champs pour toutes les métadonnées de chacun des chartes. Une fois que cette boucle permet une identification des lignes qui nous intéressent (folio, page, en-têtes de charte) et crée un conteneur vide pour les notes de bas de page, l'étape suivante sera d’ajouter les lignes restantes au champ de texte, qui est une liste Python.</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_23" corresp="code_generer-jeu-donnees-texte-ocr_23.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <h2>Ajouter les notes de la marge et le résumé de la page au dictionnaire de données</h2>
+                    <p>Lorsque nous avons généré le dictionnaire des dictionnaires ci-dessus, nous avons attribué des champs pour les notes de bas de page (juste une liste vide pour l’instant), un identifiant pour les chartes (charterID), un numéro de charte, le folio, et le numéro de page. Toutes les lignes restantes ont été ajoutées à une liste et attribuées au champ « texte ». Dans tous les cas, la première ligne du champ de texte de chaque charte devrait être le résumé italien comme nous nous en sommes assurés ci-dessus. Dans la PLUPART des cas, la deuxième ligne représente une sorte de notation marginale qui se termine habituellement par le caractère « ] » (que l'OCR interprète souvent mal). Nous devons trouver les cas qui ne satisfont pas à ce critère, fournir ou corriger le « ] » manquant, et dans les cas où il n’y a pas de notation marginale, j’ai ajouté la spécification « aucune marge ». Le script suivant fera un « print » du numéro de la charte et des deux premières lignes du champ de texte pour les chartes qui ne répondent pas à ces critères. Exécutez ce script sur chaque <code rend="inline">charte</code> du dictionnaire des chartes, corrigez et mettez à jour votre texte en conséquence.</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_24" corresp="code_generer-jeu-donnees-texte-ocr_24.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <quote>
+                        <p>Note : les blocs <code rend="inline">try: except:</code> sont rendus nécessaires par le fait que, dans ma sortie OCR, les données de la page 214 ont en quelque sorte été oubliées. Cela arrive souvent. Numériser ou photographier chaque page d’un livre de 600 pages est fastidieux à l’extrême. Il est très facile de sauter une page. Vous aurez inévitablement des anomalies comme celle-ci dans votre texte que vous devrez isoler et contourner. Le bloc <code rend="inline">try: except:</code> de Python rend cela plus facile. Python est également très utile ici en ce sens que vous pouvez aller beaucoup plus loin dans la gestion des exceptions que d'afficher « oups » dans votre console. Vous pourriez par exemple appeler une fonction spécifique qui effectue une opération tout à fait distincte sur ces éléments anormaux.</p>
+                    </quote>
+                    <p>Une fois que nous sommes sûrs que la ligne 1 et la ligne 2 dans le champ « texte » pour chaque charte du dictionnaire des <code rend="inline">chartes</code> soient respectivement le résumé italien et la notation marginale, nous pouvons faire une autre itération du dictionnaire des <code rend="inline">chartes</code>, supprimer ces lignes du champ de texte et créer de nouveaux champs dans la nouvelle entrée de la charte qui leurs seront dédiés.</p>
+                    <quote>
+                        <p>NOTA BENE : nous modifions maintenant une structure de données en mémoire plutôt que d’éditer des fichiers de texte successifs. Ce script devrait donc être <hi rend="bold">ajouté</hi> à celui ci-dessus qui a créé le squelette de votre dictionnaire. Le premier script crée le dictionnaire des <code rend="inline">chartes</code> en mémoire, tandis que celui-ci le modifie.</p>
+                    </quote>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_25" corresp="code_generer-jeu-donnees-texte-ocr_25.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <h2>Attribuer les notes de bas de page à leur chartre respective puis les ajouter au dictionnaire de données</h2>
+                    <p>La partie la plus difficile est de faire en sorte que les notes de bas de page apparaissent au bas de la page et soient associées à leurs chartes respectives. Puisque nous analysons nécessairement notre texte ligne par ligne, nous sommes confrontés au problème d’associer une référence donnée à son texte approprié alors qu’il y a peut-être beaucoup de lignes à prendre en compte.</p>
+                    <p>Pour cela, nous revenons à la même liste de lignes à partir de laquelle nous avons construit le dictionnaire. Nous nous reposons sur le fait que tous les repères figurent dans le texte de la charte, c'est-à-dire qu'aucun d’entre eux ne se trouve au début d’une ligne. De plus, chacun des textes de note de bas de page se trouve sur une ligne distincte commençant par « (1) », etc. Nous concevons des regex qui peuvent faire la distinction entre les deux et construisons un conteneur pour les retenir au fur et à mesure que nous les itérons sur les lignes. Comme nous itérons sur les lignes du fichier texte, nous trouvons et attribuons des marqueurs et des textes à notre conteneur temporaire et, ensuite, chaque fois que nous atteignons un saut de page, nous les assignons à leurs champs appropriés dans nos <code rend="inline">chartes</code> de dictionnaire Python existantes et réinitialisons notre conteneur temporaire au <code rend="inline">dictionnaire</code> vide.</p>
+                    <p>Notez comment nous construisons ce conteneur temporaire. <code rend="inline">fndict</code> commence comme un dictionnaire vide. Au fur et à mesure que nous parcourons les lignes de notre texte d’entrée, si nous trouvons des marqueurs de note dans la ligne, nous créons une entrée dans <code rend="inline">fndict</code> dont la clé est le numéro de note de bas de page et dont la valeur est un autre dictionnaire. Dans ce dictionnaire, nous inscrivons l’identité de la charte à laquelle appartient la note de bas de page et nous créons un champ vide pour le texte de cette dernière. Lorsque nous trouvons les textes de note (<code rend="inline">ntexts</code>) au bas de la page, nous recherchons le numéro de note de bas de page dans notre conteneur <code rend="inline">fndict</code> et écrivons le texte de la ligne au champ vide correspondant. Donc, à la fin de la page, nous avons un dictionnaire de notes qui ressemble à ceci :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_26" corresp="code_generer-jeu-donnees-texte-ocr_26.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Nous avons maintenant toute l’information nécessaire pour attribuer les notes de bas de page à la liste vide de « notes de bas de page » dans le dictionnaire des <code rend="inline">chartes</code> : le numéro de la note de bas de page (la clé), la charte à laquelle elle appartient (<code rend="inline">chid</code>) et le texte de la note de bas de page (<code rend="inline">fntext</code>).</p>
+                    <p>C’est une façon de faire habituelle dans la programmation et très utile : dans un processus itératif quelconque, vous utilisez un accumulateur (notre <code rend="inline">fndict</code>) pour recueillir des octets de données, puis lorsque lorsque la sentinelle que vous avez programmée rencontre une condition spécifiée (le changement de page) elle fait quelque chose avec les données.</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_27" corresp="code_generer-jeu-donnees-texte-ocr_27.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Notez que les blocs <code rend="inline">try: except:</code> viennent de nouveau à la rescousse. La boucle ci-dessus a cassé parce que, dans 3 cas, il est apparu qu’il existait des notes en bas de page pour lesquelles il n’y avait pas de marqueurs dans le texte. Il s’agissait d’un oubli éditorial dans l’édition publiée et non d’une erreur de l'OCR. Le résultat est que, quand j’ai essayé de corriger l’entrée inexistante dans <code rend="inline">fndict</code>, j’ai eu une <code rend="inline">KeyError</code>. Ma clause <code rend="inline">except</code> m’a permis de trouver et d’examiner l’erreur, de déterminer que cette dernière était déjà dans l’original et que rien de ce que je pouvais faire n'y changerait quoi que ce soit, de sorte que lors de la génération de la version finale des <code rend="inline">chartes</code>, j’aie remplacé la commande <code rend="inline">print</code> par la commande <code rend="inline">pass</code>. Les textes rédigés par les humains contiennent des erreurs ; on ne peut pas les contourner. <code rend="inline">try: except :</code> existent pour composer avec cette réalité.</p>
+                    <quote>
+                        <p>NOTA BENE : encore une fois, gardez à l’esprit que nous modifions une structure de données en mémoire plutôt que d’éditer des fichiers de texte successifs. Cette boucle devrait donc être <hi rend="bold">ajoutée</hi> à votre script <hi rend="bold">sous</hi> le résumé et la boucle qui traite les marges, qui se trouve <hi rend="bold">sous</hi> la boucle qui a créé le squelette de votre dictionnaire.</p>
+                    </quote>
+                    <h2>Convertir les éléments de type date et les ajouter au dictionnaire de données</h2>
+                    <p>Les dates sont difficiles à traiter. Les étudiant(e)s en histoire qui travaillent sur l’histoire britanniques s’accrochent ainsi à <ref target="https://www.worldcat.org/title/handbook-of-dates-for-students-of-british-history/oclc/41238508">Cheyney</ref> comme à une bouée sur un océan agité. Et, compte tenu de la façon progressive par laquelle le calendrier grégorien a été adopté, et des nombreuses variations locales, une juste appréciation de la date pour les ressources médiévales nécessitera toujours des connaissances particulières. Néanmoins, ici aussi Python peut être d’une certaine utilité.</p>
+                    <p>Notre ligne de résumé en italien contient invariablement une date tirée du texte, commodément séparée du reste de la ligne par des parenthèses. Nous pouvons donc les analyser et créer des objets de <code rend="inline">date</code> en Python. Ensuite, si nous le voulons, nous pouvons faire un simple calcul à partir du calendrier.</p>
+                    <p>Premièrement, nous devons trouver et corriger toutes les dates de la même façon que nous l’avons fait pour les autres éléments de métadonnées. Vous devez donc concevoir un script de diagnostic qui itérera sur votre dictionnaire de <code rend="inline">chartes</code>, signaler l’emplacement des erreurs dans votre texte puis les corriger manuellement. Quelque chose comme ça :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_28" corresp="code_generer-jeu-donnees-texte-ocr_28.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <quote>
+                        <p>Note : lorsque vous utilisez les blocs <code rend="inline">try/except</code>, vous devez généralement attraper des erreurs <hi rend="bold">spécifiques</hi> dans la clause except, comme <code rend="inline">ValueError</code> et autres ; cependant, dans les scripts ad hoc comme ceci, utiliser <code rend="inline">sys.exc_info</code> est un moyen rapide d’obtenir des informations sur toute exception qui peut être soulevée. (Le module <ref target="https://pymotw.com/2/sys/index.html#module-sys">sys</ref> est plein de ces trucs, utile pour le débogage).</p>
+                    </quote>
+                    <p>Une fois que vous vous êtes assuré(e) que toutes les expressions de date entre parenthèses sont présentes, correctes et conformes à votre expression régulière, vous pouvez les extraire et les ajouter à votre structure de données sous forme de dates, plutôt que de simples chaînes de caractères. Pour cela, vous pouvez utiliser le module <code rend="inline">datetime</code>.</p>
+                    <p>Ce module, qui fait partie de la bibliothèque standard, est un sujet vaste et devrait faire l’objet de son propre tutoriel, compte tenu de l’importance des dates pour les historien(ne)s. Comme avec beaucoup d’autres modules Python, une bonne introduction est <ref target="https://pymotw.com/3/datetime/index.html">Pymotw</ref> de Doug Hellmann (module de la semaine !). Une bibliothèque d’extension encore plus complète est <ref target="https://www.egenix.com/products/python/mxBase/mxDateTime/">mxDateTime</ref>. Il suffit de dire ici que le module <code rend="inline">datetime.date</code> attend des paramètres comme ceci :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_29" corresp="code_generer-jeu-donnees-texte-ocr_29.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Voici donc notre boucle pour analyser les dates à la fin des lignes de résumé en italien et les stocker dans notre dictionnaire de chartes (en nous souvenant que nous voulons modifier la structure de données de nos chartes créées précédemment) :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_30" corresp="code_generer-jeu-donnees-texte-ocr_30.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Sur 803 chartes, 29 ne seraient pas correctement analysées, principalement parce que la date inclut seulement mois et année. Vous pouvez stocker ces chaînes, mais vous avez deux types de données qui correspondent à des dates. Ou vous pouvez fournir un 01 comme jour par défaut et ainsi stocker un objet date Python, mais <span style="font-variant:small-caps;">1</span>
+                        <sup>er</sup> janvier 1160 n’est pas la même chose que janvier 1160 et donc déforme vos métadonnées. Ou vous pouvez simplement faire comme moi et vous référer au texte source pertinent : la ligne de résumé en italien dans l’édition imprimée.</p>
+                    <p>Une fois que vous avez des objets date, vous pouvez faire le calcul de la date. Supposons que nous voulions trouver toutes les chartes de moins de 3 semaines avant ou après Noël 1160.</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_31" corresp="code_generer-jeu-donnees-texte-ocr_31.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Ce qui nous donnera le résultat suivant :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_32" corresp="code_generer-jeu-donnees-texte-ocr_32.txt" lang="language-Python" rend="block"/>
+                    </ab>
+                    <p>Sympa, n'est-ce pas ?</p>
+                </div>
+                <div type="1">
+                    <head>Notre structure de données finale</head>
+                    <p>Maintenant, nous avons suffisamment corrigé notre texte pour différencier les octets de métadonnées que nous voulons capturer, et nous avons aussi créé une structure de données en mémoire, notre dictionnaire de <code rend="inline">chartes</code>, en faisant 4 itérations, chacune prolongeant et modifiant le dictionnaire en mémoire.</p>
+                    <list type="ordered">
+                        <item>Créer le squelette</item>
+                        <item>Séparer le <code rend="inline">résumé</code> et les lignes <code rend="inline">de marge</code> et leur attribuer des champs dans le dictionnaire</item>
+                        <item>Recueillir et attribuer des notes de bas de page à leurs chartes respectives</item>
+                        <item>Analyser les dates dans le champ résumé et les ajouter à leur charte respective</item>
+                    </list>
+                    <p>Imprimez en console notre dictionnaire en utilisant <code rend="inline">pprint(charters)</code> et vous verrez quelque chose comme ceci :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_33" corresp="code_generer-jeu-donnees-texte-ocr_33.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Imprimer en console votre dictionnaire Python comme une chaîne littérale peut être une bonne idée. Pour un texte de cette taille, le fichier résultant est parfaitement gérable, peut être envoyé et lu dans un programme de réponse en Python très simplement en utilisant <code rend="inline">eval()</code> ou collé directement dans un fichier de module Python. D’autre part, si vous voulez un moyen encore plus fiable le de sérialiser dans un contexte exclusivement Python, regardez dans <ref target="https://docs.python.org/3.7/library/pickle.html">Pickle</ref>. Si vous avez besoin de le déplacer vers un autre contexte, Javascript par exemple, ou des triplestores <code rend="inline">RDF</code>, le module <ref target="https://docs.python.org/3.7/library/json.html#module-json">json</ref> de Python fera très bien l'affaire. Si jamais vous devez obtenir une sortie XML, je suis vraiment désolé pour vous, mais le module Python <ref target="https://lxml.de/">lxml</ref> pourra peut-être un peu atténuer vos souffrances.</p>
+                    <h2>Du désordre à l'ordre, hip hip hip...</h2>
+                    <p>Maintenant que nous avons une structure de données ordonnée, nous pouvons faire beaucoup de choses avec elle. Un exemple très simple : ajoutons un code qui affiche des <code rend="inline">chartes</code> comme HTML pour l’affichage sur un site web :</p>
+                    <ab>
+                        <code xml:id="code_generer-jeu-donnees-texte-ocr_34" corresp="code_generer-jeu-donnees-texte-ocr_34.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>Ouvrez le fichier résultant avec un navigateur web et vous obtenez une édition numérique parfaitement formatée.</p>
+                    <figure>
+                        <desc>Exemple de charte formatée en HTML</desc>
+                        <graphic url="gs_gscriba207.png"/>
+                    </figure>
+                    <p>Être en mesure d'obtenir cela avec votre sortie OCR en grande partie non corrigée n’est pas un avantage anecdotique. Si vous tenez à émettre une édition électronique propre et sans erreur, vous devez faire un certain travail de correction. Avoir un texte source formaté pour la lecture est crucial ; de plus, si votre correcteur peut changer la police, l’espacement, la couleur, la mise en page, et ainsi de suite à volonté, vous pouvez augmenter considérablement sa précision et sa productivité. Avec cet exemple dans un navigateur web moderne, peaufiner ces paramètres avec quelques déclarations CSS simples est facile. </p>
+                    <p>Ainsi, notre problème de départ, le nettoyage OCR, est maintenant beaucoup plus gérable parce que nous pouvons cibler des expressions régulières pour les types spécifiques de métadonnées que nous avons : erreurs dans le résumé en italien ou dans le texte latin ? Ou nous pourrions concevoir des routines de recherche et de remplacement uniquement pour des chartes spécifiques ou des groupes de chartes.</p>
+                    <p>Au-delà de cela, il y a beaucoup de choses que vous pouvez faire avec un ensemble de données ordonnnées, y compris l'alimenter grâce à un outil de balisage comme <ref target="http://brat.nlplab.org/">le « brat »</ref> dont nous nous sommes servis pour le projet ChartEx. Des spécialistes peuvent alors commencer à ajouter des couches de balisage sémantique, même si vous ne faites plus de correction d’erreur OCR. En outre, avec un ensemble de données ordonnnées, nous pouvons obtenir toutes sortes de sorties : TEI (Text Encoding Initiative) ou EAD (Encoded Archival Description). Ou encore vous pouvez lire votre ensemble de données directement dans une base de données relationnelle ou un répertoire de stockage qui associe une clé et une valeur. Toutes ces choses sont tout bonnement impossibles, si vous travaillez seulement avec un simple fichier texte.</p>
+                    <p>Les morceaux de code ci-dessus ne sont en aucun cas une solution clé en main pour nettoyer une sortie OCR lambda. Il n'existe pas de telle baguette magique. L’approche de Google pour scanner le contenu des bibliothèques de recherche menace de nous noyer dans un océan de mauvaises données. Pire encore, elle élude un fait fondamental du savoir numérique : les sources numériques sont difficiles à obtenir. Des textes numériques fiables, flexibles et utiles nécessitent une rédaction soignée et une conservation pérenne. Google, Amazon, Facebook et d'autres géants du Web n’ont pas à se soucier de la qualité de leurs données, juste de leur quantité. Les historien(ne)s, par contre, doivent d’abord se soucier de l’intégrité de leurs sources.</p>
+                    <p>Les vastes projets d’édition des <span style="font-variant:small-caps;">XVIII</span>
+                        <sup>e</sup> et <span style="font-variant:small-caps;">XIX</span>
+                        <sup>e</sup> siècles, tels que la Série Rolls, la Monumenta Germaniae Historica et beaucoup d’autres, nous ont légué un trésor de ressources matérielles à travers une énorme quantité de travail très minutieux et détaillé par des armées d’érudits dévoués et bien formés. Leur tâche était la même que la nôtre : transmettre fidèlement l’héritage de l’histoire de ses formes antérieures sous une forme plus moderne, le rendant ainsi plus largement accessible. Nous ne pouvons pas faire moins. Nous avons des outils puissants à notre disposition, mais même si cela peut changer l’ampleur de la tâche, cela ne change pas pour autant sa nature.</p>
+                </div>
+            </div>
+        </body>
+    </text>
+</TEI>

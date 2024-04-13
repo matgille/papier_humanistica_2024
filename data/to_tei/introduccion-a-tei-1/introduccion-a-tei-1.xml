@@ -1,186 +1,356 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="introduccion-a-tei-1">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Introducci&#243;n a la codificaci&#243;n de textos en TEI (parte 1)</title>
-  <author role="original_author">Nicol&#225;s Vaughan</author><editor role="reviewers"><persName>Roc&#237;o M&#233;ndez</persName><persName>I&#241;aki Cano</persName></editor><editor role="editors">Jennifer Isasi</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phes0053</idno><date type="published">07/27/2021</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#introducao-codificacao-textos-tei-1"/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Esta lecci&#243;n (la primera de dos partes) te ense&#241;a los rudimentos de TEI-XML para codificar textos.</p></abstract><textClass><keywords><term xml:lang="en">data-manipulation</term><term xml:lang="en">website</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="es">
-    <body>
-      <div type="2"><head>Introducci&#243;n</head>
-<p>Uno de los problemas centrales de las humanidades digitales ha sido el trabajo con y sobre textos:
-su captura (digitalizaci&#243;n), reconocimiento, transcripci&#243;n, codificaci&#243;n, procesamiento, transformaci&#243;n y an&#225;lisis.
-En esta lecci&#243;n nos centraremos exclusivamente en la codificaci&#243;n de textos, es decir, en su categorizaci&#243;n por medio de etiquetas (tags).</p>
-<p>Un ejemplo puede ayudar a aclarar esta idea. Supongamos que tenemos un documento impreso que hemos digitalizado previamente.
-Tenemos las im&#225;genes digitalizadas de sus p&#225;ginas y, con ayuda de un software de reconocimiento &#243;ptico de caracteres (<ref target="https://es.wikipedia.org/wiki/Reconocimiento_%C3%B3ptico_de_caracteres">OCR</ref>, en ingl&#233;s), extraemos el texto contenido en ellas. Este texto es lo que suele llamarse <ref target="https://es.wikipedia.org/wiki/Archivo_de_texto">texto plano</ref> (o texto digitalizado), es decir, el texto sin formato alguno (sin cursivas, negritas, etc.) ni ninguna otra estructuraci&#243;n sem&#225;ntica.</p>
-<p>Aunque parezca extra&#241;o, el texto plano carece completamente de contenido. Para un computador es solo una larga cadena de caracteres (incluyendo puntuaci&#243;n, espacios en blanco y saltos de l&#237;nea, etc.) en alguna <ref target="https://es.wikipedia.org/wiki/Codificaci%C3%B3n_de_caracteres">codificaci&#243;n</ref> (por ejemplo <ref target="https://es.wikipedia.org/wiki/UTF-8">UTF-8</ref> o <ref target="https://es.wikipedia.org/wiki/ASCII">ASCII</ref>) de alg&#250;n alfabeto (por ejemplo latino, griego o cir&#237;lico). Somos nosotros quienes, cuando lo leemos, identificamos palabras (en una o varias lenguas), l&#237;neas, p&#225;rrafos, etc&#233;tera. Somos nosotros quienes identificamos asimismo nombres de personas y de lugares, t&#237;tulos de libros y art&#237;culos, fechas, citas, ep&#237;grafes, referencias cruzadas (internas y externas), notas a pie de p&#225;gina y notas al final del texto. Pero, de nuevo, el computador es completamente "ignorante" con respecto a dichas estructuras textuales en un texto plano sin procesar o codificar.</p>
-<p>Sin asistencia humana, por ejemplo, por medio de codificaci&#243;n <ref target="https://tei-c.org/">TEI</ref> (Text Encoding Initiative), el computador no puede "entender" o detectar contenido alguno en el texto plano.
-Eso quiere decir, entre otras cosas, que no podemos hacer b&#250;squedas estructuradas sobre ese texto (por ejemplo de nombres de personas, lugares y fechas), ni podemos extraer y procesar sistem&#225;ticamente dicha informaci&#243;n, sin antes haberle indicado al computador qu&#233; cadenas de caracteres corresponden a qu&#233; estructuras sem&#225;nticas: por ejemplo, que este es un nombre propio de persona, aquel otro nombre de persona se refiere a la misma persona que este, este es un nombre de lugar, esta es una nota al margen hecha por una tercera persona, o que este p&#225;rrafo pertenece a esta secci&#243;n del texto.
-Codificar el texto es indicar (por medio de etiquetas y otros recursos) que ciertas cadenas de texto plano tienen determinada significaci&#243;n.
-Y esa es la diferencia entre texto plano y texto sem&#225;nticamente estructurado.</p>
-<p>Hay muchas formas de codificar un texto. Por ejemplo, podemos encerrar entre asteriscos simples los nombres propios de personas: <code rend="inline">*Sim&#243;n Bol&#237;var*</code>, <code rend="inline">*Soledad Acosta*</code>, etc. Y entre asteriscos dobles los de lugares: <code rend="inline">**Bogot&#225;**</code>, <code rend="inline">**Framingham**</code>, etc. Podemos tambi&#233;n usar guiones bajos para indicar los nombres de obras y de libros: <code rend="inline">_La divina comedia_</code>, <code rend="inline">_Cien a&#241;os de soledad_</code>, etc. Estos signos sirven para etiquetar o marcar el texto que encierran, para as&#237; identificar en el texto un determinado contenido. Como es f&#225;cil de imaginar, las posibilidades de codificaci&#243;n son casi infinitas.</p>
-<p>En esta lecci&#243;n aprender&#225;s a codificar textos usando un lenguaje de computador especialmente dise&#241;ado para ello: TEI.</p>
-<div type="3"><head>Software que usaremos</head>
-<p>Cualquier editor de texto plano (en formato <code rend="inline">.txt</code>) nos servir&#225; para hacer todo lo que necesitemos en esta lecci&#243;n: el <ref target="https://es.wikipedia.org/wiki/Bloc_de_notas">Bloc de Notas (Notepad) de Windows</ref>, por ejemplo, es perfectamente adecuado para ello. Sin embargo, hay otros editores de texto que ofrecen herramientas o funcionalidades dise&#241;adas para facilitar el trabajo con XML (Extensible Markup Language) e incluso con TEI. Uno de los m&#225;s recomendados actualmente es <ref target="https://www.oxygenxml.com">Oxygen XML Editor</ref>, disponible para Windows, MacOS y Linux. Sin embargo, no es un software gratuito (la licencia acad&#233;mica cuesta unos $100 USD) ni de c&#243;digo abierto, por lo que no lo usaremos en esta lecci&#243;n.</p>
-<p>Para esta lecci&#243;n usaremos el editor <ref target="https://code.visualstudio.com/">Visual Studio Code</ref> (VS Code, m&#225;s brevemente), creado por Microsoft y mantenido actualmente por una gran comunidad de programadores de software libre. Es una aplicaci&#243;n completamente gratuita y de <ref target="https://github.com/microsoft/vscode">c&#243;digo abierto</ref>, disponible para Windows, MacOS y Linux.</p>
-<p>Descarga la versi&#243;n m&#225;s reciente de VS Code en el enlace <ref target="https://code.visualstudio.com/">https://code.visualstudio.com/</ref> e inst&#225;lala en tu computador. &#193;brelo y ver&#225;s una pantalla como la siguiente:</p>
-<figure><desc>Vista inicial de VS Code</desc><graphic url="introduccion-a-tei-1-01.png"/></figure>
-<p>Ahora instalaremos una extensi&#243;n de VS Code para trabajar m&#225;s f&#225;cilmente con documentos XML y TEI-XML: <ref target="https://marketplace.visualstudio.com/items?itemName=raffazizzi.sxml">Scholarly XML</ref>.</p>
-<p>Para ello haz clic en el bot&#243;n de extensiones en la barra lateral de herramientas, a la izquierda en la ventana principal:</p>
-<figure><desc>Extensiones de VS Code</desc><graphic url="introduccion-a-tei-1-02.png"/></figure>
-<p>Escribe <code rend="inline">Scholarly XML</code> en el campo de b&#250;squeda:</p>
-<figure><desc>B&#250;squeda de una extensi&#243;n en VS Code</desc><graphic url="introduccion-a-tei-1-03.png"/></figure>
-<p>Finalmente haz clic en "Install":</p>
-<figure><desc>Instalar Scholarly XML en VS Code</desc><graphic url="introduccion-a-tei-1-04.png"/></figure>
-<p>Esta extensi&#243;n nos permite hacer varias cosas con el c&#243;digo:</p>
-<p><hi rend="bold">Primero</hi>, seleccionar cualquier texto en un documento XML, presionar un atajo de teclado y encerrar autom&#225;ticamente el texto seleccionado dentro de un elemento XML. Cuando presionamos <code rend="inline">Ctrl+E</code> (en Windows o Linux) o <code rend="inline">Cmd+E</code> (en MacOS), VS Code abre una ventanita con la instrucci&#243;n <code rend="inline">Enter Abbreviation (Press Enter to confirm or Escape to cancel)</code> ("Introduce la abreviatura (Presiona Intro para confirmar o Escape para cancelar)"). A continuaci&#243;n escribimos el nombre del elemento y presionamos la tecla <code rend="inline">Intro</code>. El editor entonces encerrar&#225; el texto seleccionado entre una etiqueta de apertura y otra de cierre con el nombre del elemento. Cuando trabajamos con XML, automatizar la introducci&#243;n las etiquetas de apertura y de cierre nos puedo ahorrar mucho tiempo, a la vez que disminuye la probabilidad de que introduzcamos errores de tipogr&#225;ficos involuntarios en el c&#243;digo.</p>
-<figure><desc>Introducir autom&#225;ticamente un elemento XML en VS Code</desc><graphic url="introduccion-a-tei-1-05.png"/></figure>
-<p><hi rend="bold">Segundo</hi>, determinar si un documento est&#225; bien formado seg&#250;n la sintaxis de XML y adem&#225;s si es v&#225;lido sem&#225;nticamente con respecto a un esquema de validaci&#243;n de tipo <ref target="https://en.wikipedia.org/wiki/RELAX_NG">RELAX NG</ref>, por ejemplo, el esquema <code rend="inline">tei-all</code> de TEI, que contiene la totalidad de los m&#243;dulos de marcado para todos los tipos de documentos previstos por el consorcio TEI. (M&#225;s abajo explicaremos los conceptos de validez sint&#225;ctica y sem&#225;ntica.) La extensi&#243;n hace las dos cosas autom&#225;ticamente. </p>
-<figure><desc>Detectar errores de XML en VS Code</desc><graphic url="introduccion-a-tei-1-06.png"/></figure>
-<figure><desc>Detectar errores de XML en VS Code</desc><graphic url="introduccion-a-tei-1-07.png"/></figure>
-<p>Ahora bien, para realizar el segundo tipo de validaci&#243;n, es preciso que en el documento se especifique el URI del esquema en una declaraci&#243;n <code rend="inline">&lt;?xml-model&gt;</code> al principio del documento, por ejemplo as&#237;:</p>
-<ab><code xml:id="code_introduccion-a-tei-1_0" corresp="code_introduccion-a-tei-1_0.txt" lang="language-XML" rend="block"/></ab>
-<p>Puedes bajar una plantilla b&#225;sica de un documento TEI-XML [aqu&#237;](<ref target="https://raw.githubusercontent.com/programminghistorian/jekyll/gh-pages/assets/introduccion-a-tei-1/plantilla-TEI.xml**">https://raw.githubusercontent.com/programminghistorian/jekyll/gh-pages/assets/introduccion-a-tei-1/plantilla-TEI.xml**</ref>, con estas l&#237;neas ya incluidas.</p>
-<p><hi rend="bold">Tercero</hi>, la extensi&#243;n ofrece tambi&#233;n una herramientas para autocompletar el c&#243;digo de XML a partir del esquema de validaci&#243;n RELAX NG. Por ejemplo, si hemos introducido en el documento un elemento <code rend="inline">&lt;q&gt;</code> (para marcar un texto entrecomillado, por ejemplo una cita), podemos presionar la barra espaciador luego del <code rend="inline">q</code> de la etiqueta de apertura y VS Code nos mostrar&#225; una lista de atributos posibles para seleccionar en el men&#250;:</p>
-<figure><desc>Men&#250; de autocompleci&#243;n de c&#243;digo de XML en VS Code</desc><graphic url="introduccion-a-tei-1-08.png"/></figure>
-<p>Ahora bien, para poder usar esta u otras extensiones de VS Code es necesario que el editor <hi rend="bold">no</hi> est&#233; en modo restringido (<emph>Restricted Mode</emph>), como nos aparece en esta ventana:</p>
-<figure><desc>Aviso de modo restringido en VS Code</desc><graphic url="introduccion-a-tei-1-09.png"/></figure>
-<p>Este modo evita que las extensiones o el c&#243;digo del documento ejecuten instrucciones que puedan da&#241;ar nuestro sistema. Puesto que estamos trabajando con nuestros documento y la extensi&#243;n recomendada es altamente confiable, podemos desactivar el modo restringido haciendo clic en el hiperv&#237;nculo de arriba que dice <emph>Manage</emph> ("Administrar") y luego clic en el bot&#243;n <emph>Trust</emph> ("Confiar"), as&#237;:</p>
-<figure><desc>Salir del modo restringido en VS Code</desc><graphic url="introduccion-a-tei-1-10.png"/></figure>
-<p>Ahora que hemos configurado nuestro editor, podemos empezar a trabajar en TEI-XML.</p>
-</div><div type="3"><head>Visualizaci&#243;n vs. categorizaci&#243;n</head>
-<p>Quienes est&#233;n familiarizados con el lenguaje de marcado <ref target="https://daringfireball.net/projects/markdown/syntax">Markdown</ref> &#8212;hoy en d&#237;a habitual en foros t&#233;cnicos en Internet, as&#237; como en <ref target="https://github.com">GitHub</ref>, <ref target="https://gitlab.com">GitLab</ref> y otros repositorios de c&#243;digo&#8212; reconocer&#225;n seguramente el uso de elementos tales como asteriscos (<code rend="inline">*</code>), guiones bajos (<code rend="inline">_</code>) y numerales (<code rend="inline">#</code>) para hacer que el texto aparezca de cierto modo en el navegador. Por ejemplo, un texto encerrado entre asteriscos simples ser&#225; mostrado en cursivas y uno encerrado entre asteriscos dobles lo ser&#225; en negritas. De hecho, el texto de esta lecci&#243;n est&#225; escrito en Markdown siguiendo esas convenciones.</p>
-<p>Ese uso del marcado tiene como finalidad principal la visualizaci&#243;n del texto, no su categorizaci&#243;n. En otras palabras, las marcas o etiquetas de Markdown no indican que un texto sea de cierta categor&#237;a (por ejemplo, el nombre de una persona, de un lugar o de una obra), sino &#250;nicamente que el texto ha de ser visualizado o mostrado de cierto modo en un navegador o en otro medio.</p>
-<p>Comprender la diferencia entre entre marcado de visualizaci&#243;n (como el de Markdown) y marcado sem&#225;ntico (o estructural, como el que veremos a continuaci&#243;n en TEI) es crucial para entender el objetivo de la codificaci&#243;n de textos. Cuando marcamos un fragmento de texto para codificarlo, lo hacemos sin importarnos en principio c&#243;mo fue representado originalmente ni c&#243;mo pueda ser eventualmente representado en el futuro. Nos interesa &#250;nicamente la funci&#243;n sem&#225;ntica o estructural que un texto particular tenga. Por eso debemos procurar identificar con precisi&#243;n las funciones o categor&#237;as de los textos, dejando de lado, en la medida de lo posible, el modo como son mostrados en el papel o la pantalla.</p>
-<p>Aclaremos mejor esto volviendo a nuestro ejemplo inicial. Supongamos que en el texto digitalizado del que partimos los nombres propios aparecen siempre impresos en <ref target="https://es.wikipedia.org/wiki/Versalita">letra versalita</ref>, como en el siguiente fragmento:</p>
-<figure><desc>Fragmento corto de texto digitalizado de _Don Quijote_</desc><graphic url="introduccion-a-tei-1-11.png"/></figure>
-<p>Como veremos a continuaci&#243;n, TEI nos permite codificar, por medio de una serie de etiquetas, el texto que queremos categorizar. Por ejemplo, podemos utilizar una etiqueta como <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-name.html"><code rend="inline">&lt;name&gt;</code></ref> para demarcar los nombres propios contenidos en el texto, as&#237;:</p>
-<ab><code xml:id="code_introduccion-a-tei-1_1" corresp="code_introduccion-a-tei-1_1.txt" lang="language-XML" rend="block"/></ab>
-<p>Luego veremos en detalle qu&#233; es y c&#243;mo funciona una etiqueta (o m&#225;s precisamente un elemento) en XML y TEI. Por ahora notemos que la etiqueta no significa que el texto haya sido representado originalmente en versalitas (o en ning&#250;n otro modo). Tan solo significa que el texto contenido en ella tiene la categor&#237;a de nombre propio, independientemente de c&#243;mo sea representado. De hecho, podemos codificar exhaustivamente un documento con cientos o miles de etiquetas, sin que ninguna de ellas aparezca al final en una eventual representaci&#243;n.</p>
-</div></div>
-      <div type="2"><head>XML y TEI: hacia un est&#225;ndar de codificaci&#243;n de textos</head>
-<p>Desde los inicios de las humanidades digitales en los a&#241;os sesenta, hubo muchas aproximaciones a la codificaci&#243;n de textos. Casi que cada proyecto de codificaci&#243;n ten&#237;a su propio est&#225;ndar, lo que conduc&#237;a a que los proyectos fueran incompatibles e intraducibles entre s&#237;, entorpeciendo e incluso imposibilitando el trabajo colaborativo.</p>
-<p>Para resolver ese problema, unos veinte a&#241;os despu&#233;s se estableci&#243; un nuevo est&#225;ndar de codificaci&#243;n de textos, convenido un gran n&#250;mero de investigadores e investigadoras de todo el mundo, especialmente de universidades anglosajonas: el <ref target="https://es.wikipedia.org/wiki/Text_Encoding_Initiative">Text Encoding Initiative (TEI)</ref>.</p>
-<p>TEI est&#225; a su vez construido sobre el lenguaje de marcado <ref target="https://es.wikipedia.org/wiki/Extensible_Markup_Language">XML</ref> y es por ello que suele ser denominado a veces como "TEI-XML" (o tambi&#233;n "XML/TEI"). Por su parte, XML (que es la sigla para "eXtensible Markup Language") es un lenguaje de computador cuyo prop&#243;sito es describir, por medio de una serie de marcas o etiquetas (<emph>tags</emph> en ingl&#233;s), un determinado texto objeto.
-XML y TEI son lenguajes de marcado y en eso se diferencian de los lenguajes de programaci&#243;n como C, Python o Java, que describen objetos, funciones o procedimientos que han de ser ejecutados por un computador.</p>
-<div type="3"><head>XML</head>
-<p>En esta lecci&#243;n no entraremos en detalle en la sintaxis y el funcionamiento de XML. Recomendamos, por lo tanto, que el lector le d&#233; una mirada a
-<ref target="/es/lecciones/transformacion-datos-xml-xsl">esta otra lecci&#243;n</ref> para m&#225;s informaci&#243;n sobre XML, as&#237; como a la bibliograf&#237;a y referencias sugeridas al final de esta lecci&#243;n.</p>
-<p>Por ahora solo debemos saber que todo documento XML debe cumplir dos reglas b&#225;sicas para ser v&#225;lido:</p>
-<list type="ordered">
-<item>Debe haber un solo elemento ra&#237;z (que contiene a todos los dem&#225;s elementos, si los hay).</item>
-<item>Toda etiqueta de apertura debe tener una etiqueta de cierre.</item>
-</list>
-<p>Por suerte, los editores de c&#243;digo XML como VS Code (con la extensi&#243;n Scholarly XML) u OxygenXML nos permiten detectar f&#225;cilmente errores de este tipo.</p>
-</div><div type="3"><head>&#191;Qu&#233; es TEI?</head>
-<p>XML es un lenguaje tan general y abstracto que es totalmente indiferente respecto de su contenido. Puede ser usado, por ejemplo, para describir cosas tan dis&#237;miles como un texto en griego cl&#225;sico del siglo VIII a.C. y un mensaje que un termostato inteligente le env&#237;a a una aplicaci&#243;n de un smartphone usada para controlarlo.</p>
-<p>TEI es una implementaci&#243;n particular de XML. Es decir, es una serie de reglas que determinan qu&#233; elementos y qu&#233; atributos son permitidos en un documento de cierto tipo. M&#225;s precisamente, TEI es un lenguaje de marcado para codificar textos de toda clase. Esto con el fin de que sean procesados por un computador, de modo que puedan ser analizados, transformados, reproducidos y almacenados, dependiendo de las necesidades e intereses de los usuarios (tanto los de carne y hueso como los computacionales). Es por eso que podemos decir que TEI est&#225; en el coraz&#243;n de las humanidades digitales (&#161;o al menos en uno de sus corazones!). Es un est&#225;ndar para trabajar computacionalmente con una clase de objetos tradicionalmente central a las humanidades: los textos.
-As&#237; las cosas, mientras que a XML le es indiferente si los elementos de un documento describen textos (o propiedades de textos), TEI est&#225; dise&#241;ado exclusivamente para trabajar con ellos.</p>
-<p>El tipo de elementos y atributos permisibles en TEI, y las relaciones existentes entre ellos, est&#225;n especificados por las <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/index.html">reglas de TEI</ref>. Por ejemplo, si queremos codificar un poema, podemos usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lg.html"><code rend="inline">&lt;lg&gt;</code></ref> (de <emph>line group</emph>, "grupo de l&#237;neas") de TEI. Las reglas de TEI determinan qu&#233; tipos de atributos puede tener ese elemento y qu&#233; elementos pueden, a su vez, contener o ser contenidos por &#233;l. TEI determina que todo elemento elemento <code rend="inline">&lt;lg&gt;</code> debe tener al menos un elemento elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html"><code rend="inline">&lt;l&gt;</code></ref> (de <emph>line</emph>, "l&#237;nea").</p>
-<p>A modo de ilustraci&#243;n, examinemos los primeros cuatro versos del soneto <emph>Amor constante m&#225;s all&#225; de la muerte</emph> de Francisco de Quevedo (a continuaci&#243;n en texto plano):</p>
-<ab><code xml:id="code_introduccion-a-tei-1_2" corresp="code_introduccion-a-tei-1_2.txt" lang="language-XML" rend="block"/></ab>
-<p>Podemos proponer la siguiente codificaci&#243;n en TEI:</p>
-<ab><code xml:id="code_introduccion-a-tei-1_3" corresp="code_introduccion-a-tei-1_3.txt" lang="language-XML" rend="block"/></ab>
-<p>En este caso, nos hemos valido del atributo <code rend="inline">@rhyme</code> del elemento <code rend="inline">&lt;lg&gt;</code>, para hacer codificar el tipo de rima del pasaje; del atributo <code rend="inline">@met</code> para indicar el tipo de m&#233;trica del primer verso (endecas&#237;labo) (esto tendr&#237;amos que hacerlo en cada uno de los versos, aunque por claridad del c&#243;digo lo hemos hecho solo en el primero); y finalmente el atributo <code rend="inline">@n</code> para indicar el n&#250;mero del verso dentro el grupo.</p>
-<p>La comparaci&#243;n entre el texto plano del fragmento del soneto con su codificaci&#243;n nos permite empezar a ver las ventajas de TEI como un lenguaje de marcado para textos. No solo queda expl&#237;citamente dicho que las l&#237;neas (en el c&#243;digo anterior) dos a la cinco son versos de un poema, sino que ellas tienen un tipo de rima y de m&#233;trica. Una vez codificado todo el poema, o todos los poemas de una colecci&#243;n, podemos ,por ejemplo, usar un software para realizar b&#250;squedas estructuradas, de modo que nos arroje todos los poemas que tienen cierto tipo de rima o todas las l&#237;neas que tienen cierto tipo de m&#233;trica. O podemos usar (o crear) una aplicaci&#243;n para determinar cu&#225;ntos versos de los sonetos de Quevedo &#8212;si los hay&#8212; tienen m&#233;trica imperfecta. O podemos comparar las distintas versiones (los "testigos" o "testimonios" manuscritos e impresos) de los sonetos, para realizar una edici&#243;n cr&#237;tica de ellos.</p>
-<p>Ahora bien, todo eso y mucho m&#225;s es posible solo en virtud de que hemos hecho expl&#237;cito, gracias a TEI, el contenido de esos sonetos.
-Si solo tuvi&#233;ramos el texto plano de ellos, ser&#237;a t&#233;cnicamente imposible aprovechar herramientas computacionales dise&#241;adas para editar, transformar, visualizar, analizar o publicarlos.</p>
-</div></div>
-      <div type="2"><head>Un documento m&#237;nimo de TEI</head>
-<p>Examinemos ahora el siguiente documento m&#237;nimo de TEI:</p>
-<ab><code xml:id="code_introduccion-a-tei-1_4" corresp="code_introduccion-a-tei-1_4.txt" lang="language-XML" rend="block"/></ab>
-<p>La primera l&#237;nea ya es la tradicional declaraci&#243;n del documento XML.
-La segunda l&#237;nea contiene el elemento principal o "ra&#237;z" de este documento: el elemento <code rend="inline">&lt;TEI&gt;</code>. El atributo <code rend="inline">@xmlns</code> con el valor <code rend="inline">http://www.tei-c.org/ns/1.0</code> simplemente declara que todos los elementos y atributos hijos del elemento <code rend="inline">&lt;TEI&gt;</code> pertenencen al "namespace" de TEI (representado aqu&#237; por ese URL). Eso no tendr&#225; que preocuparnos m&#225;s en lo sucesivo.</p>
-<p>Lo interesante viene luego en las l&#237;neas tres y dieciseis, que contienen respectivamente a los dos hijos inmediatos del elemento ra&#237;z:</p>
-<list type="unordered">
-<item><ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-teiHeader.html"><code rend="inline">&lt;teiHeader&gt;</code></ref></item>
-<item><ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-text.html"><code rend="inline">&lt;text&gt;</code></ref></item>
-</list>
-<p>Veamos ahora en qu&#233; consisten esos dos elementos.</p>
-<div type="3"><head>El elemento &lt;teiHeader&gt;</head>
-<p>Todos los metadatos del documento est&#225;n codificados en el elemento <code rend="inline">&lt;teiHeader&gt;</code>: el t&#237;tulo, autores o autoras, d&#243;nde, cu&#225;ndo y c&#243;mo fue publicado, su fuente, de d&#243;nde se tom&#243; la fuente, etc&#233;tera. Es habitual que las personas que empiezan a codificar texto de TEI pasen de largo esa informaci&#243;n, llenando estos campos con datos gen&#233;ricos e incompletos. Sin embargo, la informaci&#243;n del <code rend="inline">&lt;teiHeader&gt;</code> es esencial a la tarea del codificador, pues sirve para identificar con toda precisi&#243;n el texto codificado.</p>
-<p>El <code rend="inline">&lt;teiHeader&gt;</code> debe contener al menos un elemento llamado <code rend="inline">&lt;fileDesc&gt;</code> (de <emph>file description</emph> o descripci&#243;n del archivo), que a su vez contiene tres elementos hijos:</p>
-<list type="unordered">
-<item><ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-titleStmt.html"><code rend="inline">&lt;titleStmt&gt;</code></ref> (de <emph>title statement</emph> o enunciado de t&#237;tulo): la informaci&#243;n sobre el t&#237;tulo del documento (dentro del elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-title.html"><code rend="inline">&lt;title&gt;</code></ref>); opcionalmente tambi&#233;n puede incluir datos sobre el autor o autores (dentro del elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-author.html"><code rend="inline">&lt;author&gt;</code></ref>)</item>
-<item>
-<ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-publicationStmt.html"><code rend="inline">&lt;publicationStmt&gt;</code></ref> (de <emph>publication statement</emph> o enunciado de publicaci&#243;n): la informaci&#243;n de c&#243;mo est&#225; publicado o disponible el documento (esto es, el documento mismo TEI, no su fuente). En ese sentido es an&#225;logo a la informaci&#243;n del editor/imprenta en el "imprint" o p&#225;gina legal de un libro. Puede ser un p&#225;rrafo descriptivo (dentro del elemento gen&#233;rico de p&#225;rrafo <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-p.html"><code rend="inline">&lt;p&gt;</code></ref>) o puede estar estructurada en uno o varios campos dentro los siguientes elementos:<list type="unordered">
-<item><ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-address.html"><code rend="inline">&lt;address&gt;</code></ref>: la direcci&#243;n postal de quien edita/codifica</item>
-<item><ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-date.html"><code rend="inline">&lt;date&gt;</code></ref>: la fecha de publicaci&#243;n del documento</item>
-<item><ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-pubPlace.html"><code rend="inline">&lt;pubPlace&gt;</code></ref>: el lugar de publicaci&#243;n del documento</item>
-<item><ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-publisher.html"><code rend="inline">&lt;publisher&gt;</code></ref>: la persona que edita/codifica el documento</item>
-<item><ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-ref.html"><code rend="inline">&lt;ref&gt;</code></ref> (o tambi&#233;n <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-ptr.html"><code rend="inline">&lt;ptr&gt;</code></ref>): una referencia externa (URL) donde est&#225; disponible el documento</item>
-</list>
-</item>
-<item><ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-sourceDesc.html"><code rend="inline">&lt;sourceDesc&gt;</code></ref> (de <emph>source description</emph> o descripci&#243;n de la fuente): la informaci&#243;n sobre la fuente de la que se toma el texto que est&#225; siendo codificado. Puede ser un p&#225;rrafo descriptivo (dentro del elemento gen&#233;rico de p&#225;rrafo, <code rend="inline">&lt;p&gt;</code>). Tambi&#233;n puede estar estructurada de varias formas. Por ejemplo, puede tener un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-bibl.html"><code rend="inline">&lt;bibl&gt;</code></ref>, que incluye una referencia bibliogr&#225;fica sin estructurar (p. ej. <code rend="inline">&lt;bibl&gt;Miguel de Cervantes Saavedra, "Don Quijote de La Mancha", Madrid: Espasa-Calpe, 2010&lt;/bibl&gt;</code>); o puede contener una referencia estructurada en el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-biblStruct.html"><code rend="inline">&lt;biblStruct&gt;</code></ref> que contiene a su vez otros elementos relevantes</item>
-</list>
-<p>Supongamos que queremos codificar el <emph>Quijote</emph> de Cervantes, partiendo de <ref target="https://archive.org/details/donquijotedelama01cerv">esta edici&#243;n</ref> disponible gratuitamente en el <ref target="https://archive.org">Internet Archive</ref>. El <code rend="inline">&lt;teiHeader&gt;</code> de nuestro documento TEI bien podr&#237;a ser el siguiente:</p>
-<ab><code xml:id="code_introduccion-a-tei-1_5" corresp="code_introduccion-a-tei-1_5.txt" lang="language-XML" rend="block"/></ab>
-<p>Esta es la informaci&#243;n m&#237;nima para identificar el documento codificado. Nos dice el t&#237;tulo y autor del texto, el responsable de la codificaci&#243;n y la fuente de donde se tom&#243; dicho texto.</p>
-<p>Sin embargo, es posible &#8212;y a veces es deseable&#8212; especificar m&#225;s detalladamente los metadatos del documento. Por ejemplo, consideremos esta otra versi&#243;n del <code rend="inline">&lt;teiHeader&gt;</code> para el mismo texto:</p>
-<ab><code xml:id="code_introduccion-a-tei-1_6" corresp="code_introduccion-a-tei-1_6.txt" lang="language-XML" rend="block"/></ab>
-<p>La decisi&#243;n sobre la exhaustividad de la informaci&#243;n en el <code rend="inline">&lt;teiHeader&gt;</code> depende de su disponibilidad, y obedece a los fines de la codificaci&#243;n y a los intereses de quien codifica/edita. Ahora bien, aunque los metadatos contenidos en el <code rend="inline">&lt;teiHeader&gt;</code> de un documento TEI no necesariamente aparezcan literalmente en el texto codificado, no por eso son irrelevantes para el proceso de codificaci&#243;n, edici&#243;n y eventual transformaci&#243;n. De hecho, en la medida en que un <code rend="inline">&lt;teiHeader&gt;</code> haya sido correcta y exhaustivamente codificado, en esa misma medida podr&#225; extraerse y transformarse la informaci&#243;n contenida en el documento.</p>
-<p>Por ejemplo, si fuera importante para nosotros distinguir entre las diferentes ediciones e impresiones del <emph>Quijote</emph>, la informaci&#243;n contenida en los <code rend="inline">&lt;teiHeader&gt;</code> de los distintos documentos transcritos ser&#237;a suficiente para poder discriminarlos autom&#225;ticamente. En efecto, podr&#237;amos aprovechar los  elementos <code rend="inline">&lt;edition&gt;</code> e <code rend="inline">&lt;imprint&gt;</code> para tal fin, y con ayuda de tecnolog&#237;as como <ref target="https://www.w3.org/TR/xslt/">XSLT</ref>, <ref target="https://www.w3.org/TR/xpath/">XPath</ref> y <ref target="https://www.w3.org/TR/xquery/">XQuery</ref> podr&#237;amos ubicar, extraer y procesar toda esa informaci&#243;n.</p>
-<p>En conclusi&#243;n, entre m&#225;s completa y minuciosamente se codifiquen los metadatos de los textos en el <code rend="inline">&lt;teiHeader&gt;</code> de nuestros documentos TEI, m&#225;s control tendremos sobre su identidad y naturaleza.</p>
-</div><div type="3"><head>El elemento &lt;text&gt;</head>
-<p>Como vimos arriba en el documento m&#237;nimo, <code rend="inline">&lt;text&gt;</code> es el segundo hijo de <code rend="inline">&lt;TEI&gt;</code>. Contiene todo el texto del documento, propiamente hablando. De acuerdo con la <ref target="https://tei-c.org/guidelines/p5/">documentaci&#243;n de TEI</ref>, <code rend="inline">&lt;text&gt;</code> puede contener una serie de elementos en los que el texto objeto se ha de estructurar:</p>
-<figure><desc>Elementos posibles de `<text>`</text></desc><graphic url="introduccion-a-tei-1-12.png"/></figure>
-<p>El m&#225;s importante de estos elementos es <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-body.html"><code rend="inline">&lt;body&gt;</code></ref>, que contiene el cuerpo principal del texto. Sin embargo, otros elementos importantes como hijos de <code rend="inline">&lt;text&gt;</code> son <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-front.html"><code rend="inline">&lt;front&gt;</code></ref>, que contiene el <emph>frontmatter</emph> (p&#225;ginas preliminares) de un texto (introducci&#243;n, pr&#243;logo, etc.), y <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-back.html"><code rend="inline">&lt;back&gt;</code></ref>, que contiene el <emph>backmatter</emph> (p&#225;ginas finales, ap&#233;ndices, &#237;ndices, etc&#233;tera).</p>
-<p>Por su parte, el elemento <code rend="inline">&lt;body&gt;</code> puede a su vez contener muchos otros elementos:</p>
-<figure><desc>Elementos posibles de ``</desc><graphic url="introduccion-a-tei-1-13.png"/></figure>
-<p>Aunque todas esas posibilidades puedan abrumarnos a primera vista, debemos recordar que un texto suele dividirse naturalmente en secciones o partes constitutivas. Es recomendable, entonces, usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-div.html"><code rend="inline">&lt;div&gt;</code></ref> para cada una de ellas y usar atributos como <code rend="inline">@type</code> o <code rend="inline">@n</code> para cualificar sus diferentes clases y posici&#243;n en el texto (p. ej. <code rend="inline">&lt;div n="3" type="subsecci&#243;n"&gt;...&lt;/div&gt;</code>).</p>
-<p>Si nuestro texto es corto o simple, podr&#237;amos usar un solo <code rend="inline">&lt;div&gt;</code>. Por ejemplo:</p>
-<ab><code xml:id="code_introduccion-a-tei-1_7" corresp="code_introduccion-a-tei-1_7.txt" lang="language-XML" rend="block"/></ab>
-<p>Pero si nuestro texto es m&#225;s complejo, usar&#237;amos varios elementos <code rend="inline">&lt;div&gt;</code>:</p>
-<ab><code xml:id="code_introduccion-a-tei-1_8" corresp="code_introduccion-a-tei-1_8.txt" lang="language-XML" rend="block"/></ab>
-<p>La estructura de nuestro documento TEI debe en principio ser similar a la estructura del texto objeto, es decir, el texto que queremos codificar. As&#237; pues, si nuestro texto objeto se divide en cap&#237;tulos, y estos se dividen en secciones o apartados, y estos, a su vez, en p&#225;rrafos, entonces lo recomendable es que repliquemos esa misma estructura en el documento TEI.</p>
-<p>Para los cap&#237;tulos y las secciones podemos usar el elemento <code rend="inline">&lt;div&gt;</code> y para los p&#225;rrafos el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-p.html"><code rend="inline">&lt;p&gt;</code></ref>.
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Introducción a la codificación de textos en TEI (parte 1)</title>
+                <author role="original_author">Nicolás Vaughan</author>
+                <editor role="reviewers">
+                    <persName>Rocío Méndez</persName>
+                    <persName>Iñaki Cano</persName>
+                </editor>
+                <editor role="editors">Jennifer Isasi</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phes0053</idno>
+                <date type="published">07/27/2021</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original. Available translations are the following: Available translations are the following: Available translations are the following: Available translations are the following:<ref type="translations" target="#introducao-codificacao-textos-tei-1"/>
+                    <ref type="translations" target="#introducao-codificacao-textos-tei-1"/>
+                    <ref type="translations" target="#introducao-codificacao-textos-tei-1"/>
+                    <ref type="translations" target="#introducao-codificacao-textos-tei-1"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Esta lección (la primera de dos partes) te enseña los rudimentos de TEI-XML para codificar textos.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">website</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="es">
+        <body>
+            <div type="2">
+                <head>Introducción</head>
+                <p>Uno de los problemas centrales de las humanidades digitales ha sido el trabajo con y sobre textos:
+su captura (digitalización), reconocimiento, transcripción, codificación, procesamiento, transformación y análisis.
+En esta lección nos centraremos exclusivamente en la codificación de textos, es decir, en su categorización por medio de etiquetas (tags).</p>
+                <p>Un ejemplo puede ayudar a aclarar esta idea. Supongamos que tenemos un documento impreso que hemos digitalizado previamente.
+Tenemos las imágenes digitalizadas de sus páginas y, con ayuda de un software de reconocimiento óptico de caracteres (<ref target="https://es.wikipedia.org/wiki/Reconocimiento_%C3%B3ptico_de_caracteres">OCR</ref>, en inglés), extraemos el texto contenido en ellas. Este texto es lo que suele llamarse <ref target="https://es.wikipedia.org/wiki/Archivo_de_texto">texto plano</ref> (o texto digitalizado), es decir, el texto sin formato alguno (sin cursivas, negritas, etc.) ni ninguna otra estructuración semántica.</p>
+                <p>Aunque parezca extraño, el texto plano carece completamente de contenido. Para un computador es solo una larga cadena de caracteres (incluyendo puntuación, espacios en blanco y saltos de línea, etc.) en alguna <ref target="https://es.wikipedia.org/wiki/Codificaci%C3%B3n_de_caracteres">codificación</ref> (por ejemplo <ref target="https://es.wikipedia.org/wiki/UTF-8">UTF-8</ref> o <ref target="https://es.wikipedia.org/wiki/ASCII">ASCII</ref>) de algún alfabeto (por ejemplo latino, griego o cirílico). Somos nosotros quienes, cuando lo leemos, identificamos palabras (en una o varias lenguas), líneas, párrafos, etcétera. Somos nosotros quienes identificamos asimismo nombres de personas y de lugares, títulos de libros y artículos, fechas, citas, epígrafes, referencias cruzadas (internas y externas), notas a pie de página y notas al final del texto. Pero, de nuevo, el computador es completamente "ignorante" con respecto a dichas estructuras textuales en un texto plano sin procesar o codificar.</p>
+                <p>Sin asistencia humana, por ejemplo, por medio de codificación <ref target="https://tei-c.org/">TEI</ref> (Text Encoding Initiative), el computador no puede "entender" o detectar contenido alguno en el texto plano.
+Eso quiere decir, entre otras cosas, que no podemos hacer búsquedas estructuradas sobre ese texto (por ejemplo de nombres de personas, lugares y fechas), ni podemos extraer y procesar sistemáticamente dicha información, sin antes haberle indicado al computador qué cadenas de caracteres corresponden a qué estructuras semánticas: por ejemplo, que este es un nombre propio de persona, aquel otro nombre de persona se refiere a la misma persona que este, este es un nombre de lugar, esta es una nota al margen hecha por una tercera persona, o que este párrafo pertenece a esta sección del texto.
+Codificar el texto es indicar (por medio de etiquetas y otros recursos) que ciertas cadenas de texto plano tienen determinada significación.
+Y esa es la diferencia entre texto plano y texto semánticamente estructurado.</p>
+                <p>Hay muchas formas de codificar un texto. Por ejemplo, podemos encerrar entre asteriscos simples los nombres propios de personas: <code rend="inline">*Simón Bolívar*</code>, <code rend="inline">*Soledad Acosta*</code>, etc. Y entre asteriscos dobles los de lugares: <code rend="inline">**Bogotá**</code>, <code rend="inline">**Framingham**</code>, etc. Podemos también usar guiones bajos para indicar los nombres de obras y de libros: <code rend="inline">_La divina comedia_</code>, <code rend="inline">_Cien años de soledad_</code>, etc. Estos signos sirven para etiquetar o marcar el texto que encierran, para así identificar en el texto un determinado contenido. Como es fácil de imaginar, las posibilidades de codificación son casi infinitas.</p>
+                <p>En esta lección aprenderás a codificar textos usando un lenguaje de computador especialmente diseñado para ello: TEI.</p>
+                <div type="3">
+                    <head>Software que usaremos</head>
+                    <p>Cualquier editor de texto plano (en formato <code rend="inline">.txt</code>) nos servirá para hacer todo lo que necesitemos en esta lección: el <ref target="https://es.wikipedia.org/wiki/Bloc_de_notas">Bloc de Notas (Notepad) de Windows</ref>, por ejemplo, es perfectamente adecuado para ello. Sin embargo, hay otros editores de texto que ofrecen herramientas o funcionalidades diseñadas para facilitar el trabajo con XML (Extensible Markup Language) e incluso con TEI. Uno de los más recomendados actualmente es <ref target="https://www.oxygenxml.com">Oxygen XML Editor</ref>, disponible para Windows, MacOS y Linux. Sin embargo, no es un software gratuito (la licencia académica cuesta unos $100 USD) ni de código abierto, por lo que no lo usaremos en esta lección.</p>
+                    <p>Para esta lección usaremos el editor <ref target="https://code.visualstudio.com/">Visual Studio Code</ref> (VS Code, más brevemente), creado por Microsoft y mantenido actualmente por una gran comunidad de programadores de software libre. Es una aplicación completamente gratuita y de <ref target="https://github.com/microsoft/vscode">código abierto</ref>, disponible para Windows, MacOS y Linux.</p>
+                    <p>Descarga la versión más reciente de VS Code en el enlace <ref target="https://code.visualstudio.com/">https://code.visualstudio.com/</ref> e instálala en tu computador. Ábrelo y verás una pantalla como la siguiente:</p>
+                    <figure>
+                        <desc>Vista inicial de VS Code</desc>
+                        <graphic url="introduccion-a-tei-1-01.png"/>
+                    </figure>
+                    <p>Ahora instalaremos una extensión de VS Code para trabajar más fácilmente con documentos XML y TEI-XML: <ref target="https://marketplace.visualstudio.com/items?itemName=raffazizzi.sxml">Scholarly XML</ref>.</p>
+                    <p>Para ello haz clic en el botón de extensiones en la barra lateral de herramientas, a la izquierda en la ventana principal:</p>
+                    <figure>
+                        <desc>Extensiones de VS Code</desc>
+                        <graphic url="introduccion-a-tei-1-02.png"/>
+                    </figure>
+                    <p>Escribe <code rend="inline">Scholarly XML</code> en el campo de búsqueda:</p>
+                    <figure>
+                        <desc>Búsqueda de una extensión en VS Code</desc>
+                        <graphic url="introduccion-a-tei-1-03.png"/>
+                    </figure>
+                    <p>Finalmente haz clic en "Install":</p>
+                    <figure>
+                        <desc>Instalar Scholarly XML en VS Code</desc>
+                        <graphic url="introduccion-a-tei-1-04.png"/>
+                    </figure>
+                    <p>Esta extensión nos permite hacer varias cosas con el código:</p>
+                    <p>
+                        <hi rend="bold">Primero</hi>, seleccionar cualquier texto en un documento XML, presionar un atajo de teclado y encerrar automáticamente el texto seleccionado dentro de un elemento XML. Cuando presionamos <code rend="inline">Ctrl+E</code> (en Windows o Linux) o <code rend="inline">Cmd+E</code> (en MacOS), VS Code abre una ventanita con la instrucción <code rend="inline">Enter Abbreviation (Press Enter to confirm or Escape to cancel)</code> ("Introduce la abreviatura (Presiona Intro para confirmar o Escape para cancelar)"). A continuación escribimos el nombre del elemento y presionamos la tecla <code rend="inline">Intro</code>. El editor entonces encerrará el texto seleccionado entre una etiqueta de apertura y otra de cierre con el nombre del elemento. Cuando trabajamos con XML, automatizar la introducción las etiquetas de apertura y de cierre nos puedo ahorrar mucho tiempo, a la vez que disminuye la probabilidad de que introduzcamos errores de tipográficos involuntarios en el código.</p>
+                    <figure>
+                        <desc>Introducir automáticamente un elemento XML en VS Code</desc>
+                        <graphic url="introduccion-a-tei-1-05.png"/>
+                    </figure>
+                    <p>
+                        <hi rend="bold">Segundo</hi>, determinar si un documento está bien formado según la sintaxis de XML y además si es válido semánticamente con respecto a un esquema de validación de tipo <ref target="https://en.wikipedia.org/wiki/RELAX_NG">RELAX NG</ref>, por ejemplo, el esquema <code rend="inline">tei-all</code> de TEI, que contiene la totalidad de los módulos de marcado para todos los tipos de documentos previstos por el consorcio TEI. (Más abajo explicaremos los conceptos de validez sintáctica y semántica.) La extensión hace las dos cosas automáticamente. </p>
+                    <figure>
+                        <desc>Detectar errores de XML en VS Code</desc>
+                        <graphic url="introduccion-a-tei-1-06.png"/>
+                    </figure>
+                    <figure>
+                        <desc>Detectar errores de XML en VS Code</desc>
+                        <graphic url="introduccion-a-tei-1-07.png"/>
+                    </figure>
+                    <p>Ahora bien, para realizar el segundo tipo de validación, es preciso que en el documento se especifique el URI del esquema en una declaración <code rend="inline">&lt;?xml-model&gt;</code> al principio del documento, por ejemplo así:</p>
+                    <ab>
+                        <code lang="language-XML" xml:id="code_introduccion-a-tei-1_0" corresp="code_introduccion-a-tei-1_0.txt" rend="block"/>
+                    </ab>
+                    <p>Puedes bajar una plantilla básica de un documento TEI-XML [aquí](<ref target="https://raw.githubusercontent.com/programminghistorian/jekyll/gh-pages/assets/introduccion-a-tei-1/plantilla-TEI.xml**">https://raw.githubusercontent.com/programminghistorian/jekyll/gh-pages/assets/introduccion-a-tei-1/plantilla-TEI.xml**</ref>, con estas líneas ya incluidas.</p>
+                    <p>
+                        <hi rend="bold">Tercero</hi>, la extensión ofrece también una herramientas para autocompletar el código de XML a partir del esquema de validación RELAX NG. Por ejemplo, si hemos introducido en el documento un elemento <code rend="inline">&lt;q&gt;</code> (para marcar un texto entrecomillado, por ejemplo una cita), podemos presionar la barra espaciador luego del <code rend="inline">q</code> de la etiqueta de apertura y VS Code nos mostrará una lista de atributos posibles para seleccionar en el menú:</p>
+                    <figure>
+                        <desc>Menú de autocompleción de código de XML en VS Code</desc>
+                        <graphic url="introduccion-a-tei-1-08.png"/>
+                    </figure>
+                    <p>Ahora bien, para poder usar esta u otras extensiones de VS Code es necesario que el editor <hi rend="bold">no</hi> esté en modo restringido (<emph>Restricted Mode</emph>), como nos aparece en esta ventana:</p>
+                    <figure>
+                        <desc>Aviso de modo restringido en VS Code</desc>
+                        <graphic url="introduccion-a-tei-1-09.png"/>
+                    </figure>
+                    <p>Este modo evita que las extensiones o el código del documento ejecuten instrucciones que puedan dañar nuestro sistema. Puesto que estamos trabajando con nuestros documento y la extensión recomendada es altamente confiable, podemos desactivar el modo restringido haciendo clic en el hipervínculo de arriba que dice <emph>Manage</emph> ("Administrar") y luego clic en el botón <emph>Trust</emph> ("Confiar"), así:</p>
+                    <figure>
+                        <desc>Salir del modo restringido en VS Code</desc>
+                        <graphic url="introduccion-a-tei-1-10.png"/>
+                    </figure>
+                    <p>Ahora que hemos configurado nuestro editor, podemos empezar a trabajar en TEI-XML.</p>
+                </div>
+                <div type="3">
+                    <head>Visualización vs. categorización</head>
+                    <p>Quienes estén familiarizados con el lenguaje de marcado <ref target="https://daringfireball.net/projects/markdown/syntax">Markdown</ref> —hoy en día habitual en foros técnicos en Internet, así como en <ref target="https://github.com">GitHub</ref>, <ref target="https://gitlab.com">GitLab</ref> y otros repositorios de código— reconocerán seguramente el uso de elementos tales como asteriscos (<code rend="inline">*</code>), guiones bajos (<code rend="inline">_</code>) y numerales (<code rend="inline">#</code>) para hacer que el texto aparezca de cierto modo en el navegador. Por ejemplo, un texto encerrado entre asteriscos simples será mostrado en cursivas y uno encerrado entre asteriscos dobles lo será en negritas. De hecho, el texto de esta lección está escrito en Markdown siguiendo esas convenciones.</p>
+                    <p>Ese uso del marcado tiene como finalidad principal la visualización del texto, no su categorización. En otras palabras, las marcas o etiquetas de Markdown no indican que un texto sea de cierta categoría (por ejemplo, el nombre de una persona, de un lugar o de una obra), sino únicamente que el texto ha de ser visualizado o mostrado de cierto modo en un navegador o en otro medio.</p>
+                    <p>Comprender la diferencia entre entre marcado de visualización (como el de Markdown) y marcado semántico (o estructural, como el que veremos a continuación en TEI) es crucial para entender el objetivo de la codificación de textos. Cuando marcamos un fragmento de texto para codificarlo, lo hacemos sin importarnos en principio cómo fue representado originalmente ni cómo pueda ser eventualmente representado en el futuro. Nos interesa únicamente la función semántica o estructural que un texto particular tenga. Por eso debemos procurar identificar con precisión las funciones o categorías de los textos, dejando de lado, en la medida de lo posible, el modo como son mostrados en el papel o la pantalla.</p>
+                    <p>Aclaremos mejor esto volviendo a nuestro ejemplo inicial. Supongamos que en el texto digitalizado del que partimos los nombres propios aparecen siempre impresos en <ref target="https://es.wikipedia.org/wiki/Versalita">letra versalita</ref>, como en el siguiente fragmento:</p>
+                    <figure>
+                        <desc>Fragmento corto de texto digitalizado de _Don Quijote_</desc>
+                        <graphic url="introduccion-a-tei-1-11.png"/>
+                    </figure>
+                    <p>Como veremos a continuación, TEI nos permite codificar, por medio de una serie de etiquetas, el texto que queremos categorizar. Por ejemplo, podemos utilizar una etiqueta como <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-name.html">
+                            <code rend="inline">&lt;name&gt;</code>
+                        </ref> para demarcar los nombres propios contenidos en el texto, así:</p>
+                    <ab>
+                        <code lang="language-XML" xml:id="code_introduccion-a-tei-1_1" corresp="code_introduccion-a-tei-1_1.txt" rend="block"/>
+                    </ab>
+                    <p>Luego veremos en detalle qué es y cómo funciona una etiqueta (o más precisamente un elemento) en XML y TEI. Por ahora notemos que la etiqueta no significa que el texto haya sido representado originalmente en versalitas (o en ningún otro modo). Tan solo significa que el texto contenido en ella tiene la categoría de nombre propio, independientemente de cómo sea representado. De hecho, podemos codificar exhaustivamente un documento con cientos o miles de etiquetas, sin que ninguna de ellas aparezca al final en una eventual representación.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>XML y TEI: hacia un estándar de codificación de textos</head>
+                <p>Desde los inicios de las humanidades digitales en los años sesenta, hubo muchas aproximaciones a la codificación de textos. Casi que cada proyecto de codificación tenía su propio estándar, lo que conducía a que los proyectos fueran incompatibles e intraducibles entre sí, entorpeciendo e incluso imposibilitando el trabajo colaborativo.</p>
+                <p>Para resolver ese problema, unos veinte años después se estableció un nuevo estándar de codificación de textos, convenido un gran número de investigadores e investigadoras de todo el mundo, especialmente de universidades anglosajonas: el <ref target="https://es.wikipedia.org/wiki/Text_Encoding_Initiative">Text Encoding Initiative (TEI)</ref>.</p>
+                <p>TEI está a su vez construido sobre el lenguaje de marcado <ref target="https://es.wikipedia.org/wiki/Extensible_Markup_Language">XML</ref> y es por ello que suele ser denominado a veces como "TEI-XML" (o también "XML/TEI"). Por su parte, XML (que es la sigla para "eXtensible Markup Language") es un lenguaje de computador cuyo propósito es describir, por medio de una serie de marcas o etiquetas (<emph>tags</emph> en inglés), un determinado texto objeto.
+XML y TEI son lenguajes de marcado y en eso se diferencian de los lenguajes de programación como C, Python o Java, que describen objetos, funciones o procedimientos que han de ser ejecutados por un computador.</p>
+                <div type="3">
+                    <head>XML</head>
+                    <p>En esta lección no entraremos en detalle en la sintaxis y el funcionamiento de XML. Recomendamos, por lo tanto, que el lector le dé una mirada a
+<ref target="/es/lecciones/transformacion-datos-xml-xsl">esta otra lección</ref> para más información sobre XML, así como a la bibliografía y referencias sugeridas al final de esta lección.</p>
+                    <p>Por ahora solo debemos saber que todo documento XML debe cumplir dos reglas básicas para ser válido:</p>
+                    <list type="ordered">
+                        <item>Debe haber un solo elemento raíz (que contiene a todos los demás elementos, si los hay).</item>
+                        <item>Toda etiqueta de apertura debe tener una etiqueta de cierre.</item>
+                    </list>
+                    <p>Por suerte, los editores de código XML como VS Code (con la extensión Scholarly XML) u OxygenXML nos permiten detectar fácilmente errores de este tipo.</p>
+                </div>
+                <div type="3">
+                    <head>¿Qué es TEI?</head>
+                    <p>XML es un lenguaje tan general y abstracto que es totalmente indiferente respecto de su contenido. Puede ser usado, por ejemplo, para describir cosas tan disímiles como un texto en griego clásico del siglo VIII a.C. y un mensaje que un termostato inteligente le envía a una aplicación de un smartphone usada para controlarlo.</p>
+                    <p>TEI es una implementación particular de XML. Es decir, es una serie de reglas que determinan qué elementos y qué atributos son permitidos en un documento de cierto tipo. Más precisamente, TEI es un lenguaje de marcado para codificar textos de toda clase. Esto con el fin de que sean procesados por un computador, de modo que puedan ser analizados, transformados, reproducidos y almacenados, dependiendo de las necesidades e intereses de los usuarios (tanto los de carne y hueso como los computacionales). Es por eso que podemos decir que TEI está en el corazón de las humanidades digitales (¡o al menos en uno de sus corazones!). Es un estándar para trabajar computacionalmente con una clase de objetos tradicionalmente central a las humanidades: los textos.
+Así las cosas, mientras que a XML le es indiferente si los elementos de un documento describen textos (o propiedades de textos), TEI está diseñado exclusivamente para trabajar con ellos.</p>
+                    <p>El tipo de elementos y atributos permisibles en TEI, y las relaciones existentes entre ellos, están especificados por las <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/index.html">reglas de TEI</ref>. Por ejemplo, si queremos codificar un poema, podemos usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lg.html">
+                            <code rend="inline">&lt;lg&gt;</code>
+                        </ref> (de <emph>line group</emph>, "grupo de líneas") de TEI. Las reglas de TEI determinan qué tipos de atributos puede tener ese elemento y qué elementos pueden, a su vez, contener o ser contenidos por él. TEI determina que todo elemento elemento <code rend="inline">&lt;lg&gt;</code> debe tener al menos un elemento elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-l.html">
+                            <code rend="inline">&lt;l&gt;</code>
+                        </ref> (de <emph>line</emph>, "línea").</p>
+                    <p>A modo de ilustración, examinemos los primeros cuatro versos del soneto <emph>Amor constante más allá de la muerte</emph> de Francisco de Quevedo (a continuación en texto plano):</p>
+                    <ab>
+                        <code lang="language-XML" xml:id="code_introduccion-a-tei-1_2" corresp="code_introduccion-a-tei-1_2.txt" rend="block"/>
+                    </ab>
+                    <p>Podemos proponer la siguiente codificación en TEI:</p>
+                    <ab>
+                        <code lang="language-XML" xml:id="code_introduccion-a-tei-1_3" corresp="code_introduccion-a-tei-1_3.txt" rend="block"/>
+                    </ab>
+                    <p>En este caso, nos hemos valido del atributo <code rend="inline">@rhyme</code> del elemento <code rend="inline">&lt;lg&gt;</code>, para hacer codificar el tipo de rima del pasaje; del atributo <code rend="inline">@met</code> para indicar el tipo de métrica del primer verso (endecasílabo) (esto tendríamos que hacerlo en cada uno de los versos, aunque por claridad del código lo hemos hecho solo en el primero); y finalmente el atributo <code rend="inline">@n</code> para indicar el número del verso dentro el grupo.</p>
+                    <p>La comparación entre el texto plano del fragmento del soneto con su codificación nos permite empezar a ver las ventajas de TEI como un lenguaje de marcado para textos. No solo queda explícitamente dicho que las líneas (en el código anterior) dos a la cinco son versos de un poema, sino que ellas tienen un tipo de rima y de métrica. Una vez codificado todo el poema, o todos los poemas de una colección, podemos ,por ejemplo, usar un software para realizar búsquedas estructuradas, de modo que nos arroje todos los poemas que tienen cierto tipo de rima o todas las líneas que tienen cierto tipo de métrica. O podemos usar (o crear) una aplicación para determinar cuántos versos de los sonetos de Quevedo —si los hay— tienen métrica imperfecta. O podemos comparar las distintas versiones (los "testigos" o "testimonios" manuscritos e impresos) de los sonetos, para realizar una edición crítica de ellos.</p>
+                    <p>Ahora bien, todo eso y mucho más es posible solo en virtud de que hemos hecho explícito, gracias a TEI, el contenido de esos sonetos.
+Si solo tuviéramos el texto plano de ellos, sería técnicamente imposible aprovechar herramientas computacionales diseñadas para editar, transformar, visualizar, analizar o publicarlos.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Un documento mínimo de TEI</head>
+                <p>Examinemos ahora el siguiente documento mínimo de TEI:</p>
+                <ab>
+                    <code lang="language-XML" xml:id="code_introduccion-a-tei-1_4" corresp="code_introduccion-a-tei-1_4.txt" rend="block"/>
+                </ab>
+                <p>La primera línea ya es la tradicional declaración del documento XML.
+La segunda línea contiene el elemento principal o "raíz" de este documento: el elemento <code rend="inline">&lt;TEI&gt;</code>. El atributo <code rend="inline">@xmlns</code> con el valor <code rend="inline">http://www.tei-c.org/ns/1.0</code> simplemente declara que todos los elementos y atributos hijos del elemento <code rend="inline">&lt;TEI&gt;</code> pertenencen al "namespace" de TEI (representado aquí por ese URL). Eso no tendrá que preocuparnos más en lo sucesivo.</p>
+                <p>Lo interesante viene luego en las líneas tres y dieciseis, que contienen respectivamente a los dos hijos inmediatos del elemento raíz:</p>
+                <list type="unordered">
+                    <item>
+                        <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-teiHeader.html">
+                            <code rend="inline">&lt;teiHeader&gt;</code>
+                        </ref>
+                    </item>
+                    <item>
+                        <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-text.html">
+                            <code rend="inline">&lt;text&gt;</code>
+                        </ref>
+                    </item>
+                </list>
+                <p>Veamos ahora en qué consisten esos dos elementos.</p>
+                <div type="3">
+                    <head>El elemento &lt;teiHeader&gt;</head>
+                    <p>Todos los metadatos del documento están codificados en el elemento <code rend="inline">&lt;teiHeader&gt;</code>: el título, autores o autoras, dónde, cuándo y cómo fue publicado, su fuente, de dónde se tomó la fuente, etcétera. Es habitual que las personas que empiezan a codificar texto de TEI pasen de largo esa información, llenando estos campos con datos genéricos e incompletos. Sin embargo, la información del <code rend="inline">&lt;teiHeader&gt;</code> es esencial a la tarea del codificador, pues sirve para identificar con toda precisión el texto codificado.</p>
+                    <p>El <code rend="inline">&lt;teiHeader&gt;</code> debe contener al menos un elemento llamado <code rend="inline">&lt;fileDesc&gt;</code> (de <emph>file description</emph> o descripción del archivo), que a su vez contiene tres elementos hijos:</p>
+                    <list type="unordered">
+                        <item>
+                            <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-titleStmt.html">
+                                <code rend="inline">&lt;titleStmt&gt;</code>
+                            </ref> (de <emph>title statement</emph> o enunciado de título): la información sobre el título del documento (dentro del elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-title.html">
+                                <code rend="inline">&lt;title&gt;</code>
+                            </ref>); opcionalmente también puede incluir datos sobre el autor o autores (dentro del elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-author.html">
+                                <code rend="inline">&lt;author&gt;</code>
+                            </ref>)</item>
+                        <item>
+                            <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-publicationStmt.html">
+                                <code rend="inline">&lt;publicationStmt&gt;</code>
+                            </ref> (de <emph>publication statement</emph> o enunciado de publicación): la información de cómo está publicado o disponible el documento (esto es, el documento mismo TEI, no su fuente). En ese sentido es análogo a la información del editor/imprenta en el "imprint" o página legal de un libro. Puede ser un párrafo descriptivo (dentro del elemento genérico de párrafo <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-p.html">
+                                <code rend="inline">&lt;p&gt;</code>
+                            </ref>) o puede estar estructurada en uno o varios campos dentro los siguientes elementos:<list type="unordered">
+                                <item>
+                                    <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-address.html">
+                                        <code rend="inline">&lt;address&gt;</code>
+                                    </ref>: la dirección postal de quien edita/codifica</item>
+                                <item>
+                                    <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-date.html">
+                                        <code rend="inline">&lt;date&gt;</code>
+                                    </ref>: la fecha de publicación del documento</item>
+                                <item>
+                                    <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-pubPlace.html">
+                                        <code rend="inline">&lt;pubPlace&gt;</code>
+                                    </ref>: el lugar de publicación del documento</item>
+                                <item>
+                                    <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-publisher.html">
+                                        <code rend="inline">&lt;publisher&gt;</code>
+                                    </ref>: la persona que edita/codifica el documento</item>
+                                <item>
+                                    <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-ref.html">
+                                        <code rend="inline">&lt;ref&gt;</code>
+                                    </ref> (o también <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-ptr.html">
+                                        <code rend="inline">&lt;ptr&gt;</code>
+                                    </ref>): una referencia externa (URL) donde está disponible el documento</item>
+                            </list>
+                        </item>
+                        <item>
+                            <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-sourceDesc.html">
+                                <code rend="inline">&lt;sourceDesc&gt;</code>
+                            </ref> (de <emph>source description</emph> o descripción de la fuente): la información sobre la fuente de la que se toma el texto que está siendo codificado. Puede ser un párrafo descriptivo (dentro del elemento genérico de párrafo, <code rend="inline">&lt;p&gt;</code>). También puede estar estructurada de varias formas. Por ejemplo, puede tener un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-bibl.html">
+                                <code rend="inline">&lt;bibl&gt;</code>
+                            </ref>, que incluye una referencia bibliográfica sin estructurar (p. ej. <code rend="inline">&lt;bibl&gt;Miguel de Cervantes Saavedra, "Don Quijote de La Mancha", Madrid: Espasa-Calpe, 2010&lt;/bibl&gt;</code>); o puede contener una referencia estructurada en el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-biblStruct.html">
+                                <code rend="inline">&lt;biblStruct&gt;</code>
+                            </ref> que contiene a su vez otros elementos relevantes</item>
+                    </list>
+                    <p>Supongamos que queremos codificar el <emph>Quijote</emph> de Cervantes, partiendo de <ref target="https://archive.org/details/donquijotedelama01cerv">esta edición</ref> disponible gratuitamente en el <ref target="https://archive.org">Internet Archive</ref>. El <code rend="inline">&lt;teiHeader&gt;</code> de nuestro documento TEI bien podría ser el siguiente:</p>
+                    <ab>
+                        <code lang="language-XML" xml:id="code_introduccion-a-tei-1_5" corresp="code_introduccion-a-tei-1_5.txt" rend="block"/>
+                    </ab>
+                    <p>Esta es la información mínima para identificar el documento codificado. Nos dice el título y autor del texto, el responsable de la codificación y la fuente de donde se tomó dicho texto.</p>
+                    <p>Sin embargo, es posible —y a veces es deseable— especificar más detalladamente los metadatos del documento. Por ejemplo, consideremos esta otra versión del <code rend="inline">&lt;teiHeader&gt;</code> para el mismo texto:</p>
+                    <ab>
+                        <code lang="language-XML" xml:id="code_introduccion-a-tei-1_6" corresp="code_introduccion-a-tei-1_6.txt" rend="block"/>
+                    </ab>
+                    <p>La decisión sobre la exhaustividad de la información en el <code rend="inline">&lt;teiHeader&gt;</code> depende de su disponibilidad, y obedece a los fines de la codificación y a los intereses de quien codifica/edita. Ahora bien, aunque los metadatos contenidos en el <code rend="inline">&lt;teiHeader&gt;</code> de un documento TEI no necesariamente aparezcan literalmente en el texto codificado, no por eso son irrelevantes para el proceso de codificación, edición y eventual transformación. De hecho, en la medida en que un <code rend="inline">&lt;teiHeader&gt;</code> haya sido correcta y exhaustivamente codificado, en esa misma medida podrá extraerse y transformarse la información contenida en el documento.</p>
+                    <p>Por ejemplo, si fuera importante para nosotros distinguir entre las diferentes ediciones e impresiones del <emph>Quijote</emph>, la información contenida en los <code rend="inline">&lt;teiHeader&gt;</code> de los distintos documentos transcritos sería suficiente para poder discriminarlos automáticamente. En efecto, podríamos aprovechar los  elementos <code rend="inline">&lt;edition&gt;</code> e <code rend="inline">&lt;imprint&gt;</code> para tal fin, y con ayuda de tecnologías como <ref target="https://www.w3.org/TR/xslt/">XSLT</ref>, <ref target="https://www.w3.org/TR/xpath/">XPath</ref> y <ref target="https://www.w3.org/TR/xquery/">XQuery</ref> podríamos ubicar, extraer y procesar toda esa información.</p>
+                    <p>En conclusión, entre más completa y minuciosamente se codifiquen los metadatos de los textos en el <code rend="inline">&lt;teiHeader&gt;</code> de nuestros documentos TEI, más control tendremos sobre su identidad y naturaleza.</p>
+                </div>
+                <div type="3">
+                    <head>El elemento &lt;text&gt;</head>
+                    <p>Como vimos arriba en el documento mínimo, <code rend="inline">&lt;text&gt;</code> es el segundo hijo de <code rend="inline">&lt;TEI&gt;</code>. Contiene todo el texto del documento, propiamente hablando. De acuerdo con la <ref target="https://tei-c.org/guidelines/p5/">documentación de TEI</ref>, <code rend="inline">&lt;text&gt;</code> puede contener una serie de elementos en los que el texto objeto se ha de estructurar:</p>
+                    <figure>
+                        <desc>Elementos posibles de `<text>`</text>
+                        </desc>
+                        <graphic url="introduccion-a-tei-1-12.png"/>
+                    </figure>
+                    <p>El más importante de estos elementos es <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-body.html">
+                            <code rend="inline">&lt;body&gt;</code>
+                        </ref>, que contiene el cuerpo principal del texto. Sin embargo, otros elementos importantes como hijos de <code rend="inline">&lt;text&gt;</code> son <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-front.html">
+                            <code rend="inline">&lt;front&gt;</code>
+                        </ref>, que contiene el <emph>frontmatter</emph> (páginas preliminares) de un texto (introducción, prólogo, etc.), y <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-back.html">
+                            <code rend="inline">&lt;back&gt;</code>
+                        </ref>, que contiene el <emph>backmatter</emph> (páginas finales, apéndices, índices, etcétera).</p>
+                    <p>Por su parte, el elemento <code rend="inline">&lt;body&gt;</code> puede a su vez contener muchos otros elementos:</p>
+                    <figure>
+                        <desc>Elementos posibles de ``</desc>
+                        <graphic url="introduccion-a-tei-1-13.png"/>
+                    </figure>
+                    <p>Aunque todas esas posibilidades puedan abrumarnos a primera vista, debemos recordar que un texto suele dividirse naturalmente en secciones o partes constitutivas. Es recomendable, entonces, usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-div.html">
+                            <code rend="inline">&lt;div&gt;</code>
+                        </ref> para cada una de ellas y usar atributos como <code rend="inline">@type</code> o <code rend="inline">@n</code> para cualificar sus diferentes clases y posición en el texto (p. ej. <code rend="inline">&lt;div n="3" type="subsección"&gt;...&lt;/div&gt;</code>).</p>
+                    <p>Si nuestro texto es corto o simple, podríamos usar un solo <code rend="inline">&lt;div&gt;</code>. Por ejemplo:</p>
+                    <ab>
+                        <code lang="language-XML" xml:id="code_introduccion-a-tei-1_7" corresp="code_introduccion-a-tei-1_7.txt" rend="block"/>
+                    </ab>
+                    <p>Pero si nuestro texto es más complejo, usaríamos varios elementos <code rend="inline">&lt;div&gt;</code>:</p>
+                    <ab>
+                        <code lang="language-XML" xml:id="code_introduccion-a-tei-1_8" corresp="code_introduccion-a-tei-1_8.txt" rend="block"/>
+                    </ab>
+                    <p>La estructura de nuestro documento TEI debe en principio ser similar a la estructura del texto objeto, es decir, el texto que queremos codificar. Así pues, si nuestro texto objeto se divide en capítulos, y estos se dividen en secciones o apartados, y estos, a su vez, en párrafos, entonces lo recomendable es que repliquemos esa misma estructura en el documento TEI.</p>
+                    <p>Para los capítulos y las secciones podemos usar el elemento <code rend="inline">&lt;div&gt;</code> y para los párrafos el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-p.html">
+                            <code rend="inline">&lt;p&gt;</code>
+                        </ref>.
 Veamos, por ejemplo, el siguiente esquema:</p>
-<ab><code xml:id="code_introduccion-a-tei-1_9" corresp="code_introduccion-a-tei-1_9.txt" lang="language-XML" rend="block"/></ab>
-<p>Aunque TEI nos permita codificar exhaustivamente muchos de los aspectos y propiedades de un texto, en ocasiones no nos interesan todos ellos. Es m&#225;s, el proceso de codificaci&#243;n puede extenderse innecesariamente en el tiempo si codificamos elementos que nunca vamos a aprovechar en una eventual transformaci&#243;n. Por ejemplo, si estamos codificando el texto de una edici&#243;n impresa, puede ocurrir que las divisiones de l&#237;nea en los p&#225;rrafos no sean relevantes para nuestra codificaci&#243;n.</p>
-<p>En ese caso podemos ignorarlas y quedarnos solo con las divisiones de p&#225;rrafo, sin descender m&#225;s all&#225; de ellas. O quiz&#225;s sintamos la tentaci&#243;n de codificar sistem&#225;ticamente todas las fechas y los nombres de lugares (con los elementos <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-date.html"><code rend="inline">&lt;date&gt;</code></ref> y <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-placeName.html"><code rend="inline">&lt;placeName&gt;</code></ref>, respectivamente) que aparezcan en nuestro texto objeto, aun cuando nunca los aprovechemos posteriormente. Hacerlo no es un error, desde luego, pero quiz&#225;s perdamos tiempo valioso en ello.</p>
-<p>En suma, podr&#237;amos formular la "regla de oro" de la codificaci&#243;n as&#237;: codifiquemos todos y solo los elementos que tengan una determinada significaci&#243;n para nosotros, teniendo en cuenta que eventualmente los podremos aprovechar para fines concretos.</p>
-</div><div type="3"><head>Conclusiones</head>
-<p>En esta primera parte de la lecci&#243;n has aprendido:</p>
-<list type="ordered">
-<item>Qu&#233; significa c&#243;dificar un texto</item>
-<item>Qu&#233; son los documentos XML y XML-TEI</item>
-</list>
-<p>En <ref target="/es/lecciones/introduccion-a-tei-2">la segunda parte</ref> ver&#225;s en detalle dos ejemplos de codificaci&#243;n de textos.</p>
-</div><div type="3"><head>Referencias recomendadas</head>
-<list type="unordered">
-<item>
-<p>La documentaci&#243;n completa de TEI (los <emph>TEI Guidelines</emph>) est&#225; disponible en <ref target="https://tei-c.org/guidelines/">la p&#225;gina del consorcio</ref>. Si  bien est&#225; disp&#243;nible en varios idiomas, solo est&#225; completa en ingl&#233;s.</p>
-</item>
-<item>
-<p>Una buena introducci&#243;n a TEI es el libro <emph>&#191;Qu&#233; es la iniciativa de codificaci&#243;n de textos? C&#243;mo a&#241;adir marcado inteligente a los recursos digitales</emph> de Lou Burnard (Marsella: OpenEdition Press, 2012/2022) <ref target="https://books.openedition.org/oep/15662">disponible gratuitamente en l&#237;nea</ref>.</p>
-</item>
-<item>
-<p>Un buen tutorial para XML est&#225; disponible en: <ref target="https://www.w3schools.com/xml/">https://www.w3schools.com/xml/</ref> y en: <ref target="https://www.tutorialspoint.com/xml/index.htm">https://www.tutorialspoint.com/xml/index.htm</ref>.</p>
-</item>
-<item>
-<p>El consorcio TEI tambi&#233;n ofrece <ref target="https://www.tei-c.org/release/doc/tei-p5-doc/en/html/SG.html">una buena introducci&#243;n a XML</ref>.</p>
-</item>
-<item>
-<p>La documentaci&#243;n oficial de XML est&#225; disponible en <ref target="https://www.w3.org/XML/">la p&#225;gina del consorcio W3C</ref> Tambi&#233;n est&#225; disponible <ref target="https://www.w3.org/Style/XSL/">la documentaci&#243;n para toda la familia XSL</ref> (incluido XSLT).</p>
-</item>
-<item>
-<p>La Mozilla Foundation tambi&#233;n ofrece una buena p&#225;gina sobre XSLT y tecnolog&#237;as asociadas <ref target="https://developer.mozilla.org/es/docs/Web/XSLT">(en espa&#241;ol)</ref> y <ref target="https://developer.mozilla.org/en-US/docs/Web/XSLT">(en ingl&#233;s)</ref>.</p>
-</item>
-<item>
-<p>La p&#225;gina <ref target="https://tthub.io">TTHUB</ref> contiene una excelente <ref target="https://tthub.io/aprende/introduccion-a-tei/">"Introducci&#243;n a la Text Encoding Initiative"</ref> por Susanna All&#233;s Torrent (2019).</p>
-</item>
-<item>
-<p>Una lecci&#243;n introductoria de Programming Historian a XML y las transformaciones XSL es <ref target="/es/lecciones/transformacion-datos-xml-xsl"><emph>Transformaci&#243;n de datos con XML y XSL para su reutilizaci&#243;n</emph></ref>, de M. H. Beals.</p>
-</item>
-</list>
-</div></div>
-    </body>
-  </text>
+                    <ab>
+                        <code lang="language-XML" xml:id="code_introduccion-a-tei-1_9" corresp="code_introduccion-a-tei-1_9.txt" rend="block"/>
+                    </ab>
+                    <p>Aunque TEI nos permita codificar exhaustivamente muchos de los aspectos y propiedades de un texto, en ocasiones no nos interesan todos ellos. Es más, el proceso de codificación puede extenderse innecesariamente en el tiempo si codificamos elementos que nunca vamos a aprovechar en una eventual transformación. Por ejemplo, si estamos codificando el texto de una edición impresa, puede ocurrir que las divisiones de línea en los párrafos no sean relevantes para nuestra codificación.</p>
+                    <p>En ese caso podemos ignorarlas y quedarnos solo con las divisiones de párrafo, sin descender más allá de ellas. O quizás sintamos la tentación de codificar sistemáticamente todas las fechas y los nombres de lugares (con los elementos <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-date.html">
+                            <code rend="inline">&lt;date&gt;</code>
+                        </ref> y <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-placeName.html">
+                            <code rend="inline">&lt;placeName&gt;</code>
+                        </ref>, respectivamente) que aparezcan en nuestro texto objeto, aun cuando nunca los aprovechemos posteriormente. Hacerlo no es un error, desde luego, pero quizás perdamos tiempo valioso en ello.</p>
+                    <p>En suma, podríamos formular la "regla de oro" de la codificación así: codifiquemos todos y solo los elementos que tengan una determinada significación para nosotros, teniendo en cuenta que eventualmente los podremos aprovechar para fines concretos.</p>
+                </div>
+                <div type="3">
+                    <head>Conclusiones</head>
+                    <p>En esta primera parte de la lección has aprendido:</p>
+                    <list type="ordered">
+                        <item>Qué significa códificar un texto</item>
+                        <item>Qué son los documentos XML y XML-TEI</item>
+                    </list>
+                    <p>En <ref target="/es/lecciones/introduccion-a-tei-2">la segunda parte</ref> verás en detalle dos ejemplos de codificación de textos.</p>
+                </div>
+                <div type="3">
+                    <head>Referencias recomendadas</head>
+                    <list type="unordered">
+                        <item>
+                            <p>La documentación completa de TEI (los <emph>TEI Guidelines</emph>) está disponible en <ref target="https://tei-c.org/guidelines/">la página del consorcio</ref>. Si  bien está dispónible en varios idiomas, solo está completa en inglés.</p>
+                        </item>
+                        <item>
+                            <p>Una buena introducción a TEI es el libro <emph>¿Qué es la iniciativa de codificación de textos? Cómo añadir marcado inteligente a los recursos digitales</emph> de Lou Burnard (Marsella: OpenEdition Press, 2012/2022) <ref target="https://books.openedition.org/oep/15662">disponible gratuitamente en línea</ref>.</p>
+                        </item>
+                        <item>
+                            <p>Un buen tutorial para XML está disponible en: <ref target="https://www.w3schools.com/xml/">https://www.w3schools.com/xml/</ref> y en: <ref target="https://www.tutorialspoint.com/xml/index.htm">https://www.tutorialspoint.com/xml/index.htm</ref>.</p>
+                        </item>
+                        <item>
+                            <p>El consorcio TEI también ofrece <ref target="https://www.tei-c.org/release/doc/tei-p5-doc/en/html/SG.html">una buena introducción a XML</ref>.</p>
+                        </item>
+                        <item>
+                            <p>La documentación oficial de XML está disponible en <ref target="https://www.w3.org/XML/">la página del consorcio W3C</ref> También está disponible <ref target="https://www.w3.org/Style/XSL/">la documentación para toda la familia XSL</ref> (incluido XSLT).</p>
+                        </item>
+                        <item>
+                            <p>La Mozilla Foundation también ofrece una buena página sobre XSLT y tecnologías asociadas <ref target="https://developer.mozilla.org/es/docs/Web/XSLT">(en español)</ref> y <ref target="https://developer.mozilla.org/en-US/docs/Web/XSLT">(en inglés)</ref>.</p>
+                        </item>
+                        <item>
+                            <p>La página <ref target="https://tthub.io">TTHUB</ref> contiene una excelente <ref target="https://tthub.io/aprende/introduccion-a-tei/">"Introducción a la Text Encoding Initiative"</ref> por Susanna Allés Torrent (2019).</p>
+                        </item>
+                        <item>
+                            <p>Una lección introductoria de Programming Historian a XML y las transformaciones XSL es <ref target="/es/lecciones/transformacion-datos-xml-xsl">
+                                    <emph>Transformación de datos con XML y XSL para su reutilización</emph>
+                                </ref>, de M. H. Beals.</p>
+                        </item>
+                    </list>
+                </div>
+            </div>
+        </body>
+    </text>
 </TEI>

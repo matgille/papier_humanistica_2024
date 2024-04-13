@@ -1,207 +1,307 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="camadas-vetoriais-qgis">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Criar novas camadas vetoriais com o QGIS 2.0</title>
-  <author role="original_author"><persName>Jim Clifford</persName><persName>Josh MacFadyen</persName><persName>Daniel Macfarlane</persName></author><editor role="reviewers"><persName>Finn Arne J&#248;rgensen</persName><persName>Peter Webster</persName><persName>Abby Schreiber</persName></editor><author role="translators">Rafael Laguardia</author><editor role="translation-reviewers"><persName>Luis Ferla</persName><persName>Ana Alc&#226;ntara</persName></editor><editor role="editors">Adam Crymble</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phpt0009</idno><date type="published">12/13/2013</date><date type="translated">03/30/2021</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#vector-layers-qgis"/>.</p><p>There are other translations: <ref target=""/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Nesta li&#231;&#227;o, aprender&#225; como criar camadas vetoriais com base em mapas hist&#243;ricos digitalizados.</p></abstract><textClass><keywords><term xml:lang="en">mapping</term><term xml:lang="en">data-visualization</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="pt">
-    <body>
-      <div type="2"><head>Objetivos da li&#231;&#227;o</head>
-<p>Nesta li&#231;&#227;o, aprender&#225; como criar camadas vetoriais com base em mapas hist&#243;ricos digitalizados. <ref target="/en/lessons/googlemaps-googleearth">Na introdu&#231;&#227;o ao Google Maps e Google Earth</ref> (em ingl&#234;s), usou camadas vetoriais e criou atributos no Google Earth. Faremos o mesmo nesta li&#231;&#227;o, embora num n&#237;vel mais avan&#231;ado, usando o software QGIS.</p>
-<p>As camadas vetoriais (ou shapefiles) s&#227;o, junto com as camadas raster, um dos dois tipos b&#225;sicos de estruturas de armazenamento de dados. As camadas vetoriais usam as tr&#234;s fei&#231;&#245;es<sup>1</sup> b&#225;sicas do SIG (Sistema de Informa&#231;&#245;es Geogr&#225;ficas) - pontos, linhas e pol&#237;gonos - para representar aspectos do mundo real em formato digital. Pontos podem ser usados para representar locais espec&#237;ficos, como cidades, edif&#237;cios, eventos, etc. (a escala do seu mapa determinar&#225; o que voc&#234; representa como um ponto - no mapa de uma prov&#237;ncia, uma cidade seria um ponto, enquanto no mapa de uma cidade, um edif&#237;cio pode ser um ponto). Linhas podem representar estradas, rios, canais, ferrovias, etc. Pol&#237;gonos (formas fechadas) s&#227;o usados para representar objetos mais complexos, como os limites de um lago, pa&#237;s, divis&#227;o administrativa ou eleitoral, etc. (novamente, a escala afetar&#225; sua escolha - grandes edif&#237;cios num mapa de pormenor de uma cidade podem ser melhor representados como pol&#237;gonos do que como pontos).</p>
-<p>Nesta li&#231;&#227;o, criar&#225; shapefiles (que s&#227;o um formato de armazenamento de dados vetoriais) para representar o desenvolvimento hist&#243;rico de comunidades e estradas na Ilha Prince Edward. Cada shapefile pode ser criado como um dos tr&#234;s tipos de fei&#231;&#245;es: ponto, linha, pol&#237;gono (embora essas fei&#231;&#245;es n&#227;o possam ser misturadas num shapefile). Cada fei&#231;&#227;o que cria num shapefile possui um conjunto correspondente de atributos, que s&#227;o armazenados numa tabela de atributos. Criar&#225; fei&#231;&#245;es e aprender&#225; como modific&#225;-las, o que envolve n&#227;o apenas a cria&#231;&#227;o visual dos tr&#234;s tipos de fei&#231;&#245;es, mas tamb&#233;m a modifica&#231;&#227;o de seus atributos. Para fazer isso, usaremos os ficheiros da li&#231;&#227;o <ref target="/en/lessons/qgis-layers">instalar o QGIS 2.0 e adicionaremos camadas</ref> (em ingl&#234;s) referentes &#224; Ilha Prince Edward.  </p>
-</div>
-      <div type="2"><head>Come&#231;ando</head>
-<p>Comece por descarregar o <ref target="/assets/PEI_HollandMap1798_compLZW.tif">mapa PEI_Holland</ref> para a pasta do projeto.  </p>
-<p>Abra o ficheiro que voc&#234; salvou no final da li&#231;&#227;o <ref target="/en/lessons/qgis-layers">instalar o QGIS 2.0 e adicionar camadas</ref> (em ingl&#234;s). Deve ter as seguintes camadas na aba Camadas:</p>
-<list type="unordered">
-<item>PEI_placenames</item>
-<item>PEI_highway</item>
-<item>PEI HYDRONETWORK</item>
-<item>1935 inventory_region</item>
-<item>coastline_polygon</item>
-<item>PEI-CumminsMap1927</item>
-</list>
-<p>Desmarque todas essas camadas, exceto 'PEI_placenames', 'coastline_polygon' e 'PEI_CumminsMap1927'. </p>
-<figure><desc>Figura 1</desc><graphic url="pei1.png"/></figure>
-<p>Agora vamos adicionar um segundo mapa hist&#243;rico como uma camada raster.</p>
-<figure><desc>Figura 2</desc><graphic url="pei2.png"/></figure>
-<list type="unordered">
-<item>Em Camada na barra de ferramentas, escolha Adicionar Camada Raster (alternativamente, o mesmo &#237;cone que v&#234; ao lado de 'Adicionar Camada Raster' tamb&#233;m pode ser selecionado na barra de ferramentas)</item>
-<item>Encontre o ficheiro que descarregou intitulado 'PEI_HollandMap1798'</item>
-<item>Ser-lhe-&#225; solicitado que defina o sistema de coordenadas desta camada. Na caixa de filtro, pesquise por '2291' e, na caixa abaixo, selecione 'NAD83 (CSRS98) / Prince Edward Isl. Stereographic'</item>
-<item>Se n&#227;o lhe for solicitado que defina o sistema de coordenadas da camada, ser&#225; necess&#225;rio alterar uma configura&#231;&#227;o. Clique em 'Configura&#231;&#245;es' e, em seguida, em 'Op&#231;&#245;es'. Clique em 'CRS' no menu &#224; direita e escolha 'Solicitar CRS' a partir das op&#231;&#245;es abaixo. 'Quando uma nova camada &#233; criada, ou quando uma camada &#233; carregada sem CRS'. Clique 'OK'. Remova a camada 'PEI_HollandMap1798' (clique com o bot&#227;o direito sobre ela e clique em Remover) e tente adicion&#225;-la novamente. Desta vez, deve-lhe ser solicitado que forne&#231;a um 'CRS' e pode selecionar a op&#231;&#227;o 'NAD83' (veja acima).</item>
-</list>
-<figure><desc>Figura 3</desc><graphic url="Figura3.jpg"/></figure>
-<p>Nas etapas anteriores, selecionou e desmarcou camadas na janela 'Camadas' marcando e desmarcando as caixas ao lado delas. Essas camadas s&#227;o organizadas em ordem decrescente de visibilidade. Ou seja, a camada superior &#233; a camada superior da janela do visualizador (desde que esteja selecionada). Pode arrastar as camadas para cima e para baixo na janela de camadas para alterar a ordem em que ficar&#227;o vis&#237;veis na janela de visualiza&#231;&#227;o. A camada raster 'litoral_polygon' n&#227;o est&#225; vis&#237;vel no momento porque est&#225; abaixo das camadas 'PEI_HollandMap1798' e 'PEI_Cummins1927'. Em geral, &#233; melhor manter as camadas vetoriais acima das camadas raster.</p>
-<p>Desmarque 'PEI_Cummins1927' para que a &#250;nica camada restante seja 'PEI_HollandMap1798'. Observe que o mapa aparece torto na tela; isso ocorre porque j&#225; foi georreferenciado pelos redatores da li&#231;&#227;o para coincidir com as camadas vetoriais de SIG. Saiba mais sobre georreferenciamento em <ref target="/en/lessons/georeferencing-qgis">georreferenciamento no QGIS 2.0</ref> (em ingl&#234;s).</p>
-<figure><desc>Figura 4</desc><graphic url="pei4.png"/></figure>
-<p>Agora criaremos um shapefile de pontos, que &#233; uma camada vetorial. Clique em 'Camada' -&gt; 'Nova' -&gt; 'Nova Camada Shapefile'</p>
-<list type="unordered">
-<item>Alternativamente, pode selecionar o &#237;cone 'Nova camada Shapefile' no topo da janela da barra de ferramentas QGIS </item>
-</list>
-<figure><desc>Figura 5</desc><graphic url="Figura5.jpg"/></figure>
-<p>Depois de selecionar 'Nova Camada Shapefile', aparece uma janela intitulada 'Nova Camada Vetorial'</p>
-<list type="unordered">
-<item>Na categoria 'Tipo', 'ponto' j&#225; est&#225; selecionado. Clique no bot&#227;o 'Especificar CRS' e selecione 'NAD83 (CSRS98) / Prince Edward Isl. Estereogr&#225;fico (EPSG: 2291)' e, em seguida, clique em OK (para obter informa&#231;&#245;es sobre como entender e selecionar a zona UTM: <ref target="https://lib.uwaterloo.ca/locations/umd/digital/clump_classes.html">https://lib.uwaterloo.ca/locations/umd/digital/clump_classes.html</ref></item>
-</list>
-<figure><desc>Figura 6</desc><graphic url="Figura6.jpg"/></figure>
-<p>Retornando &#224; janela 'Nova Camada vetorial', iremos criar alguns atributos. Para criar o primeiro atributo:  </p>
-<list type="unordered">
-<item>Em 'Novo atributo', no campo ao lado de 'Nome', digite 'Nome_Assentamento' (observe que ao trabalhar em bancos de dados n&#227;o pode usar espa&#231;os vazios nos nomes, por isso a conven&#231;&#227;o &#233; usar sublinhados em seus lugares)</item>
-<item>Clique em 'Adicionar' &#224; lista de atributos </item>
-</list>
-<p>Agora vamos criar um segundo atributo:  </p>
-<list type="unordered">
-<item>Em 'Novo Atributo', no campo ao lado de 'Nome', digite 'Ano'</item>
-<item>Desta vez, vamos mudar o 'Tipo' para 'N&#250;mero Inteiro'</item>
-<item>Clique em 'Adicionar &#224; lista de atributos'</item>
-</list>
-<p>Para o terceiro atributo:</p>
-<list type="unordered">
-<item>Sob Novo atributo, no campo ao lado de Nome, digite 'Ano_Final' (o SIG nem sempre &#233; ideal para lidar com mudan&#231;as ao longo do tempo, ent&#227;o em alguns casos &#233; importante ter um campo para identificar aproximadamente quando algo deixou de existir)</item>
-<item>Mude o 'Tipo' novamente para 'N&#250;mero Inteiro'</item>
-<item>Clique em Adicionar &#224; lista de atributos</item>
-</list>
-<figure><desc>Figura 7</desc><graphic url="Figura7.jpg"/></figure>
-<list type="unordered">
-<item>Ao concluir essas tr&#234;s etapas, termine de criar esse shapefile clicando em OK na parte inferior direita da janela 'Nova Camada Vetorial'. Um 'pop-up' ir&#225; surgir, nomeie-o de 'Assentamentos' e salve-o com os seus outros ficheiros SIG.</item>
-</list>
-<p>Observe que uma camada chamada 'Assentamentos' agora aparece na janela 'Camadas'. Reposicione-a acima das camadas raster.</p>
-<figure><desc>Figura 8</desc><graphic url="Figura8.jpg"/></figure>
-<p>Desmarque todas as camadas, exceto 'Assentamentos'. A janela de visualiza&#231;&#227;o agora est&#225; em branco, pois n&#227;o cria&#225;mos nenhum dado. Agora criaremos novos dados do 'PEI_CumminsMap1927' e do 'PEI_HollandMap 1798' para mostrar o aumento da ocupa&#231;&#227;o entre o final do s&#233;culo XVIII e o in&#237;cio do s&#233;culo XX. </p>
-<list type="unordered">
-<item>N&#243;s come&#231;aremos com o mapa mais recente e, portanto, geralmente mais preciso. Selecione novamente (ou seja,  marque as caixas ao lado) 'coast_polygon' e 'PEI_CumminsMap1927'.</item>
-<item>Na janela de visualiza&#231;&#227;o, aumente o 'Zoom' em 'Charlottetown' (dica: 'Charlottetown' fica perto do meio da ilha no lado sul, na conflu&#234;ncia de tr&#234;s rios).</item>
-<item>Selecione a camada de 'Assentamentos' na janela 'Camadas'.</item>
-<item>Na barra de menu, selecione 'Alternar Edi&#231;&#227;o'.</item>
-</list>
-<figure><desc>Figura 9</desc><graphic url="pei9.png"/></figure>
-<list type="unordered">
-<item>Depois de selecionar 'Alternar Edi&#231;&#227;o', os bot&#245;es de edi&#231;&#227;o ficar&#227;o dispon&#237;veis &#224; direita na barra de menus. Selecione o bot&#227;o de fei&#231;&#227;o com 'tr&#234;s pontos'.</item>
-</list>
-<figure><desc>Figura 10</desc><graphic url="pei10.png"/></figure>
-<list type="unordered">
-<item>O cursor aparece agora como uma cruz - aponte a cruz para 'Charlottetown' (se por acaso n&#227;o conhecer a geografia do 'PEI', pode ter ajuda adicionando a camada 'PEI_nomes de local'), mantendo-a dentro da linha costeira atual e clique (a digitaliza&#231;&#227;o &#233; sempre um compromisso entre precis&#227;o e funcionalidade; dependendo da qualidade do mapa original e da digitaliza&#231;&#227;o, para a maioria das aplica&#231;&#245;es hist&#243;ricas, a precis&#227;o extrema n&#227;o &#233; necess&#225;ria).</item>
-<item>Uma janela de atributos aparecer&#225;. Deixe o campo 'id' em branco (no momento da escrita, o QGIS criar&#225; dois campos 'id' e este &#233; desnecess&#225;rio). No campo 'Assentamento', digite 'Charlottetown'. No campo 'Ano', digite '1764'. Clique em 'OK'.
-Vamos agora repetir as etapas que realiz&#225;mos com 'Charlottetown' para 'Montague', 'Summerside' e 'Cavendish' (novamente, pode encontrar esses locais adicionando as camadas 'PEI_nomes de local'). Encontre 'Montague' no mapa, selecione o bot&#227;o de fei&#231;&#227;o com 'tr&#234;s pontos' e clique em Montague no mapa. Quando a janela 'Atributos' aparecer, insira 'Montague' e '1732' nos campos apropriados. Repita para 'Summerside (1876)' e 'Cavendish (1790)'.</item>
-</list>
-<figure><desc>Figura 11</desc><graphic url="Figura11.jpg"/></figure>
-<p>Na janela 'Camadas', desmarque 'PEI_CumminsMap1927' e selecione 'PEI_HollandMap1798'. Agora vamos identificar dois assentamentos ('Princetown' e 'Havre-St-Pierre') que j&#225; n&#227;o existem.  </p>
-<list type="unordered">
-<item>
-<p>Para localizar 'Princetown', procure 'Richmond Bay' e 'Cape Aylebsury' (na costa norte a oeste de 'Cavendish'), aqui voc&#234; encontrar&#225; 'Princetown' (sombreado) perto da fronteira entre o amarelo e o azul.</p>
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Criar novas camadas vetoriais com o QGIS 2.0</title>
+                <author role="original_author">
+                    <persName>Jim Clifford</persName>
+                    <persName>Josh MacFadyen</persName>
+                    <persName>Daniel Macfarlane</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Finn Arne Jørgensen</persName>
+                    <persName>Peter Webster</persName>
+                    <persName>Abby Schreiber</persName>
+                </editor>
+                <author role="translators">Rafael Laguardia</author>
+                <editor role="translation-reviewers">
+                    <persName>Luis Ferla</persName>
+                    <persName>Ana Alcântara</persName>
+                </editor>
+                <editor role="editors">Adam Crymble</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">03/30/2021</date>
+                <idno type="doi">10.46430/phpt0009</idno>
+                <date type="published">12/13/2013</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#vector-layers-qgis"/>.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Nesta lição, aprenderá como criar camadas vetoriais com base em mapas históricos digitalizados.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">mapping</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <div type="2">
+                <head>Objetivos da lição</head>
+                <p>Nesta lição, aprenderá como criar camadas vetoriais com base em mapas históricos digitalizados. <ref target="/en/lessons/googlemaps-googleearth">Na introdução ao Google Maps e Google Earth</ref> (em inglês), usou camadas vetoriais e criou atributos no Google Earth. Faremos o mesmo nesta lição, embora num nível mais avançado, usando o software QGIS.</p>
+                <p>As camadas vetoriais (ou shapefiles) são, junto com as camadas raster, um dos dois tipos básicos de estruturas de armazenamento de dados. As camadas vetoriais usam as três feições<hi rend="textsuperscript">1</hi> básicas do SIG (Sistema de Informações Geográficas) - pontos, linhas e polígonos - para representar aspectos do mundo real em formato digital. Pontos podem ser usados para representar locais específicos, como cidades, edifícios, eventos, etc. (a escala do seu mapa determinará o que você representa como um ponto - no mapa de uma província, uma cidade seria um ponto, enquanto no mapa de uma cidade, um edifício pode ser um ponto). Linhas podem representar estradas, rios, canais, ferrovias, etc. Polígonos (formas fechadas) são usados para representar objetos mais complexos, como os limites de um lago, país, divisão administrativa ou eleitoral, etc. (novamente, a escala afetará sua escolha - grandes edifícios num mapa de pormenor de uma cidade podem ser melhor representados como polígonos do que como pontos).</p>
+                <p>Nesta lição, criará shapefiles (que são um formato de armazenamento de dados vetoriais) para representar o desenvolvimento histórico de comunidades e estradas na Ilha Prince Edward. Cada shapefile pode ser criado como um dos três tipos de feições: ponto, linha, polígono (embora essas feições não possam ser misturadas num shapefile). Cada feição que cria num shapefile possui um conjunto correspondente de atributos, que são armazenados numa tabela de atributos. Criará feições e aprenderá como modificá-las, o que envolve não apenas a criação visual dos três tipos de feições, mas também a modificação de seus atributos. Para fazer isso, usaremos os ficheiros da lição <ref target="/en/lessons/qgis-layers">instalar o QGIS 2.0 e adicionaremos camadas</ref> (em inglês) referentes à Ilha Prince Edward.  </p>
+            </div>
+            <div type="2">
+                <head>Começando</head>
+                <p>Comece por descarregar o <ref target="/assets/PEI_HollandMap1798_compLZW.tif">mapa PEI_Holland</ref> para a pasta do projeto.  </p>
+                <p>Abra o ficheiro que você salvou no final da lição <ref target="/en/lessons/qgis-layers">instalar o QGIS 2.0 e adicionar camadas</ref> (em inglês). Deve ter as seguintes camadas na aba Camadas:</p>
+                <list type="unordered">
+                    <item>PEI_placenames</item>
+                    <item>PEI_highway</item>
+                    <item>PEI HYDRONETWORK</item>
+                    <item>1935 inventory_region</item>
+                    <item>coastline_polygon</item>
+                    <item>PEI-CumminsMap1927</item>
+                </list>
+                <p>Desmarque todas essas camadas, exceto 'PEI_placenames', 'coastline_polygon' e 'PEI_CumminsMap1927'. </p>
+                <figure>
+                    <desc>Figura 1</desc>
+                    <graphic url="pei1.png"/>
+                </figure>
+                <p>Agora vamos adicionar um segundo mapa histórico como uma camada raster.</p>
+                <figure>
+                    <desc>Figura 2</desc>
+                    <graphic url="pei2.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>Em Camada na barra de ferramentas, escolha Adicionar Camada Raster (alternativamente, o mesmo ícone que vê ao lado de 'Adicionar Camada Raster' também pode ser selecionado na barra de ferramentas)</item>
+                    <item>Encontre o ficheiro que descarregou intitulado 'PEI_HollandMap1798'</item>
+                    <item>Ser-lhe-á solicitado que defina o sistema de coordenadas desta camada. Na caixa de filtro, pesquise por '2291' e, na caixa abaixo, selecione 'NAD83 (CSRS98) / Prince Edward Isl. Stereographic'</item>
+                    <item>Se não lhe for solicitado que defina o sistema de coordenadas da camada, será necessário alterar uma configuração. Clique em 'Configurações' e, em seguida, em 'Opções'. Clique em 'CRS' no menu à direita e escolha 'Solicitar CRS' a partir das opções abaixo. 'Quando uma nova camada é criada, ou quando uma camada é carregada sem CRS'. Clique 'OK'. Remova a camada 'PEI_HollandMap1798' (clique com o botão direito sobre ela e clique em Remover) e tente adicioná-la novamente. Desta vez, deve-lhe ser solicitado que forneça um 'CRS' e pode selecionar a opção 'NAD83' (veja acima).</item>
+                </list>
+                <figure>
+                    <desc>Figura 3</desc>
+                    <graphic url="Figura3.jpg"/>
+                </figure>
+                <p>Nas etapas anteriores, selecionou e desmarcou camadas na janela 'Camadas' marcando e desmarcando as caixas ao lado delas. Essas camadas são organizadas em ordem decrescente de visibilidade. Ou seja, a camada superior é a camada superior da janela do visualizador (desde que esteja selecionada). Pode arrastar as camadas para cima e para baixo na janela de camadas para alterar a ordem em que ficarão visíveis na janela de visualização. A camada raster 'litoral_polygon' não está visível no momento porque está abaixo das camadas 'PEI_HollandMap1798' e 'PEI_Cummins1927'. Em geral, é melhor manter as camadas vetoriais acima das camadas raster.</p>
+                <p>Desmarque 'PEI_Cummins1927' para que a única camada restante seja 'PEI_HollandMap1798'. Observe que o mapa aparece torto na tela; isso ocorre porque já foi georreferenciado pelos redatores da lição para coincidir com as camadas vetoriais de SIG. Saiba mais sobre georreferenciamento em <ref target="/en/lessons/georeferencing-qgis">georreferenciamento no QGIS 2.0</ref> (em inglês).</p>
+                <figure>
+                    <desc>Figura 4</desc>
+                    <graphic url="pei4.png"/>
+                </figure>
+                <p>Agora criaremos um shapefile de pontos, que é uma camada vetorial. Clique em 'Camada' -&gt; 'Nova' -&gt; 'Nova Camada Shapefile'</p>
+                <list type="unordered">
+                    <item>Alternativamente, pode selecionar o ícone 'Nova camada Shapefile' no topo da janela da barra de ferramentas QGIS </item>
+                </list>
+                <figure>
+                    <desc>Figura 5</desc>
+                    <graphic url="Figura5.jpg"/>
+                </figure>
+                <p>Depois de selecionar 'Nova Camada Shapefile', aparece uma janela intitulada 'Nova Camada Vetorial'</p>
+                <list type="unordered">
+                    <item>Na categoria 'Tipo', 'ponto' já está selecionado. Clique no botão 'Especificar CRS' e selecione 'NAD83 (CSRS98) / Prince Edward Isl. Estereográfico (EPSG: 2291)' e, em seguida, clique em OK (para obter informações sobre como entender e selecionar a zona UTM: <ref target="https://lib.uwaterloo.ca/locations/umd/digital/clump_classes.html">https://lib.uwaterloo.ca/locations/umd/digital/clump_classes.html</ref>
+                    </item>
+                </list>
+                <figure>
+                    <desc>Figura 6</desc>
+                    <graphic url="Figura6.jpg"/>
+                </figure>
+                <p>Retornando à janela 'Nova Camada vetorial', iremos criar alguns atributos. Para criar o primeiro atributo:  </p>
+                <list type="unordered">
+                    <item>Em 'Novo atributo', no campo ao lado de 'Nome', digite 'Nome_Assentamento' (observe que ao trabalhar em bancos de dados não pode usar espaços vazios nos nomes, por isso a convenção é usar sublinhados em seus lugares)</item>
+                    <item>Clique em 'Adicionar' à lista de atributos </item>
+                </list>
+                <p>Agora vamos criar um segundo atributo:  </p>
+                <list type="unordered">
+                    <item>Em 'Novo Atributo', no campo ao lado de 'Nome', digite 'Ano'</item>
+                    <item>Desta vez, vamos mudar o 'Tipo' para 'Número Inteiro'</item>
+                    <item>Clique em 'Adicionar à lista de atributos'</item>
+                </list>
+                <p>Para o terceiro atributo:</p>
+                <list type="unordered">
+                    <item>Sob Novo atributo, no campo ao lado de Nome, digite 'Ano_Final' (o SIG nem sempre é ideal para lidar com mudanças ao longo do tempo, então em alguns casos é importante ter um campo para identificar aproximadamente quando algo deixou de existir)</item>
+                    <item>Mude o 'Tipo' novamente para 'Número Inteiro'</item>
+                    <item>Clique em Adicionar à lista de atributos</item>
+                </list>
+                <figure>
+                    <desc>Figura 7</desc>
+                    <graphic url="Figura7.jpg"/>
+                </figure>
+                <list type="unordered">
+                    <item>Ao concluir essas três etapas, termine de criar esse shapefile clicando em OK na parte inferior direita da janela 'Nova Camada Vetorial'. Um 'pop-up' irá surgir, nomeie-o de 'Assentamentos' e salve-o com os seus outros ficheiros SIG.</item>
+                </list>
+                <p>Observe que uma camada chamada 'Assentamentos' agora aparece na janela 'Camadas'. Reposicione-a acima das camadas raster.</p>
+                <figure>
+                    <desc>Figura 8</desc>
+                    <graphic url="Figura8.jpg"/>
+                </figure>
+                <p>Desmarque todas as camadas, exceto 'Assentamentos'. A janela de visualização agora está em branco, pois não criaámos nenhum dado. Agora criaremos novos dados do 'PEI_CumminsMap1927' e do 'PEI_HollandMap 1798' para mostrar o aumento da ocupação entre o final do século XVIII e o início do século XX. </p>
+                <list type="unordered">
+                    <item>Nós começaremos com o mapa mais recente e, portanto, geralmente mais preciso. Selecione novamente (ou seja,  marque as caixas ao lado) 'coast_polygon' e 'PEI_CumminsMap1927'.</item>
+                    <item>Na janela de visualização, aumente o 'Zoom' em 'Charlottetown' (dica: 'Charlottetown' fica perto do meio da ilha no lado sul, na confluência de três rios).</item>
+                    <item>Selecione a camada de 'Assentamentos' na janela 'Camadas'.</item>
+                    <item>Na barra de menu, selecione 'Alternar Edição'.</item>
+                </list>
+                <figure>
+                    <desc>Figura 9</desc>
+                    <graphic url="pei9.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>Depois de selecionar 'Alternar Edição', os botões de edição ficarão disponíveis à direita na barra de menus. Selecione o botão de feição com 'três pontos'.</item>
+                </list>
+                <figure>
+                    <desc>Figura 10</desc>
+                    <graphic url="pei10.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>O cursor aparece agora como uma cruz - aponte a cruz para 'Charlottetown' (se por acaso não conhecer a geografia do 'PEI', pode ter ajuda adicionando a camada 'PEI_nomes de local'), mantendo-a dentro da linha costeira atual e clique (a digitalização é sempre um compromisso entre precisão e funcionalidade; dependendo da qualidade do mapa original e da digitalização, para a maioria das aplicações históricas, a precisão extrema não é necessária).</item>
+                    <item>Uma janela de atributos aparecerá. Deixe o campo 'id' em branco (no momento da escrita, o QGIS criará dois campos 'id' e este é desnecessário). No campo 'Assentamento', digite 'Charlottetown'. No campo 'Ano', digite '1764'. Clique em 'OK'.
+Vamos agora repetir as etapas que realizámos com 'Charlottetown' para 'Montague', 'Summerside' e 'Cavendish' (novamente, pode encontrar esses locais adicionando as camadas 'PEI_nomes de local'). Encontre 'Montague' no mapa, selecione o botão de feição com 'três pontos' e clique em Montague no mapa. Quando a janela 'Atributos' aparecer, insira 'Montague' e '1732' nos campos apropriados. Repita para 'Summerside (1876)' e 'Cavendish (1790)'.</item>
+                </list>
+                <figure>
+                    <desc>Figura 11</desc>
+                    <graphic url="Figura11.jpg"/>
+                </figure>
+                <p>Na janela 'Camadas', desmarque 'PEI_CumminsMap1927' e selecione 'PEI_HollandMap1798'. Agora vamos identificar dois assentamentos ('Princetown' e 'Havre-St-Pierre') que já não existem.  </p>
+                <list type="unordered">
+                    <item>
+                        <p>Para localizar 'Princetown', procure 'Richmond Bay' e 'Cape Aylebsury' (na costa norte a oeste de 'Cavendish'), aqui você encontrará 'Princetown' (sombreado) perto da fronteira entre o amarelo e o azul.</p>
+                    </item>
+                    <item>
+                        <p>Se consultar a <ref target="https://pt.wikipedia.org/wiki/Ilha_do_Pr%C3%ADncipe_Eduardo">entrada da Wikipedia</ref> desta cidade, notará que por causa de um porto raso, 'Princetown' não se tornou um assentamento importante. Foi renomeado em 1947 e, posteriormente, rebaixado para uma aldeia. Por esse motivo, incluiremos 1947 como a data final para este assentamento.</p>
+                    </item>
+                    <item>
+                        <p>Com o cursor do mouse (em formato de cruz), clique em 'Princetown'. Na 'tabela de atributos' que aparece, coloque 'Princetown' no campo 'Assentamento', coloque '1764' no campo 'Ano' e coloque '1947' em 'Ano_Final'. Clique 'OK'.</p>
+                    </item>
+                </list>
+                <figure>
+                    <desc>Figura 12</desc>
+                    <graphic url="Figura12.jpg"/>
+                </figure>
+                <list type="unordered">
+                    <item>
+                        <p>Clique no ícone 'Salvar edições' na barra de menu (fica entre 'Alternar' e 'Adicione Feição').</p>
+                    </item>
+                    <item>
+                        <p>Clique duas vezes na camada de 'Assentamentos' na janela 'Camadas', escolha a guia 'Etiquetas' na parte superior da janela seguinte. Clique na caixa ao lado de 'Mostrar etiquetas'. Em Campo contendo rótulo, selecione 'Ano' (se necessário), altere o tamanho da fonte para 18,0, altere 'Posicionamento para Acima à esquerda' e clique em 'OK'.</p>
+                    </item>
+                </list>
+                <p>Na costa norte do 'lote 39', entre 'Britain's Pond' e 'St. Peters Bay', colocaremos agora um ponto para a localização de uma aldeia há muito perdida chamada 'Havre-St-Pierre'.</p>
+                <list type="unordered">
+                    <item>
+                        <p>'Havre-St-Pierre' foi o primeiro assentamento acadiano da ilha, mas está desabitado desde a deportação dos acadianos em 1758.</p>
+                    </item>
+                    <item>
+                        <p>Com o cursor do mouse (em formato de cruz), clique em 'Havre-St. Pierre'. Na 'tabela de Atributos' que aparece, coloque 'Havre-St-Pierre' no campo 'Assentamento', coloque '1720' no campo 'Ano' e '1758' em 'Ano_Final'. Clique 'OK'.</p>
+                    </item>
+                </list>
+                <figure>
+                    <desc>Figura 13</desc>
+                    <graphic url="pei13.png"/>
+                </figure>
+                <p>Agora vamos criar outra camada vetorial: um vetor linha. Clique em 'Camada' -&gt; 'Nova' -&gt; 'Nova Camada Shapefile'. A janela 'Nova Camada Vetorial' aparecerá (na categoria 'Tipo', no topo, selecione 'Linha')  </p>
+                <list type="unordered">
+                    <item>Clique no botão 'Especificar CRS' e selecione 'NAD83 (CSRS98) / Prince Edward Isl. Estereográfico (EPSG: 2291)' e clique em 'OK'.</item>
+                    <item>Em 'Novo atributo', no campo ao lado de 'Nome', digite 'Nome_Estrada'.</item>
+                    <item>Clique em 'Adicionar campos à lista'.</item>
+                </list>
+                <p>Crie um segundo atributo:</p>
+                <list type="unordered">
+                    <item>Em 'Novo atributo', no campo ao lado de 'Nome', digite 'Ano'.</item>
+                    <item>Mude o 'Tipo' para 'Número Inteiro'.</item>
+                    <item>Clique em 'Adicionar à lista de Atributos'.</item>
+                    <item>Para terminar de criar este ficheiro, clique em 'OK' na parte inferior direita da janela 'Nova Camada Vetorial'. Uma tela para 'salvar' aparece - chame-a de 'estradas' e salve-a com seus outros ficheiros SIG.</item>
+                </list>
+                <p>Vamos agora traçar as estradas do 'mapa de 1798' para que possamos compará-las com as estradas atuais. Certifique-se de ter as camadas 'PEI_Holland1798' e 'Assentamentos' marcadas na janela de 'Camadas'. Selecione a camada 'estradas' na janela de 'camadas', selecione 'Alternar Edição' na barra de ferramentas superior e selecione 'Adicionar Feição'.</p>
+                <figure>
+                    <desc>Figura 14</desc>
+                    <graphic url="pei14.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>Primeiro trace a estrada de 'Charlottetown' a 'Princetown'. Clique em 'Charlottetown' e depois clique repetidamente em pontos ao longo da estrada para 'Princetown' e verá a linha a ser criada. Repita até chegar a 'Princetown' e clique com o botão direito. Na janela 'Atributos' - estrada que aparece, no campo 'Nome', insira 'para Princetown' e no campo 'Ano' insira '1798'. Clique em 'OK'.</item>
+                </list>
+                <figure>
+                    <desc>Figura 15</desc>
+                    <graphic url="pei15.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>
+                        <p>Repita esta etapa para mais 3 a 4 estradas encontradas no 'PEI_HollandMap1798'.</p>
+                    </item>
+                    <item>
+                        <p>Clique em 'Salvar mudanças' e, em seguida, clique em 'Alternar Edição' para desligá-lo.</p>
+                    </item>
+                </list>
+                <p>Desmarque 'PEI_HollandMap1798' na janela 'Camadas' e selecione o mapa 'PEI_highway'. Compare as estradas representadas no mapa 'PEI_highway' (as linhas vermelhas pontilhadas) com as estradas que você acabou de traçar.</p>
+                <figure>
+                    <desc>Figura 16</desc>
+                    <graphic url="pei16.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>Podemos ver que algumas dessas estradas correspondem exatamente às estradas atuais, enquanto outras não correspondem de forma alguma. Seriam necessárias mais pesquisas históricas para determinar se isso ocorre simplesmente porque o mapa da Holanda não representa suficientemente as estradas na época, ou se as estradas mudaram consideravelmente desde então. </item>
+                </list>
+                <p>Agora crie um terceiro tipo de camada vetorial: um vetor poligonal. Clique em 'Camada' -&gt; 'Nova' -&gt; 'Nova Camada Vetorial'. A janela 'Nova Camada Vetorial' aparecerá - na categoria 'Tipo', no topo, selecione 'Polígono'. </p>
+                <list type="unordered">
+                    <item>Clique no botão 'Selecione o SRC' e selecione 'NAD83 (CSRS98) / Prince Edward Isl. Estereográfico (EPSG: 2291)' e clique em 'OK'.</item>
+                    <item>Em 'Novo Atributo', no campo ao lado de 'Nome', digite 'nome_lote' no campo ao lado de 'Ano'.</item>
+                    <item>Clique em 'Adicionar campos à lista'.  </item>
+                </list>
+                <p>Crie um segundo atributo:  </p>
+                <list type="unordered">
+                    <item>Em 'Novo atributo', no campo ao lado de 'Nome', digite 'Ano'.</item>
+                    <item>Mude o 'Tipo' para 'Número Inteiro'.</item>
+                    <item>Clique em 'Adicionar à lista de Atributos'.</item>
+                </list>
+                <figure>
+                    <desc>Figura 17</desc>
+                    <graphic url="Figura17.jpg"/>
+                </figure>
+                <p>Comece criando um polígono para o 'Lote 66', que é o único lote retangular na ilha.</p>
+                <list type="unordered">
+                    <item>Clique em 'Alternar Edição' na barra de ferramentas superior e, em seguida, clique em 'Adicionar Feição'.</item>
+                    <item>Clique nos quatro cantos do 'lote 66' e você verá um polígono criado.</item>
+                    <item>Clique com o botão direito no canto final e uma janela de 'Atributos' aparecerá. Adicione '66' ao campo 'nome_lote' e adicione '1764' (o ano em que esses lotes foram inventariados) ao campo 'Ano'.</item>
+                </list>
+                <figure>
+                    <desc>Figura 18</desc>
+                    <graphic url="Figura18.jpg"/>
+                </figure>
+                <p>Agora vamos rastrear o 'Lote 38', que fica a oeste de 'Havre-St-Pierre'. Certifique-se de que há uma marca de seleção na caixa ao lado da camada 'PEI_HollandMap1798' na janela 'Camadas'.</p>
+                <p>Clique em 'Alternar Edição' na barra de ferramentas superior e, em seguida, clique em 'Adicionar Feição'.</p>
+                <p>Trace o contorno do 'Lote 38', que é mais difícil por causa da linha costeira, com a maior precisão possível. Para mostrar a feição 'Ajuste', queremos que trace ao longo da costa atual (o 'ajuste' é uma operação de edição automática que ajusta a feição que você desenhou para coincidir ou alinhar exatamente com as coordenadas e forma de outra feição próxima).</p>
+                <list type="unordered">
+                    <item>Selecione 'Configurações'-&gt; 'Opções de Ajuste'.</item>
+                </list>
+                <figure>
+                    <desc>Figura 19</desc>
+                    <graphic url="Figura19.jpg"/>
+                </figure>
+                <list type="unordered">
+                    <item>Uma janela de 'opções de ajuste' irá abrir: clique na caixa ao lado de 'coast_polygon', para a categoria 'Modo' selecione 'vértice e segmento', para 'Tolerância' selecione '10.0', e para 'Unidades' selecione 'pixels'. Clique 'OK'.</item>
+                    <item>
 </item>
-<item>
-<p>Se consultar a <ref target="https://pt.wikipedia.org/wiki/Ilha_do_Pr%C3%ADncipe_Eduardo">entrada da Wikipedia</ref> desta cidade, notar&#225; que por causa de um porto raso, 'Princetown' n&#227;o se tornou um assentamento importante. Foi renomeado em 1947 e, posteriormente, rebaixado para uma aldeia. Por esse motivo, incluiremos 1947 como a data final para este assentamento.</p>
-</item>
-<item>
-<p>Com o cursor do mouse (em formato de cruz), clique em 'Princetown'. Na 'tabela de atributos' que aparece, coloque 'Princetown' no campo 'Assentamento', coloque '1764' no campo 'Ano' e coloque '1947' em 'Ano_Final'. Clique 'OK'.</p>
-</item>
-</list>
-<figure><desc>Figura 12</desc><graphic url="Figura12.jpg"/></figure>
-<list type="unordered">
-<item>
-<p>Clique no &#237;cone 'Salvar edi&#231;&#245;es' na barra de menu (fica entre 'Alternar' e 'Adicione Fei&#231;&#227;o').</p>
-</item>
-<item>
-<p>Clique duas vezes na camada de 'Assentamentos' na janela 'Camadas', escolha a guia 'Etiquetas' na parte superior da janela seguinte. Clique na caixa ao lado de 'Mostrar etiquetas'. Em Campo contendo r&#243;tulo, selecione 'Ano' (se necess&#225;rio), altere o tamanho da fonte para 18,0, altere 'Posicionamento para Acima &#224; esquerda' e clique em 'OK'.</p>
-</item>
-</list>
-<p>Na costa norte do 'lote 39', entre 'Britain's Pond' e 'St. Peters Bay', colocaremos agora um ponto para a localiza&#231;&#227;o de uma aldeia h&#225; muito perdida chamada 'Havre-St-Pierre'.</p>
-<list type="unordered">
-<item>
-<p>'Havre-St-Pierre' foi o primeiro assentamento acadiano da ilha, mas est&#225; desabitado desde a deporta&#231;&#227;o dos acadianos em 1758.</p>
-</item>
-<item>
-<p>Com o cursor do mouse (em formato de cruz), clique em 'Havre-St. Pierre'. Na 'tabela de Atributos' que aparece, coloque 'Havre-St-Pierre' no campo 'Assentamento', coloque '1720' no campo 'Ano' e '1758' em 'Ano_Final'. Clique 'OK'.</p>
-</item>
-</list>
-<figure><desc>Figura 13</desc><graphic url="pei13.png"/></figure>
-<p>Agora vamos criar outra camada vetorial: um vetor linha. Clique em 'Camada' -&gt; 'Nova' -&gt; 'Nova Camada Shapefile'. A janela 'Nova Camada Vetorial' aparecer&#225; (na categoria 'Tipo', no topo, selecione 'Linha')  </p>
-<list type="unordered">
-<item>Clique no bot&#227;o 'Especificar CRS' e selecione 'NAD83 (CSRS98) / Prince Edward Isl. Estereogr&#225;fico (EPSG: 2291)' e clique em 'OK'.</item>
-<item>Em 'Novo atributo', no campo ao lado de 'Nome', digite 'Nome_Estrada'.</item>
-<item>Clique em 'Adicionar campos &#224; lista'.</item>
-</list>
-<p>Crie um segundo atributo:</p>
-<list type="unordered">
-<item>Em 'Novo atributo', no campo ao lado de 'Nome', digite 'Ano'.</item>
-<item>Mude o 'Tipo' para 'N&#250;mero Inteiro'.</item>
-<item>Clique em 'Adicionar &#224; lista de Atributos'.</item>
-<item>Para terminar de criar este ficheiro, clique em 'OK' na parte inferior direita da janela 'Nova Camada Vetorial'. Uma tela para 'salvar' aparece - chame-a de 'estradas' e salve-a com seus outros ficheiros SIG.</item>
-</list>
-<p>Vamos agora tra&#231;ar as estradas do 'mapa de 1798' para que possamos compar&#225;-las com as estradas atuais. Certifique-se de ter as camadas 'PEI_Holland1798' e 'Assentamentos' marcadas na janela de 'Camadas'. Selecione a camada 'estradas' na janela de 'camadas', selecione 'Alternar Edi&#231;&#227;o' na barra de ferramentas superior e selecione 'Adicionar Fei&#231;&#227;o'.</p>
-<figure><desc>Figura 14</desc><graphic url="pei14.png"/></figure>
-<list type="unordered">
-<item>Primeiro trace a estrada de 'Charlottetown' a 'Princetown'. Clique em 'Charlottetown' e depois clique repetidamente em pontos ao longo da estrada para 'Princetown' e ver&#225; a linha a ser criada. Repita at&#233; chegar a 'Princetown' e clique com o bot&#227;o direito. Na janela 'Atributos' - estrada que aparece, no campo 'Nome', insira 'para Princetown' e no campo 'Ano' insira '1798'. Clique em 'OK'.</item>
-</list>
-<figure><desc>Figura 15</desc><graphic url="pei15.png"/></figure>
-<list type="unordered">
-<item>
-<p>Repita esta etapa para mais 3 a 4 estradas encontradas no 'PEI_HollandMap1798'.</p>
-</item>
-<item>
-<p>Clique em 'Salvar mudan&#231;as' e, em seguida, clique em 'Alternar Edi&#231;&#227;o' para deslig&#225;-lo.</p>
-</item>
-</list>
-<p>Desmarque 'PEI_HollandMap1798' na janela 'Camadas' e selecione o mapa 'PEI_highway'. Compare as estradas representadas no mapa 'PEI_highway' (as linhas vermelhas pontilhadas) com as estradas que voc&#234; acabou de tra&#231;ar.</p>
-<figure><desc>Figura 16</desc><graphic url="pei16.png"/></figure>
-<list type="unordered">
-<item>Podemos ver que algumas dessas estradas correspondem exatamente &#224;s estradas atuais, enquanto outras n&#227;o correspondem de forma alguma. Seriam necess&#225;rias mais pesquisas hist&#243;ricas para determinar se isso ocorre simplesmente porque o mapa da Holanda n&#227;o representa suficientemente as estradas na &#233;poca, ou se as estradas mudaram consideravelmente desde ent&#227;o. </item>
-</list>
-<p>Agora crie um terceiro tipo de camada vetorial: um vetor poligonal. Clique em 'Camada' -&gt; 'Nova' -&gt; 'Nova Camada Vetorial'. A janela 'Nova Camada Vetorial' aparecer&#225; - na categoria 'Tipo', no topo, selecione 'Pol&#237;gono'. </p>
-<list type="unordered">
-<item>Clique no bot&#227;o 'Selecione o SRC' e selecione 'NAD83 (CSRS98) / Prince Edward Isl. Estereogr&#225;fico (EPSG: 2291)' e clique em 'OK'.</item>
-<item>Em 'Novo Atributo', no campo ao lado de 'Nome', digite 'nome_lote' no campo ao lado de 'Ano'.</item>
-<item>Clique em 'Adicionar campos &#224; lista'.  </item>
-</list>
-<p>Crie um segundo atributo:  </p>
-<list type="unordered">
-<item>Em 'Novo atributo', no campo ao lado de 'Nome', digite 'Ano'.</item>
-<item>Mude o 'Tipo' para 'N&#250;mero Inteiro'.</item>
-<item>Clique em 'Adicionar &#224; lista de Atributos'.</item>
-</list>
-<figure><desc>Figura 17</desc><graphic url="Figura17.jpg"/></figure>
-<p>Comece criando um pol&#237;gono para o 'Lote 66', que &#233; o &#250;nico lote retangular na ilha.</p>
-<list type="unordered">
-<item>Clique em 'Alternar Edi&#231;&#227;o' na barra de ferramentas superior e, em seguida, clique em 'Adicionar Fei&#231;&#227;o'.</item>
-<item>Clique nos quatro cantos do 'lote 66' e voc&#234; ver&#225; um pol&#237;gono criado.</item>
-<item>Clique com o bot&#227;o direito no canto final e uma janela de 'Atributos' aparecer&#225;. Adicione '66' ao campo 'nome_lote' e adicione '1764' (o ano em que esses lotes foram inventariados) ao campo 'Ano'.</item>
-</list>
-<figure><desc>Figura 18</desc><graphic url="Figura18.jpg"/></figure>
-<p>Agora vamos rastrear o 'Lote 38', que fica a oeste de 'Havre-St-Pierre'. Certifique-se de que h&#225; uma marca de sele&#231;&#227;o na caixa ao lado da camada 'PEI_HollandMap1798' na janela 'Camadas'.</p>
-<p>Clique em 'Alternar Edi&#231;&#227;o' na barra de ferramentas superior e, em seguida, clique em 'Adicionar Fei&#231;&#227;o'.</p>
-<p>Trace o contorno do 'Lote 38', que &#233; mais dif&#237;cil por causa da linha costeira, com a maior precis&#227;o poss&#237;vel. Para mostrar a fei&#231;&#227;o 'Ajuste', queremos que trace ao longo da costa atual (o 'ajuste' &#233; uma opera&#231;&#227;o de edi&#231;&#227;o autom&#225;tica que ajusta a fei&#231;&#227;o que voc&#234; desenhou para coincidir ou alinhar exatamente com as coordenadas e forma de outra fei&#231;&#227;o pr&#243;xima).</p>
-<list type="unordered">
-<item>Selecione 'Configura&#231;&#245;es'-&gt; 'Op&#231;&#245;es de Ajuste'.</item>
-</list>
-<figure><desc>Figura 19</desc><graphic url="Figura19.jpg"/></figure>
-<list type="unordered">
-<item>Uma janela de 'op&#231;&#245;es de ajuste' ir&#225; abrir: clique na caixa ao lado de 'coast_polygon', para a categoria 'Modo' selecione 'v&#233;rtice e segmento', para 'Toler&#226;ncia' selecione '10.0', e para 'Unidades' selecione 'pixels'. Clique 'OK'.</item>
-<item>
-</item>
-</list>
-<figure><desc>Figura 20</desc><graphic url="Figura20.jpg"/></figure>
-<p>Certifique-se de que a camada de 'lotes' esteja selecionada na janela 'Camadas' e selecione 'Adicionar fei&#231;&#227;o' na barra de ferramentas. </p>
-<list type="unordered">
-<item>Com o cursor, clique nos dois cantos inferiores do pol&#237;gono, assim como fez com o 'lote 38'. Na linha costeira, voc&#234; notar&#225; que tem uma cole&#231;&#227;o de linhas para tra&#231;ar ao redor do 'Savage Harbour'. &#201; aqui que os recursos de ader&#234;ncia se tornam &#250;teis. Enquanto tra&#231;ar a linha ao longo da costa atual, sua precis&#227;o aumentar&#225; significativamente, encaixando os 'cliques' diretamente no topo da linha existente. Quanto mais 'cliques' voc&#234; fizer, mais preciso ser&#225;, mas tenha em mente que, para muitos fins de SIGH (SIG hist&#243;rico), obter extrema precis&#227;o &#224;s vezes produz retornos decrescentes.</item>
-</list>
-<figure><desc>Figura 21</desc><graphic url="pei21.png"/></figure>
-<p>Quando terminar de tra&#231;ar e criar o pol&#237;gono, selecione e desmarque as v&#225;rias 'camadas' que criou, comparando e vendo quais rela&#231;&#245;es pode deduzir.
-No Google Earth, havia limita&#231;&#245;es nos tipos de 'fei&#231;&#245;es', 'atributos' e dados fornecidos, e o Google Earth fez grande parte do trabalho por si. Isso &#233; bom quando est&#225; aprendendo ou deseja criar mapas rapidamente. A vantagem de usar o software QGIS para criar novas camadas vetoriais &#233; a liberdade e controle sobre os tipos de dados que se pode usar e as 'fei&#231;&#245;es' e 'atributos' que se podem criar. Assim, &#233; poss&#237;vel criar mapas personalizados e ir muito al&#233;m do que pode ser alcan&#231;ado no Google Earth ou no Google Maps Engine Lite. Viu isso em primeira m&#227;o com as camadas vetoriais de pontos, linhas e pol&#237;gonos que aprendeu a criar nesta li&#231;&#227;o. Se tiver dados sobre, por exemplo, registros de sa&#250;de p&#250;blica no s&#233;culo XVIII, pode criar uma nova camada mostrando a distribui&#231;&#227;o de surtos de febre tifoide e ver se h&#225; correla&#231;&#245;es com estradas e assentamentos principais. Al&#233;m disso, o software SIG permite n&#227;o apenas representar e apresentar dados espaciais de maneiras mais sofisticadas, mas tamb&#233;m analisar e criar novos dados que n&#227;o seriam poss&#237;veis de outra forma. </p>
-<p><hi rend="bold">Aprendeu como criar camadas vetoriais. Certifique-se de salvar seu trabalho!</hi></p>
-<p>1 &#201; poss&#237;vel identificar a palavra 'fei&#231;&#227;o', em tradu&#231;&#245;es no QGIS BR, ao referir os tr&#234;s tipos de 'formas' ou 'geometrias' usadas nas camadas vetoriais dos SIG. Mas, isto cria uma diferen&#231;a entre as vers&#245;es do QGIS BR e QGIS PT.</p>
-<p><emph>Esta li&#231;&#227;o &#233; parte do <ref target="http://geospatialhistorian.wordpress.com/">Geospatial Historian</ref>.</emph></p>
-</div>
-    </body>
-  </text>
+                </list>
+                <figure>
+                    <desc>Figura 20</desc>
+                    <graphic url="Figura20.jpg"/>
+                </figure>
+                <p>Certifique-se de que a camada de 'lotes' esteja selecionada na janela 'Camadas' e selecione 'Adicionar feição' na barra de ferramentas. </p>
+                <list type="unordered">
+                    <item>Com o cursor, clique nos dois cantos inferiores do polígono, assim como fez com o 'lote 38'. Na linha costeira, você notará que tem uma coleção de linhas para traçar ao redor do 'Savage Harbour'. É aqui que os recursos de aderência se tornam úteis. Enquanto traçar a linha ao longo da costa atual, sua precisão aumentará significativamente, encaixando os 'cliques' diretamente no topo da linha existente. Quanto mais 'cliques' você fizer, mais preciso será, mas tenha em mente que, para muitos fins de SIGH (SIG histórico), obter extrema precisão às vezes produz retornos decrescentes.</item>
+                </list>
+                <figure>
+                    <desc>Figura 21</desc>
+                    <graphic url="pei21.png"/>
+                </figure>
+                <p>Quando terminar de traçar e criar o polígono, selecione e desmarque as várias 'camadas' que criou, comparando e vendo quais relações pode deduzir.
+No Google Earth, havia limitações nos tipos de 'feições', 'atributos' e dados fornecidos, e o Google Earth fez grande parte do trabalho por si. Isso é bom quando está aprendendo ou deseja criar mapas rapidamente. A vantagem de usar o software QGIS para criar novas camadas vetoriais é a liberdade e controle sobre os tipos de dados que se pode usar e as 'feições' e 'atributos' que se podem criar. Assim, é possível criar mapas personalizados e ir muito além do que pode ser alcançado no Google Earth ou no Google Maps Engine Lite. Viu isso em primeira mão com as camadas vetoriais de pontos, linhas e polígonos que aprendeu a criar nesta lição. Se tiver dados sobre, por exemplo, registros de saúde pública no século XVIII, pode criar uma nova camada mostrando a distribuição de surtos de febre tifoide e ver se há correlações com estradas e assentamentos principais. Além disso, o software SIG permite não apenas representar e apresentar dados espaciais de maneiras mais sofisticadas, mas também analisar e criar novos dados que não seriam possíveis de outra forma. </p>
+                <p>
+                    <hi rend="bold">Aprendeu como criar camadas vetoriais. Certifique-se de salvar seu trabalho!</hi>
+                </p>
+                <p>1 É possível identificar a palavra 'feição', em traduções no QGIS BR, ao referir os três tipos de 'formas' ou 'geometrias' usadas nas camadas vetoriais dos SIG. Mas, isto cria uma diferença entre as versões do QGIS BR e QGIS PT.</p>
+                <p>
+                    <emph>Esta lição é parte do <ref target="http://geospatialhistorian.wordpress.com/">Geospatial Historian</ref>.</emph>
+                </p>
+            </div>
+        </body>
+    </text>
 </TEI>

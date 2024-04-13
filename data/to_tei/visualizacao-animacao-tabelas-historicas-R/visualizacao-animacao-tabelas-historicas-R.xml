@@ -1,183 +1,324 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="visualizacao-animacao-tabelas-historicas-R">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Visualiza&#231;&#227;o e anima&#231;&#227;o de tabelas hist&#243;ricas com R</title>
-  <author role="original_author">Marcelo Raimundo</author><editor role="reviewers"><persName>Jennifer Isasi</persName><persName>Basthian Medina</persName></editor><author role="translators">Diana Rebelo Rodriguez</author><editor role="translation-reviewers"><persName>Felipe Lamarca</persName><persName>Ana Giulia Aldgeire</persName></editor><editor role="editors">Riva Quiroga</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phpt0021</idno><date type="published">06/28/2021</date><date type="translated">11/19/2021</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#visualizacion-y-animacion-de-tablas-historicas-con-R"/>.</p><p>There are other translations: <ref target=""/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Esta li&#231;&#227;o lhe mostrar&#225; como cruzar refer&#234;ncias, produzir gr&#225;ficos e animar um conjunto de dados hist&#243;ricos dispon&#237;veis numa tabela.</p></abstract><textClass><keywords><term xml:lang="en">distant-reading</term><term xml:lang="en">r</term><term xml:lang="en">data-visualization</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="pt">
-    <body>
-      <div type="2"><head>Conte&#250;dos</head>
-<p>{:.no_toc}</p>
-<list type="unordered">
-<item>TOC
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Visualização e animação de tabelas históricas com R</title>
+                <author role="original_author">Marcelo Raimundo</author>
+                <editor role="reviewers">
+                    <persName>Jennifer Isasi</persName>
+                    <persName>Basthian Medina</persName>
+                </editor>
+                <author role="translators">Diana Rebelo Rodriguez</author>
+                <editor role="translation-reviewers">
+                    <persName>Felipe Lamarca</persName>
+                    <persName>Ana Giulia Aldgeire</persName>
+                </editor>
+                <editor role="editors">Riva Quiroga</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">11/19/2021</date>
+                <idno type="doi">10.46430/phpt0021</idno>
+                <date type="published">06/28/2021</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#visualizacion-y-animacion-de-tablas-historicas-con-R"/>.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Esta lição lhe mostrará como cruzar referências, produzir gráficos e animar um conjunto de dados históricos disponíveis numa tabela.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">distant-reading</term>
+                    <term xml:lang="en">r</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <div type="2">
+                <head>Conteúdos</head>
+                <p>{:.no_toc}</p>
+                <list type="unordered">
+                    <item>TOC
 {:toc}</item>
-</list>
-<div type="1"><head>Resumo</head>
-<p>Esta li&#231;&#227;o lhe mostrar&#225; como cruzar, tra&#231;ar e animar um conjunto de dados hist&#243;ricos. Vamos aprender como importar dados dispon&#237;veis em uma tabela eletr&#244;nica em <emph>RStudio</emph> e como utilizar fun&#231;&#245;es que permitam transformar esses dados para represent&#225;-los como uma tabela de conting&#234;ncia. Tamb&#233;m veremos como utilizar fun&#231;&#245;es de novas bibliotecas que lhe permitir&#227;o visualizar os seus dados cruzados em forma gr&#225;fica e at&#233; mesmo anim&#225;-los em perspectiva de tempo.</p>
-</div><div type="1"><head>Objetivos</head>
-<p>Nesta li&#231;&#227;o, aprenderemos a:</p>
-<list type="ordered">
-<item>Classificar e transformar tabelas hist&#243;ricas para realizar an&#225;lises explorat&#243;rias;</item>
-<item>Gerar gr&#225;ficos est&#225;ticos e animados para visualizar dados hist&#243;ricos.</item>
-</list>
-</div><div type="1"><head>Introdu&#231;&#227;o</head>
-<p>N&#227;o h&#225; d&#250;vida de que em uma disciplina como a Hist&#243;ria, predomina o tratamento qualitativo dos documentos e das fontes que o passado nos legou. Mas, como Roderick Floud salientou, &#8220;embora estejamos basicamente mais interessados nas quest&#245;es &#8216;qualitativas&#8217; do que nas &#8216;quantitativas&#8217;, as duas est&#227;o inextricavelmente ligadas&#8221;<ref type="footnotemark" target="#note_1"/>. Ou seja, elas n&#227;o competem, n&#227;o se substituem, mas se complementam. Uma maneira de combinar ambas as metodologias &#233; atrav&#233;s da busca de regularidades ou padr&#245;es ocultos ou, inversamente, de anomalias. Isto aproxima aqueles que fazem pesquisa hist&#243;rica de uma melhor compreens&#227;o das coordenadas nas quais situar as suas interpreta&#231;&#245;es. Se esta compreens&#227;o global dos dados puder ser visualizada graficamente, &#233; poss&#237;vel &#8220;que o pesquisador descubra facilmente as rela&#231;&#245;es, semelhan&#231;as e diferen&#231;as entre os seus casos&#8221;. Desde que Floud escreveu - em meados dos anos 70 - a tecnologia e a programa&#231;&#227;o de computadores avan&#231;aram de tal forma que &#233; muito f&#225;cil cruzar perspectivas metodol&#243;gicas. Assim, se um trabalho hist&#243;rico qualitativo visa aprofundar aspectos dos fen&#244;menos que aconteceram no passado, um trabalho quantitativo permitir&#225; saber com que frequ&#234;ncia eles aconteceram, observar padr&#245;es e anomalias, e estabelecer rela&#231;&#245;es temporais entre as diferentes categorias de an&#225;lise existentes. </p>
-<p>Quem pretende realizar uma an&#225;lise hist&#243;rica quantitativa deve come&#231;ar com um exerc&#237;cio de codifica&#231;&#227;o das fontes documentais que o passado nos legou e traduzi-las em uma matriz de dados. Em outras palavras, isto requer um processo de convers&#227;o de nossas fontes de informa&#231;&#227;o, a fim de transformar dados textuais (palavras) em dados simb&#243;licos (n&#250;meros) oper&#225;veis digitalmente. Isto consiste de v&#225;rias etapas: 1) <emph>classificar</emph> os documentos que foram acessados de forma a permitir que sejam reunidos de acordo com determinados crit&#233;rios, 2) <emph>categorizar</emph> o conte&#250;do das fontes de forma descritiva, interpretativa ou anal&#237;tica, com ideias, categorias ou conceitos, 3) <emph>codificar</emph>, dando &#224;s diferentes express&#245;es particulares de cada caso um s&#237;mbolo (n&#250;meros, palavras), 4) <emph>tabular</emph>, ou seja, representar os casos organizados sob a forma de uma matriz em um meio de computador, geralmente uma tabela de c&#225;lculo.</p>
-<p>Nesta li&#231;&#227;o, mostraremos uma das muitas maneiras pelas quais ficheiros que re&#250;nem informa&#231;&#245;es sistem&#225;ticas e seriadas (como casos de produtores de documenta&#231;&#227;o permanente como o Estado, empresas ou a imprensa) podem ser analisados quantitativamente usando a linguagem de programa&#231;&#227;o R. O objetivo &#233; que se adquira conhecimentos que lhe permitam realizar uma an&#225;lise explorat&#243;ria dos dados, trabalhando principalmente na distribui&#231;&#227;o de frequ&#234;ncias de diferentes vari&#225;veis atrav&#233;s de tabelas de conting&#234;ncia, para depois visualiz&#225;-las, gerar gr&#225;ficos e, finalmente, criar uma anima&#231;&#227;o das mesmas em perspectiva temporal.</p>
-</div><div type="1"><head>Pr&#233;-requisitos</head>
-<p>Esta li&#231;&#227;o exige um entendimento b&#225;sico de R, que pode ser obtido nas li&#231;&#245;es <ref target="/pt/licoes/nocoes-basicas-R-dados-tabulares">No&#231;&#245;es b&#225;sicas de R com dados tabulares</ref> de Trayn Dewar e <ref target="/en/lessons/data_wrangling_and_management_in_R">Manipula&#231;&#227;o e transforma&#231;&#227;o de dados em R</ref> (em ingl&#234;s) de Nabeel Siddiqui.</p>
-<p>Al&#233;m do R, ser&#225; necess&#225;rio possuir o ambiente de desenvolvimento <ref target="https://www.rstudio.com/products/rstudio/download/#download">RStudio</ref> instalado. Se ainda n&#227;o o tiver, <ref target="https://www.youtube.com/watch?v=A8A-OU_nlsw">este v&#237;deo</ref> fornece um guia sobre como baix&#225;-lo e instal&#225;-lo.</p>
-</div><table>
-<row>
-<cell align="center" role="label">fecha</cell>
-<cell align="center" role="label">ciudad</cell>
-<cell align="center" role="label">objeto</cell>
-<cell align="center" role="label">sitio</cell>
-<cell align="center" role="label">objetivo</cell>
-</row>
-<row>
-<cell align="center">20/01/1959</cell>
-<cell align="center">Matanza</cell>
-<cell align="center">bomba</cell>
-<cell align="center">vias ffcc</cell>
-<cell align="center">ferrocarril</cell>
-</row>
-<row>
-<cell align="center">20/01/1959</cell>
-<cell align="center">Lomas</cell>
-<cell align="center">bomba</cell>
-<cell align="center">vias ffcc</cell>
-<cell align="center">ferrocarril</cell>
-</row>
-<row>
-<cell align="center">20/01/1959</cell>
-<cell align="center">Avellaneda</cell>
-<cell align="center">bomba</cell>
-<cell align="center">vias ffcc</cell>
-<cell align="center">ferrocarril</cell>
-</row>
-<row>
-<cell align="center">20/01/1959</cell>
-<cell align="center">Avellaneda</cell>
-<cell align="center">molotov</cell>
-<cell align="center">comercio</cell>
-<cell align="center">comercio</cell>
-</row>
-<row>
-<cell align="center">19/01/1959</cell>
-<cell align="center">Matanza</cell>
-<cell align="center">bomba</cell>
-<cell align="center">vias ffcc</cell>
-<cell align="center">ferrocarril</cell>
-</row>
-<row>
-<cell align="center">19/01/1959</cell>
-<cell align="center">La Plata</cell>
-<cell align="center">petardo</cell>
-<cell align="center">vias ffcc</cell>
-<cell align="center">ferrocarril</cell>
-</row>
-<row>
-<cell align="center">18/01/1959</cell>
-<cell align="center">La Plata</cell>
-<cell align="center">bomba</cell>
-<cell align="center">sede</cell>
-<cell align="center">institucion extranjera</cell>
-</row>
-</table><div type="1"><head>Processamento e limpeza de dados com R</head>
-<p>Nesta se&#231;&#227;o mostraremos como carregar os dados no RStudio para come&#231;ar a process&#225;-los. N&#227;o espere que tudo esteja pronto para funcionar uma vez que a tabela tenha sido importada; sempre precisaremos ajustar seus dados para que R possa interpret&#225;-los. Neste caso, por exemplo, ap&#243;s a importa&#231;&#227;o, precisaremos atribuir um tipo &#224;s vari&#225;veis, convert&#234;-las, fazer algumas modifica&#231;&#245;es nos dados e, em seguida, orden&#225;-las temporariamente.</p>
-<p>O primeiro passo &#233; import&#225;-los de seu formato de tabela para o ambiente RStudio. Para fazer isso, ser&#225; necess&#225;rio primeiro instalar o pacote que lhe dar&#225; os recursos necess&#225;rios: <ref target="https://readxl.tidyverse.org/">readxl</ref>^[4]. Este pacote faz parte da cole&#231;&#227;o de pacotes conhecidos como <ref target="https://www.tidyverse.org/">Tidyverse</ref>^[5], um dos mais utilizados para o tipo de an&#225;lise que estamos propondo, pois permite realizar facilmente tarefas como leitura, transforma&#231;&#227;o, processamento, manipula&#231;&#227;o, organiza&#231;&#227;o e visualiza&#231;&#227;o de diferentes tipos de dados. Al&#233;m do <emph>readxl</emph>, ele cont&#233;m v&#225;rios dos pacotes que talvez sejam necess&#225;rios mais tarde.</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_0" corresp="code_visualizacao-animacao-tabelas-historicas-R_0.txt" lang="language-R" rend="block"/></ab>
-<p>A seguir, precisamos carregar tanto o pacote <emph>readxl</emph> quanto o pacote <emph>tidyverse</emph>. Embora o pacote <emph>readxl</emph> esteja contido dentro do &#250;ltimo, ele precisa ser carregado separadamente.</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_1" corresp="code_visualizacao-animacao-tabelas-historicas-R_1.txt" lang="language-R" rend="block"/></ab>
-<p>Agora temos condi&#231;&#245;es de importar o conjunto de dados, usando a fun&#231;&#227;o <code rend="inline">read_excel()</code>. Esta fun&#231;&#227;o toma como argumento o nome do ficheiro onde est&#225; armazenada a tabela, assumindo que ela esteja em seu diret&#243;rio de trabalho atual. Se n&#227;o estiver em seu diret&#243;rio de trabalho, ser&#225; necess&#225;rio especificar o caminho completo para o ficheiro. O conte&#250;do do ficheiro ser&#225; atribu&#237;do a um novo objeto chamado <code rend="inline">at59</code>:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_2" corresp="code_visualizacao-animacao-tabelas-historicas-R_2.txt" lang="language-R" rend="block"/></ab>
-<p>&#201; essencial entender de que forma as informa&#231;&#245;es foram armazenadas. Em R tudo &#233; um objeto e, dependendo das caracter&#237;sticas dos dados importados, ele corresponder&#225; a uma certa <emph>estrutura de dados</emph>. R lida com v&#225;rias estruturas que diferem por terem diferentes n&#250;meros de dimens&#245;es e por poderem ou n&#227;o armazenar dados de diferentes tipos. O mais conhecido &#233; o <emph>vetor</emph>, que &#233; uma cole&#231;&#227;o unidimensional de dados do mesmo tipo. Outra estrutura &#233; a <emph>matriz</emph>, que &#233; semelhante ao vetor, mas permite trabalhar em duas dimens&#245;es.</p>
-<p>Al&#233;m disso, R tem uma forma particular de estrutura de dados, que tem duas dimens&#245;es e nos d&#225; a possibilidade de conter dados de diferentes tipos (inteiros junto com datas, caracteres, etc.). Esta estrutura &#233; chamada <emph>data frame</emph>, e &#233; composta de linhas e colunas; cada linha corresponde a uma observa&#231;&#227;o ou registro, enquanto cada coluna &#233; um vetor representando uma vari&#225;vel de an&#225;lise. O <emph>data frame</emph> &#233; uma das estruturas mais utilizadas em R e os dados que importamos de tabelas ser&#227;o armazenados desta forma. &#201; importante notar que muitas das fun&#231;&#245;es Tidyverse (como <code rend="inline">read_excel()</code>) retornam um tipo particular de quadro de dados chamado <emph>tibble</emph>. A principal diferen&#231;a entre os dois tipos &#233; a forma como os dados s&#227;o exibidos no console. O <emph>tibble</emph>, por exemplo, mostra abaixo do nome de cada vari&#225;vel qual &#233; o seu tipo. &#201; poss&#237;vel ver isso usando a fun&#231;&#227;o <code rend="inline">head()</code>, que exibe os seis primeiros registros de <code rend="inline">at59</code>. Ent&#227;o vemos que a data est&#225; no formato <emph>datetime</emph> (data e hora) e o resto das colunas s&#227;o do tipo <emph>character</emph> (caractere).</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_3" corresp="code_visualizacao-animacao-tabelas-historicas-R_3.txt" lang="language-R" rend="block"/></ab>
-<p>Com a tabela j&#225; carregada no <emph>RStudio</emph>, podemos come&#231;ar a processar os dados. Assim, por exemplo, podemos come&#231;ar a substituir certos valores da estrutura de dados para corrigir ou alterar maci&#231;amente o conte&#250;do. Para este fim, usaremos a fun&#231;&#227;o <code rend="inline">ifelse()</code>, que permite selecionar elementos de uma estrutura de dados de acordo com o cumprimento ou n&#227;o de uma condi&#231;&#227;o. Esta fun&#231;&#227;o tira proveito da vetoriza&#231;&#227;o da linguagem R e permite que, ao aplicar uma fun&#231;&#227;o a um objeto, ela o fa&#231;a em todos os seus elementos. Isto evita a necessidade de usar estruturas de repeti&#231;&#227;o (<code rend="inline">for</code> ou <code rend="inline">while</code>, por exemplo) para atravessar as linhas. Recomenda-se realizar estas opera&#231;&#245;es sobre os dados antes de realizar qualquer convers&#227;o sobre seu tipo.</p>
-<p>Suponha que desejamos substituir todos os casos em que o objeto &#233; listado como &#8221;bomba&#8221; pelo termo &#8220;explosivo&#8221;. Para este fim, podemos usar a fun&#231;&#227;o <code rend="inline">ifelse()</code>, passando por apenas tr&#234;s argumentos. Primeiro, indicamos a condi&#231;&#227;o a ser preenchida, neste caso, os valores &#8220;bomba&#8221; na coluna de <emph>objeto</emph> de <emph>at59</emph>, que &#233; selecionada com o s&#237;mbolo <code rend="inline">$</code>. O segundo argumento corresponde ao que a fun&#231;&#227;o atribuir&#225; caso a condi&#231;&#227;o seja cumprida: ela a substituir&#225; por &#8221;explosivo&#8221;. O terceiro argumento &#233; o valor atribu&#237;do no caso negativo. Neste caso, manteremos o valor original:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_4" corresp="code_visualizacao-animacao-tabelas-historicas-R_4.txt" lang="language-R" rend="block"/></ab>
-<p>Caso se arrependa das mudan&#231;as, &#233; poss&#237;vel fazer a mesma opera&#231;&#227;o ao contr&#225;rio:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_5" corresp="code_visualizacao-animacao-tabelas-historicas-R_5.txt" lang="language-R" rend="block"/></ab>
-<p>Em seguida, seria conveniente transformar os <emph>tipos</emph> de vari&#225;veis. Nesse caso, as altera&#231;&#245;es permitir&#227;o que se aproveite melhor as fun&#231;&#245;es de visualiza&#231;&#227;o. Primeiro, como n&#227;o importa que as datas tamb&#233;m tenham a hora, podemos ajustar essa vari&#225;vel usando a fun&#231;&#227;o <code rend="inline">as.Date()</code> na coluna de <emph>data</emph>. Em segundo lugar, podemos transformar o resto das vari&#225;veis de an&#225;lise em fatores, que &#233; o tipo de dados que <emph>R</emph> fornece para trabalhar com <emph>vari&#225;veis categ&#243;ricas</emph>, ou seja, aqueles que representam um conjunto fixo e conhecido de valores poss&#237;veis. Em seguida, devemos fazer algo id&#234;ntico com cada uma das quatro colunas restantes (<emph>ciudad</emph>, <emph>objeto</emph>, <emph>sitio</emph> e <emph>objetivo</emph>) e aplicar a fun&#231;&#227;o <code rend="inline">factor()</code> a elas. Em princ&#237;pio, isso envolveria escrever cinco afirma&#231;&#245;es (uma para cada vari&#225;vel): <code rend="inline">vari&#225;vel &lt;- factor (vari&#225;vel)</code>. Se houver interesse em escrever um c&#243;digo limpo, um dos preceitos &#233; evitar a repeti&#231;&#227;o de senten&#231;as caso elas n&#227;o sejam necess&#225;rias e aproveitar o potencial oferecido pela linguagem que estamos usando. No caso de R, podemos fazer isso com fun&#231;&#245;es que permitem que outras fun&#231;&#245;es sejam aplicadas de forma generalizada a uma estrutura de dados.</p>
-<p>Entre v&#225;rias op&#231;&#245;es, lhe convidamos a usar <code rend="inline">map_df()</code> do pacote <emph>purrr</emph>^[6], que tamb&#233;m faz parte do Tidyverse. <code rend="inline">map_df()</code> permite que se atribua uma fun&#231;&#227;o - que neste caso ser&#225; a de alterar o tipo de dado - a v&#225;rios elementos de um <emph>data frame</emph> e armazenar o resultado em um objeto dessa mesma classe. Como argumentos da fun&#231;&#227;o, primeiro indicamos o nome das colunas - em um formato vetorial com <code rend="inline">c()</code> - e, em seguida, a fun&#231;&#227;o que deseja aplicar a essas colunas. Para juntar o c&#243;digo de ambas as transforma&#231;&#245;es em uma &#250;nica instru&#231;&#227;o, usamos a fun&#231;&#227;o <code rend="inline">tibble()</code>. Isso resultar&#225; em um <emph>tibble</emph> com as colunas convertidas e organizadas como estavam originalmente:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_6" corresp="code_visualizacao-animacao-tabelas-historicas-R_6.txt" lang="language-R" rend="block"/></ab>
-<p>Para terminar esta etapa de limpeza e transforma&#231;&#227;o de dados, &#233; necess&#225;rio organizar os dados cronologicamente. Para fazer isso, existe a fun&#231;&#227;o <code rend="inline">arrange()</code>, do pacote <emph>dplyr</emph>^[7], tamb&#233;m parte do Tidyverse, o que lhe permitir&#225; reordenar as linhas do quadro de dados. Por padr&#227;o, ele o faz em ordem ascendente, embora, como a maioria das fun&#231;&#245;es em R, ele seja parametriz&#225;vel e permita varia&#231;&#245;es. Neste caso, a ordem ascendente &#233; relevante, portanto n&#227;o &#233; poss&#237;vel usar a fun&#231;&#227;o diretamente. O primeiro argumento &#233; o seu objeto de dados e o segundo argumento &#233; a vari&#225;vel a ser usada como crit&#233;rio computacional. Se fizer isso por data, ser&#225; necess&#225;rio entrar:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_7" corresp="code_visualizacao-animacao-tabelas-historicas-R_7.txt" lang="language-R" rend="block"/></ab>
-<p>Com <code rend="inline">head()</code> podemos ver como o conjunto de dados est&#225; reorganizado e pronto para que possamos come&#231;ar a analis&#225;-lo.</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_8" corresp="code_visualizacao-animacao-tabelas-historicas-R_8.txt" lang="language-R" rend="block"/></ab>
-</div><div type="1"><head>Explorando os dados</head>
-<p>Faremos agora uma <emph>an&#225;lise explorat&#243;ria</emph> b&#225;sica de nossos dados hist&#243;ricos a fim de encontrar rela&#231;&#245;es entre os casos de ataque inclu&#237;dos no conjunto de dados. A ideia deste tipo de metodologia &#233; identificar as principais caracter&#237;sticas de um conjunto de dados (padr&#245;es, diferen&#231;as, tend&#234;ncias, anomalias, descontinuidades e distribui&#231;&#245;es), a fim de compreender sua <emph>variabilidade</emph>. Ao representar esta variabilidade numericamente, e especialmente na forma de gr&#225;ficos e visualiza&#231;&#245;es, a an&#225;lise explorat&#243;ria de dados torna-se um meio para desenvolver novos insights anal&#237;ticos, perguntas ou hip&#243;teses: num relance podemos estar cientes das concentra&#231;&#245;es de dados, valores at&#237;picos, saltos e assim por diante.</p>
-<p>Com nosso banco de dados, vamos trabalhar com uma das principais formas pelas quais a variabilidade das informa&#231;&#245;es se manifesta: a distribui&#231;&#227;o de frequ&#234;ncia. Faremos isso em modo bivariado, ou seja, veremos como tabelas de conting&#234;ncia podem ser constru&#237;das para contar os casos resultantes do cruzamento de duas vari&#225;veis dentro do conjunto de ataques realizados durante 1959.</p>
-<p>Para este fim, h&#225; uma fun&#231;&#227;o simples chamada <code rend="inline">table()</code> que toma as vari&#225;veis de fatores como par&#226;metros e retorna a frequ&#234;ncia de ocorr&#234;ncia das categorias da vari&#225;vel. Um aspecto interessante desta fun&#231;&#227;o &#233; que ela tamb&#233;m permite que se passe uma &#250;nica coluna como argumento. Por exemplo, se quisermos saber quantos ataques existem por cidade, podemos descobrir o n&#250;mero com a declara&#231;&#227;o:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_9" corresp="code_visualizacao-animacao-tabelas-historicas-R_9.txt" lang="language-R" rend="block"/></ab>
-<p>Se quiser come&#231;ar a testar as capacidades gr&#225;ficas que a base R lhe oferece, &#233; poss&#237;vel transformar essa tabela unidimensional em um gr&#225;fico de barras, com uma fun&#231;&#227;o chamada <code rend="inline">barplot()</code>:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_10" corresp="code_visualizacao-animacao-tabelas-historicas-R_10.txt" lang="language-R" rend="block"/></ab>
-<p>O gr&#225;fico resultante (Figura 2) vai aparecer na aba <emph>Plots</emph> da janela de utilidades.</p>
-<figure><desc>Figura 2. Gr&#225;fico de barras mostrando a frequ&#234;ncia dos ataques por cidade. Neste caso, Avellaneda e La Plata t&#234;m o maior n&#250;mero de ataques.</desc><graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R2.png"/></figure>
-<p>Para analisar as poss&#237;veis rela&#231;&#245;es entre vari&#225;veis e categorias, podemos estabelecer uma tabela de conting&#234;ncia. Para isso, precisamos aplicar as duas colunas nas quais estamos interessados em cruzar para a fun&#231;&#227;o de <code rend="inline">table()</code> como um argumento. Por exemplo, se quisermos saber com que tipo de elementos ou objetos os ataques foram perpetrados, de acordo com a cidade de ocorr&#234;ncia do evento, devemos entrar no console:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_11" corresp="code_visualizacao-animacao-tabelas-historicas-R_11.txt" lang="language-R" rend="block"/></ab>
-<p>Como resultado, obteremos a seguinte tabela:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_12" corresp="code_visualizacao-animacao-tabelas-historicas-R_12.txt" lang="language-R" rend="block"/></ab>
-<p>H&#225; muitas maneiras de tornar a visualiza&#231;&#227;o das tabelas de conting&#234;ncia mais f&#225;cil, usando pacotes dispon&#237;veis no <emph>CRAN</emph>. Um que, sem ser complicado, lhe dar&#225; tabelas esteticamente melhoradas &#233; o <ref target="https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html">kableExtra</ref>^[8]^[9]. O procedimento tem duas partes. Primeiro, &#233; preciso formatar a tabela em formato <emph>html</emph> com a fun&#231;&#227;o <code rend="inline">kable()</code> e armazen&#225;-la em uma vari&#225;vel (por exemplo, <code rend="inline">a59k</code>). Ent&#227;o, deve-se usar esse objeto como argumento para a fun&#231;&#227;o <code rend="inline">kable_styling()</code>, que lhe permitir&#225; exibir a tabela e lidar com v&#225;rios atributos de estilo, tais como tamanho da fonte e cor. Dito isto, tente instalar, carregar e testar esse pacote, e aproveite a oportunidade para adicionar um t&#237;tulo &#224; sua tabela com o argumento <code rend="inline">caption</code>:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_13" corresp="code_visualizacao-animacao-tabelas-historicas-R_13.txt" lang="language-R" rend="block"/></ab>
-<p>O resultado aparecer&#225; no <emph>Viewer</emph> e teremos a possibilidade de salv&#225;-lo como uma imagem ou como c&#243;digo html, atrav&#233;s da aba <emph>Export</emph>.</p>
-<figure><desc>Figura 3. A mesma tabela de conting&#234;ncia criada acima, mas com o formato dado pelo pacote kableExtra.</desc><graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R3.png"/></figure>
-</div><div type="1"><head>Visualiza&#231;&#227;o de tabelas com ggplot2</head>
-<p>Como mostramos com os gr&#225;ficos gerados nesta li&#231;&#227;o, R se sobressai na ilustra&#231;&#227;o de conjuntos de dados. O pacote <ref target="https://ggplot2.tidyverse.org/">ggplot2</ref> ^[10] &#233; um dos pacotes gr&#225;ficos mais utilizados para aqueles que usam esta linguagem de programa&#231;&#227;o. Tem uma l&#243;gica inspirada na chamada gram&#225;tica dos gr&#225;ficos (<emph>grammar of graphics</emph>) ^[11] , que consiste no uso de camadas (<emph>layers</emph>), que s&#227;o ajustadas de acordo com certos par&#226;metros. Um gr&#225;fico &#233; a combina&#231;&#227;o de camadas, onde cada uma cumpre uma fun&#231;&#227;o espec&#237;fica sobre os dados, seus aspectos est&#233;ticos (tamanho, forma, cor, etc.), os objetos geom&#233;tricos que v&#227;o representar os dados (pontos, linhas, pol&#237;gonos, &#225;reas, etc.). Estas tr&#234;s camadas (dados, par&#226;metros est&#233;ticos e representa&#231;&#227;o geom&#233;trica) s&#227;o essenciais, ou seja, n&#227;o podem estar ausentes. Opcionalmente, &#233; poss&#237;vel modificar os valores padr&#227;o de outras camadas, o que lhe permitir&#225; facetar os dados em subgrupos, modificar o tipo de coordenadas, usar fun&#231;&#245;es estat&#237;sticas e modificar a apar&#234;ncia geral do gr&#225;fico. O pacote <emph>ggplot2</emph> est&#225; inclu&#237;do no Tidyverse e &#233; carregado quando se executa <code rend="inline">library(tidyverse)</code>, portanto, nenhuma instala&#231;&#227;o adicional &#233; necess&#225;ria.</p>
-<p>Em termos abstratos, uma declara&#231;&#227;o b&#225;sica desta gram&#225;tica gr&#225;fica tem a seguinte estrutura: <code rend="inline">ggplot(dados, vari&#225;veis) + fun&#231;&#227;o geom&#233;trica</code>. Os dados correspondem ao objeto de dados que cont&#233;m as vari&#225;veis que queremos visualizar, que para ggplot2 deve estar no formato <emph>data frame</emph>. As vari&#225;veis s&#227;o interpretadas aqui como os par&#226;metros est&#233;ticos (<code rend="inline">aes</code>) nos quais as colunas escolhidas ser&#227;o representadas (por exemplo, posi&#231;&#227;o nos eixos x e y, tamanho, cor). A fun&#231;&#227;o geom&#233;trica (<code rend="inline">geom</code>) nos permite escolher o objeto visual com o qual os dados ser&#227;o representados. Por ser uma l&#243;gica de camadas, o sinal <code rend="inline">+</code> permite adicionar tantas camadas quantas forem consideradas necess&#225;rias para que o gr&#225;fico inclua os elementos entendidos como relevantes.</p>
-<p>Se quiser visualizar graficamente a tabela de conting&#234;ncia constru&#237;da anteriormente, &#233; poss&#237;vel come&#231;ar fazendo a equival&#234;ncia de um ataque = um ponto no plano, ao qual a senten&#231;a m&#237;nima corresponderia:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_14" corresp="code_visualizacao-animacao-tabelas-historicas-R_14.txt" lang="language-R" rend="block"/></ab>
-<p>Com o c&#243;digo acima, o resultado ser&#225; semelhante ao da Figura 4.</p>
-<figure><desc>Figura 4. Gr&#225;fico de pontos mostrando o cruzamento das vari&#225;veis objeto e cidade.</desc><graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R4.png"/></figure>
-<p>Entretanto, deve-se reconhecer que a acumula&#231;&#227;o de pontos, um em cima do outro, na mesma coordenada (fen&#244;meno conhecido como <emph>overplotting</emph>), resulta em uma visualiza&#231;&#227;o pouco &#250;til, pois, ao contr&#225;rio da tabela, n&#227;o consegue representar as frequ&#234;ncias. Mostra apenas a exist&#234;ncia de cruzamentos de vari&#225;veis, n&#227;o quantas vezes elas ocorrem. Em casos como este, &#233; aconselh&#225;vel substituir a fun&#231;&#227;o <code rend="inline">geom_point()</code> por uma que conte o n&#250;mero de ocorr&#234;ncias de cada combina&#231;&#227;o, para obter uma imagem que lhe d&#234; uma r&#225;pida pista sobre as varia&#231;&#245;es na freq&#252;&#234;ncia dos ataques. Para este fim, a <code rend="inline">geom_count()</code> est&#225; dispon&#237;vel, o que, al&#233;m do efeito visual, adiciona uma escala de frequ&#234;ncia ao gr&#225;fico.</p>
-<p>Se tamb&#233;m estiver interessado em enriquecer a visualiza&#231;&#227;o adicionando etiquetas ao gr&#225;fico (dando-lhe um t&#237;tulo, mudando os nomes das vari&#225;veis nos eixos, etc.), &#233; poss&#237;vel adicionar uma camada com a fun&#231;&#227;o <code rend="inline">labs()</code>. Ainda, existe a possibilidade de alterar a apar&#234;ncia geral adicionando uma camada com uma das variantes fornecidas pelas fun&#231;&#245;es <code rend="inline">theme_()</code>, que lhe permitem controlar os elementos n&#227;o-dados do gr&#225;fico. Assim, o resultado obtido ser&#225; semelhante ao da Figura 5.</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_15" corresp="code_visualizacao-animacao-tabelas-historicas-R_15.txt" lang="language-R" rend="block"/></ab>
-<figure><desc>Figura 5. Gr&#225;fico de pontos representando a frequ&#234;ncia dos ataques, por objeto e cidade. O tamanho dos pontos depende do n&#250;mero de combina&#231;&#245;es entre o objeto do ataque e a cidade. Pode-se ver que as cidades de Avellaneda e La Plata t&#234;m o maior n&#250;mero de ataques, e que foram utilizados explosivos na maioria deles.</desc><graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R5.png"/></figure>
-<p>Para armazenar o gr&#225;fico em um ficheiro, h&#225; a fun&#231;&#227;o <code rend="inline">ggsave()</code>, que salvar&#225; sua imagem em seu diret&#243;rio de trabalho:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_16" corresp="code_visualizacao-animacao-tabelas-historicas-R_16.txt" lang="language-R" rend="block"/></ab>
-<p>Outra maneira de aproveitar os benef&#237;cios de visualiza&#231;&#227;o de R e evitar a sobreposi&#231;&#227;o de pontos &#233; usar a propriedade <emph>jitter</emph>, que afeta a posi&#231;&#227;o dos pontos. A fun&#231;&#227;o gr&#225;fica <code rend="inline">geom_jitter()</code> permite adicionar uma pequena varia&#231;&#227;o aleat&#243;ria &#224; localiza&#231;&#227;o de cada ponto; isto &#233; muito &#250;til se estivermos trabalhando com posi&#231;&#245;es discretas e pequenos conjuntos de dados. Para explorar outras capacidades est&#233;ticas, tente, por exemplo, definir a cor dos pontos a serem diferentes por cidade, usando o argumento <code rend="inline">colour</code>. Como o argumento deve estar em formato num&#233;rico, devemos convert&#234;-lo com <code rend="inline">as.numeric()</code>. Al&#233;m de definir a colora&#231;&#227;o, temos a possibilidade de manipular o tamanho dos pontos com o argumento <code rend="inline">size</code>, sua transpar&#234;ncia com <code rend="inline">alpha</code> e a dist&#226;ncia vertical ou horizontal entre pontos com <code rend="inline">width</code> ou <code rend="inline">height</code>. O gr&#225;fico obtido ser&#225; semelhante ao da Figura 6.</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_17" corresp="code_visualizacao-animacao-tabelas-historicas-R_17.txt" lang="language-R" rend="block"/></ab>
-<figure><desc>Figura 6. Gr&#225;fico resultante da aplica&#231;&#227;o da fun&#231;&#227;o geom_jitter(). Ele permite visualizar a mesma tend&#234;ncia do gr&#225;fico anterior (mais explosivos em Avellaneda e La Plata), mas atribuindo um ponto para cada combina&#231;&#227;o objeto/cidade para evitar sobreposi&#231;&#245;es.</desc><graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R6.png"/></figure>
-</div><div type="1"><head>Animando a visualiza&#231;&#227;o dos dados com gganimate</head>
-<p>Embora existam diferentes pacotes para animar visualiza&#231;&#245;es em R, n&#243;s o convidamos a faz&#234;-lo com <ref target="https://gganimate.com/">gganimate</ref>^[12]], que &#233; uma extens&#227;o do pacote <emph>ggplot2</emph> que lhe permitir&#225; criar uma anima&#231;&#227;o a partir de um gr&#225;fico <emph>ggplot</emph> e ver dinamicamente como seus dados evoluem de acordo com os estados ou com o tempo. As fun&#231;&#245;es centrais do <emph>gganimate</emph> s&#227;o as fun&#231;&#245;es de transi&#231;&#227;o (<code rend="inline">transition_*()</code>), que permitem especificar como os dados devem ser interpretados em termos de sua anima&#231;&#227;o, ou seja, de acordo com que crit&#233;rios os quadros (<emph>frames</emph>) a serem animados ser&#227;o criados.</p>
-<p>Para instalar e ativar o pacote, use o c&#243;digo abaixo. Sugerimos tamb&#233;m a instala&#231;&#227;o da &#250;ltima vers&#227;o do pacote <emph>gifski</emph>. Algumas pessoas relataram problemas gerando anima&#231;&#245;es ao usar uma vers&#227;o mais antiga que 0.8.6.</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_18" corresp="code_visualizacao-animacao-tabelas-historicas-R_18.txt" lang="language-R" rend="block"/></ab>
-<p>Se quiser gerar uma anima&#231;&#227;o que represente a ocorr&#234;ncia de ataques de acordo com uma progress&#227;o no tempo, a fun&#231;&#227;o indicada &#233; <code rend="inline">transiton_time()</code>. O procedimento &#233; muito simples: ao c&#243;digo que escrevemos para fazer o gr&#225;fico, adicionamos esta fun&#231;&#227;o, colocando como argumento a vari&#225;vel temporal, neste caso, a <emph>fecha</emph> (data). Entretanto, a fim de fazer uma visualiza&#231;&#227;o mais clara de seus dados, &#233; conveniente que acrescentemos alguns elementos ao c&#243;digo.</p>
-<p>Por um lado, como no <emph>gganimate</emph> a anima&#231;&#227;o resultante &#233; um conjunto de imagens (instant&#226;neas) exibidas em s&#233;ries consecutivas, cada novo quadro (<emph>frame</emph>) - se n&#227;o dissermos o contr&#225;rio - quando exibido esconde o anterior e s&#243; veremos pontos piscando. Para lidar com isto, temos o grupo de fun&#231;&#245;es <emph>shadow</emph> (sombras), que lhe permite escolher como exibir dados que n&#227;o correspondem mais ao quadro (<emph>frame</emph>) atual. No caso deste gr&#225;fico, a fim de manter todos os dados anteriores em segundo plano, precisamos usar <code rend="inline">shadow_mark(past = TRUE)</code>, o que permite deixar vis&#237;veis os quadros j&#225; apresentados. Por outro lado, como pode ser bastante dif&#237;cil entender uma anima&#231;&#227;o sem qualquer indica&#231;&#227;o do significado de cada ponto de tempo, <emph>gganimate</emph> fornece um conjunto de vari&#225;veis para cada <emph>frame (frame variables)</emph>, que podemos inserir nas etiquetas dos gr&#225;ficos usando a pr&#243;pria sintaxe do pacote <emph>glue</emph>, que usa os s&#237;mbolos <code rend="inline">{}</code>. Isto lhe fornecer&#225; um conjunto de metadados, dependendo da variante de transi&#231;&#227;o que se tentar. Para <code rend="inline">transition_time()</code>, h&#225; <code rend="inline">{frame_time}</code>, que retornar&#225; o valor do argumento processado pela fun&#231;&#227;o durante o frame atual, ou seja, permitir&#225; visualizar a data correspondente. O c&#243;digo ficaria assim:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_19" corresp="code_visualizacao-animacao-tabelas-historicas-R_19.txt" lang="language-R" rend="block"/></ab>
-<p>Quando inserimos o c&#243;digo diretamente no console, o processo de gera&#231;&#227;o da anima&#231;&#227;o, chamado <emph>rendering</emph> (renderiza&#231;&#227;o), come&#231;a. Este processo tem uma dura&#231;&#227;o relativa, dependendo do volume de dados e de seu processamento. Neste caso, deve levar apenas alguns segundos, durante os quais vemos uma barra de progresso indicando quanto tempo ainda resta. Quando terminar, na aba <emph>Viewer</emph> da janela de utilidades, poderemos assistir a anima&#231;&#227;o. Se pressionamos o &#237;cone <emph>Show in new window</emph> (mostrar em nova janela), um <emph>gif</emph> ser&#225; aberto em seu navegador padr&#227;o associado, de onde poderemos salv&#225;-lo. Caso se deseje continuar praticando com o console, tamb&#233;m &#233; poss&#237;vel salv&#225;-lo com a fun&#231;&#227;o <code rend="inline">anim_save()</code>, que salva a &#250;ltima anima&#231;&#227;o em seu diret&#243;rio de trabalho:</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_20" corresp="code_visualizacao-animacao-tabelas-historicas-R_20.txt" lang="language-R" rend="block"/></ab>
-<p>Para explorar mais possibilidades do pacote <emph>gganimate</emph>, a sugest&#227;o &#233; que se atribua o bloco de c&#243;digo para gerar o gr&#225;fico a um objeto. Isto lhe dar&#225; a possibilidade de lidar com par&#226;metros como velocidade e pausas na anima&#231;&#227;o por meio da fun&#231;&#227;o <code rend="inline">animate()</code>. Com ele, tamb&#233;m podemos ajustar o n&#250;mero total de quadros, a dura&#231;&#227;o total e os quadros por segundo. Para experimentar, d&#234; aos <code rend="inline">fps</code> um par&#226;metro de 5 quadros por segundo e acrescente uma pausa final de 15 segundos com <code rend="inline">end_pause</code>. Isto lhe dar&#225; uma anima&#231;&#227;o semelhante &#224; Figura 7.</p>
-<ab><code xml:id="code_visualizacao-animacao-tabelas-historicas-R_21" corresp="code_visualizacao-animacao-tabelas-historicas-R_21.txt" lang="language-R" rend="block"/></ab>
-<figure><desc>Figura 7. Vers&#227;o animada do gr&#225;fico criado com a fun&#231;&#227;o geom_jitter.</desc><graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R7.gif"/></figure>
-<p>Neste ponto e com estes resultados, podemos considerar que foi realizada uma an&#225;lise explorat&#243;ria de seus dados e que est&#225; em condi&#231;&#245;es de apresentar hip&#243;teses a este respeito. No caso de ter trabalhado, e se o (a) pesquisador (a) se dedica &#224; hist&#243;ria das lutas sociais e pol&#237;ticas na Argentina contempor&#226;nea, as tabelas de conting&#234;ncia e gr&#225;ficos est&#225;ticos trabalhados nesta li&#231;&#227;o, por exemplo, permitem encontrar semelhan&#231;as entre Avellaneda e La Plata, tanto em termos da frequ&#234;ncia dos ataques quanto de seu tipo (em termos do objeto utilizado). Al&#233;m disso, temos o ritmo temporal (intensidade) dos ataques, o que nos convida a nos concentrar em poss&#237;veis padr&#245;es ou rela&#231;&#245;es de natureza mais hist&#243;rica entre casos que normalmente n&#227;o est&#227;o conectados na pesquisa devido a sua diferente estrutura s&#243;cio-econ&#244;mica na &#233;poca.</p>
-</div><div type="1"><head>Conclus&#227;o</head>
-<p>Esta li&#231;&#227;o procurou oferecer uma ideia geral das v&#225;rias tarefas que devem ser seguidas a fim de preparar e realizar uma primeira an&#225;lise explorat&#243;ria de dados sobre uma s&#233;rie de documentos hist&#243;ricos. Este procedimento permite realizar c&#225;lculos b&#225;sicos com estes dados e analis&#225;-los visualmente a fim de pensar, gerar perguntas e hip&#243;teses a partir deles.</p>
-<p>Nesta li&#231;&#227;o, oferecemos apenas um ponto de partida para a an&#225;lise de suas tabelas hist&#243;ricas. Como um desafio, e com base no que se aprendeu neste tutorial, propomos que se continue a tentar outros cruzamentos de vari&#225;veis. Finalmente, te convidamos a descobrir por si pr&#243;prio o poder do <emph>ggplot</emph> e do <emph>gganimate</emph>, explorando a <ref target="https://gganimate.com/index.html">documenta&#231;&#227;o</ref> deste &#250;ltimo pacote para aprender sobre as outras op&#231;&#245;es dispon&#237;veis.</p>
-</div><div type="1"><head>Notas</head>
-<p><ref type="footnotemark" target="#note_1"/> : Roderick Floud, <emph>M&#233;todos cuantitativos para historiadores</emph> (Madrid: Alianza, 1983).</p>
-<p><ref type="footnotemark" target="#note_2"/> : Para encontrar uma refer&#234;ncia detalhada do ficheiro no local da Comiss&#227;o Provincial pela Mem&#243;ria da Prov&#237;ncia de Buenos Aires: <ref target="https://www.comisionporlamemoria.org/extra/archivo/cuadroclasificacion/">https://www.comisionporlamemoria.org/extra/archivo/cuadroclasificacion/</ref></p>
-<p><ref type="footnotemark" target="#note_3"/> : Os fundamentos e o significado da no&#231;&#227;o de &#8220;dados ordenados&#8221; podem ser encontrados em: Hadley Wickham, "Tidy Data", <emph>Journal of Statistical Software</emph>, Volume 59, Issue 10, 2019,https://www.jstatsoft.org/index.php/jss/article/view/v059i10/v59i10.pdf)</p>
-<p><ref type="footnotemark" target="#note_4"/> : Hadley Wickham and Jennifer Bryan, "readxl: Read Excel Files. R package version 1.3.1", 2019, <ref target="https://CRAN.R-project.org/package=readxl">https://CRAN.R-project.org/package=readxl</ref></p>
-<p><ref type="footnotemark" target="#note_5"/> : Hadley Wickham et al.,"Welcome to the tidyverse", <emph>Journal of Open Source Software</emph>, 4(43), 1686 (2019): 1-5, <ref target="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</ref></p>
-<p><ref type="footnotemark" target="#note_6"/> : Lionel Henry and Hadley Wickham, "purrr: Functional Programming Tools. R package version 0.3.4", 2020, <ref target="https://CRAN.R-project.org/package=purrr">https://CRAN.R-project.org/package=purrr</ref></p>
-<p><ref type="footnotemark" target="#note_7"/> : Hadley Wickham, Romain Fran&#231;ois, Lionel Henry and Kirill M&#252;ller, "dplyr: A Grammar of Data Manipulation. R package version 1.0.6", CRAN R Project, 2021, <ref target="https://CRAN.R-project.org/package=dplyr">https://CRAN.R-project.org/package=dplyr</ref></p>
-<p><ref type="footnotemark" target="#note_8"/> : Hao Zhu, "kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R package version 1.3.2", 2021, <ref target="https://CRAN.R-project.org/package=kableExtra">https://CRAN.R-project.org/package=kableExtra</ref></p>
-<p><ref type="footnotemark" target="#note_9"/> : Nota da Tradutora: ao instalar o pacote <emph>kableExtra</emph>, pode ser que o R demande a atualiza&#231;&#227;o do pacote <emph>htmltools</emph></p>
-<p><ref type="footnotemark" target="#note_10"/> : Hadley Wickham, "ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics", Springer-Verlag New York, 2016, <ref target="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</ref></p>
-<p><ref type="footnotemark" target="#note_11"/> : A refer&#234;ncia para o conceito &#233; Leland Wilkinson, com seu trabalho <emph>The Grammar of Graphics</emph>, algumas p&#225;ginas podem ser consultadas em: <ref target="https://www.springer.com/gp/book/9780387245447">https://www.springer.com/gp/book/9780387245447</ref></p>
-<p><ref type="footnotemark" target="#note_12"/> : Thomas Lin Pedersen and David Robinson, "gganimate: A Grammar of Animated Graphics. R package version 1.0.7", 2020, <ref target="https://CRAN.R-project.org/package=gganimate">https://CRAN.R-project.org/package=gganimate</ref></p>
-</div></div>
-    </body>
-  </text>
+                </list>
+                <div type="1">
+                    <head>Resumo</head>
+                    <p>Esta lição lhe mostrará como cruzar, traçar e animar um conjunto de dados históricos. Vamos aprender como importar dados disponíveis em uma tabela eletrônica em <emph>RStudio</emph> e como utilizar funções que permitam transformar esses dados para representá-los como uma tabela de contingência. Também veremos como utilizar funções de novas bibliotecas que lhe permitirão visualizar os seus dados cruzados em forma gráfica e até mesmo animá-los em perspectiva de tempo.</p>
+                </div>
+                <div type="1">
+                    <head>Objetivos</head>
+                    <p>Nesta lição, aprenderemos a:</p>
+                    <list type="ordered">
+                        <item>Classificar e transformar tabelas históricas para realizar análises exploratórias;</item>
+                        <item>Gerar gráficos estáticos e animados para visualizar dados históricos.</item>
+                    </list>
+                </div>
+                <div type="1">
+                    <head>Introdução</head>
+                    <p>Não há dúvida de que em uma disciplina como a História, predomina o tratamento qualitativo dos documentos e das fontes que o passado nos legou. Mas, como Roderick Floud salientou, “embora estejamos basicamente mais interessados nas questões ‘qualitativas’ do que nas ‘quantitativas’, as duas estão inextricavelmente ligadas”<ref type="footnotemark" target="#pt_note_1"/>. Ou seja, elas não competem, não se substituem, mas se complementam. Uma maneira de combinar ambas as metodologias é através da busca de regularidades ou padrões ocultos ou, inversamente, de anomalias. Isto aproxima aqueles que fazem pesquisa histórica de uma melhor compreensão das coordenadas nas quais situar as suas interpretações. Se esta compreensão global dos dados puder ser visualizada graficamente, é possível “que o pesquisador descubra facilmente as relações, semelhanças e diferenças entre os seus casos”. Desde que Floud escreveu - em meados dos anos 70 - a tecnologia e a programação de computadores avançaram de tal forma que é muito fácil cruzar perspectivas metodológicas. Assim, se um trabalho histórico qualitativo visa aprofundar aspectos dos fenômenos que aconteceram no passado, um trabalho quantitativo permitirá saber com que frequência eles aconteceram, observar padrões e anomalias, e estabelecer relações temporais entre as diferentes categorias de análise existentes. </p>
+                    <p>Quem pretende realizar uma análise histórica quantitativa deve começar com um exercício de codificação das fontes documentais que o passado nos legou e traduzi-las em uma matriz de dados. Em outras palavras, isto requer um processo de conversão de nossas fontes de informação, a fim de transformar dados textuais (palavras) em dados simbólicos (números) operáveis digitalmente. Isto consiste de várias etapas: 1) <emph>classificar</emph> os documentos que foram acessados de forma a permitir que sejam reunidos de acordo com determinados critérios, 2) <emph>categorizar</emph> o conteúdo das fontes de forma descritiva, interpretativa ou analítica, com ideias, categorias ou conceitos, 3) <emph>codificar</emph>, dando às diferentes expressões particulares de cada caso um símbolo (números, palavras), 4) <emph>tabular</emph>, ou seja, representar os casos organizados sob a forma de uma matriz em um meio de computador, geralmente uma tabela de cálculo.</p>
+                    <p>Nesta lição, mostraremos uma das muitas maneiras pelas quais ficheiros que reúnem informações sistemáticas e seriadas (como casos de produtores de documentação permanente como o Estado, empresas ou a imprensa) podem ser analisados quantitativamente usando a linguagem de programação R. O objetivo é que se adquira conhecimentos que lhe permitam realizar uma análise exploratória dos dados, trabalhando principalmente na distribuição de frequências de diferentes variáveis através de tabelas de contingência, para depois visualizá-las, gerar gráficos e, finalmente, criar uma animação das mesmas em perspectiva temporal.</p>
+                </div>
+                <div type="1">
+                    <head>Pré-requisitos</head>
+                    <p>Esta lição exige um entendimento básico de R, que pode ser obtido nas lições <ref target="/pt/licoes/nocoes-basicas-R-dados-tabulares">Noções básicas de R com dados tabulares</ref> de Trayn Dewar e <ref target="/en/lessons/data_wrangling_and_management_in_R">Manipulação e transformação de dados em R</ref> (em inglês) de Nabeel Siddiqui.</p>
+                    <p>Além do R, será necessário possuir o ambiente de desenvolvimento <ref target="https://www.rstudio.com/products/rstudio/download/#download">RStudio</ref> instalado. Se ainda não o tiver, <ref target="https://www.youtube.com/watch?v=A8A-OU_nlsw">este vídeo</ref> fornece um guia sobre como baixá-lo e instalá-lo.</p>
+                </div>
+                <head>Os dados explorados</head>
+                <p>O conjunto de dados aqui apresentado nos ajudará a ver como R pode ajudá-lo a analisar a dinâmica da violência política na Argentina no final dos anos 50, com base em documentos de espionagem policial. Normalmente estes ficheiros de inteligência têm sido utilizados para o estudo histórico de casos particulares, mas raramente o objetivo tem sido alcançar graus de agregação que permitam fazer comparações entre diferentes casos. Dispor de alguns elementos básicos de programação facilita a tomada de medidas nessa direção.</p>
+                <p>A fonte que propomos codificar é um ficheiro muito especial do acervo da antiga Diretoria de Inteligência da Polícia de Buenos Aires (Argentina). Ele contém vários relatórios de inteligência que dão conta de “atos terroristas” durante os anos do período de conflito político e social conhecido na história argentina como a “Resistência Peronista”<ref type="footnotemark" target="#pt_note_2"/>. Uma imagem digitalizada de um dos ficheiros é apresentada na Figura 1. O interessante é que a informação bruta é apresentada de uma forma que facilita sua tabulação.</p>
+                <figure>
+                    <desc>Figura 1. Imagem de um ficheiro com dados sobre os ataques</desc>
+                    <graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R1.jpg"/>
+                </figure>
+                <p>Este documento foi transformado em um conjunto de dados quantitativamente processáveis. Uma tabela foi construída a partir de informações sobre algumas localidades da província de Buenos Aires em 1959, um ano em que o número de "atos terroristas" ou ataques foi muito alto. Os dados representam os valores de certas variáveis de análise comuns a todos os registros, tais como a <emph>ciudad</emph> (onde) e a <emph>fecha</emph> do ataque (quando). A partir das informações descritivas da polícia (atributos do ataque), foi possível gerar variáveis como: <emph>objeto</emph> utilizado no ataque (com que elemento foi realizado), <emph>sitio</emph> (lugar/espaço) e <emph>objetivo</emph> (contra quem). Com esta categorização, procuramos salvar um passo, pois a tabela segue os preceitos de “dados ordenados” (<emph>tidy data</emph>): cada variável forma uma coluna, cada observação forma uma linha, cada valor tem a sua própria célula, cada tipo de unidade observacional forma uma tabela<ref type="footnotemark" target="#pt_note_3"/>.</p>
+                <table>
+                    <row>
+                        <cell role="label">fecha</cell>
+                        <cell role="label">ciudad</cell>
+                        <cell role="label">objeto</cell>
+                        <cell role="label">sitio</cell>
+                        <cell role="label">objetivo</cell>
+                    </row>
+                    <row>
+                        <cell>18/01/1959</cell>
+                        <cell>La Plata</cell>
+                        <cell>bomba</cell>
+                        <cell>sede</cell>
+                        <cell>institucion extranjera</cell>
+                    </row>
+                    <row>
+                        <cell>19/01/1959</cell>
+                        <cell>La Plata</cell>
+                        <cell>petardo</cell>
+                        <cell>vias ffcc</cell>
+                        <cell>ferrocarril</cell>
+                    </row>
+                    <row>
+                        <cell>19/01/1959</cell>
+                        <cell>Matanza</cell>
+                        <cell>bomba</cell>
+                        <cell>vias ffcc</cell>
+                        <cell>ferrocarril</cell>
+                    </row>
+                    <row>
+                        <cell>20/01/1959</cell>
+                        <cell>Avellaneda</cell>
+                        <cell>molotov</cell>
+                        <cell>comercio</cell>
+                        <cell>comercio</cell>
+                    </row>
+                    <row>
+                        <cell>20/01/1959</cell>
+                        <cell>Avellaneda</cell>
+                        <cell>bomba</cell>
+                        <cell>vias ffcc</cell>
+                        <cell>ferrocarril</cell>
+                    </row>
+                    <row>
+                        <cell>20/01/1959</cell>
+                        <cell>Lomas</cell>
+                        <cell>bomba</cell>
+                        <cell>vias ffcc</cell>
+                        <cell>ferrocarril</cell>
+                    </row>
+                    <row>
+                        <cell>20/01/1959</cell>
+                        <cell>Matanza</cell>
+                        <cell>bomba</cell>
+                        <cell>vias ffcc</cell>
+                        <cell>ferrocarril</cell>
+                    </row>
+                </table>
+                <p>Para esta lição usaremos a tabela correspondente aos ataques em cinco cidades da Argentina durante 1959, que está disponível no ficheiro <ref target="/assets/visualizacion-y-animacion-de-tablas-historicas-con-R/atentados1959.xlsx">atentados1959.xlsx</ref>.</p>
+                <div type="1">
+                    <head>Processamento e limpeza de dados com R</head>
+                    <p>Nesta seção mostraremos como carregar os dados no RStudio para começar a processá-los. Não espere que tudo esteja pronto para funcionar uma vez que a tabela tenha sido importada; sempre precisaremos ajustar seus dados para que R possa interpretá-los. Neste caso, por exemplo, após a importação, precisaremos atribuir um tipo às variáveis, convertê-las, fazer algumas modificações nos dados e, em seguida, ordená-las temporariamente.</p>
+                    <p>O primeiro passo é importá-los de seu formato de tabela para o ambiente RStudio. Para fazer isso, será necessário primeiro instalar o pacote que lhe dará os recursos necessários: <ref target="https://readxl.tidyverse.org/">readxl</ref>^[4]. Este pacote faz parte da coleção de pacotes conhecidos como <ref target="https://www.tidyverse.org/">Tidyverse</ref>^[5], um dos mais utilizados para o tipo de análise que estamos propondo, pois permite realizar facilmente tarefas como leitura, transformação, processamento, manipulação, organização e visualização de diferentes tipos de dados. Além do <emph>readxl</emph>, ele contém vários dos pacotes que talvez sejam necessários mais tarde.</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_0" corresp="code_visualizacao-animacao-tabelas-historicas-R_0.txt" rend="block"/>
+                    </ab>
+                    <p>A seguir, precisamos carregar tanto o pacote <emph>readxl</emph> quanto o pacote <emph>tidyverse</emph>. Embora o pacote <emph>readxl</emph> esteja contido dentro do último, ele precisa ser carregado separadamente.</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_1" corresp="code_visualizacao-animacao-tabelas-historicas-R_1.txt" rend="block"/>
+                    </ab>
+                    <p>Agora temos condições de importar o conjunto de dados, usando a função <code rend="inline">read_excel()</code>. Esta função toma como argumento o nome do ficheiro onde está armazenada a tabela, assumindo que ela esteja em seu diretório de trabalho atual. Se não estiver em seu diretório de trabalho, será necessário especificar o caminho completo para o ficheiro. O conteúdo do ficheiro será atribuído a um novo objeto chamado <code rend="inline">at59</code>:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_2" corresp="code_visualizacao-animacao-tabelas-historicas-R_2.txt" rend="block"/>
+                    </ab>
+                    <p>É essencial entender de que forma as informações foram armazenadas. Em R tudo é um objeto e, dependendo das características dos dados importados, ele corresponderá a uma certa <emph>estrutura de dados</emph>. R lida com várias estruturas que diferem por terem diferentes números de dimensões e por poderem ou não armazenar dados de diferentes tipos. O mais conhecido é o <emph>vetor</emph>, que é uma coleção unidimensional de dados do mesmo tipo. Outra estrutura é a <emph>matriz</emph>, que é semelhante ao vetor, mas permite trabalhar em duas dimensões.</p>
+                    <p>Além disso, R tem uma forma particular de estrutura de dados, que tem duas dimensões e nos dá a possibilidade de conter dados de diferentes tipos (inteiros junto com datas, caracteres, etc.). Esta estrutura é chamada <emph>data frame</emph>, e é composta de linhas e colunas; cada linha corresponde a uma observação ou registro, enquanto cada coluna é um vetor representando uma variável de análise. O <emph>data frame</emph> é uma das estruturas mais utilizadas em R e os dados que importamos de tabelas serão armazenados desta forma. É importante notar que muitas das funções Tidyverse (como <code rend="inline">read_excel()</code>) retornam um tipo particular de quadro de dados chamado <emph>tibble</emph>. A principal diferença entre os dois tipos é a forma como os dados são exibidos no console. O <emph>tibble</emph>, por exemplo, mostra abaixo do nome de cada variável qual é o seu tipo. É possível ver isso usando a função <code rend="inline">head()</code>, que exibe os seis primeiros registros de <code rend="inline">at59</code>. Então vemos que a data está no formato <emph>datetime</emph> (data e hora) e o resto das colunas são do tipo <emph>character</emph> (caractere).</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_3" corresp="code_visualizacao-animacao-tabelas-historicas-R_3.txt" rend="block"/>
+                    </ab>
+                    <p>Com a tabela já carregada no <emph>RStudio</emph>, podemos começar a processar os dados. Assim, por exemplo, podemos começar a substituir certos valores da estrutura de dados para corrigir ou alterar maciçamente o conteúdo. Para este fim, usaremos a função <code rend="inline">ifelse()</code>, que permite selecionar elementos de uma estrutura de dados de acordo com o cumprimento ou não de uma condição. Esta função tira proveito da vetorização da linguagem R e permite que, ao aplicar uma função a um objeto, ela o faça em todos os seus elementos. Isto evita a necessidade de usar estruturas de repetição (<code rend="inline">for</code> ou <code rend="inline">while</code>, por exemplo) para atravessar as linhas. Recomenda-se realizar estas operações sobre os dados antes de realizar qualquer conversão sobre seu tipo.</p>
+                    <p>Suponha que desejamos substituir todos os casos em que o objeto é listado como ”bomba” pelo termo “explosivo”. Para este fim, podemos usar a função <code rend="inline">ifelse()</code>, passando por apenas três argumentos. Primeiro, indicamos a condição a ser preenchida, neste caso, os valores “bomba” na coluna de <emph>objeto</emph> de <emph>at59</emph>, que é selecionada com o símbolo <code rend="inline">$</code>. O segundo argumento corresponde ao que a função atribuirá caso a condição seja cumprida: ela a substituirá por ”explosivo”. O terceiro argumento é o valor atribuído no caso negativo. Neste caso, manteremos o valor original:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_4" corresp="code_visualizacao-animacao-tabelas-historicas-R_4.txt" rend="block"/>
+                    </ab>
+                    <p>Caso se arrependa das mudanças, é possível fazer a mesma operação ao contrário:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_5" corresp="code_visualizacao-animacao-tabelas-historicas-R_5.txt" rend="block"/>
+                    </ab>
+                    <p>Em seguida, seria conveniente transformar os <emph>tipos</emph> de variáveis. Nesse caso, as alterações permitirão que se aproveite melhor as funções de visualização. Primeiro, como não importa que as datas também tenham a hora, podemos ajustar essa variável usando a função <code rend="inline">as.Date()</code> na coluna de <emph>data</emph>. Em segundo lugar, podemos transformar o resto das variáveis de análise em fatores, que é o tipo de dados que <emph>R</emph> fornece para trabalhar com <emph>variáveis categóricas</emph>, ou seja, aqueles que representam um conjunto fixo e conhecido de valores possíveis. Em seguida, devemos fazer algo idêntico com cada uma das quatro colunas restantes (<emph>ciudad</emph>, <emph>objeto</emph>, <emph>sitio</emph> e <emph>objetivo</emph>) e aplicar a função <code rend="inline">factor()</code> a elas. Em princípio, isso envolveria escrever cinco afirmações (uma para cada variável): <code rend="inline">variável &lt;- factor (variável)</code>. Se houver interesse em escrever um código limpo, um dos preceitos é evitar a repetição de sentenças caso elas não sejam necessárias e aproveitar o potencial oferecido pela linguagem que estamos usando. No caso de R, podemos fazer isso com funções que permitem que outras funções sejam aplicadas de forma generalizada a uma estrutura de dados.</p>
+                    <p>Entre várias opções, lhe convidamos a usar <code rend="inline">map_df()</code> do pacote <emph>purrr</emph>^[6], que também faz parte do Tidyverse. <code rend="inline">map_df()</code> permite que se atribua uma função - que neste caso será a de alterar o tipo de dado - a vários elementos de um <emph>data frame</emph> e armazenar o resultado em um objeto dessa mesma classe. Como argumentos da função, primeiro indicamos o nome das colunas - em um formato vetorial com <code rend="inline">c()</code> - e, em seguida, a função que deseja aplicar a essas colunas. Para juntar o código de ambas as transformações em uma única instrução, usamos a função <code rend="inline">tibble()</code>. Isso resultará em um <emph>tibble</emph> com as colunas convertidas e organizadas como estavam originalmente:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_6" corresp="code_visualizacao-animacao-tabelas-historicas-R_6.txt" rend="block"/>
+                    </ab>
+                    <p>Para terminar esta etapa de limpeza e transformação de dados, é necessário organizar os dados cronologicamente. Para fazer isso, existe a função <code rend="inline">arrange()</code>, do pacote <emph>dplyr</emph>^[7], também parte do Tidyverse, o que lhe permitirá reordenar as linhas do quadro de dados. Por padrão, ele o faz em ordem ascendente, embora, como a maioria das funções em R, ele seja parametrizável e permita variações. Neste caso, a ordem ascendente é relevante, portanto não é possível usar a função diretamente. O primeiro argumento é o seu objeto de dados e o segundo argumento é a variável a ser usada como critério computacional. Se fizer isso por data, será necessário entrar:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_7" corresp="code_visualizacao-animacao-tabelas-historicas-R_7.txt" rend="block"/>
+                    </ab>
+                    <p>Com <code rend="inline">head()</code> podemos ver como o conjunto de dados está reorganizado e pronto para que possamos começar a analisá-lo.</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_8" corresp="code_visualizacao-animacao-tabelas-historicas-R_8.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="1">
+                    <head>Explorando os dados</head>
+                    <p>Faremos agora uma <emph>análise exploratória</emph> básica de nossos dados históricos a fim de encontrar relações entre os casos de ataque incluídos no conjunto de dados. A ideia deste tipo de metodologia é identificar as principais características de um conjunto de dados (padrões, diferenças, tendências, anomalias, descontinuidades e distribuições), a fim de compreender sua <emph>variabilidade</emph>. Ao representar esta variabilidade numericamente, e especialmente na forma de gráficos e visualizações, a análise exploratória de dados torna-se um meio para desenvolver novos insights analíticos, perguntas ou hipóteses: num relance podemos estar cientes das concentrações de dados, valores atípicos, saltos e assim por diante.</p>
+                    <p>Com nosso banco de dados, vamos trabalhar com uma das principais formas pelas quais a variabilidade das informações se manifesta: a distribuição de frequência. Faremos isso em modo bivariado, ou seja, veremos como tabelas de contingência podem ser construídas para contar os casos resultantes do cruzamento de duas variáveis dentro do conjunto de ataques realizados durante 1959.</p>
+                    <p>Para este fim, há uma função simples chamada <code rend="inline">table()</code> que toma as variáveis de fatores como parâmetros e retorna a frequência de ocorrência das categorias da variável. Um aspecto interessante desta função é que ela também permite que se passe uma única coluna como argumento. Por exemplo, se quisermos saber quantos ataques existem por cidade, podemos descobrir o número com a declaração:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_9" corresp="code_visualizacao-animacao-tabelas-historicas-R_9.txt" rend="block"/>
+                    </ab>
+                    <p>Se quiser começar a testar as capacidades gráficas que a base R lhe oferece, é possível transformar essa tabela unidimensional em um gráfico de barras, com uma função chamada <code rend="inline">barplot()</code>:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_10" corresp="code_visualizacao-animacao-tabelas-historicas-R_10.txt" rend="block"/>
+                    </ab>
+                    <p>O gráfico resultante (Figura 2) vai aparecer na aba <emph>Plots</emph> da janela de utilidades.</p>
+                    <figure>
+                        <desc>Figura 2. Gráfico de barras mostrando a frequência dos ataques por cidade. Neste caso, Avellaneda e La Plata têm o maior número de ataques.</desc>
+                        <graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R2.png"/>
+                    </figure>
+                    <p>Para analisar as possíveis relações entre variáveis e categorias, podemos estabelecer uma tabela de contingência. Para isso, precisamos aplicar as duas colunas nas quais estamos interessados em cruzar para a função de <code rend="inline">table()</code> como um argumento. Por exemplo, se quisermos saber com que tipo de elementos ou objetos os ataques foram perpetrados, de acordo com a cidade de ocorrência do evento, devemos entrar no console:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_11" corresp="code_visualizacao-animacao-tabelas-historicas-R_11.txt" rend="block"/>
+                    </ab>
+                    <p>Como resultado, obteremos a seguinte tabela:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_12" corresp="code_visualizacao-animacao-tabelas-historicas-R_12.txt" rend="block"/>
+                    </ab>
+                    <p>Há muitas maneiras de tornar a visualização das tabelas de contingência mais fácil, usando pacotes disponíveis no <emph>CRAN</emph>. Um que, sem ser complicado, lhe dará tabelas esteticamente melhoradas é o <ref target="https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html">kableExtra</ref>^[8]^[9]. O procedimento tem duas partes. Primeiro, é preciso formatar a tabela em formato <emph>html</emph> com a função <code rend="inline">kable()</code> e armazená-la em uma variável (por exemplo, <code rend="inline">a59k</code>). Então, deve-se usar esse objeto como argumento para a função <code rend="inline">kable_styling()</code>, que lhe permitirá exibir a tabela e lidar com vários atributos de estilo, tais como tamanho da fonte e cor. Dito isto, tente instalar, carregar e testar esse pacote, e aproveite a oportunidade para adicionar um título à sua tabela com o argumento <code rend="inline">caption</code>:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_13" corresp="code_visualizacao-animacao-tabelas-historicas-R_13.txt" rend="block"/>
+                    </ab>
+                    <p>O resultado aparecerá no <emph>Viewer</emph> e teremos a possibilidade de salvá-lo como uma imagem ou como código html, através da aba <emph>Export</emph>.</p>
+                    <figure>
+                        <desc>Figura 3. A mesma tabela de contingência criada acima, mas com o formato dado pelo pacote kableExtra.</desc>
+                        <graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R3.png"/>
+                    </figure>
+                </div>
+                <div type="1">
+                    <head>Visualização de tabelas com ggplot2</head>
+                    <p>Como mostramos com os gráficos gerados nesta lição, R se sobressai na ilustração de conjuntos de dados. O pacote <ref target="https://ggplot2.tidyverse.org/">ggplot2</ref> ^[10] é um dos pacotes gráficos mais utilizados para aqueles que usam esta linguagem de programação. Tem uma lógica inspirada na chamada gramática dos gráficos (<emph>grammar of graphics</emph>) ^[11] , que consiste no uso de camadas (<emph>layers</emph>), que são ajustadas de acordo com certos parâmetros. Um gráfico é a combinação de camadas, onde cada uma cumpre uma função específica sobre os dados, seus aspectos estéticos (tamanho, forma, cor, etc.), os objetos geométricos que vão representar os dados (pontos, linhas, polígonos, áreas, etc.). Estas três camadas (dados, parâmetros estéticos e representação geométrica) são essenciais, ou seja, não podem estar ausentes. Opcionalmente, é possível modificar os valores padrão de outras camadas, o que lhe permitirá facetar os dados em subgrupos, modificar o tipo de coordenadas, usar funções estatísticas e modificar a aparência geral do gráfico. O pacote <emph>ggplot2</emph> está incluído no Tidyverse e é carregado quando se executa <code rend="inline">library(tidyverse)</code>, portanto, nenhuma instalação adicional é necessária.</p>
+                    <p>Em termos abstratos, uma declaração básica desta gramática gráfica tem a seguinte estrutura: <code rend="inline">ggplot(dados, variáveis) + função geométrica</code>. Os dados correspondem ao objeto de dados que contém as variáveis que queremos visualizar, que para ggplot2 deve estar no formato <emph>data frame</emph>. As variáveis são interpretadas aqui como os parâmetros estéticos (<code rend="inline">aes</code>) nos quais as colunas escolhidas serão representadas (por exemplo, posição nos eixos x e y, tamanho, cor). A função geométrica (<code rend="inline">geom</code>) nos permite escolher o objeto visual com o qual os dados serão representados. Por ser uma lógica de camadas, o sinal <code rend="inline">+</code> permite adicionar tantas camadas quantas forem consideradas necessárias para que o gráfico inclua os elementos entendidos como relevantes.</p>
+                    <p>Se quiser visualizar graficamente a tabela de contingência construída anteriormente, é possível começar fazendo a equivalência de um ataque = um ponto no plano, ao qual a sentença mínima corresponderia:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_14" corresp="code_visualizacao-animacao-tabelas-historicas-R_14.txt" rend="block"/>
+                    </ab>
+                    <p>Com o código acima, o resultado será semelhante ao da Figura 4.</p>
+                    <figure>
+                        <desc>Figura 4. Gráfico de pontos mostrando o cruzamento das variáveis objeto e cidade.</desc>
+                        <graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R4.png"/>
+                    </figure>
+                    <p>Entretanto, deve-se reconhecer que a acumulação de pontos, um em cima do outro, na mesma coordenada (fenômeno conhecido como <emph>overplotting</emph>), resulta em uma visualização pouco útil, pois, ao contrário da tabela, não consegue representar as frequências. Mostra apenas a existência de cruzamentos de variáveis, não quantas vezes elas ocorrem. Em casos como este, é aconselhável substituir a função <code rend="inline">geom_point()</code> por uma que conte o número de ocorrências de cada combinação, para obter uma imagem que lhe dê uma rápida pista sobre as variações na freqüência dos ataques. Para este fim, a <code rend="inline">geom_count()</code> está disponível, o que, além do efeito visual, adiciona uma escala de frequência ao gráfico.</p>
+                    <p>Se também estiver interessado em enriquecer a visualização adicionando etiquetas ao gráfico (dando-lhe um título, mudando os nomes das variáveis nos eixos, etc.), é possível adicionar uma camada com a função <code rend="inline">labs()</code>. Ainda, existe a possibilidade de alterar a aparência geral adicionando uma camada com uma das variantes fornecidas pelas funções <code rend="inline">theme_()</code>, que lhe permitem controlar os elementos não-dados do gráfico. Assim, o resultado obtido será semelhante ao da Figura 5.</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_15" corresp="code_visualizacao-animacao-tabelas-historicas-R_15.txt" rend="block"/>
+                    </ab>
+                    <figure>
+                        <desc>Figura 5. Gráfico de pontos representando a frequência dos ataques, por objeto e cidade. O tamanho dos pontos depende do número de combinações entre o objeto do ataque e a cidade. Pode-se ver que as cidades de Avellaneda e La Plata têm o maior número de ataques, e que foram utilizados explosivos na maioria deles.</desc>
+                        <graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R5.png"/>
+                    </figure>
+                    <p>Para armazenar o gráfico em um ficheiro, há a função <code rend="inline">ggsave()</code>, que salvará sua imagem em seu diretório de trabalho:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_16" corresp="code_visualizacao-animacao-tabelas-historicas-R_16.txt" rend="block"/>
+                    </ab>
+                    <p>Outra maneira de aproveitar os benefícios de visualização de R e evitar a sobreposição de pontos é usar a propriedade <emph>jitter</emph>, que afeta a posição dos pontos. A função gráfica <code rend="inline">geom_jitter()</code> permite adicionar uma pequena variação aleatória à localização de cada ponto; isto é muito útil se estivermos trabalhando com posições discretas e pequenos conjuntos de dados. Para explorar outras capacidades estéticas, tente, por exemplo, definir a cor dos pontos a serem diferentes por cidade, usando o argumento <code rend="inline">colour</code>. Como o argumento deve estar em formato numérico, devemos convertê-lo com <code rend="inline">as.numeric()</code>. Além de definir a coloração, temos a possibilidade de manipular o tamanho dos pontos com o argumento <code rend="inline">size</code>, sua transparência com <code rend="inline">alpha</code> e a distância vertical ou horizontal entre pontos com <code rend="inline">width</code> ou <code rend="inline">height</code>. O gráfico obtido será semelhante ao da Figura 6.</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_17" corresp="code_visualizacao-animacao-tabelas-historicas-R_17.txt" rend="block"/>
+                    </ab>
+                    <figure>
+                        <desc>Figura 6. Gráfico resultante da aplicação da função geom_jitter(). Ele permite visualizar a mesma tendência do gráfico anterior (mais explosivos em Avellaneda e La Plata), mas atribuindo um ponto para cada combinação objeto/cidade para evitar sobreposições.</desc>
+                        <graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R6.png"/>
+                    </figure>
+                </div>
+                <div type="1">
+                    <head>Animando a visualização dos dados com gganimate</head>
+                    <p>Embora existam diferentes pacotes para animar visualizações em R, nós o convidamos a fazê-lo com <ref target="https://gganimate.com/">gganimate</ref>^[12]], que é uma extensão do pacote <emph>ggplot2</emph> que lhe permitirá criar uma animação a partir de um gráfico <emph>ggplot</emph> e ver dinamicamente como seus dados evoluem de acordo com os estados ou com o tempo. As funções centrais do <emph>gganimate</emph> são as funções de transição (<code rend="inline">transition_*()</code>), que permitem especificar como os dados devem ser interpretados em termos de sua animação, ou seja, de acordo com que critérios os quadros (<emph>frames</emph>) a serem animados serão criados.</p>
+                    <p>Para instalar e ativar o pacote, use o código abaixo. Sugerimos também a instalação da última versão do pacote <emph>gifski</emph>. Algumas pessoas relataram problemas gerando animações ao usar uma versão mais antiga que 0.8.6.</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_18" corresp="code_visualizacao-animacao-tabelas-historicas-R_18.txt" rend="block"/>
+                    </ab>
+                    <p>Se quiser gerar uma animação que represente a ocorrência de ataques de acordo com uma progressão no tempo, a função indicada é <code rend="inline">transiton_time()</code>. O procedimento é muito simples: ao código que escrevemos para fazer o gráfico, adicionamos esta função, colocando como argumento a variável temporal, neste caso, a <emph>fecha</emph> (data). Entretanto, a fim de fazer uma visualização mais clara de seus dados, é conveniente que acrescentemos alguns elementos ao código.</p>
+                    <p>Por um lado, como no <emph>gganimate</emph> a animação resultante é um conjunto de imagens (instantâneas) exibidas em séries consecutivas, cada novo quadro (<emph>frame</emph>) - se não dissermos o contrário - quando exibido esconde o anterior e só veremos pontos piscando. Para lidar com isto, temos o grupo de funções <emph>shadow</emph> (sombras), que lhe permite escolher como exibir dados que não correspondem mais ao quadro (<emph>frame</emph>) atual. No caso deste gráfico, a fim de manter todos os dados anteriores em segundo plano, precisamos usar <code rend="inline">shadow_mark(past = TRUE)</code>, o que permite deixar visíveis os quadros já apresentados. Por outro lado, como pode ser bastante difícil entender uma animação sem qualquer indicação do significado de cada ponto de tempo, <emph>gganimate</emph> fornece um conjunto de variáveis para cada <emph>frame (frame variables)</emph>, que podemos inserir nas etiquetas dos gráficos usando a própria sintaxe do pacote <emph>glue</emph>, que usa os símbolos <code rend="inline">{}</code>. Isto lhe fornecerá um conjunto de metadados, dependendo da variante de transição que se tentar. Para <code rend="inline">transition_time()</code>, há <code rend="inline">{frame_time}</code>, que retornará o valor do argumento processado pela função durante o frame atual, ou seja, permitirá visualizar a data correspondente. O código ficaria assim:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_19" corresp="code_visualizacao-animacao-tabelas-historicas-R_19.txt" rend="block"/>
+                    </ab>
+                    <p>Quando inserimos o código diretamente no console, o processo de geração da animação, chamado <emph>rendering</emph> (renderização), começa. Este processo tem uma duração relativa, dependendo do volume de dados e de seu processamento. Neste caso, deve levar apenas alguns segundos, durante os quais vemos uma barra de progresso indicando quanto tempo ainda resta. Quando terminar, na aba <emph>Viewer</emph> da janela de utilidades, poderemos assistir a animação. Se pressionamos o ícone <emph>Show in new window</emph> (mostrar em nova janela), um <emph>gif</emph> será aberto em seu navegador padrão associado, de onde poderemos salvá-lo. Caso se deseje continuar praticando com o console, também é possível salvá-lo com a função <code rend="inline">anim_save()</code>, que salva a última animação em seu diretório de trabalho:</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_20" corresp="code_visualizacao-animacao-tabelas-historicas-R_20.txt" rend="block"/>
+                    </ab>
+                    <p>Para explorar mais possibilidades do pacote <emph>gganimate</emph>, a sugestão é que se atribua o bloco de código para gerar o gráfico a um objeto. Isto lhe dará a possibilidade de lidar com parâmetros como velocidade e pausas na animação por meio da função <code rend="inline">animate()</code>. Com ele, também podemos ajustar o número total de quadros, a duração total e os quadros por segundo. Para experimentar, dê aos <code rend="inline">fps</code> um parâmetro de 5 quadros por segundo e acrescente uma pausa final de 15 segundos com <code rend="inline">end_pause</code>. Isto lhe dará uma animação semelhante à Figura 7.</p>
+                    <ab>
+                        <code lang="language-R" xml:id="code_visualizacao-animacao-tabelas-historicas-R_21" corresp="code_visualizacao-animacao-tabelas-historicas-R_21.txt" rend="block"/>
+                    </ab>
+                    <figure>
+                        <desc>Figura 7. Versão animada do gráfico criado com a função geom_jitter.</desc>
+                        <graphic url="visualizacion-y-animacion-de-tablas-historicas-con-R7.gif"/>
+                    </figure>
+                    <p>Neste ponto e com estes resultados, podemos considerar que foi realizada uma análise exploratória de seus dados e que está em condições de apresentar hipóteses a este respeito. No caso de ter trabalhado, e se o (a) pesquisador (a) se dedica à história das lutas sociais e políticas na Argentina contemporânea, as tabelas de contingência e gráficos estáticos trabalhados nesta lição, por exemplo, permitem encontrar semelhanças entre Avellaneda e La Plata, tanto em termos da frequência dos ataques quanto de seu tipo (em termos do objeto utilizado). Além disso, temos o ritmo temporal (intensidade) dos ataques, o que nos convida a nos concentrar em possíveis padrões ou relações de natureza mais histórica entre casos que normalmente não estão conectados na pesquisa devido a sua diferente estrutura sócio-econômica na época.</p>
+                </div>
+                <div type="1">
+                    <head>Conclusão</head>
+                    <p>Esta lição procurou oferecer uma ideia geral das várias tarefas que devem ser seguidas a fim de preparar e realizar uma primeira análise exploratória de dados sobre uma série de documentos históricos. Este procedimento permite realizar cálculos básicos com estes dados e analisá-los visualmente a fim de pensar, gerar perguntas e hipóteses a partir deles.</p>
+                    <p>Nesta lição, oferecemos apenas um ponto de partida para a análise de suas tabelas históricas. Como um desafio, e com base no que se aprendeu neste tutorial, propomos que se continue a tentar outros cruzamentos de variáveis. Finalmente, te convidamos a descobrir por si próprio o poder do <emph>ggplot</emph> e do <emph>gganimate</emph>, explorando a <ref target="https://gganimate.com/index.html">documentação</ref> deste último pacote para aprender sobre as outras opções disponíveis.</p>
+                </div>
+                <div type="1">
+                    <head>Notas</head>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_1"/> : Roderick Floud, <emph>Métodos cuantitativos para historiadores</emph> (Madrid: Alianza, 1983).</p>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_2"/> : Para encontrar uma referência detalhada do ficheiro no local da Comissão Provincial pela Memória da Província de Buenos Aires: <ref target="https://www.comisionporlamemoria.org/extra/archivo/cuadroclasificacion/">https://www.comisionporlamemoria.org/extra/archivo/cuadroclasificacion/</ref>
+                    </p>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_3"/> : Os fundamentos e o significado da noção de “dados ordenados” podem ser encontrados em: Hadley Wickham, "Tidy Data", <emph>Journal of Statistical Software</emph>, Volume 59, Issue 10, 2019,https://www.jstatsoft.org/index.php/jss/article/view/v059i10/v59i10.pdf)</p>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_4"/> : Hadley Wickham and Jennifer Bryan, "readxl: Read Excel Files. R package version 1.3.1", 2019, <ref target="https://CRAN.R-project.org/package=readxl">https://CRAN.R-project.org/package=readxl</ref>
+                    </p>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_5"/> : Hadley Wickham et al.,"Welcome to the tidyverse", <emph>Journal of Open Source Software</emph>, 4(43), 1686 (2019): 1-5, <ref target="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</ref>
+                    </p>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_6"/> : Lionel Henry and Hadley Wickham, "purrr: Functional Programming Tools. R package version 0.3.4", 2020, <ref target="https://CRAN.R-project.org/package=purrr">https://CRAN.R-project.org/package=purrr</ref>
+                    </p>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_7"/> : Hadley Wickham, Romain François, Lionel Henry and Kirill Müller, "dplyr: A Grammar of Data Manipulation. R package version 1.0.6", CRAN R Project, 2021, <ref target="https://CRAN.R-project.org/package=dplyr">https://CRAN.R-project.org/package=dplyr</ref>
+                    </p>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_8"/> : Hao Zhu, "kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R package version 1.3.2", 2021, <ref target="https://CRAN.R-project.org/package=kableExtra">https://CRAN.R-project.org/package=kableExtra</ref>
+                    </p>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_9"/> : Nota da Tradutora: ao instalar o pacote <emph>kableExtra</emph>, pode ser que o R demande a atualização do pacote <emph>htmltools</emph>
+                    </p>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_10"/> : Hadley Wickham, "ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics", Springer-Verlag New York, 2016, <ref target="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</ref>
+                    </p>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_11"/> : A referência para o conceito é Leland Wilkinson, com seu trabalho <emph>The Grammar of Graphics</emph>, algumas páginas podem ser consultadas em: <ref target="https://www.springer.com/gp/book/9780387245447">https://www.springer.com/gp/book/9780387245447</ref>
+                    </p>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_12"/> : Thomas Lin Pedersen and David Robinson, "gganimate: A Grammar of Animated Graphics. R package version 1.0.7", 2020, <ref target="https://CRAN.R-project.org/package=gganimate">https://CRAN.R-project.org/package=gganimate</ref>
+                    </p>
+                </div>
+            </div>
+        </body>
+    </text>
 </TEI>

@@ -1,0 +1,145 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="salida-de-datos-como-archivo-html">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Salida de datos como archivo HTML con Python</title>
+                <author role="original_author">
+                    <persName>William J. Turkel</persName>
+                    <persName>Adam Crymble</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Jim Clifford</persName>
+                    <persName>Frederik Elwert</persName>
+                </editor>
+                <author role="translators">Víctor Gayol</author>
+                <editor role="translation-reviewers">
+                    <persName>Jairo A. Melo</persName>
+                    <persName>Maria José Afanador-Llach</persName>
+                    <persName>Antonio Rojas Castro</persName>
+                </editor>
+                <editor role="editors">Miriam Posner</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">03/15/2017</date>
+                <idno type="doi">10.46430/phes0025</idno>
+                <date type="published">07/17/2012</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#output-data-as-html-file"/>.</p>
+                <p>There are other translations: <ref target="#saida-dados-ficheiro-html-python"/>
+                </p>
+                <p>There are other translations: <ref target="#saida-dados-ficheiro-html-python"/>
+                </p>
+                <p>There are other translations: <ref target="#saida-dados-ficheiro-html-python"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Esta lección toma los pares de frecuencia creados en 'Contar frecuencias de palabras con Python' y crea una salida de datos a un archivo HTML.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                    <term xml:lang="en">website</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="es">
+        <body>
+            <div type="2">
+                <head>Objetivo de la lección</head>
+                <p>Esta lección toma los pares de frecuencia creados en <ref target="/es/lecciones/contar-frecuencias">Contar frecuencias de palabras con Python</ref> y crea una salida de datos a un archivo HTML.</p>
+                <p>Aquí aprenderás a crear esta salida de datos como archivo HTML utilizando Python. También aprenderás acerca del formato de cadenas. El resultado final es un archivo HTML que muestra las palabras clave encontradas en la fuente original en orden de frecuencia descendente junto con el número de veces que aparece cada palabra clave.</p>
+            </div>
+            <div type="2">
+                <head>Archivos necesarios para esta lección</head>
+                <list type="unordered">
+                    <item>
+                        <code rend="inline">obo.py</code>
+                    </item>
+                </list>
+                <p>Si no tienes estos archivos de las lecciones anteriores, puedes descargar python-es-lecciones6, un <ref target="/assets/python-es-lecciones6.zip">archivo zip de las lecciones anteriores</ref>.</p>
+            </div>
+            <div type="2">
+                <head>Construcción de un contenedor de HTML</head>
+                <p>En la lección anterior aprendiste cómo etiquetar el mensaje "Hola Mundo" en HTML, escribir el resultado en un archivo y abrirlo automáticamente en el navegador. Un programa que pone códigos de formato alrededor de algo para que pueda ser usado por otro programa es llamado a veces "contenedor" (<emph>wrapper</emph>). Lo que vamos a hacer ahora es desarrollar un contenedor de HTML para la salida de nuestro código que computa frecuencias de palabras. También añadiremos algunos <emph>metadatos</emph> dinámicos útiles para complementar los datos de frecuencia recogidos en <ref target="/es/lecciones/contar-frecuencias">Contar frecuencias</ref>.</p>
+            </div>
+            <div type="2">
+                <head>Metadatos</head>
+                <p>La distinción entre datos y metadatos es crucial en las ciencias de la información. Los metadatos son datos acerca de datos. Este concepto ya te debe ser familiar incluso si no has escuchado antes el término. Considera un libro tradicional. Si tomamos el texto del libro como los datos, hay un número de otras características que están asociadas con el texto pero que pueden o no estar impresas en el libro de manera explícita. El título del libro, el autor, el editor y el lugar y fecha de la publicación son metadatos y generalmente están impresos en el trabajo. El lugar y fecha del escrito, el nombre del corrector de estilo, los datos de catalogación de la Biblioteca del Congreso y el nombre del tipo de fuente utilizado para la composición tipográfica, a veces están impresas en él. La persona que compra una copia particular puede escribir o no su nombre en el libro. Si el libro pertenece a la colección de una biblioteca, esa biblioteca mantendrá metadatos adicionales, pero solamente algunos de ellos estarán unidos físicamente al libro. El registro de los préstamos, por ejemplo, se mantiene generalmente en una especie de base de datos y se vincula al libro con un identificador único. Bibliotecas, archivos y museos tienen complejos sistemas para generar y mantener un registro de metadatos.</p>
+                <p>Cuando trabajas con datos digitales es buena idea incorporar metadatos en tus propios archivos siempre que sea posible. Ahora vamos a desarrollar algunas estrategias básicas para hacer que nuestros archivos de datos sean <emph>auto-documentados</emph>. En nuestro contenedor queremos incluir información dinámica acerca del archivo, tales como la hora y fecha en el que fue creado así como un título HTML que es relevante para el archivo. En este caso podríamos darle un nombre nosotros mismos, pero cuando empecemos a trabajar con múltiples archivos, crear automáticamente archivos autodocumentados nos ahorrará mucho tiempo, así que lo practicaremos ahora. Y para ello tendremos que aprender algunas opciones más potentes de formato de cadenas de texto.</p>
+            </div>
+            <div type="2">
+                <head>Formato de cadenas de texto en Python</head>
+                <p>Python incluye un operador especial para formato que te permite insertar una cadena dentro de otra. Está representado por un signo de porcentaje seguido por una "s". Abre el <emph>shell</emph> de Python e intenta los ejemplos siguientes:</p>
+                <ab>
+                    <code xml:id="code_salida-de-datos-como-archivo-html_0" corresp="code_salida-de-datos-como-archivo-html_0.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>También hay una manera que te permite interpolar una lista de cadenas dentro de otra.</p>
+                <ab>
+                    <code xml:id="code_salida-de-datos-como-archivo-html_1" corresp="code_salida-de-datos-como-archivo-html_1.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>En estos ejemplos, un <code rend="inline">%s</code> en una cadena indica que otra cadena será incrustada en ese punto. Hay una serie de otros códigos de formato de cadenas, la mayoría de los cuales permiten introducir números en las cadenas con varios formatos como <code rend="inline">%i</code> para enteros (i.e. 1, 2, 3), <code rend="inline">%f</code> para punto decimal flotante (por ejemplo: 3.023, 4.59, 1.0) y demás. Al utilizar este método podemos introducir información que es única para ese archivo.</p>
+            </div>
+            <div type="2">
+                <head>Archivo de datos auto-documentado</head>
+                <p>Vamos a convertir en funciones algo del código que ya hemos escrito. Uno de ellos descargará el contenido de un URL y nos regresará una cadena de texto en minúsculas de la página Web. Copia este código en el módulo <code rend="inline">obo.py</code>.</p>
+                <ab>
+                    <code xml:id="code_salida-de-datos-como-archivo-html_2" corresp="code_salida-de-datos-como-archivo-html_2.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>También queremos una función que tome una cadena de texto en cualquier orden y la haga el cuerpo de un archivo HTML que se abra automáticamente en Firefox. Esta función debe incluir algunos metadatos básicos, como la hora y la fecha en la que se creó y el nombre del programa que lo creó. Estudia el siguiente código con atención y luego cópialo en el módulo <code rend="inline">obo.py</code>.</p>
+                <div type="3">
+                    <head>Instrucciones para Mac</head>
+                    <p>Si estás usado una Mac asegúrate de incluir la variable de la ruta de nombre de archivo adecuada en la segunda línea del último párrafo del código para reflejar en dónde estás guardando tus archivos.</p>
+                    <ab>
+                        <code xml:id="code_salida-de-datos-como-archivo-html_3" corresp="code_salida-de-datos-como-archivo-html_3.txt" lang="language-python" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Instrucciones para Windows</head>
+                    <ab>
+                        <code xml:id="code_salida-de-datos-como-archivo-html_4" corresp="code_salida-de-datos-como-archivo-html_4.txt" lang="language-python" rend="block"/>
+                    </ab>
+                    <p>***</p>
+                    <p>Ten en cuenta que esta función utiliza el operador de formato de cadenas que apenas aprendimos. Si aún tienes problema con esta idea, echa una mirada al archivo HTML que se abrió en la nueva pestaña de tu Firefox y podrás ver cómo funcionó. Si aún estás atascado en esta parte, échale un ojo a:</p>
+                    <ab>
+                        <code xml:id="code_salida-de-datos-como-archivo-html_5" corresp="code_salida-de-datos-como-archivo-html_5.txt" rend="block"/>
+                    </ab>
+                    <p>en el archivo HTML y rastrea cómo el programa sabe poner ahí el valor del URL.</p>
+                    <p>La función también convoca una biblioteca <code rend="inline">datetime</code> de Python para determinar la hora y fecha actuales. Como el operador de formato de cadena <code rend="inline">%s</code>, esta biblioteca utiliza el <code rend="inline">%</code> como reemplazo de valores. En este caso, <code rend="inline">%Y %m %d %H %M %S</code> representan año, mes, día, hora, minutos y segundos respectivamente. A diferencia de <code rend="inline">%s</code>, el programa determinará para ti el valor de estas variables utilizando el reloj de tu computadora. Es importante que entiendas esta diferencia.</p>
+                    <p>Estos metadatos de fecha junto con el nombre del programa que llamó a la función, se guarda en la etiqueta de título del HTML. El archivo HTML que es creado tiene el mismo nombre que el programa de Python que lo creó pero con la extensión <code rend="inline">.html</code> en vez de <code rend="inline">.py</code>.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Ensamblar todo</head>
+                <p>Ahora podemos crear otra versión de nuestro programa para computar frecuencias. En vez de enviar su salida de datos a un archivo de texto o a una ventana de salida, envía la salida de datos a un archivo HTML que será abierto en una nueva pestaña de Firefox. De ahí, la salida de datos del programa puede agregarse fácilmente como una entrada bibliográfica a Zotero. Escribe o copia el código siguiente en tu editor de texto, guárdalo como <code rend="inline">html-a-frec-3.py</code> y ejecútalo para confirmar que trabaja como se espera.</p>
+                <p>Utiliza lo más apropiado para tu sistema: <code rend="inline">obo.envuelveCadenaenHTMLMac()</code> u <code rend="inline">obo.envuelveCadenaenHTMLWindows()</code>.</p>
+                <ab>
+                    <code xml:id="code_salida-de-datos-como-archivo-html_6" corresp="code_salida-de-datos-como-archivo-html_6.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Observa que intercalamos nuestros pares de frecuencia de palabras con la etiqueta de salto <code rend="inline">&lt;br\&gt;</code> de HTML, la cual actúa como una <emph>nueva línea</emph>. Si todo va bien, deberías ver las mismas frecuencias de palabras que computamos en la última sección pero esta vez en la ventana de tu navegador.</p>
+                <div type="3">
+                    <head>Leturas sugeridas</head>
+                    <list type="unordered">
+                        <item>
+Lutz, Learning Python<list type="unordered">
+                                <item>Re-read and review Chs. 1-17</item>
+                            </list>
+                        </item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Sincronización de código</head>
+                    <p>Para seguir a lo largo de las lecciones futuras es importante que tengas los archivos correctos y programas en el directorio "programming-historian" de tu disco duro. Al final de cada lección puedes descargar el archivo zip "python-es-lecciones" para asegurarte que tienes el código correcto. Si estás trabajando con la versión Mac o Linux de las lecciones deberás abrir el archivo <code rend="inline">obo.py</code> y cambiar "file:///Users/username/Desktop/programming-historian/" a la ruta del directorio de tu propia computadora.</p>
+                    <list type="unordered">
+                        <item>python-es-lecciones7.zip <ref target="/assets/python-es-lecciones7.zip">zip sync</ref>
+                        </item>
+                    </list>
+                </div>
+            </div>
+        </body>
+    </text>
+</TEI>

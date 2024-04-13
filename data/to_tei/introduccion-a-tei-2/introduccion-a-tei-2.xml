@@ -1,440 +1,743 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="introduccion-a-tei-2">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Introducci&#243;n a la codificaci&#243;n de textos en TEI (parte 2)</title>
-  <author role="original_author">Nicol&#225;s Vaughan</author><editor role="reviewers"><persName>David Merino Recalde</persName><persName>Rosa Mar&#237;a Mu&#241;oz Mendo</persName></editor><editor role="editors">Jennifer Isasi</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phes0055</idno><date type="published">11/16/2021</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. This lesson is original.</p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Esta lecci&#243;n (la segunda de dos partes) te ense&#241;a los rudimentos de TEI-XML para codificar textos.</p></abstract><textClass><keywords><term xml:lang="en">data-manipulation</term><term xml:lang="en">website</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="es">
-    <body>
-      <div type="2"><head>Introducci&#243;n</head>
-<p>Esta es la segunda parte de la lecci&#243;n sobre codificaci&#243;n de textos en el lenguaje de marcado <ref target="https://tei-c.org/">TEI</ref>. La <ref target="/es/lecciones/introduccion-a-tei-1">primera</ref> consisti&#243; en una breve introducci&#243;n al concepto de codificaci&#243;n y su importancia en las humanidades digitales, as&#237; como a los documentos <ref target="https://es.wikipedia.org/wiki/Extensible_Markup_Language">XML</ref> y TEI.</p>
-<p>Con el objetivo de ilustrar las posibilidades que ofrece TEI, en esta parte estudiaremos en detalle dos ejemplos de codificaci&#243;n de textos breves.</p>
-<p>Ahora bien, aunque en principio las dos lecciones son independientes, en el sentido en que pueden comprenderse la una sin la otra, es recomendable revisar <ref target="/es/lecciones/introduccion-a-tei-1">la primera parte</ref> antes de seguir con los ejemplos examinados en esta.</p>
-<div type="3"><head>Software que usaremos</head>
-<p>Al igual que en la primera parte, utilizaremos el editor de texto <ref target="https://code.visualstudio.com/">Visual Studio Code</ref> (VS Code, m&#225;s brevemente) y el "plugin" o extensi&#243;n <ref target="https://marketplace.visualstudio.com/items?itemName=rogalmic.vscode-xml-complete">XML Complete</ref>.
-Los detalles de la instalaci&#243;n de lo anterior est&#225;n disponibles en la primera parte de la lecci&#243;n.</p>
-</div></div>
-      <div type="2"><head>Primer ejemplo: una postal</head>
-<p>Consideremos la siguiente <ref target="https://commons.wikimedia.org/wiki/File:Postal_de_Federico_a_Antonio_de_Luna.jpg">postal</ref> de Federico Garc&#237;a Lorca:</p>
-<figure><desc>Postal de Federico Garc&#237;a Lorca</desc><graphic url="introduccion-a-tei-2-01.jpg"/></figure>
-<p>Las postales tienen dos caras: la frontal, que contiene un imagen, y la de atr&#225;s, que contiene la direcci&#243;n, la estampilla y el texto.
-En TEI podr&#237;amos usar dos elementos <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-div.html"><code rend="inline">&lt;div&gt;</code></ref> ("divisi&#243;n") para cada cara.
-De hecho, podr&#237;amos usar el atributo <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.typed.html"><code rend="inline">@type</code></ref> ("tipo")<ref type="footnotemark" target="#note_1"/> para distinguirlas (con los valores <code rend="inline">recto</code> y <code rend="inline">verso</code> respectivamente), as&#237;:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_0" corresp="code_introduccion-a-tei-2_0.txt" lang="language-XML" rend="block"/></ab>
-<p>Para este primer ejemplo trabajaremos con la parte de atr&#225;s. La parte frontal de una postal contiene una imagen y no podr&#237;amos codificarla adecuadamente a menos que contuviera alg&#250;n texto. Podemos identificar al menos cuatro partes estructurales en nuestra postal:</p>
-<list type="unordered">
-<item>El mensaje</item>
-<item>Los saludos</item>
-<item>La direcci&#243;n</item>
-<item>Las estampillas</item>
-</list>
-<p>Recordemos que nuestra codificaci&#243;n no debe ser una representaci&#243;n gr&#225;fica del texto &#8212;es decir, no debe simular c&#243;mo se ve&#8212;, sino una representaci&#243;n sem&#225;ntica.<ref type="footnotemark" target="#note_2"/>
-En ese sentido, podemos usar cuatro elementos <code rend="inline">&lt;div&gt;</code> para cada una de las partes de nuestra postal, sin tener en cuenta su ubicaci&#243;n espacial exacta.
-Si dicha ubicaci&#243;n nos interesara podr&#237;amos valernos de los elementos que TEI ofrece para codificar <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/PH.html#PHFAX">facs&#237;miles digitales</ref>
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Introducción a la codificación de textos en TEI (parte 2)</title>
+                <author role="original_author">Nicolás Vaughan</author>
+                <editor role="reviewers">
+                    <persName>David Merino Recalde</persName>
+                    <persName>Rosa María Muñoz Mendo</persName>
+                </editor>
+                <editor role="editors">Jennifer Isasi</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phes0055</idno>
+                <date type="published">11/16/2021</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Esta lección (la segunda de dos partes) te enseña los rudimentos de TEI-XML para codificar textos.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">website</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="es">
+        <body>
+            <div type="2">
+                <head>Introducción</head>
+                <p>Esta es la segunda parte de la lección sobre codificación de textos en el lenguaje de marcado <ref target="https://tei-c.org/">TEI</ref>. La <ref target="/es/lecciones/introduccion-a-tei-1">primera</ref> consistió en una breve introducción al concepto de codificación y su importancia en las humanidades digitales, así como a los documentos <ref target="https://es.wikipedia.org/wiki/Extensible_Markup_Language">XML</ref> y TEI.</p>
+                <p>Con el objetivo de ilustrar las posibilidades que ofrece TEI, en esta parte estudiaremos en detalle dos ejemplos de codificación de textos breves.</p>
+                <p>Ahora bien, aunque en principio las dos lecciones son independientes, en el sentido en que pueden comprenderse la una sin la otra, es recomendable revisar <ref target="/es/lecciones/introduccion-a-tei-1">la primera parte</ref> antes de seguir con los ejemplos examinados en esta.</p>
+                <div type="3">
+                    <head>Software que usaremos</head>
+                    <p>Al igual que en la primera parte, utilizaremos el editor de texto <ref target="https://code.visualstudio.com/">Visual Studio Code</ref> (VS Code, más brevemente) y el "plugin" o extensión <ref target="https://marketplace.visualstudio.com/items?itemName=rogalmic.vscode-xml-complete">XML Complete</ref>.
+Los detalles de la instalación de lo anterior están disponibles en la primera parte de la lección.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Primer ejemplo: una postal</head>
+                <p>Consideremos la siguiente <ref target="https://commons.wikimedia.org/wiki/File:Postal_de_Federico_a_Antonio_de_Luna.jpg">postal</ref> de Federico García Lorca:</p>
+                <figure>
+                    <desc>Postal de Federico García Lorca</desc>
+                    <graphic url="introduccion-a-tei-2-01.jpg"/>
+                </figure>
+                <p>Las postales tienen dos caras: la frontal, que contiene un imagen, y la de atrás, que contiene la dirección, la estampilla y el texto.
+En TEI podríamos usar dos elementos <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-div.html">
+                        <code rend="inline">&lt;div&gt;</code>
+                    </ref> ("división") para cada cara.
+De hecho, podríamos usar el atributo <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.typed.html">
+                        <code rend="inline">@type</code>
+                    </ref> ("tipo")<ref type="footnotemark" target="#es_note_1"/> para distinguirlas (con los valores <code rend="inline">recto</code> y <code rend="inline">verso</code> respectivamente), así:</p>
+                <ab>
+                    <code lang="language-XML" xml:id="code_introduccion-a-tei-2_0" corresp="code_introduccion-a-tei-2_0.txt" rend="block"/>
+                </ab>
+                <p>Para este primer ejemplo trabajaremos con la parte de atrás. La parte frontal de una postal contiene una imagen y no podríamos codificarla adecuadamente a menos que contuviera algún texto. Podemos identificar al menos cuatro partes estructurales en nuestra postal:</p>
+                <list type="unordered">
+                    <item>El mensaje</item>
+                    <item>Los saludos</item>
+                    <item>La dirección</item>
+                    <item>Las estampillas</item>
+                </list>
+                <p>Recordemos que nuestra codificación no debe ser una representación gráfica del texto —es decir, no debe simular cómo se ve—, sino una representación semántica.<ref type="footnotemark" target="#es_note_2"/>
+En ese sentido, podemos usar cuatro elementos <code rend="inline">&lt;div&gt;</code> para cada una de las partes de nuestra postal, sin tener en cuenta su ubicación espacial exacta.
+Si dicha ubicación nos interesara podríamos valernos de los elementos que TEI ofrece para codificar <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/PH.html#PHFAX">facsímiles digitales</ref>
 (por ahora los pasaremos por alto). Podemos empezar entonces con la siguiente estructura:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_1" corresp="code_introduccion-a-tei-2_1.txt" lang="language-XML" rend="block"/></ab>
-<p>El <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-teiHeader.html"><code rend="inline">&lt;teiHeader&gt;</code></ref> de este c&#243;digo contiene los datos b&#225;sicos de la postal (disponible libremente en la p&#225;gina de <ref target="https://commons.wikimedia.org/">Wikimedia Commons</ref>), as&#237; como los metadatos de la codificaci&#243;n.
-En <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-text.html"><code rend="inline">&lt;text&gt;</code></ref> (texto) hemos incluido los tres elementos <code rend="inline">&lt;div&gt;</code> correspondientes a las partes que hemos identificado.
-Asimismo, hemos asignado los valores <code rend="inline">saludos</code>, <code rend="inline">mensaje</code>, <code rend="inline">direcci&#243;n</code> y <code rend="inline">estampillas</code> (as&#237;, en espa&#241;ol) al atributo <code rend="inline">@type</code>.
-El uso de este atributo es opcional; el documento bien podr&#237;a no tenerlo y seguir siendo v&#225;lido.
+                <ab>
+                    <code lang="language-XML" xml:id="code_introduccion-a-tei-2_1" corresp="code_introduccion-a-tei-2_1.txt" rend="block"/>
+                </ab>
+                <p>El <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-teiHeader.html">
+                        <code rend="inline">&lt;teiHeader&gt;</code>
+                    </ref> de este código contiene los datos básicos de la postal (disponible libremente en la página de <ref target="https://commons.wikimedia.org/">Wikimedia Commons</ref>), así como los metadatos de la codificación.
+En <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-text.html">
+                        <code rend="inline">&lt;text&gt;</code>
+                    </ref> (texto) hemos incluido los tres elementos <code rend="inline">&lt;div&gt;</code> correspondientes a las partes que hemos identificado.
+Asimismo, hemos asignado los valores <code rend="inline">saludos</code>, <code rend="inline">mensaje</code>, <code rend="inline">dirección</code> y <code rend="inline">estampillas</code> (así, en español) al atributo <code rend="inline">@type</code>.
+El uso de este atributo es opcional; el documento bien podría no tenerlo y seguir siendo válido.
 Sin embargo, este atributo nos sirve para distinguir los diferentes tipos de <code rend="inline">&lt;div&gt;</code> en nuestro documento.
-Vale la pena que los codifiquemos &#8212;tal como lo hicimos anteriormente&#8212; solo si esperamos eventualmente valernos de esa informaci&#243;n para algo en concreto, por ejemplo, si quieremos extraer solo la informaci&#243;n de los sellos postales.</p>
-<p>En lugar del atributo <code rend="inline">@type</code>, tambi&#233;n es usual utilizar el atributo global <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.global.html#tei_att.n"><code rend="inline">@n</code></ref> que sirve para enumerar los elementos de un mismo tipo.
+Vale la pena que los codifiquemos —tal como lo hicimos anteriormente— solo si esperamos eventualmente valernos de esa información para algo en concreto, por ejemplo, si quieremos extraer solo la información de los sellos postales.</p>
+                <p>En lugar del atributo <code rend="inline">@type</code>, también es usual utilizar el atributo global <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.global.html#tei_att.n">
+                        <code rend="inline">@n</code>
+                    </ref> que sirve para enumerar los elementos de un mismo tipo.
 Por ejemplo:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_2" corresp="code_introduccion-a-tei-2_2.txt" lang="language-XML" rend="block"/></ab>
-<p>Sin embargo, para nuestros fines el atributo <code rend="inline">@type</code> estar&#225; bien.
+                <ab>
+                    <code lang="language-XML" xml:id="code_introduccion-a-tei-2_2" corresp="code_introduccion-a-tei-2_2.txt" rend="block"/>
+                </ab>
+                <p>Sin embargo, para nuestros fines el atributo <code rend="inline">@type</code> estará bien.
 Continuemos.</p>
-<div type="3"><head>Primer <div>: los saludos
-<p>Puesto que este es un texto manuscrito, ser&#225; importante que tengamos en cuenta los saltos de l&#237;nea.
-Usaremos para ello el elemento de autocerrado <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html"><code rend="inline">&lt;lb/&gt;</code></ref> ("line break" o salto de l&#237;nea).<ref type="footnotemark" target="#note_3"/>
+                <div type="3">
+                    <head>Primer <div>: los saludos
+<p>Puesto que este es un texto manuscrito, será importante que tengamos en cuenta los saltos de línea.
+Usaremos para ello el elemento de autocerrado <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lb.html">
+                                    <code rend="inline">&lt;lb/&gt;</code>
+                                </ref> ("line break" o salto de línea).<ref type="footnotemark" target="#es_note_3"/>
 Empecemos, pues, a codificar el primer <code rend="inline">&lt;div&gt;</code>:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_3" corresp="code_introduccion-a-tei-2_3.txt" lang="language-XML" rend="block"/></ab>
-<p>Si nos fijamos en el c&#243;digo anterior, podremos notar tres cosas:</p>
-<p>Primero, el hijo inmediato del <code rend="inline">&lt;div&gt;</code> es un elemento de p&#225;rrafo <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-p.html"><code rend="inline">&lt;p&gt;</code></ref>.
-La raz&#243;n de esto es que, de acuerdo con <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-div.html">las reglas sem&#225;nticas de TEI para los <code rend="inline">&lt;div&gt;</code></ref>, estos elementos no pueden contener texto plano inmediatamente, sino que deben contener otros elementos (por ejemplo <code rend="inline">&lt;p&gt;</code>).<ref type="footnotemark" target="#note_4"/></p>
-<p>Segundo, el elemento vac&#237;o <code rend="inline">&lt;lb/&gt;</code> va al principio de la l&#237;nea que identifica y no al final como podr&#237;a esperarse.
-Como mencionamos arriba, este tipo de elementos &#8212;denominados "hitos" o "marcadores" ("milestones")&#8212; sirven para indicar lugares liminales en el texto (saltos de l&#237;nea, en este caso, pero tambi&#233;n saltos de p&#225;gina o de columna, entre otros).</p>
-<p>Tercero, los saludos nombran a "Salvador Da." (seguramente Salvador Dal&#237;).
+                            <ab>
+                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_3" corresp="code_introduccion-a-tei-2_3.txt" rend="block"/>
+                            </ab>
+                            <p>Si nos fijamos en el código anterior, podremos notar tres cosas:</p>
+                            <p>Primero, el hijo inmediato del <code rend="inline">&lt;div&gt;</code> es un elemento de párrafo <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-p.html">
+                                    <code rend="inline">&lt;p&gt;</code>
+                                </ref>.
+La razón de esto es que, de acuerdo con <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-div.html">las reglas semánticas de TEI para los <code rend="inline">&lt;div&gt;</code>
+                                </ref>, estos elementos no pueden contener texto plano inmediatamente, sino que deben contener otros elementos (por ejemplo <code rend="inline">&lt;p&gt;</code>).<ref type="footnotemark" target="#es_note_4"/>
+                            </p>
+                            <p>Segundo, el elemento vacío <code rend="inline">&lt;lb/&gt;</code> va al principio de la línea que identifica y no al final como podría esperarse.
+Como mencionamos arriba, este tipo de elementos —denominados "hitos" o "marcadores" ("milestones")— sirven para indicar lugares liminales en el texto (saltos de línea, en este caso, pero también saltos de página o de columna, entre otros).</p>
+                            <p>Tercero, los saludos nombran a "Salvador Da." (seguramente Salvador Dalí).
 Haremos entonces dos cosas.
-Por un lado, pondremos dicho nombre en el contenido de un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-persName.html"><code rend="inline">&lt;persName&gt;</code></ref>.
-Podr&#237;amos hacerlo tambi&#233;n en un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-name.html"><code rend="inline">&lt;name&gt;</code></ref> (nombre), aunque la elecci&#243;n de <code rend="inline">&lt;persName&gt;</code> ("person name", nombre de persona) es sem&#225;nticamente m&#225;s precisa.</p>
-<ab><code xml:id="code_introduccion-a-tei-2_4" corresp="code_introduccion-a-tei-2_4.txt" lang="language-XML" rend="block"/></ab>
-<p>Por otro lado, "Da." (incluido el punto) es una abreviatura para "Dal&#237;".
-TEI nos ofrece el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-abbr.html"><code rend="inline">&lt;abbr&gt;</code></ref> ("abbreviation", abreviatura) para codificar abreviaturas
-y el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-expan.html"><code rend="inline">&lt;expan&gt;</code></ref> ("expansion", expansi&#243;n) para hacer otro tanto con sus expansiones.
-El conjunto de una abreviatura y su expansi&#243;n deben ponerse dentro de un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-choice.html"><code rend="inline">&lt;choice&gt;</code></ref> (elecci&#243;n) a fin de conectarlos, as&#237;:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_5" corresp="code_introduccion-a-tei-2_5.txt" lang="language-XML" rend="block"/></ab>
-<p>Todo el <code rend="inline">&lt;div&gt;</code> quedar&#237;a entonces as&#237;:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_6" corresp="code_introduccion-a-tei-2_6.txt" lang="language-XML" rend="block"/></ab>
-<p>De nuevo, los saltos de l&#237;neas en el c&#243;digo son irrelevantes y los incluimos aqu&#237; para facilitar su legilibilidad.</p>
-<p>Ahora bien, en la imagen de nuestra postal el saludo aparece subrayado.
-&#191;Cu&#225;l es el prop&#243;sito de dicho subrayado?
-En mi opini&#243;n, la raya solo sirve aqu&#237; para separar este texto del resto.
-Su funci&#243;n es estructural, no enf&#225;tica.
-Por esa raz&#243;n no la vamos a codificar; simplemente incluimos estos "saludos" en un <code rend="inline">&lt;div&gt;</code> independiente.
-Sin embargo, si opin&#225;ramos que su funci&#243;n es enf&#225;tica, podr&#237;amos usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-hi.html"><code rend="inline">&lt;hi&gt;</code></ref> ("highlight", resaltado), con el atributo <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.global.rendition.html"><code rend="inline">@rend</code></ref> ("rendition", representaci&#243;n) y el valor <code rend="inline">underline</code> para codificar tal uso enf&#225;tico, as&#237;:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_7" corresp="code_introduccion-a-tei-2_7.txt" lang="language-XML" rend="block"/></ab>
-<h3>Segundo <div>: el mensaje
+Por un lado, pondremos dicho nombre en el contenido de un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-persName.html">
+                                    <code rend="inline">&lt;persName&gt;</code>
+                                </ref>.
+Podríamos hacerlo también en un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-name.html">
+                                    <code rend="inline">&lt;name&gt;</code>
+                                </ref> (nombre), aunque la elección de <code rend="inline">&lt;persName&gt;</code> ("person name", nombre de persona) es semánticamente más precisa.</p>
+                            <ab>
+                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_4" corresp="code_introduccion-a-tei-2_4.txt" rend="block"/>
+                            </ab>
+                            <p>Por otro lado, "Da." (incluido el punto) es una abreviatura para "Dalí".
+TEI nos ofrece el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-abbr.html">
+                                    <code rend="inline">&lt;abbr&gt;</code>
+                                </ref> ("abbreviation", abreviatura) para codificar abreviaturas
+y el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-expan.html">
+                                    <code rend="inline">&lt;expan&gt;</code>
+                                </ref> ("expansion", expansión) para hacer otro tanto con sus expansiones.
+El conjunto de una abreviatura y su expansión deben ponerse dentro de un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-choice.html">
+                                    <code rend="inline">&lt;choice&gt;</code>
+                                </ref> (elección) a fin de conectarlos, así:</p>
+                            <ab>
+                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_5" corresp="code_introduccion-a-tei-2_5.txt" rend="block"/>
+                            </ab>
+                            <p>Todo el <code rend="inline">&lt;div&gt;</code> quedaría entonces así:</p>
+                            <ab>
+                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_6" corresp="code_introduccion-a-tei-2_6.txt" rend="block"/>
+                            </ab>
+                            <p>De nuevo, los saltos de líneas en el código son irrelevantes y los incluimos aquí para facilitar su legilibilidad.</p>
+                            <p>Ahora bien, en la imagen de nuestra postal el saludo aparece subrayado.
+¿Cuál es el propósito de dicho subrayado?
+En mi opinión, la raya solo sirve aquí para separar este texto del resto.
+Su función es estructural, no enfática.
+Por esa razón no la vamos a codificar; simplemente incluimos estos "saludos" en un <code rend="inline">&lt;div&gt;</code> independiente.
+Sin embargo, si opináramos que su función es enfática, podríamos usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-hi.html">
+                                    <code rend="inline">&lt;hi&gt;</code>
+                                </ref> ("highlight", resaltado), con el atributo <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.global.rendition.html">
+                                    <code rend="inline">@rend</code>
+                                </ref> ("rendition", representación) y el valor <code rend="inline">underline</code> para codificar tal uso enfático, así:</p>
+                            <ab>
+                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_7" corresp="code_introduccion-a-tei-2_7.txt" rend="block"/>
+                            </ab>
+                            <h3>Segundo <div>: el mensaje
 <p>Continuemos ahora con el texto del mensaje, que va dentro de nuestro segundo <code rend="inline">&lt;div&gt;</code>.
-Transcribamos las trece l&#237;neas del texto y codifiqu&#233;moslas inicialmente:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_8" corresp="code_introduccion-a-tei-2_8.txt" lang="language-XML" rend="block"/></ab>
-<p>Notemos que no hemos corregido o "normalizado" la ortograf&#237;a en nuestra transcripci&#243;n del texto.
-Esto es importante porque hemos querido capturar al texto mismo, sin mayores intervenciones editoriales, lo que se denomina una "transcripci&#243;n diplom&#225;tica".
-Sin embargo, en el presente caso nos interesa tambi&#233;n intervenir editorialmente el texto, normalizando su ortograf&#237;a.
-Para ello usaremos el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-orig.html"><code rend="inline">&lt;orig&gt;</code></ref> ("original form", forma original) para codificar el texto original (antes de la normalizaci&#243;n),
-y el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-reg.html"><code rend="inline">&lt;reg&gt;</code></ref> ("regularization", regularizaci&#243;n) para codificar el texto regularizado o normalizado.
+Transcribamos las trece líneas del texto y codifiquémoslas inicialmente:</p>
+                                    <ab>
+                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_8" corresp="code_introduccion-a-tei-2_8.txt" rend="block"/>
+                                    </ab>
+                                    <p>Notemos que no hemos corregido o "normalizado" la ortografía en nuestra transcripción del texto.
+Esto es importante porque hemos querido capturar al texto mismo, sin mayores intervenciones editoriales, lo que se denomina una "transcripción diplomática".
+Sin embargo, en el presente caso nos interesa también intervenir editorialmente el texto, normalizando su ortografía.
+Para ello usaremos el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-orig.html">
+                                            <code rend="inline">&lt;orig&gt;</code>
+                                        </ref> ("original form", forma original) para codificar el texto original (antes de la normalización),
+y el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-reg.html">
+                                            <code rend="inline">&lt;reg&gt;</code>
+                                        </ref> ("regularization", regularización) para codificar el texto regularizado o normalizado.
 Como con las abreviaturas y sus expansiones, debemos incluir la pareja de elementos en un elemento <code rend="inline">&lt;choice&gt;</code>:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_9" corresp="code_introduccion-a-tei-2_9.txt" lang="language-XML" rend="block"/></ab>
-<p>Normalicemos entonces todo lo que lo requiera:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_10" corresp="code_introduccion-a-tei-2_10.txt" lang="language-XML" rend="block"/></ab>
-<p>Tenemos tambi&#233;n varios nombres propios: "Antonito", "Dal&#237;", "Antonio", "Paquito" y "Federico".
-Codifiqu&#233;moslos ahora con ayuda del elemento <code rend="inline">&lt;persName&gt;</code>:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_11" corresp="code_introduccion-a-tei-2_11.txt" lang="language-XML" rend="block"/></ab>
-<p>N&#243;tese que en el caso de "Dal&#237;" todo el elemento <code rend="inline">&lt;persName&gt;</code> contiene a la pareja normalizada.</p>
-<ab><code xml:id="code_introduccion-a-tei-2_12" corresp="code_introduccion-a-tei-2_12.txt" lang="language-XML" rend="block"/></ab>
-<p>Aunque no es obligatorio, s&#237; es recomendable hacer expl&#237;cito el idioma del texto principal, en este caso espa&#241;ol.
-Esto lo hacemos con el atributo de XML <code rend="inline">@xml:lang</code> y el valor <ref target="https://iso639-3.sil.org/code/spa"><code rend="inline">spa</code></ref> en el elemento <code rend="inline">&lt;text&gt;</code>:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_13" corresp="code_introduccion-a-tei-2_13.txt" lang="language-XML" rend="block"/></ab>
-<p>Las l&#237;neas 6 y 7 (en el texto de la imagen) contienen texto en otra lengua, el catal&#225;n.
-TEI nos permite codificar el cambio de idioma con el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-foreign.html"><code rend="inline">&lt;foreign&gt;</code></ref>.
-Para identificar el idioma usamos el atributo de XML <code rend="inline">@xml:lang</code> con el valor <ref target="https://iso639-3.sil.org/code/cat"><code rend="inline">cat</code></ref>.
-Esas dos l&#237;neas quedar&#225;n as&#237;:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_14" corresp="code_introduccion-a-tei-2_14.txt" lang="language-XML" rend="block"/></ab>
-<p>Curiosamente, Garc&#237;a Lorca escribi&#243; "moll" en ambos casos, cuando lo correcto en el catal&#225;n ser&#237;a "molt".<ref type="footnotemark" target="#note_5"/>
-En ese caso podemos anotar el "error" usando los elementos <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-sic.html"><code rend="inline">&lt;sic&gt;</code></ref> (as&#237;, en lat&#237;n), para indicar el original, y <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-corr.html"><code rend="inline">&lt;corr&gt;</code></ref> ("correction", correcci&#243;n) para indicar nuestra correcci&#243;n.
-Ambos elementos deben estar encerrados en un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-choice.html"><code rend="inline">&lt;choice&gt;</code></ref>, a fin de que el procesador de XML entienda que constituyen una unidad.
-As&#237; pues, el c&#243;digo anterior quedar&#237;a as&#237;:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_15" corresp="code_introduccion-a-tei-2_15.txt" lang="language-XML" rend="block"/></ab>
-<p>&#191;Qu&#233; m&#225;s podemos codificar aqu&#237;?
-Primero, notemos que hace falta una coma en la l&#237;nea 3 (en el texto de la imagen).
-Introducirla en nuestro documento es tambi&#233;n una forma de intervenci&#243;n editorial, para la que nuevamente usaremos el elemento <code rend="inline">&lt;corr&gt;</code> esta vez solo:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_16" corresp="code_introduccion-a-tei-2_16.txt" lang="language-XML" rend="block"/></ab>
-<p>Eso significa que el editor &#8212;o codificador, en este caso nosotros&#8212; ha introducido <code rend="inline">,</code> en el texto.
-N&#243;tese que no hemos dejado un espacio en blanco entre <code rend="inline">cubistas</code> y <code rend="inline">&lt;corr&gt;,&lt;/corr&gt;</code>.</p>
-<p>Por otro lado, notemos que "Federico", en la l&#237;nea 13 (en el texto de la imagen), es la firma del autor de la postal.
-TEI tiene el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-signed.html"><code rend="inline">&lt;signed&gt;</code></ref> (<emph>signature</emph>, "firma") para codificarlo.
-Si leemos la documentaci&#243;n de TEI, este elemento no puede ser un hijo de <code rend="inline">&lt;p&gt;</code> sino solo de los siguientes elementos:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_17" corresp="code_introduccion-a-tei-2_17.txt" rend="block"/></ab>
-<p>Aqu&#237; usaremos el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-closer.html"><code rend="inline">&lt;closer&gt;</code></ref> (cierre), que codifica el cierre de una carta o postal.
-Lo que haremos ahora ser&#225; sacar el c&#243;digo <code rend="inline">&lt;persName&gt;Federico&lt;/persName&gt;</code> del elemento <code rend="inline">&lt;p&gt;</code> que lo contiene, lo meteremos en un elemento <code rend="inline">&lt;signed&gt;</code> y, finalmente, lo incluiremos en un nuevo elemento <code rend="inline">&lt;closer&gt;</code>:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_18" corresp="code_introduccion-a-tei-2_18.txt" lang="language-XML" rend="block"/></ab>
-<p>Ahora debemos eliminar el <code rend="inline">&lt;lb n="13"/&gt;</code> puesto que los hitos <code rend="inline">&lt;lb/&gt;</code> hacen parte del elemento <code rend="inline">&lt;p&gt;</code>, es decir, son l&#237;neas de un p&#225;rrafo.
-Como hemos sacado la firma del p&#225;rrafo y hemos creado una nueva divisi&#243;n (<code rend="inline">&lt;closer&gt;</code>), ya no es necesario que introduzcamos un nuevo salto de l&#237;nea.
-Dicho con otras palabras, este salto de l&#237;nea cumple una funci&#243;n estructural, al igual que el subrayado de los "saludos" y en la firma misma.
-Sin embargo, si alguien quisiera introducir el <code rend="inline">&lt;lb n="13"/&gt;</code>, bien podr&#237;a hacerlo antes del <code rend="inline">&lt;signed&gt;</code>. TEI no lo proh&#237;be.</p>
-<p>Solo nos queda una cosa por codificar en el mensaje de la postal.
-La palabra "inalterable" (en la l&#237;nea 11) est&#225; subrayada.
-A diferencia de los "saludos" y de la firma, la funci&#243;n del subrayado parece ser en este caso de &#233;nfasis.
+                                    <ab>
+                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_9" corresp="code_introduccion-a-tei-2_9.txt" rend="block"/>
+                                    </ab>
+                                    <p>Normalicemos entonces todo lo que lo requiera:</p>
+                                    <ab>
+                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_10" corresp="code_introduccion-a-tei-2_10.txt" rend="block"/>
+                                    </ab>
+                                    <p>Tenemos también varios nombres propios: "Antonito", "Dalí", "Antonio", "Paquito" y "Federico".
+Codifiquémoslos ahora con ayuda del elemento <code rend="inline">&lt;persName&gt;</code>:</p>
+                                    <ab>
+                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_11" corresp="code_introduccion-a-tei-2_11.txt" rend="block"/>
+                                    </ab>
+                                    <p>Nótese que en el caso de "Dalí" todo el elemento <code rend="inline">&lt;persName&gt;</code> contiene a la pareja normalizada.</p>
+                                    <ab>
+                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_12" corresp="code_introduccion-a-tei-2_12.txt" rend="block"/>
+                                    </ab>
+                                    <p>Aunque no es obligatorio, sí es recomendable hacer explícito el idioma del texto principal, en este caso español.
+Esto lo hacemos con el atributo de XML <code rend="inline">@xml:lang</code> y el valor <ref target="https://iso639-3.sil.org/code/spa">
+                                            <code rend="inline">spa</code>
+                                        </ref> en el elemento <code rend="inline">&lt;text&gt;</code>:</p>
+                                    <ab>
+                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_13" corresp="code_introduccion-a-tei-2_13.txt" rend="block"/>
+                                    </ab>
+                                    <p>Las líneas 6 y 7 (en el texto de la imagen) contienen texto en otra lengua, el catalán.
+TEI nos permite codificar el cambio de idioma con el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-foreign.html">
+                                            <code rend="inline">&lt;foreign&gt;</code>
+                                        </ref>.
+Para identificar el idioma usamos el atributo de XML <code rend="inline">@xml:lang</code> con el valor <ref target="https://iso639-3.sil.org/code/cat">
+                                            <code rend="inline">cat</code>
+                                        </ref>.
+Esas dos líneas quedarán así:</p>
+                                    <ab>
+                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_14" corresp="code_introduccion-a-tei-2_14.txt" rend="block"/>
+                                    </ab>
+                                    <p>Curiosamente, García Lorca escribió "moll" en ambos casos, cuando lo correcto en el catalán sería "molt".<ref type="footnotemark" target="#es_note_5"/>
+En ese caso podemos anotar el "error" usando los elementos <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-sic.html">
+                                            <code rend="inline">&lt;sic&gt;</code>
+                                        </ref> (así, en latín), para indicar el original, y <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-corr.html">
+                                            <code rend="inline">&lt;corr&gt;</code>
+                                        </ref> ("correction", corrección) para indicar nuestra corrección.
+Ambos elementos deben estar encerrados en un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-choice.html">
+                                            <code rend="inline">&lt;choice&gt;</code>
+                                        </ref>, a fin de que el procesador de XML entienda que constituyen una unidad.
+Así pues, el código anterior quedaría así:</p>
+                                    <ab>
+                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_15" corresp="code_introduccion-a-tei-2_15.txt" rend="block"/>
+                                    </ab>
+                                    <p>¿Qué más podemos codificar aquí?
+Primero, notemos que hace falta una coma en la línea 3 (en el texto de la imagen).
+Introducirla en nuestro documento es también una forma de intervención editorial, para la que nuevamente usaremos el elemento <code rend="inline">&lt;corr&gt;</code> esta vez solo:</p>
+                                    <ab>
+                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_16" corresp="code_introduccion-a-tei-2_16.txt" rend="block"/>
+                                    </ab>
+                                    <p>Eso significa que el editor —o codificador, en este caso nosotros— ha introducido <code rend="inline">,</code> en el texto.
+Nótese que no hemos dejado un espacio en blanco entre <code rend="inline">cubistas</code> y <code rend="inline">&lt;corr&gt;,&lt;/corr&gt;</code>.</p>
+                                    <p>Por otro lado, notemos que "Federico", en la línea 13 (en el texto de la imagen), es la firma del autor de la postal.
+TEI tiene el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-signed.html">
+                                            <code rend="inline">&lt;signed&gt;</code>
+                                        </ref> (<emph>signature</emph>, "firma") para codificarlo.
+Si leemos la documentación de TEI, este elemento no puede ser un hijo de <code rend="inline">&lt;p&gt;</code> sino solo de los siguientes elementos:</p>
+                                    <ab>
+                                        <code xml:id="code_introduccion-a-tei-2_17" corresp="code_introduccion-a-tei-2_17.txt" rend="block"/>
+                                    </ab>
+                                    <p>Aquí usaremos el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-closer.html">
+                                            <code rend="inline">&lt;closer&gt;</code>
+                                        </ref> (cierre), que codifica el cierre de una carta o postal.
+Lo que haremos ahora será sacar el código <code rend="inline">&lt;persName&gt;Federico&lt;/persName&gt;</code> del elemento <code rend="inline">&lt;p&gt;</code> que lo contiene, lo meteremos en un elemento <code rend="inline">&lt;signed&gt;</code> y, finalmente, lo incluiremos en un nuevo elemento <code rend="inline">&lt;closer&gt;</code>:</p>
+                                    <ab>
+                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_18" corresp="code_introduccion-a-tei-2_18.txt" rend="block"/>
+                                    </ab>
+                                    <p>Ahora debemos eliminar el <code rend="inline">&lt;lb n="13"/&gt;</code> puesto que los hitos <code rend="inline">&lt;lb/&gt;</code> hacen parte del elemento <code rend="inline">&lt;p&gt;</code>, es decir, son líneas de un párrafo.
+Como hemos sacado la firma del párrafo y hemos creado una nueva división (<code rend="inline">&lt;closer&gt;</code>), ya no es necesario que introduzcamos un nuevo salto de línea.
+Dicho con otras palabras, este salto de línea cumple una función estructural, al igual que el subrayado de los "saludos" y en la firma misma.
+Sin embargo, si alguien quisiera introducir el <code rend="inline">&lt;lb n="13"/&gt;</code>, bien podría hacerlo antes del <code rend="inline">&lt;signed&gt;</code>. TEI no lo prohíbe.</p>
+                                    <p>Solo nos queda una cosa por codificar en el mensaje de la postal.
+La palabra "inalterable" (en la línea 11) está subrayada.
+A diferencia de los "saludos" y de la firma, la función del subrayado parece ser en este caso de énfasis.
 Usaremos el elemento <code rend="inline">&lt;hi&gt;</code> con el atributo <code rend="inline">@rend</code> y el valor <code rend="inline">underline</code> (subrayado) para codificarlo:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_19" corresp="code_introduccion-a-tei-2_19.txt" lang="language-XML" rend="block"/></ab>
-<h3>Tercer <div>: la direcci&#243;n
-<p>TEI nos ofrece el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-address.html"><code rend="inline">&lt;address&gt;</code></ref> (direcci&#243;n), compuesto de varios elementos <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-addrLine.html"><code rend="inline">&lt;addrLine&gt;</code></ref> ("address line", l&#237;nea de direcci&#243;n), para codificar esta informaci&#243;n.
-De acuerdo con la documentaci&#243;n de TEI, <code rend="inline">&lt;address&gt;</code> debe estar contenido en un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-opener.html"><code rend="inline">&lt;opener&gt;</code></ref> (apertura), que sirve para codificar el inicio ("opener") de una carta o postal.
-Nuestro c&#243;digo ser&#225; entonces el siguiente:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_20" corresp="code_introduccion-a-tei-2_20.txt" lang="language-XML" rend="block"/></ab>
-<p>Podemos hacer varias cosas m&#225;s.
-Primero, vamos a expandir las abreviaturas "Sr" y "D." a "Se&#241;or" y "Don", respectivamente.
-Segundo, a&#241;adiremos el punto faltante en "Sr" con un elemento <code rend="inline">&lt;corr&gt;</code>, al igual que hicimos arriba con la coma faltante.
+                                    <ab>
+                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_19" corresp="code_introduccion-a-tei-2_19.txt" rend="block"/>
+                                    </ab>
+                                    <h3>Tercer <div>: la dirección
+<p>TEI nos ofrece el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-address.html">
+                                                    <code rend="inline">&lt;address&gt;</code>
+                                                </ref> (dirección), compuesto de varios elementos <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-addrLine.html">
+                                                    <code rend="inline">&lt;addrLine&gt;</code>
+                                                </ref> ("address line", línea de dirección), para codificar esta información.
+De acuerdo con la documentación de TEI, <code rend="inline">&lt;address&gt;</code> debe estar contenido en un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-opener.html">
+                                                    <code rend="inline">&lt;opener&gt;</code>
+                                                </ref> (apertura), que sirve para codificar el inicio ("opener") de una carta o postal.
+Nuestro código será entonces el siguiente:</p>
+                                            <ab>
+                                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_20" corresp="code_introduccion-a-tei-2_20.txt" rend="block"/>
+                                            </ab>
+                                            <p>Podemos hacer varias cosas más.
+Primero, vamos a expandir las abreviaturas "Sr" y "D." a "Señor" y "Don", respectivamente.
+Segundo, añadiremos el punto faltante en "Sr" con un elemento <code rend="inline">&lt;corr&gt;</code>, al igual que hicimos arriba con la coma faltante.
 Tercero, vamos a codificar "Antonio Luna" como un nombre de persona, con ayuda del elemento <code rend="inline">&lt;persName&gt;</code>.
-Y, cuarto, vamos codificar "Granada" como un nombre de lugar, con ayuda del elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-placeName.html"><code rend="inline">&lt;placeName&gt;</code></ref> (nombre de lugar).</p>
-<p>Finalmente, en la segunda l&#237;nea de la direcci&#243;n, la caligraf&#237;a no es del todo clara &#8212;al menos para m&#237;&#8212;.
-&#191;Dice "Dairo" o "Dar&#237;o"?
+Y, cuarto, vamos codificar "Granada" como un nombre de lugar, con ayuda del elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-placeName.html">
+                                                    <code rend="inline">&lt;placeName&gt;</code>
+                                                </ref> (nombre de lugar).</p>
+                                            <p>Finalmente, en la segunda línea de la dirección, la caligrafía no es del todo clara —al menos para mí—.
+¿Dice "Dairo" o "Darío"?
 Para casos de ilegilibilidad (o dificultad para leer), TEI nos ofrece varias opciones.
-Una es usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-unclear.html"><code rend="inline">&lt;unclear&gt;</code></ref> (confuso) para encerrar el texto involucrado.
-Otra es usar el atributo <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.global.responsibility.html"><code rend="inline">@cert</code></ref> (certeza), con los valores <code rend="inline">low</code>, <code rend="inline">mid</code> o <code rend="inline">high</code> (baja, media o alta), para indicar el grado de certeza que tiene quien transcribe o edita con respecto a un cierto texto.
+Una es usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-unclear.html">
+                                                    <code rend="inline">&lt;unclear&gt;</code>
+                                                </ref> (confuso) para encerrar el texto involucrado.
+Otra es usar el atributo <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.global.responsibility.html">
+                                                    <code rend="inline">@cert</code>
+                                                </ref> (certeza), con los valores <code rend="inline">low</code>, <code rend="inline">mid</code> o <code rend="inline">high</code> (baja, media o alta), para indicar el grado de certeza que tiene quien transcribe o edita con respecto a un cierto texto.
 Este atributo se incluye en el elemento inmediatamente superior, en este caso el segundo <code rend="inline">&lt;addrLine&gt;</code>.
-Como el texto dudoso no es toda la l&#237;nea sino solo una palabra, lo m&#225;s conveniente aqu&#237; es usar la opci&#243;n de <code rend="inline">&lt;unclear&gt;</code>.</p>
-<p>El c&#243;digo completo quedar&#237;a as&#237;:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_21" corresp="code_introduccion-a-tei-2_21.txt" lang="language-XML" rend="block"/></ab>
-<h3>Cuarto <div>: los sellos
-<p>El &#250;ltimo <code rend="inline">&lt;div&gt;</code> contiene los sellos postales y dem&#225;s informaci&#243;n impresa.
-Aqu&#237; tenemos tres textos: "TARJETA POSTAL", "CORRESPONDENCIA" y un sello parcialmente legible que quiz&#225;s diga "BARCELONA".
-Para ellos usaremos el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-stamp.html"><code rend="inline">&lt;stamp&gt;</code></ref> (sello) de TEI.
-Seg&#250;n la documentaci&#243;n, puede ir incluido &#8212;entre otras posibilidades&#8212; en un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-ab.html"><code rend="inline">&lt;ab&gt;</code></ref> ("anonymous block", bloque an&#243;nimo).</p>
-<p>Asimismo, encima del sello hallamos un pedazo de una estampilla verde.
-Como no podemos descifrar su contenido, no podemos codificar nada de &#233;l.
-La opci&#243;n m&#225;s com&#250;n ser&#237;a excluirlo por completo del documento TEI.
-Otra opci&#243;n ser&#237;a usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-gap.html"><code rend="inline">&lt;gap&gt;</code></ref> (brecha) para indicar una laguna en el texto.
-Como no tiene contenido (pues no lo conocemos), podemos usar la forma abreviada <code rend="inline">&lt;gap/&gt;</code>.<ref type="footnotemark" target="#note_3"/></p>
-<p>El c&#243;digo completo ser&#237;a:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_22" corresp="code_introduccion-a-tei-2_22.txt" lang="language-XML" rend="block"/></ab>
-<p>Como puede verse, hemos decidido no transcribir en may&#250;sculas estos textos puesto que su representaci&#243;n visual es irrelevante para su contenido.<ref type="footnotemark" target="#note_2"/></p>
-<h3>C&#243;digo completo del documento</h3>
-<p>El <ref target="https://raw.githubusercontent.com/programminghistorian/jekyll/gh-pages/assets/introduccion-a-tei-2/postal.xml">c&#243;digo completo</ref> del documento TEI de la postal es el siguiente:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_23" corresp="code_introduccion-a-tei-2_23.txt" lang="language-XML" rend="block"/></ab>
-<p>Aunque VS Code y BaseX nos dicen que nuestro c&#243;digo es sint&#225;cticamente v&#225;lido en XML, podemos verificar que tambi&#233;n es sem&#225;nticamente v&#225;lido en TEI con ayuda del <ref target="https://teibyexample.org/exist/tools/TBEvalidator.htm">TBE Validation Service</ref>:</p>
-<figure><desc>Validaci&#243;n TEI del c&#243;digo de la postal en TBE Validation Service. El color verde indica que la validaci&#243;n fue exitosa. Si hubiese alg&#250;n error, aparecer&#237;a un mensaje en color rojo.</desc><graphic url="introduccion-a-tei-2-02.png"/></figure>
-<h2>Segundo ejemplo</h2>
-<p>Para nuestro segundo ejemplo hemos escogido un fragmento manuscrito del <emph>Peque&#241;o manual del estudiante de historia universal</emph> (sin fecha), de la escritora colombiana <ref target="https://es.wikipedia.org/wiki/Soledad_Acosta_de_Samper">Soledad Acosta de Samper</ref> (1833-1913).
+Como el texto dudoso no es toda la línea sino solo una palabra, lo más conveniente aquí es usar la opción de <code rend="inline">&lt;unclear&gt;</code>.</p>
+                                            <p>El código completo quedaría así:</p>
+                                            <ab>
+                                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_21" corresp="code_introduccion-a-tei-2_21.txt" rend="block"/>
+                                            </ab>
+                                            <h3>Cuarto <div>: los sellos
+<p>El último <code rend="inline">&lt;div&gt;</code> contiene los sellos postales y demás información impresa.
+Aquí tenemos tres textos: "TARJETA POSTAL", "CORRESPONDENCIA" y un sello parcialmente legible que quizás diga "BARCELONA".
+Para ellos usaremos el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-stamp.html">
+                                                            <code rend="inline">&lt;stamp&gt;</code>
+                                                        </ref> (sello) de TEI.
+Según la documentación, puede ir incluido —entre otras posibilidades— en un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-ab.html">
+                                                            <code rend="inline">&lt;ab&gt;</code>
+                                                        </ref> ("anonymous block", bloque anónimo).</p>
+                                                    <p>Asimismo, encima del sello hallamos un pedazo de una estampilla verde.
+Como no podemos descifrar su contenido, no podemos codificar nada de él.
+La opción más común sería excluirlo por completo del documento TEI.
+Otra opción sería usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-gap.html">
+                                                            <code rend="inline">&lt;gap&gt;</code>
+                                                        </ref> (brecha) para indicar una laguna en el texto.
+Como no tiene contenido (pues no lo conocemos), podemos usar la forma abreviada <code rend="inline">&lt;gap/&gt;</code>.<ref type="footnotemark" target="#es_note_3"/>
+                                                    </p>
+                                                    <p>El código completo sería:</p>
+                                                    <ab>
+                                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_22" corresp="code_introduccion-a-tei-2_22.txt" rend="block"/>
+                                                    </ab>
+                                                    <p>Como puede verse, hemos decidido no transcribir en mayúsculas estos textos puesto que su representación visual es irrelevante para su contenido.<ref type="footnotemark" target="#es_note_2"/>
+                                                    </p>
+                                                    <h3>Código completo del documento</h3>
+                                                    <p>El <ref target="https://raw.githubusercontent.com/programminghistorian/jekyll/gh-pages/assets/introduccion-a-tei-2/postal.xml">código completo</ref> del documento TEI de la postal es el siguiente:</p>
+                                                    <ab>
+                                                        <code lang="language-XML" xml:id="code_introduccion-a-tei-2_23" corresp="code_introduccion-a-tei-2_23.txt" rend="block"/>
+                                                    </ab>
+                                                    <p>Aunque VS Code y BaseX nos dicen que nuestro código es sintácticamente válido en XML, podemos verificar que también es semánticamente válido en TEI con ayuda del <ref target="https://teibyexample.org/exist/tools/TBEvalidator.htm">TBE Validation Service</ref>:</p>
+                                                    <figure>
+                                                        <desc>Validación TEI del código de la postal en TBE Validation Service. El color verde indica que la validación fue exitosa. Si hubiese algún error, aparecería un mensaje en color rojo.</desc>
+                                                        <graphic url="introduccion-a-tei-2-02.png"/>
+                                                    </figure>
+                                                    <h2>Segundo ejemplo</h2>
+                                                    <p>Para nuestro segundo ejemplo hemos escogido un fragmento manuscrito del <emph>Pequeño manual del estudiante de historia universal</emph> (sin fecha), de la escritora colombiana <ref target="https://es.wikipedia.org/wiki/Soledad_Acosta_de_Samper">Soledad Acosta de Samper</ref> (1833-1913).
 Este fragmento es muy interesante para nuestros fines, pues introduce notas y correcciones, entre otros rasgos textuales.
 Como veremos, TEI nos permite trabajar con todos ellos.</p>
-<p>La imagen de la p&#225;gina 59 disponible libremente en la Biblioteca Digital Soledad Acosta de Samper es la siguiente:</p>
-<figure><desc>Imagen del manuscrito 'Peque&#241;o manual del estudiante de historia universal' de Soledad Acosta de Samper, tomo 1, p. 59</desc><graphic url="introduccion-a-tei-2-03.png"/></figure>
-<h3>El &lt;teiHeader&gt;</h3>
-<p>En este caso el <code rend="inline">&lt;teiHeader&gt;</code> de nuestro documento ser&#225; el siguiente:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_24" corresp="code_introduccion-a-tei-2_24.txt" rend="block"/></ab>
-<p>Como solo hemos codificado un p&#225;gina para este ejercicio, la hemos indicado expl&#237;citamente en los metadatos de nuestro documento.
-Si quisi&#233;ramos codificar todo el texto de Soledad Acosta, no ser&#237;a necesario explicitar dicha informaci&#243;n.
-Por otro lado, puesto que nuestro texto objeto es un manuscrito cuyo lugar y fecha de elaboraci&#243;n nos son desconocidos, debemos dejar eso claro en el <code rend="inline">&lt;sourceDesc&gt;</code>.</p>
-<h3>El &lt;text&gt;</h3>
-<p>Con respecto al cuerpo del texto &#8212;que se encuentra contenido en el elemento <code rend="inline">&lt;text&gt;</code> del documento, como ya hemos visto&#8212;, lo primero que haremos ser&#225; identificar los tipos de texto seg&#250;n su funci&#243;n estructural.
-A primera vista podemos hallar ocho tipos b&#225;sicos, ilustrados con colores y n&#250;meros en la siguiente imagen:</p>
-<p>{% include figure.html filename="introduccion-a-tei-2-04.png" caption="An&#225;lisis de la p.59" alt = "Imagen del manuscrito en que se destacan en diferentes colores los ocho tipos de texto identificados"%}</p>
-<p>Los textos son los siguientes:</p>
-<list type="ordered">
-<item>Nota marginal</item>
-<item>T&#237;tulo (encabezado) de la secci&#243;n</item>
-<item>Paginaci&#243;n</item>
-<item>Texto principal</item>
-<item>Correcci&#243;n (dentro del texto principal)</item>
-<item>Cita (dentro de la correcci&#243;n)</item>
-<item>Nota a pie explicatoria (con referencia bibliogr&#225;fica)</item>
-<item>Nota a pie bibliogr&#225;fica</item>
-</list>
-<p>Podemos ver que los textos 1, 7 y 8 son notas textuales &#8212;la primera marginal, las otras dos a pie de p&#225;gina&#8212; y est&#225;n en cierto modo "ancladas" en los textos que anotan.
-Eso significa que aunque visualmente puedan parecer desarticulados y separados del texto principal (textos 4, 5 y 6), estructuralmente hablando los tres forman parte de &#233;l.
-De nuevo, su representaci&#243;n visual &#8212;esto es, su dise&#241;o gr&#225;fico en la composici&#243;n de la p&#225;gina&#8212; es independiente de su funci&#243;n y categor&#237;a estructural con respecto al texto.</p>
-<div type="4"><head>La paginaci&#243;n (texto 3)</head>
-<p>En nuestro texto podemos distinguir dos formas de paginaci&#243;n.
-La primera es la "visual", esto es, los n&#250;meros 47 y 59 que aparecen escritos &#8212;por manos diferentes&#8212; en la esquina superior derecha de la p&#225;gina.
-Es probable que el n&#250;mero 47 corresponda a una primera paginaci&#243;n del manuscrito hecha por la autora misma, y que el n&#250;mero 59 corresponda a una paginaci&#243;n posterior hecha quiz&#225;s por la Biblioteca Nacional de Colombia (o por alg&#250;n propietario/lector anterior del manuscrito).</p>
-<p>La segunda forma de paginaci&#243;n es la l&#243;gica (o estructural), esto es, el puesto que la p&#225;gina o folio ocupa en la secuencia ordenada del texto completo del manuscrito.
-Si examinamos el PDF del manuscrito completo, podemos ver que la paginaci&#243;n l&#243;gica parece coincidir en l&#237;neas generales con la del segundo n&#250;mero de la paginaci&#243;n visual (59, en nuestro caso).Vale notar que la Biblioteca Nacional de Colombia ha eliminado del PDF las p&#225;ginas en blanco, seguramente para reducir su tama&#241;o.</p>
-<p>Ahora bien, hay editores/codificadores &#8212;con quienes yo estoy de acuerdo&#8212; que consideran innecesario incluir expl&#237;citamente la primera forma de paginaci&#243;n, debido a que por lo general esta solo cumple una funci&#243;n estructural y por lo tanto ya se halla expl&#237;citamente incluida en la segunda.
+                                                    <p>La imagen de la página 59 disponible libremente en la Biblioteca Digital Soledad Acosta de Samper es la siguiente:</p>
+                                                    <figure>
+                                                        <desc>Imagen del manuscrito 'Pequeño manual del estudiante de historia universal' de Soledad Acosta de Samper, tomo 1, p. 59</desc>
+                                                        <graphic url="introduccion-a-tei-2-03.png"/>
+                                                    </figure>
+                                                    <h3>El &lt;teiHeader&gt;</h3>
+                                                    <p>En este caso el <code rend="inline">&lt;teiHeader&gt;</code> de nuestro documento será el siguiente:</p>
+                                                    <ab>
+                                                        <code xml:id="code_introduccion-a-tei-2_24" corresp="code_introduccion-a-tei-2_24.txt" rend="block"/>
+                                                    </ab>
+                                                    <p>Como solo hemos codificado un página para este ejercicio, la hemos indicado explícitamente en los metadatos de nuestro documento.
+Si quisiéramos codificar todo el texto de Soledad Acosta, no sería necesario explicitar dicha información.
+Por otro lado, puesto que nuestro texto objeto es un manuscrito cuyo lugar y fecha de elaboración nos son desconocidos, debemos dejar eso claro en el <code rend="inline">&lt;sourceDesc&gt;</code>.</p>
+                                                    <h3>El &lt;text&gt;</h3>
+                                                    <p>Con respecto al cuerpo del texto —que se encuentra contenido en el elemento <code rend="inline">&lt;text&gt;</code> del documento, como ya hemos visto—, lo primero que haremos será identificar los tipos de texto según su función estructural.
+A primera vista podemos hallar ocho tipos básicos, ilustrados con colores y números en la siguiente imagen:</p>
+                                                    <p>{% include figure.html filename="introduccion-a-tei-2-04.png" caption="Análisis de la p.59" alt = "Imagen del manuscrito en que se destacan en diferentes colores los ocho tipos de texto identificados"%}</p>
+                                                    <p>Los textos son los siguientes:</p>
+                                                    <list type="ordered">
+                                                        <item>Nota marginal</item>
+                                                        <item>Título (encabezado) de la sección</item>
+                                                        <item>Paginación</item>
+                                                        <item>Texto principal</item>
+                                                        <item>Corrección (dentro del texto principal)</item>
+                                                        <item>Cita (dentro de la corrección)</item>
+                                                        <item>Nota a pie explicatoria (con referencia bibliográfica)</item>
+                                                        <item>Nota a pie bibliográfica</item>
+                                                    </list>
+                                                    <p>Podemos ver que los textos 1, 7 y 8 son notas textuales —la primera marginal, las otras dos a pie de página— y están en cierto modo "ancladas" en los textos que anotan.
+Eso significa que aunque visualmente puedan parecer desarticulados y separados del texto principal (textos 4, 5 y 6), estructuralmente hablando los tres forman parte de él.
+De nuevo, su representación visual —esto es, su diseño gráfico en la composición de la página— es independiente de su función y categoría estructural con respecto al texto.</p>
+                                                    <div type="4">
+                                                        <head>La paginación (texto 3)</head>
+                                                        <p>En nuestro texto podemos distinguir dos formas de paginación.
+La primera es la "visual", esto es, los números 47 y 59 que aparecen escritos —por manos diferentes— en la esquina superior derecha de la página.
+Es probable que el número 47 corresponda a una primera paginación del manuscrito hecha por la autora misma, y que el número 59 corresponda a una paginación posterior hecha quizás por la Biblioteca Nacional de Colombia (o por algún propietario/lector anterior del manuscrito).</p>
+                                                        <p>La segunda forma de paginación es la lógica (o estructural), esto es, el puesto que la página o folio ocupa en la secuencia ordenada del texto completo del manuscrito.
+Si examinamos el PDF del manuscrito completo, podemos ver que la paginación lógica parece coincidir en líneas generales con la del segundo número de la paginación visual (59, en nuestro caso).Vale notar que la Biblioteca Nacional de Colombia ha eliminado del PDF las páginas en blanco, seguramente para reducir su tamaño.</p>
+                                                        <p>Ahora bien, hay editores/codificadores —con quienes yo estoy de acuerdo— que consideran innecesario incluir explícitamente la primera forma de paginación, debido a que por lo general esta solo cumple una función estructural y por lo tanto ya se halla explícitamente incluida en la segunda.
 (Del mismo modo que el subrayado puede indicar un rasgo estructural y por lo tanto no ha de codificarse por separado con un elemento <code rend="inline">&lt;hi @rend="underline"&gt;</code>, por ejemplo.)</p>
-<p>En aras de la exhaustividad codificaremos ambas paginaciones para este ejemplo.
-Para la primera usaremos dos elementos <code rend="inline">&lt;ab&gt;</code><ref type="footnotemark" target="#note_4"/> dentro de un elemento <code rend="inline">&lt;div&gt;</code> que los incluye juntos; para la segunda usaremos el hito <code rend="inline">&lt;pb/&gt;</code> ("page break", salto de p&#225;gina) con el atributo <code rend="inline">@n="59"</code>:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_25" corresp="code_introduccion-a-tei-2_25.txt" lang="language-XML" rend="block"/></ab>
-<p>Vamos a poner el hito <code rend="inline">&lt;pb/&gt;</code> justo al principio de la p&#225;gina, porque de lo contrario indicar&#237;amos que los n&#250;meros (aquellos dos escritos por distintas personas) est&#225;n en la p&#225;gina anterior.</p>
-<p>TEI tiene <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/PH.html#PHDH">diversas formas</ref> para indicar la identidad de las personas que escriben un documento.
-En cr&#237;tica textual se las denomina "manos" cuando se trata de un texto manuscrito.
-Podemos usar el atributo <code rend="inline">@hand</code> en muchos de los elementos de TEI para hacer expl&#237;cita esta responsabilidad.</p>
-<p>En el caso de los n&#250;meros de p&#225;gina, claramente hay dos manos involucradas.
-Podemos codificarlas as&#237;:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_26" corresp="code_introduccion-a-tei-2_26.txt" lang="language-XML" rend="block"/></ab>
-<p>El signo de numeral (<code rend="inline">#</code>) significa que estamos haciendo referencia a un valor previamente definido.
+                                                        <p>En aras de la exhaustividad codificaremos ambas paginaciones para este ejemplo.
+Para la primera usaremos dos elementos <code rend="inline">&lt;ab&gt;</code>
+                                                            <ref type="footnotemark" target="#es_note_4"/> dentro de un elemento <code rend="inline">&lt;div&gt;</code> que los incluye juntos; para la segunda usaremos el hito <code rend="inline">&lt;pb/&gt;</code> ("page break", salto de página) con el atributo <code rend="inline">@n="59"</code>:</p>
+                                                        <ab>
+                                                            <code lang="language-XML" xml:id="code_introduccion-a-tei-2_25" corresp="code_introduccion-a-tei-2_25.txt" rend="block"/>
+                                                        </ab>
+                                                        <p>Vamos a poner el hito <code rend="inline">&lt;pb/&gt;</code> justo al principio de la página, porque de lo contrario indicaríamos que los números (aquellos dos escritos por distintas personas) están en la página anterior.</p>
+                                                        <p>TEI tiene <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/PH.html#PHDH">diversas formas</ref> para indicar la identidad de las personas que escriben un documento.
+En crítica textual se las denomina "manos" cuando se trata de un texto manuscrito.
+Podemos usar el atributo <code rend="inline">@hand</code> en muchos de los elementos de TEI para hacer explícita esta responsabilidad.</p>
+                                                        <p>En el caso de los números de página, claramente hay dos manos involucradas.
+Podemos codificarlas así:</p>
+                                                        <ab>
+                                                            <code lang="language-XML" xml:id="code_introduccion-a-tei-2_26" corresp="code_introduccion-a-tei-2_26.txt" rend="block"/>
+                                                        </ab>
+                                                        <p>El signo de numeral (<code rend="inline">#</code>) significa que estamos haciendo referencia a un valor previamente definido.
 Esta es la manera de codificar manos en TEI usando el atributo @hand. El signo de numeral <code rend="inline">#</code> significa que estamos haciendo referencia a un valor previamente definido.
-Aunque a&#250;n no hayamos definido a qu&#233; se refieren <code rend="inline">SAS</code> y <code rend="inline">BNC</code> (hemos usado las siglas de "Soledad Acosta de Samper" y "Biblioteca Nacional de Colombia", suponiendo que ellos sean los responsables), por ahora queda claro al menos que se trata de dos "manos" diferentes.</p>
-<p>En otro lugar de nuestro documento TEI podemos definir esas referencias, usando el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-listPerson.html"><code rend="inline">listPerson</code></ref> ("list of persons", lista de personas).
-Un buen lugar para hacerlo es dentro de un tercer hijo de <code rend="inline">&lt;TEI&gt;</code> entre <code rend="inline">&lt;teiHeader&gt;</code> y <code rend="inline">&lt;text&gt;</code>: el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-standOff.html"><code rend="inline">standOff</code></ref>, por ejemplo:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_27" corresp="code_introduccion-a-tei-2_27.txt" lang="language-XML" rend="block"/></ab>
-<p>El atributo <code rend="inline">@hand</code>, cuyos valores son <code rend="inline">#SAS</code> y <code rend="inline">#BNC</code> respectivamente, en &#250;ltimas se refiere a los dos elementos <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-person.html"><code rend="inline">&lt;person&gt;</code></ref> (previamente definidos dentro del elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-listPerson.html"><code rend="inline">&lt;listPerson&gt;</code></ref>) por medio de los atributos gen&#233;ricos de XML <code rend="inline">@xml:id</code>.
-Como dijimos arriba, XML requiere que los valores de <code rend="inline">@xml:id</code> sean &#250;nicos.</p>
-<p>Puesto que la Biblioteca Nacional de Colombia es una instituci&#243;n y no una persona, debemos usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-name.html"><code rend="inline">&lt;name&gt;</code></ref> en lugar del elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-persName.html"><code rend="inline">&lt;persName&gt;</code></ref>.
-Asimismo, si quisi&#233;ramos incluir informaci&#243;n adicional sobre ellos (a&#241;os de nacimiento y de muerte, ocupaci&#243;n, localizaci&#243;n geogr&#225;fica, etc&#233;tera) podr&#237;amos hacerlo dentro del elemento <code rend="inline">&lt;person&gt;</code>.</p>
-<p>Finalmente, n&#243;tese que hemos decidido incluir el atributo <code rend="inline">@hand="#SAS"</code> en el elemento <code rend="inline">&lt;text&gt;</code>, a fin de identificar a Soledad Acosta como la persona que escribi&#243; de su pu&#241;o y letra el manuscrito que estamos codificando.</p>
-</div><div type="4"><head>El texto principal (textos 2, 4, 5 y 6)</head>
-<p>Los textos 4, 5 y 6 forman parte de una secci&#243;n que empieza en esta p&#225;gina, siendo el texto 2 su encabezado.
-Vamos a usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-head.html"><code rend="inline">&lt;head&gt;</code></ref> (encabezado) para codificarlo.
-Sin embargo, lo haremos dentro de un <code rend="inline">&lt;div&gt;</code> que contenga el resto del texto principial.<ref type="footnotemark" target="#note_6"/></p>
-<p>Empecemos entonces transcribiendo el manuscrito en este punto:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_28" corresp="code_introduccion-a-tei-2_28.txt" lang="language-XML" rend="block"/></ab>
-<p>Varias cosas deben se&#241;alarse sobre esta primera versi&#243;n.</p>
-<p>Primero, hemos incluido el hito <code rend="inline">&lt;lb n="1"/&gt;</code> antes del encabezado, puesto que este hace parte del texto principal y es una l&#237;nea que debe contarse.</p>
-<p>Segundo, hemos codificado con el elemento <code rend="inline">&lt;persName&gt;</code> el nombre propio "Mois&#233;s", y con el elemento <code rend="inline">&lt;title&gt;</code> el t&#237;tulo del <emph>G&#233;nesis</emph>.</p>
-<p>Tercero, cuando hay una ruptura de palabra al final de la l&#237;nea no debemos escribir un gui&#243;n (<code rend="inline">-</code>).
-En ese caso debemos usar el atributo <code rend="inline">@break="no"</code> en el siguiente salto de l&#237;nea, para indicar que la palabra no se rompe ah&#237; sino que contin&#250;a en la siguiente l&#237;nea del texto.
-Esto ocurre en las l&#237;neas 4, 7, 9, 10, 11, 15 y 16.</p>
-<p>Cuarto, en la l&#237;nea 11 hemos incluido una coma (con <code rend="inline">&lt;corr&gt;,&lt;/corr&gt;</code>) y en la l&#237;nea 18 hemos se&#241;alado que hay una coma que sobra (usando el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-sic.html"><code rend="inline">&lt;sic&gt;</code></ref>, as&#237;: <code rend="inline">&lt;sic&gt;,&lt;/sic&gt;</code>). Ambas son intervenciones editoriales debidamente codificadas.</p>
-<p>Quinto, en las l&#237;neas 5 y 10-11 hay unas palabras que no hemos entendido bien.
-Las hemos incluido dentro de dos elementos <code rend="inline">&lt;unclear&gt;</code>. N&#243;tese de paso la utilidad del elemento de autocerrado <code rend="inline">&lt;lb/&gt;</code> en la l&#237;nea 11: nos permite encerrar la palabra "coveinentas" en un elemento <code rend="inline">&lt;unclear&gt;</code> sin violar las reglas sint&#225;cticas de XML.</p>
-<p>Sexto, hemos usado temporalmente unos asteriscos en la l&#237;nea 4 para indicar una correcci&#243;n hecha por la autora misma; de hecho, la caligraf&#237;a parece ser la misma en la correcci&#243;n y en el texto principal, por lo que es muy probable que ambas sean de la autora.
-TEI nos permite codificar estas correcciones con el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-add.html"><code rend="inline">&lt;add&gt;</code></ref> ("addition", adici&#243;n), que indica que el texto contenido en &#233;l es un a&#241;adido introducido a modo de correcci&#243;n en el texto objeto, y no una correcci&#243;n editoral nuestra, que como sabemos se codifica con el elemento <code rend="inline">&lt;corr&gt;</code>.
-Usaremos el atributo <code rend="inline">@place="arriba"</code> para se&#241;alar su ubicaci&#243;n en el manuscrito.
-As&#237; pues, la l&#237;nea 4 quedar&#237;a as&#237; en una nueva versi&#243;n del documento:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_29" corresp="code_introduccion-a-tei-2_29.txt" rend="block"/></ab>
-<div type="5"><head>Correcciones</head>
-<p>N&#243;tese que entre las l&#237;neas 3 y 4 la palabra "historiador" parece ser una correcci&#243;n o enmienda.
-La autora parece haber borrado algo en l&#225;piz y luego haberlo corregido con esa palabra.
-Como no podemos descifrar qu&#233; palabra ha sido borrada, debemos usar el elemento de autocerrado <code rend="inline">&lt;gap/&gt;</code>, con los atributos <code rend="inline">@quantity="1"</code> y <code rend="inline">@unit="palabra"</code> para codificar eso.
-Dicho elemento se&#241;ala que hay una laguna textual.</p>
-<p>Ahora bien, para indicar que hay una correcci&#243;n en la que un texto ha sido eliminado y otro ha sido introducido usamos los elementos <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-del.html"><code rend="inline">&lt;del&gt;</code></ref> ("deletion", eliminaci&#243;n) y <code rend="inline">&lt;add&gt;</code>, encerrados juntos en un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-subst.html"><code rend="inline">&lt;subst&gt;</code></ref> ("substition", sustituci&#243;n), que indica una sustituci&#243;n:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_30" corresp="code_introduccion-a-tei-2_30.txt" lang="language-XML" rend="block"/></ab>
-<p>En consecuencia, las l&#237;neas 3 y 4 quedar&#237;an as&#237; en una nueva versi&#243;n de la codificaci&#243;n:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_31" corresp="code_introduccion-a-tei-2_31.txt" rend="block"/></ab>
-<p>Recu&#233;rdese que los saltos de l&#237;nea en XML, as&#237; como el sangrado, no es sem&#225;nticamente significativo, sino que solo se usa para la legibilidad de las personas que leen el texto.
-La l&#237;nea 4 aparece sangrada simplemente para indicar que su inicio (<code rend="inline">riador&lt;/add&gt;</code>) est&#225; contenido en el elemento <code rend="inline">&lt;subst&gt;</code>, que inicia en la l&#237;nea anterior.
-Para el computador &#8212;m&#225;s precisamente para el procesador de XML&#8212; estos sangrados y saltos de l&#237;nea son irrelevantes.</p>
-<p>Las l&#237;neas 13-19 son una correcci&#243;n hecha por la autora.
-Ella recort&#243; una hoja de su cuaderno con la correcci&#243;n y la peg&#243; sobre la hoja de esta p&#225;gina.
-En consecuencia codificaremos esas l&#237;neas dentro de un elemento <code rend="inline">&lt;subst&gt;</code>:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_32" corresp="code_introduccion-a-tei-2_32.txt" lang="language-XML" rend="block"/></ab>
-<p>Hemos indicado con el elemento <code rend="inline">&lt;gap/&gt;</code> que ignoramos el contenido del texto eliminado.
-Con los atributos <code rend="inline">@quantity="7"</code> y <code rend="inline">@unit="l&#237;neas"</code> indicamos su extensi&#243;n.
-Y hemos a&#241;adido finalmente una explicaci&#243;n con el atributo opcional <code rend="inline">@reason="ilegible"</code>.</p>
-</div><div type="5"><head>Citas</head>
-<p>Entre las l&#237;neas 14 y 19 tenemos una cita del libro del <emph>G&#233;nesis</emph>. De hecho, la cita se extiende a la siguiente p&#225;gina del manuscrito, aunque para los fines de este ejemplo supondremos que termina ac&#225;. Para codificarla tenemos a nuestra disposici&#243;n dos posibilidades. La m&#225;s simple es usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html"><code rend="inline">&lt;q&gt;</code></ref> ("quoted", citado), para indicar que hay un texto entre comillas (n&#243;tese que hemos eliminado los signos de <code rend="inline">"</code>, pues estos cumplen estructuralmente la misma funci&#243;n realizada por <code rend="inline">&lt;q&gt;</code>).
-Ser&#237;a entonces algo como esto:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_33" corresp="code_introduccion-a-tei-2_33.txt" lang="language-XML" rend="block"/></ab>
-<p>La segunda posibilidad es un poco m&#225;s sofisticada.
-Podemos usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-cit.html"><code rend="inline">&lt;cit&gt;</code></ref> ("citation", citaci&#243;n)
-para crear una citaci&#243;n que incluya el texto citado (dentro de un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-quote.html"><code rend="inline">&lt;quote&gt;</code></ref>(cita)) y una referencia bibliogr&#225;fica (dentro de un elemento <code rend="inline">&lt;bibl&gt;</code> ("bibliographic citation", citaci&#243;n bibliogr&#225;fica)).<ref type="footnotemark" target="#note_7"/>
+Aunque aún no hayamos definido a qué se refieren <code rend="inline">SAS</code> y <code rend="inline">BNC</code> (hemos usado las siglas de "Soledad Acosta de Samper" y "Biblioteca Nacional de Colombia", suponiendo que ellos sean los responsables), por ahora queda claro al menos que se trata de dos "manos" diferentes.</p>
+                                                        <p>En otro lugar de nuestro documento TEI podemos definir esas referencias, usando el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-listPerson.html">
+                                                                <code rend="inline">listPerson</code>
+                                                            </ref> ("list of persons", lista de personas).
+Un buen lugar para hacerlo es dentro de un tercer hijo de <code rend="inline">&lt;TEI&gt;</code> entre <code rend="inline">&lt;teiHeader&gt;</code> y <code rend="inline">&lt;text&gt;</code>: el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-standOff.html">
+                                                                <code rend="inline">standOff</code>
+                                                            </ref>, por ejemplo:</p>
+                                                        <ab>
+                                                            <code lang="language-XML" xml:id="code_introduccion-a-tei-2_27" corresp="code_introduccion-a-tei-2_27.txt" rend="block"/>
+                                                        </ab>
+                                                        <p>El atributo <code rend="inline">@hand</code>, cuyos valores son <code rend="inline">#SAS</code> y <code rend="inline">#BNC</code> respectivamente, en últimas se refiere a los dos elementos <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-person.html">
+                                                                <code rend="inline">&lt;person&gt;</code>
+                                                            </ref> (previamente definidos dentro del elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-listPerson.html">
+                                                                <code rend="inline">&lt;listPerson&gt;</code>
+                                                            </ref>) por medio de los atributos genéricos de XML <code rend="inline">@xml:id</code>.
+Como dijimos arriba, XML requiere que los valores de <code rend="inline">@xml:id</code> sean únicos.</p>
+                                                        <p>Puesto que la Biblioteca Nacional de Colombia es una institución y no una persona, debemos usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-name.html">
+                                                                <code rend="inline">&lt;name&gt;</code>
+                                                            </ref> en lugar del elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-persName.html">
+                                                                <code rend="inline">&lt;persName&gt;</code>
+                                                            </ref>.
+Asimismo, si quisiéramos incluir información adicional sobre ellos (años de nacimiento y de muerte, ocupación, localización geográfica, etcétera) podríamos hacerlo dentro del elemento <code rend="inline">&lt;person&gt;</code>.</p>
+                                                        <p>Finalmente, nótese que hemos decidido incluir el atributo <code rend="inline">@hand="#SAS"</code> en el elemento <code rend="inline">&lt;text&gt;</code>, a fin de identificar a Soledad Acosta como la persona que escribió de su puño y letra el manuscrito que estamos codificando.</p>
+                                                    </div>
+                                                    <div type="4">
+                                                        <head>El texto principal (textos 2, 4, 5 y 6)</head>
+                                                        <p>Los textos 4, 5 y 6 forman parte de una sección que empieza en esta página, siendo el texto 2 su encabezado.
+Vamos a usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-head.html">
+                                                                <code rend="inline">&lt;head&gt;</code>
+                                                            </ref> (encabezado) para codificarlo.
+Sin embargo, lo haremos dentro de un <code rend="inline">&lt;div&gt;</code> que contenga el resto del texto principial.<ref type="footnotemark" target="#es_note_6"/>
+                                                        </p>
+                                                        <p>Empecemos entonces transcribiendo el manuscrito en este punto:</p>
+                                                        <ab>
+                                                            <code lang="language-XML" xml:id="code_introduccion-a-tei-2_28" corresp="code_introduccion-a-tei-2_28.txt" rend="block"/>
+                                                        </ab>
+                                                        <p>Varias cosas deben señalarse sobre esta primera versión.</p>
+                                                        <p>Primero, hemos incluido el hito <code rend="inline">&lt;lb n="1"/&gt;</code> antes del encabezado, puesto que este hace parte del texto principal y es una línea que debe contarse.</p>
+                                                        <p>Segundo, hemos codificado con el elemento <code rend="inline">&lt;persName&gt;</code> el nombre propio "Moisés", y con el elemento <code rend="inline">&lt;title&gt;</code> el título del <emph>Génesis</emph>.</p>
+                                                        <p>Tercero, cuando hay una ruptura de palabra al final de la línea no debemos escribir un guión (<code rend="inline">-</code>).
+En ese caso debemos usar el atributo <code rend="inline">@break="no"</code> en el siguiente salto de línea, para indicar que la palabra no se rompe ahí sino que continúa en la siguiente línea del texto.
+Esto ocurre en las líneas 4, 7, 9, 10, 11, 15 y 16.</p>
+                                                        <p>Cuarto, en la línea 11 hemos incluido una coma (con <code rend="inline">&lt;corr&gt;,&lt;/corr&gt;</code>) y en la línea 18 hemos señalado que hay una coma que sobra (usando el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-sic.html">
+                                                                <code rend="inline">&lt;sic&gt;</code>
+                                                            </ref>, así: <code rend="inline">&lt;sic&gt;,&lt;/sic&gt;</code>). Ambas son intervenciones editoriales debidamente codificadas.</p>
+                                                        <p>Quinto, en las líneas 5 y 10-11 hay unas palabras que no hemos entendido bien.
+Las hemos incluido dentro de dos elementos <code rend="inline">&lt;unclear&gt;</code>. Nótese de paso la utilidad del elemento de autocerrado <code rend="inline">&lt;lb/&gt;</code> en la línea 11: nos permite encerrar la palabra "coveinentas" en un elemento <code rend="inline">&lt;unclear&gt;</code> sin violar las reglas sintácticas de XML.</p>
+                                                        <p>Sexto, hemos usado temporalmente unos asteriscos en la línea 4 para indicar una corrección hecha por la autora misma; de hecho, la caligrafía parece ser la misma en la corrección y en el texto principal, por lo que es muy probable que ambas sean de la autora.
+TEI nos permite codificar estas correcciones con el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-add.html">
+                                                                <code rend="inline">&lt;add&gt;</code>
+                                                            </ref> ("addition", adición), que indica que el texto contenido en él es un añadido introducido a modo de corrección en el texto objeto, y no una corrección editoral nuestra, que como sabemos se codifica con el elemento <code rend="inline">&lt;corr&gt;</code>.
+Usaremos el atributo <code rend="inline">@place="arriba"</code> para señalar su ubicación en el manuscrito.
+Así pues, la línea 4 quedaría así en una nueva versión del documento:</p>
+                                                        <ab>
+                                                            <code xml:id="code_introduccion-a-tei-2_29" corresp="code_introduccion-a-tei-2_29.txt" rend="block"/>
+                                                        </ab>
+                                                        <div type="5">
+                                                            <head>Correcciones</head>
+                                                            <p>Nótese que entre las líneas 3 y 4 la palabra "historiador" parece ser una corrección o enmienda.
+La autora parece haber borrado algo en lápiz y luego haberlo corregido con esa palabra.
+Como no podemos descifrar qué palabra ha sido borrada, debemos usar el elemento de autocerrado <code rend="inline">&lt;gap/&gt;</code>, con los atributos <code rend="inline">@quantity="1"</code> y <code rend="inline">@unit="palabra"</code> para codificar eso.
+Dicho elemento señala que hay una laguna textual.</p>
+                                                            <p>Ahora bien, para indicar que hay una corrección en la que un texto ha sido eliminado y otro ha sido introducido usamos los elementos <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-del.html">
+                                                                    <code rend="inline">&lt;del&gt;</code>
+                                                                </ref> ("deletion", eliminación) y <code rend="inline">&lt;add&gt;</code>, encerrados juntos en un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-subst.html">
+                                                                    <code rend="inline">&lt;subst&gt;</code>
+                                                                </ref> ("substition", sustitución), que indica una sustitución:</p>
+                                                            <ab>
+                                                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_30" corresp="code_introduccion-a-tei-2_30.txt" rend="block"/>
+                                                            </ab>
+                                                            <p>En consecuencia, las líneas 3 y 4 quedarían así en una nueva versión de la codificación:</p>
+                                                            <ab>
+                                                                <code xml:id="code_introduccion-a-tei-2_31" corresp="code_introduccion-a-tei-2_31.txt" rend="block"/>
+                                                            </ab>
+                                                            <p>Recuérdese que los saltos de línea en XML, así como el sangrado, no es semánticamente significativo, sino que solo se usa para la legibilidad de las personas que leen el texto.
+La línea 4 aparece sangrada simplemente para indicar que su inicio (<code rend="inline">riador&lt;/add&gt;</code>) está contenido en el elemento <code rend="inline">&lt;subst&gt;</code>, que inicia en la línea anterior.
+Para el computador —más precisamente para el procesador de XML— estos sangrados y saltos de línea son irrelevantes.</p>
+                                                            <p>Las líneas 13-19 son una corrección hecha por la autora.
+Ella recortó una hoja de su cuaderno con la corrección y la pegó sobre la hoja de esta página.
+En consecuencia codificaremos esas líneas dentro de un elemento <code rend="inline">&lt;subst&gt;</code>:</p>
+                                                            <ab>
+                                                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_32" corresp="code_introduccion-a-tei-2_32.txt" rend="block"/>
+                                                            </ab>
+                                                            <p>Hemos indicado con el elemento <code rend="inline">&lt;gap/&gt;</code> que ignoramos el contenido del texto eliminado.
+Con los atributos <code rend="inline">@quantity="7"</code> y <code rend="inline">@unit="líneas"</code> indicamos su extensión.
+Y hemos añadido finalmente una explicación con el atributo opcional <code rend="inline">@reason="ilegible"</code>.</p>
+                                                        </div>
+                                                        <div type="5">
+                                                            <head>Citas</head>
+                                                            <p>Entre las líneas 14 y 19 tenemos una cita del libro del <emph>Génesis</emph>. De hecho, la cita se extiende a la siguiente página del manuscrito, aunque para los fines de este ejemplo supondremos que termina acá. Para codificarla tenemos a nuestra disposición dos posibilidades. La más simple es usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-q.html">
+                                                                    <code rend="inline">&lt;q&gt;</code>
+                                                                </ref> ("quoted", citado), para indicar que hay un texto entre comillas (nótese que hemos eliminado los signos de <code rend="inline">"</code>, pues estos cumplen estructuralmente la misma función realizada por <code rend="inline">&lt;q&gt;</code>).
+Sería entonces algo como esto:</p>
+                                                            <ab>
+                                                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_33" corresp="code_introduccion-a-tei-2_33.txt" rend="block"/>
+                                                            </ab>
+                                                            <p>La segunda posibilidad es un poco más sofisticada.
+Podemos usar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-cit.html">
+                                                                    <code rend="inline">&lt;cit&gt;</code>
+                                                                </ref> ("citation", citación)
+para crear una citación que incluya el texto citado (dentro de un elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-quote.html">
+                                                                    <code rend="inline">&lt;quote&gt;</code>
+                                                                </ref>(cita)) y una referencia bibliográfica (dentro de un elemento <code rend="inline">&lt;bibl&gt;</code> ("bibliographic citation", citación bibliográfica)).<ref type="footnotemark" target="#es_note_7"/>
 Su estructura es la siguiente:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_34" corresp="code_introduccion-a-tei-2_34.txt" lang="language-XML" rend="block"/></ab>
-<p>Notemos que &#8212;como en el caso del elemento <code rend="inline">&lt;head&gt;</code> de arriba&#8212; tanto el texto de la cita (dentro de <code rend="inline">&lt;quote&gt;</code>) como el de la referencia bibliogr&#225;fica (dentro de <code rend="inline">&lt;bibl&gt;</code>) deben efectivamente encontrarse en el texto.
-Por fortuna, la autora nos ha proporcionado la informaci&#243;n bibliogr&#225;fica en una nota a pie de p&#225;gina (texto 8). En la siguiente secci&#243;n discutiremos c&#243;mo aclarar que se trata de, adem&#225;s de una cita, de una nota a pie de p&#225;gina. Sin embargo, antes de hacerlo, notemos que debemos corregir "Genesis" por "G&#233;nesis", haciendo uso de los elementos <code rend="inline">&lt;sic&gt;</code> y <code rend="inline">&lt;corr&gt;</code>, dentro de un elemento <code rend="inline">&lt;choice&gt;</code>, tal como lo hicimos anteriormente:<ref type="footnotemark" target="#note_8"/></p>
-<ab><code xml:id="code_introduccion-a-tei-2_35" corresp="code_introduccion-a-tei-2_35.txt" lang="language-XML" rend="block"/></ab>
-<p>Podr&#237;amos entonces codificar la citaci&#243;n as&#237;:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_36" corresp="code_introduccion-a-tei-2_36.txt" lang="language-XML" rend="block"/></ab>
-<p>N&#243;tese la coma que hemos introducido por medio de un elemento <code rend="inline">&lt;corr&gt;</code> para separar el cap&#237;tulo de los vers&#237;culos. La ventaja de esta manera m&#225;s exhaustiva de codificar las citaciones es que hemos vinculado sem&#225;nticamente la cita con su referencia bibliogr&#225;fica, independientemente de c&#243;mo haya sido representada visualmente.</p>
-</div></div><div type="4"><head>Notas textuales (textos 1, 7 y 8)</head>
-<p>Como dijimos arriba, en este fragmento del texto manuscrito tenemos tres notas:
-una marginal (margen izquierdo) y dos a pie de p&#225;gina (margen inferior).
-TEI cuenta con el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-note.html"><code rend="inline">&lt;note&gt;</code></ref> para codificar toda clase de notas textuales.
-Este elemento tiene una variedad de atributos para especificar el tipo de la nota, su funci&#243;n, ubicaci&#243;n, responsable, etc&#233;tera.
-Los m&#225;s importantes para nuestro caso ser&#225;n estos:</p>
-<list type="unordered">
-<item><code rend="inline">@type</code>, el tipo de la nota; para nuestros ejemplo, sus valores podr&#225;n ser <code rend="inline">estructural</code>, <code rend="inline">aclaratoria</code> y <code rend="inline">bibliogr&#225;fica</code></item>
-<item><code rend="inline">@place</code>, el lugar de ubicaci&#243;n: <code rend="inline">margen-izquierdo</code> y <code rend="inline">margen-inferior</code> en nuestro caso</item>
-</list>
-<p>El valor <code rend="inline">estructural</code> para el atributo <code rend="inline">@type</code> de la nota significa que esta sirve para indicar la estructura del texto; en este caso el contenido ser&#225; "La historia antes del Diluvio".
+                                                            <ab>
+                                                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_34" corresp="code_introduccion-a-tei-2_34.txt" rend="block"/>
+                                                            </ab>
+                                                            <p>Notemos que —como en el caso del elemento <code rend="inline">&lt;head&gt;</code> de arriba— tanto el texto de la cita (dentro de <code rend="inline">&lt;quote&gt;</code>) como el de la referencia bibliográfica (dentro de <code rend="inline">&lt;bibl&gt;</code>) deben efectivamente encontrarse en el texto.
+Por fortuna, la autora nos ha proporcionado la información bibliográfica en una nota a pie de página (texto 8). En la siguiente sección discutiremos cómo aclarar que se trata de, además de una cita, de una nota a pie de página. Sin embargo, antes de hacerlo, notemos que debemos corregir "Genesis" por "Génesis", haciendo uso de los elementos <code rend="inline">&lt;sic&gt;</code> y <code rend="inline">&lt;corr&gt;</code>, dentro de un elemento <code rend="inline">&lt;choice&gt;</code>, tal como lo hicimos anteriormente:<ref type="footnotemark" target="#es_note_8"/>
+                                                            </p>
+                                                            <ab>
+                                                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_35" corresp="code_introduccion-a-tei-2_35.txt" rend="block"/>
+                                                            </ab>
+                                                            <p>Podríamos entonces codificar la citación así:</p>
+                                                            <ab>
+                                                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_36" corresp="code_introduccion-a-tei-2_36.txt" rend="block"/>
+                                                            </ab>
+                                                            <p>Nótese la coma que hemos introducido por medio de un elemento <code rend="inline">&lt;corr&gt;</code> para separar el capítulo de los versículos. La ventaja de esta manera más exhaustiva de codificar las citaciones es que hemos vinculado semánticamente la cita con su referencia bibliográfica, independientemente de cómo haya sido representada visualmente.</p>
+                                                        </div>
+                                                    </div>
+                                                    <div type="4">
+                                                        <head>Notas textuales (textos 1, 7 y 8)</head>
+                                                        <p>Como dijimos arriba, en este fragmento del texto manuscrito tenemos tres notas:
+una marginal (margen izquierdo) y dos a pie de página (margen inferior).
+TEI cuenta con el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-note.html">
+                                                                <code rend="inline">&lt;note&gt;</code>
+                                                            </ref> para codificar toda clase de notas textuales.
+Este elemento tiene una variedad de atributos para especificar el tipo de la nota, su función, ubicación, responsable, etcétera.
+Los más importantes para nuestro caso serán estos:</p>
+                                                        <list type="unordered">
+                                                            <item>
+                                                                <code rend="inline">@type</code>, el tipo de la nota; para nuestros ejemplo, sus valores podrán ser <code rend="inline">estructural</code>, <code rend="inline">aclaratoria</code> y <code rend="inline">bibliográfica</code>
+                                                            </item>
+                                                            <item>
+                                                                <code rend="inline">@place</code>, el lugar de ubicación: <code rend="inline">margen-izquierdo</code> y <code rend="inline">margen-inferior</code> en nuestro caso</item>
+                                                        </list>
+                                                        <p>El valor <code rend="inline">estructural</code> para el atributo <code rend="inline">@type</code> de la nota significa que esta sirve para indicar la estructura del texto; en este caso el contenido será "La historia antes del Diluvio".
 Es evidente que no es una nota aclaratoria, sino que sirve casi como encabezado del texto principal (textos 4, 5 y 6).</p>
-<div type="5"><head>Nota estructural (texto 1)</head>
-<p>Su c&#243;digo ser&#225; el siguiente:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_37" corresp="code_introduccion-a-tei-2_37.txt" lang="language-XML" rend="block"/></ab>
-<p>Cabe destacar que no hemos encerrado el texto en un elemento <code rend="inline">&lt;div&gt;</code>.
-&#191;D&#243;nde lo pondremos en nuestro documento, entonces?
-Vamos a considerar que se trata de una nota marginal estructural con respecto a toda la secci&#243;n y, as&#237;, ir&#225; ubicada al principio de esta manera:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_38" corresp="code_introduccion-a-tei-2_38.txt" lang="language-XML" rend="block"/></ab>
-<p>Es importante aclara aqu&#237; que, aunque en el manuscrito este texto aparezca separado por guiones &#8212;ya que de lo contrario no cabr&#237;a en el margen&#8212;, para nosotros esta partici&#243;n no es significativa.
-La raz&#243;n de esto es que dicha partici&#243;n no constituye en s&#237; misma saltos de l&#237;nea (an&#225;logos a los del texto principal).
-En general, la convenci&#243;n es no codificar los saltos de l&#237;nea de los textos perif&#233;ricos &#8212;notas marginales, notas a pie de p&#225;gina&#8212;, sino solo los del texto principal en la p&#225;gina.
-Con todo, nada en TEI impide que codifiquemos cada l&#237;nea en una superficie textual.</p>
-</div><div type="5"><head>Nota aclaratoria (texto 7)</head>
-<p>La segunda nota est&#225; anclada en la l&#237;nea 9 del texto, luego de la palabra "extraordinaria".
-En el manuscrito hay un llamado a pie de p&#225;gina: "(1)".
-Podemos eliminarlo de nuestra codificaci&#243;n, puesto que su funci&#243;n es puramente estructural.
-As&#237; pues, el c&#243;digo ser&#225; el siguiente:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_39" corresp="code_introduccion-a-tei-2_39.txt" lang="language-XML" rend="block"/></ab>
-<p>Como puede verse, hemos incluido los nombres "Mathusalem" y "Lamech" en sendos elementos <code rend="inline">&lt;persName&gt;</code>.</p>
-<p>M&#225;s interesante es el uso del elemento <code rend="inline">&lt;bibl&gt;</code> para introducir "informaci&#243;n bibliogr&#225;fica ligeramente estructurada ("loosely-structured")", como lo define la documentaci&#243;n de TEI.<ref type="footnotemark" target="#note_9"/></p>
-<p>Dentro del elemento <code rend="inline">&lt;bibl&gt;</code> tenemos dos hijos: un elemento <code rend="inline">&lt;title&gt;</code>, que codifica el t&#237;tulo de una obra (en este caso "G&#233;nesis", t&#237;tulo que hemos normalizado a partir de "Genesis" en el manuscrito), y un texto: "Cap. V, ver. 27-29" que dejamos tal cual aparece.
-Como puede verse, todo el <code rend="inline">&lt;bibl&gt;</code> va entre par&#233;ntesis, exactamente como aparece en el manuscrito de la autora.<ref type="footnotemark" target="#note_10"/></p>
-</div><div type="5"><head>Nota bibliogr&#225;fica (texto 8)</head>
-<p>Como vimos antes, la autora nos ha proporcionado amablemente la informaci&#243;n bibliogr&#225;fica para la cita del <emph>G&#233;nesis</emph> contenida en las l&#237;neas 14-19.
-Esa informaci&#243;n est&#225; en una nota a pie de p&#225;gina.
-Lo que haremos ahora es incluir el elemento <code rend="inline">&lt;bibl&gt;</code> de la citaci&#243;n en un elemento <code rend="inline">&lt;note&gt;</code>.
-El c&#243;digo de toda la citaci&#243;n ser&#225; entonces el siguiente:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_40" corresp="code_introduccion-a-tei-2_40.txt" lang="language-XML" rend="block"/></ab>
-<h3>C&#243;digo completo del documento</h3>
-<p>El <ref target="https://raw.githubusercontent.com/programminghistorian/jekyll/gh-pages/assets/introduccion-a-tei-2/Acosta.xml">c&#243;digo completo</ref> del documento TEI del fragmento de Soledad Acosta es este:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_41" corresp="code_introduccion-a-tei-2_41.txt" rend="block"/></ab>
-<p>Aunque VS Code nos dice que nuestro c&#243;digo es sint&#225;cticamente v&#225;lido en XML, podemos verificar que tambi&#233;n es sem&#225;nticamente v&#225;lido en TEI con ayuda del <ref target="https://teibyexample.org/exist/tools/TBEvalidator.htm">TBE Validation Service</ref>:</p>
-<figure><desc>Validaci&#243;n TEI del c&#243;digo del manuscrito de Soledad Acosta en TBE Validation Service. El color verde indica que la validaci&#243;n fue exitosa. Si hubiese alg&#250;n error, aparecer&#237;a un mensaje en color rojo</desc><graphic url="introduccion-a-tei-2-05.png"/></figure>
-<h2>Conclusiones</h2>
-<p>En esta segunda parte de la lecci&#243;n realizamos lo siguiente:</p>
-<list type="ordered">
-<item>
-<p>Pusimos en pr&#225;ctica la teor&#237;a vista en la primera parte</p>
-</item>
-<item>
-<p>Estudiamos dos ejemplos de codificaci&#243;n al lenguaje de marcado TEI-XML: una postal y un manuscrito</p>
-</item>
-<item>
-<p>Discutimos diferentes formas de aprovechar los elementos y atributos ofrecidos por TEI para codificar con precisi&#243;n nuestros dos ejemplos</p>
-</item>
-</list>
-<p>Lo anterior nos permiti&#243; ver las ventajas y posibilidades de TEI para describir y codificar diversos tipos de texto.</p>
-<h2>Ep&#237;logo. Transformaciones b&#225;sicas sin XSLT</h2>
-<p>Ya hemos aprendido a codificar en TEI dos textos simples: una postal y el fragmento de un manuscrito con correcciones y notas.
-&#191;Qu&#233; podemos hacer ahora con dichas codificaciones?</p>
-<p>En su ingenuidad, esta pregunta puede parecer en principio injustificada.
-La codificaci&#243;n es un fin en s&#237; mismo, en la medida en que constituye un ejercicio anal&#237;tico sobre un texto.
-Es m&#225;s, si recordamos las recomendaciones que hemos hecho repetidamente con respecto a distinguir entre marcado de visualizaci&#243;n y marcado sem&#225;ntico, podr&#237;a parecer desatinado preguntarse c&#243;mo podemos visualizar el resultado de nuestra codificaci&#243;n.</p>
-<p>Sin embargo, tambi&#233;n hay que saber que la codificaci&#243;n TEI es solo uno de los pasos en una cadena, probablemente muy extensa, de reutilizaci&#243;n, procesamiento y an&#225;lisis de textos con herramientas de las humanidades digitales.</p>
-<p>En s&#237; mismo, TEI no es m&#225;s que un lenguaje de codificaci&#243;n de textos.
+                                                        <div type="5">
+                                                            <head>Nota estructural (texto 1)</head>
+                                                            <p>Su código será el siguiente:</p>
+                                                            <ab>
+                                                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_37" corresp="code_introduccion-a-tei-2_37.txt" rend="block"/>
+                                                            </ab>
+                                                            <p>Cabe destacar que no hemos encerrado el texto en un elemento <code rend="inline">&lt;div&gt;</code>.
+¿Dónde lo pondremos en nuestro documento, entonces?
+Vamos a considerar que se trata de una nota marginal estructural con respecto a toda la sección y, así, irá ubicada al principio de esta manera:</p>
+                                                            <ab>
+                                                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_38" corresp="code_introduccion-a-tei-2_38.txt" rend="block"/>
+                                                            </ab>
+                                                            <p>Es importante aclara aquí que, aunque en el manuscrito este texto aparezca separado por guiones —ya que de lo contrario no cabría en el margen—, para nosotros esta partición no es significativa.
+La razón de esto es que dicha partición no constituye en sí misma saltos de línea (análogos a los del texto principal).
+En general, la convención es no codificar los saltos de línea de los textos periféricos —notas marginales, notas a pie de página—, sino solo los del texto principal en la página.
+Con todo, nada en TEI impide que codifiquemos cada línea en una superficie textual.</p>
+                                                        </div>
+                                                        <div type="5">
+                                                            <head>Nota aclaratoria (texto 7)</head>
+                                                            <p>La segunda nota está anclada en la línea 9 del texto, luego de la palabra "extraordinaria".
+En el manuscrito hay un llamado a pie de página: "(1)".
+Podemos eliminarlo de nuestra codificación, puesto que su función es puramente estructural.
+Así pues, el código será el siguiente:</p>
+                                                            <ab>
+                                                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_39" corresp="code_introduccion-a-tei-2_39.txt" rend="block"/>
+                                                            </ab>
+                                                            <p>Como puede verse, hemos incluido los nombres "Mathusalem" y "Lamech" en sendos elementos <code rend="inline">&lt;persName&gt;</code>.</p>
+                                                            <p>Más interesante es el uso del elemento <code rend="inline">&lt;bibl&gt;</code> para introducir "información bibliográfica ligeramente estructurada ("loosely-structured")", como lo define la documentación de TEI.<ref type="footnotemark" target="#es_note_9"/>
+                                                            </p>
+                                                            <p>Dentro del elemento <code rend="inline">&lt;bibl&gt;</code> tenemos dos hijos: un elemento <code rend="inline">&lt;title&gt;</code>, que codifica el título de una obra (en este caso "Génesis", título que hemos normalizado a partir de "Genesis" en el manuscrito), y un texto: "Cap. V, ver. 27-29" que dejamos tal cual aparece.
+Como puede verse, todo el <code rend="inline">&lt;bibl&gt;</code> va entre paréntesis, exactamente como aparece en el manuscrito de la autora.<ref type="footnotemark" target="#es_note_10"/>
+                                                            </p>
+                                                        </div>
+                                                        <div type="5">
+                                                            <head>Nota bibliográfica (texto 8)</head>
+                                                            <p>Como vimos antes, la autora nos ha proporcionado amablemente la información bibliográfica para la cita del <emph>Génesis</emph> contenida en las líneas 14-19.
+Esa información está en una nota a pie de página.
+Lo que haremos ahora es incluir el elemento <code rend="inline">&lt;bibl&gt;</code> de la citación en un elemento <code rend="inline">&lt;note&gt;</code>.
+El código de toda la citación será entonces el siguiente:</p>
+                                                            <ab>
+                                                                <code lang="language-XML" xml:id="code_introduccion-a-tei-2_40" corresp="code_introduccion-a-tei-2_40.txt" rend="block"/>
+                                                            </ab>
+                                                            <h3>Código completo del documento</h3>
+                                                            <p>El <ref target="https://raw.githubusercontent.com/programminghistorian/jekyll/gh-pages/assets/introduccion-a-tei-2/Acosta.xml">código completo</ref> del documento TEI del fragmento de Soledad Acosta es este:</p>
+                                                            <ab>
+                                                                <code xml:id="code_introduccion-a-tei-2_41" corresp="code_introduccion-a-tei-2_41.txt" rend="block"/>
+                                                            </ab>
+                                                            <p>Aunque VS Code nos dice que nuestro código es sintácticamente válido en XML, podemos verificar que también es semánticamente válido en TEI con ayuda del <ref target="https://teibyexample.org/exist/tools/TBEvalidator.htm">TBE Validation Service</ref>:</p>
+                                                            <figure>
+                                                                <desc>Validación TEI del código del manuscrito de Soledad Acosta en TBE Validation Service. El color verde indica que la validación fue exitosa. Si hubiese algún error, aparecería un mensaje en color rojo</desc>
+                                                                <graphic url="introduccion-a-tei-2-05.png"/>
+                                                            </figure>
+                                                            <h2>Conclusiones</h2>
+                                                            <p>En esta segunda parte de la lección realizamos lo siguiente:</p>
+                                                            <list type="ordered">
+                                                                <item>
+                                                                    <p>Pusimos en práctica la teoría vista en la primera parte</p>
+                                                                </item>
+                                                                <item>
+                                                                    <p>Estudiamos dos ejemplos de codificación al lenguaje de marcado TEI-XML: una postal y un manuscrito</p>
+                                                                </item>
+                                                                <item>
+                                                                    <p>Discutimos diferentes formas de aprovechar los elementos y atributos ofrecidos por TEI para codificar con precisión nuestros dos ejemplos</p>
+                                                                </item>
+                                                            </list>
+                                                            <p>Lo anterior nos permitió ver las ventajas y posibilidades de TEI para describir y codificar diversos tipos de texto.</p>
+                                                            <h2>Epílogo. Transformaciones básicas sin XSLT</h2>
+                                                            <p>Ya hemos aprendido a codificar en TEI dos textos simples: una postal y el fragmento de un manuscrito con correcciones y notas.
+¿Qué podemos hacer ahora con dichas codificaciones?</p>
+                                                            <p>En su ingenuidad, esta pregunta puede parecer en principio injustificada.
+La codificación es un fin en sí mismo, en la medida en que constituye un ejercicio analítico sobre un texto.
+Es más, si recordamos las recomendaciones que hemos hecho repetidamente con respecto a distinguir entre marcado de visualización y marcado semántico, podría parecer desatinado preguntarse cómo podemos visualizar el resultado de nuestra codificación.</p>
+                                                            <p>Sin embargo, también hay que saber que la codificación TEI es solo uno de los pasos en una cadena, probablemente muy extensa, de reutilización, procesamiento y análisis de textos con herramientas de las humanidades digitales.</p>
+                                                            <p>En sí mismo, TEI no es más que un lenguaje de codificación de textos.
 En consecuencia, TEI nos permite mostrar, transformar, analizar, reutilizar y realizar un sin fin de procesos y procedimientos con los documentos codificados.
-Para eso precisamos de otros lenguajes y otras tecnolog&#237;as, particularmente el lenguaje de transformaciones <ref target="https://www.w3.org/TR/xslt/">XSLT</ref>, al que aludimos l&#237;neas atr&#225;s.
-XSLT es un lenguaje altamente sofisticado cuya explicaci&#243;n no podemos cubrir en esta lecci&#243;n.</p>
-<p>Existen herramientas gratuitas (y comerciales) que nos permiten transformar los documentos TEI en otros formatos.
+Para eso precisamos de otros lenguajes y otras tecnologías, particularmente el lenguaje de transformaciones <ref target="https://www.w3.org/TR/xslt/">XSLT</ref>, al que aludimos líneas atrás.
+XSLT es un lenguaje altamente sofisticado cuya explicación no podemos cubrir en esta lección.</p>
+                                                            <p>Existen herramientas gratuitas (y comerciales) que nos permiten transformar los documentos TEI en otros formatos.
 Entre ellas <ref target="https://teipublisher.com/index.html">teiPublisher</ref>
-(con su <ref target="https://marketplace.visualstudio.com/items?itemName=e-editiones.tei-publisher-vscode">extensi&#243;n para VS Code</ref>)
+(con su <ref target="https://marketplace.visualstudio.com/items?itemName=e-editiones.tei-publisher-vscode">extensión para VS Code</ref>)
 y <ref target="https://github.com/TEIC/CETEIcean">CETEIcean</ref>, que permiten producir aplicaciones web basadas en HTML y CSS bastante elaboradas.
-La instalaci&#243;n y uso de estas dos herramientas supera los l&#237;mites de este breve ep&#237;logo; sin embargo, pr&#243;ximamente <ref target="/es/">Programming Historian</ref> publicar&#225; la tercera parte de esta serie, dedicada al uso de <ref target="https://github.com/TEIC/CETEIcean">CETEIcean</ref>, escrita por Gabriel Calarco y Gimena del R&#237;o Riande.</p>
-<p>Ahora bien, existe otra herramienta para realizar transformaciones llamada  <ref target="https://oxgarage.tei-c.org/">OxGarage</ref>, creada por el consorcio TEI.
-Podemos usar OxGarage en l&#237;nea o tambi&#233;n podemos <ref target="https://github.com/sebastianrahtz/oxgarage">instalarla localmente</ref> en nuestro computador.
-Para nuestros fines usaremos la versi&#243;n en l&#237;nea.</p>
-<p>Antes de comenzar, debemos asegurarnos que nuestros documentos TEI sean sint&#225;ctica y sem&#225;nticamente v&#225;lidos, pues de lo contrario no podr&#225;n ser procesados por OxGarage, ni por ning&#250;n otro procesador. Para ello podemos usar una herramienta como la del <ref target="https://teibyexample.org/exist/tools/TBEvalidator.htm">TBE Validation Service</ref>, mencionada arriba.</p>
-<p>Una vez abierta la p&#225;gina web de OxGarage, haremos clic en la opci&#243;n "Documents":</p>
-<figure><desc>OxGarage: opci&#243;n documentos</desc><graphic url="introduccion-a-tei-2-06.png"/></figure>
-<p>Luego seleccionaremos "TEI P5 XML Document" en la columna "Convert from":</p>
-<figure><desc>OxGarage: formato de entrada</desc><graphic url="introduccion-a-tei-2-07.png"/></figure>
-<p>Entonces nos aparecer&#225; la columna de opciones para elegir el formato de salida, donde tenemos 19 posibilidades: LaTeX, ePub, DOCX, PDF, XHTML, etc&#233;tera.
-Para nuestro ejemplo escojeremos la opci&#243;n "XHTML":</p>
-<figure><desc>OxGarage: formato de salida: xHTML</desc><graphic url="introduccion-a-tei-2-08.png"/></figure>
-<p>Ahora subiremos nuestro documento TEI al servidor, haciendo clic en el bot&#243;n "Seleccionar archivo..." de la izquierda. Si nuestro documento hubiera incluido im&#225;genes, por ejemplo en un facs&#237;mil digital, podr&#237;amos subirlas en un archivo .zip con el bot&#243;n "Browse..." de la derecha.</p>
-<figure><desc>OxGarage: subir el documento</desc><graphic url="introduccion-a-tei-2-09.png"/></figure>
-<p>Finalmente haremos clic en el bot&#243;n "Convert" y esperaremos a que el servidor descargue el resultado en el navegador. Si nada sucede, es probable que exista un error en el documento TEI de entrada; desafortunadamente OxGarage no reporta dichos errores.</p>
-<figure><desc>OxGarage: convertir</desc><graphic url="introduccion-a-tei-2-10.png"/></figure>
-<p>Hagamos la prueba primero con la postal y luego con el fragmento del manuscrito. Podemos abrir los archivos resultantes con extensi&#243;n ".html" en cualquier navegador web, haciendo doble clic sobre ellos en el explorador de archivos.
-Este es el resultado de la transformaci&#243;n para el ejemplo de la postal:</p>
-<figure><desc>OxGarage: XHTML resultante de la postal, abierto en el navegador Firefox</desc><graphic url="introduccion-a-tei-2-11.png"/></figure>
-<p>N&#243;tese c&#243;mo los elementos <code rend="inline">&lt;foreign&gt;</code> han sido representados en cursivas en el XHTML.<ref type="footnotemark" target="#note_11"/></p>
-<p>Y este es el resultado de la transformaci&#243;n para la codificaci&#243;n del manuscrito:</p>
-<figure><desc>OxGarage: xHTML resultante del manuscrito, abierto en el navegador Firefox</desc><graphic url="introduccion-a-tei-2-12.png"/></figure>
-<p>En este caso OxGarage ha usado par&#233;ntesis angulares (<code rend="inline">&#10216;&#10217;</code>) para indicar los a&#241;adidos, incluido un <code rend="inline">[?]</code> luego de las palabras dudosas (correspondientes a los elementos <code rend="inline">&lt;unclear&gt;</code>).</p>
-<p>Estos dos ejemplos de conversi&#243;n pueden parecer algo simples.
-Ciertamente, el motor conversi&#243;n de OxGarage realiza transformaciones XSLT muy elementales y gen&#233;ricas.
-Con todo, OxGarage puede ser muy &#250;til para extraer el texto de codificaciones de documentos extensos, para los cuales a&#250;n no hayamos programado transformaciones XSLT m&#225;s elaboradas.</p>
-<h2>Referencias recomendadas</h2>
-<list type="unordered">
-<item>
-<p>La documentaci&#243;n completa de TEI (los <emph>TEI Guidelines</emph>) est&#225; disponible en la p&#225;gina del consorcio: <ref target="https://tei-c.org/guidelines/">https://tei-c.org/guidelines/</ref> . Si  bien est&#225; disp&#243;nible en varios idiomas, solo est&#225; completa en ingl&#233;s.</p>
-</item>
-<item>
-<p>Una buena introducci&#243;n a TEI es el libro <emph>&#191;Qu&#233; es la iniciativa de codificaci&#243;n de textos? C&#243;mo a&#241;adir marcado inteligente a los recursos digitales</emph> de Lou Burnard (Marsella: OpenEdition Press, 2012/2022) <ref target="https://books.openedition.org/oep/15662">disponible gratuitamente en l&#237;nea</ref>.</p>
-</item>
-<item>
-<p>Un buen tutorial para XML est&#225; disponible en: <ref target="https://www.w3schools.com/xml/">https://www.w3schools.com/xml/</ref> y en: <ref target="https://www.tutorialspoint.com/xml/index.htm">https://www.tutorialspoint.com/xml/index.htm</ref></p>
-</item>
-<item>
-<p>El consorcio TEI tambi&#233;n ofrece una buena introducci&#243;n a XML: <ref target="https://www.tei-c.org/release/doc/tei-p5-doc/en/html/SG.html">https://www.tei-c.org/release/doc/tei-p5-doc/en/html/SG.html</ref></p>
-</item>
-<item>
-<p>La documentaci&#243;n oficial de XML est&#225; disponible en la p&#225;gina del consorcio W3C: <ref target="https://www.w3.org/XML/">https://www.w3.org/XML/</ref> Tambi&#233;n est&#225; disponible la documentaci&#243;n para toda la familia XSL (incluido XSLT): <ref target="https://www.w3.org/Style/XSL/">https://www.w3.org/Style/XSL/</ref></p>
-</item>
-<item>
-<p>La Mozilla Foundation tambi&#233;n ofrece una buena p&#225;gina sobre XSLT y tecnolog&#237;as asociadas: <ref target="https://developer.mozilla.org/es/docs/Web/XSLT">https://developer.mozilla.org/es/docs/Web/XSLT</ref> (en espa&#241;ol) y <ref target="https://developer.mozilla.org/en-US/docs/Web/XSLT">https://developer.mozilla.org/en-US/docs/Web/XSLT</ref> (en ingl&#233;s)</p>
-</item>
-<item>
-<p>La p&#225;gina <ref target="https://tthub.io">TTHUB</ref> contiene una excelente "Introducci&#243;n a la Text Encoding Initiative" por Susanna All&#233;s Torrent (2019): <ref target="https://tthub.io/aprende/introduccion-a-tei/">https://tthub.io/aprende/introduccion-a-tei/</ref></p>
-</item>
-<item>
-<p>En Programming Historian existe ya publicada una lecci&#243;n introductoria a XML y las transformaciones XSL: <emph><ref target="/es/lecciones/transformacion-datos-xml-xsl">Transformaci&#243;n de datos con XML y XSL para su reutilizaci&#243;n</ref></emph>, de M. H. Beals.</p>
-</item>
-</list>
-<h2>Notas</h2>
-<p><ref type="footnotemark" target="#note_1"/> : Adoptaremos la convenci&#243;n de usar una <code rend="inline">@</code> para denotar en esta lecci&#243;n un atributo de un elemento de XML. Sin embargo, ese signo no se usa en el c&#243;digo de XML, sino solo en la documentaci&#243;n (como esta lecci&#243;n). Por ejemplo, <code rend="inline">@type</code> significa el atributo <code rend="inline">type</code> en &#8212;digamos&#8212; <code rend="inline">&lt;div type="recto"&gt;</code>.</p>
-<p><ref type="footnotemark" target="#note_2"/> : Al respecto v&#233;ase la <ref target="/es/lecciones/introduccion-a-tei-1#visualizaci%C3%B3n-vs-categorizaci%C3%B3n">primera lecci&#243;n</ref>.</p>
-<p><ref type="footnotemark" target="#note_3"/> : Un "elemento de autocerrado" es un elemento de XML que no tiene contenido, por ejemplo: <code rend="inline">&lt;name&gt;&lt;/name&gt;</code>, que se abrevia as&#237;: <code rend="inline">&lt;name/&gt;</code>.
-N&#243;tese la barra invertida <code rend="inline">/</code> <emph>antes</emph> del cierre de la etiqueta. Suelen usarse en TEI para los denominados elementos "hitos" (<emph>milestones</emph>), como los saltos de l&#237;nea (<code rend="inline">&lt;lb/&gt;</code>), saltos de p&#225;gina (<code rend="inline">&lt;pb/&gt;</code>) y saltos de columna (<code rend="inline">&lt;cb/&gt;</code>), que carecen de contenido y solo se usan para marcar un lugar preciso en el texto. Los procesadores de XML (como por ejemplo los navegadores web) autom&#225;ticamente expanden estos elementos en su forma larga, de modo que son completamente sin&#243;nimos.</p>
-<p><ref type="footnotemark" target="#note_4"/> : Hay quienes prefieren usar aqu&#237; el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-ab.html"><code rend="inline">&lt;ab&gt;</code></ref> (<emph>anonymous block</emph>, "bloque an&#243;nimo") en lugar del elemento <code rend="inline">&lt;p&gt;</code>.
-Hacen eso porque consideran, no sin cierta raz&#243;n, que este no es propiamente un p&#225;rrafo sino un bloque gen&#233;rico de texto.</p>
-<p><ref type="footnotemark" target="#note_5"/> : Agradezco a <ref target="https://github.com/dxvidmr">David Merino Recalde</ref> por esta aclaraci&#243;n. Para nosotros esta distinci&#243;n no ser&#225; tan importante por ahora, por lo que usaremos tranquilamente un elemento <code rend="inline">&lt;p&gt;</code>.</p>
-<p><ref type="footnotemark" target="#note_6"/> : Es importante aclarar que el elemento <code rend="inline">&lt;header&gt;</code> contiene un texto que efectivamente aparece en el documento objeto y que funciona como encabezado en una divisi&#243;n; en otras palabras, no es meramente una divisi&#243;n l&#243;gica de este. Si quisi&#233;ramos &#8212;digamos en una edici&#243;n cr&#237;tica&#8212; introducir encabezados que no aparecen efectivamente el texto, sino que contienen un texto introducido por el editor, TEI ofrece el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-supplied.html"><code rend="inline">&lt;supplied&gt;</code></ref> ("suplido") para ello. Por ejemplo: <code rend="inline">&lt;header&gt;&lt;supplied&gt;Argumentos en contra&lt;/supplied&gt;&lt;/header&gt;</code>.)</p>
-<p><ref type="footnotemark" target="#note_7"/> : La diferencia entre <code rend="inline">&lt;q&gt;</code> y <code rend="inline">&lt;quote&gt;</code> quiz&#225; sea algo difusa.
-De acuerdo con <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/CO.html#COHQQ">la documentaci&#243;n de TEI</ref>, <code rend="inline">&lt;q&gt;</code> se usa en general para indicar que un texto se menciona y no se usa, lo cual usualmente se representa gr&#225;ficamente poniendo el texto entre comillas o en cursivas. El elemento <code rend="inline">&lt;quote&gt;</code>, por el contrario, se usa para atribuirle a alguien (a "un autor o narrador") la autor&#237;a del texto. En ese sentido, cuando se codifica por completo una citaci&#243;n bibliogr&#225;fica (con el elemento <code rend="inline">&lt;cit&gt;</code>), en nuestra opini&#243;n es recomendable incluir en ella tanto el texto citado (en un elemento <code rend="inline">&lt;quote&gt;</code>) como la referencia bibliogr&#225;fica (en un elemento <code rend="inline">&lt;bibl&gt;</code>).</p>
-<p><ref type="footnotemark" target="#note_8"/> : Otra opci&#243;n ser&#237;a usar los elementos <code rend="inline">&lt;orig&gt;</code> y <code rend="inline">&lt;reg&gt;</code>, como lo hicimos antes con la postal, para indicar que estamos regularizando una variaci&#243;n ortogr&#225;fica. La diferencia en &#250;ltimas una decisi&#243;n editorial, dependiendo de c&#243;mo se interprete la anomal&#237;a en el texto original: o bien como un error ortogr&#225;fico de la autora (quien debi&#243; haber usado la tilde), o bien como una variante ortogr&#225;fica.</p>
-<p><ref type="footnotemark" target="#note_9"/> : Si quisi&#233;ramos introducir una bibliograf&#237;a completamente estructurada, por ejemplo en el caso de una edici&#243;n cr&#237;tica, podr&#237;amos utilizar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-biblStruct.html"><code rend="inline">&lt;biblStruct&gt;</code></ref> (<emph>structured bibliographic citation</emph>, "citaci&#243;n bibliogr&#225;fica estructurada").</p>
-<p><ref type="footnotemark" target="#note_10"/> : Si para nuestros prop&#243;sitos fuera importante codificar los n&#250;meros de llamado a nota (p. ej. "(1)", "(2)", etc&#233;tera), podr&#237;amos utilizar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-metamark.html"><code rend="inline">&lt;metamark&gt;</code></ref> de TEI. Su uso es un poco m&#225;s complicado, pues requiere referencias cruzadas (con el signo <code rend="inline">#</code>, como vimos arriba). Ser&#237;a algo como lo siguiente:</p>
-<ab><code xml:id="code_introduccion-a-tei-2_42" corresp="code_introduccion-a-tei-2_42.txt" rend="block"/></ab>
-<p><ref type="footnotemark" target="#note_11"/> : M&#225;s exactamente, OxGarage los transform&#243; en elementos <code rend="inline">&lt;span class="foreign"&gt;</code> que, de acuerdo con el <ref target="https://www.tei-c.org/release/xml/tei/stylesheet/tei.css">CSS</ref> vinculado en el documento xHTML tienen la propiedad <code rend="inline">font-style:italic</code>. En ese sentido, si un lector competente en CSS lo quisiera, podr&#237;a asignarle otras propiedades CSS a este u otros elementos resultantes de la conversi&#243;n. Sin embargo, esto no es necesario para producir un resultado relativamente agradable.</p>
-<!---
+La instalación y uso de estas dos herramientas supera los límites de este breve epílogo; sin embargo, próximamente <ref target="/es/">Programming Historian</ref> publicará la tercera parte de esta serie, dedicada al uso de <ref target="https://github.com/TEIC/CETEIcean">CETEIcean</ref>, escrita por Gabriel Calarco y Gimena del Río Riande.</p>
+                                                            <p>Ahora bien, existe otra herramienta para realizar transformaciones llamada  <ref target="https://oxgarage.tei-c.org/">OxGarage</ref>, creada por el consorcio TEI.
+Podemos usar OxGarage en línea o también podemos <ref target="https://github.com/sebastianrahtz/oxgarage">instalarla localmente</ref> en nuestro computador.
+Para nuestros fines usaremos la versión en línea.</p>
+                                                            <p>Antes de comenzar, debemos asegurarnos que nuestros documentos TEI sean sintáctica y semánticamente válidos, pues de lo contrario no podrán ser procesados por OxGarage, ni por ningún otro procesador. Para ello podemos usar una herramienta como la del <ref target="https://teibyexample.org/exist/tools/TBEvalidator.htm">TBE Validation Service</ref>, mencionada arriba.</p>
+                                                            <p>Una vez abierta la página web de OxGarage, haremos clic en la opción "Documents":</p>
+                                                            <figure>
+                                                                <desc>OxGarage: opción documentos</desc>
+                                                                <graphic url="introduccion-a-tei-2-06.png"/>
+                                                            </figure>
+                                                            <p>Luego seleccionaremos "TEI P5 XML Document" en la columna "Convert from":</p>
+                                                            <figure>
+                                                                <desc>OxGarage: formato de entrada</desc>
+                                                                <graphic url="introduccion-a-tei-2-07.png"/>
+                                                            </figure>
+                                                            <p>Entonces nos aparecerá la columna de opciones para elegir el formato de salida, donde tenemos 19 posibilidades: LaTeX, ePub, DOCX, PDF, XHTML, etcétera.
+Para nuestro ejemplo escojeremos la opción "XHTML":</p>
+                                                            <figure>
+                                                                <desc>OxGarage: formato de salida: xHTML</desc>
+                                                                <graphic url="introduccion-a-tei-2-08.png"/>
+                                                            </figure>
+                                                            <p>Ahora subiremos nuestro documento TEI al servidor, haciendo clic en el botón "Seleccionar archivo..." de la izquierda. Si nuestro documento hubiera incluido imágenes, por ejemplo en un facsímil digital, podríamos subirlas en un archivo .zip con el botón "Browse..." de la derecha.</p>
+                                                            <figure>
+                                                                <desc>OxGarage: subir el documento</desc>
+                                                                <graphic url="introduccion-a-tei-2-09.png"/>
+                                                            </figure>
+                                                            <p>Finalmente haremos clic en el botón "Convert" y esperaremos a que el servidor descargue el resultado en el navegador. Si nada sucede, es probable que exista un error en el documento TEI de entrada; desafortunadamente OxGarage no reporta dichos errores.</p>
+                                                            <figure>
+                                                                <desc>OxGarage: convertir</desc>
+                                                                <graphic url="introduccion-a-tei-2-10.png"/>
+                                                            </figure>
+                                                            <p>Hagamos la prueba primero con la postal y luego con el fragmento del manuscrito. Podemos abrir los archivos resultantes con extensión ".html" en cualquier navegador web, haciendo doble clic sobre ellos en el explorador de archivos.
+Este es el resultado de la transformación para el ejemplo de la postal:</p>
+                                                            <figure>
+                                                                <desc>OxGarage: XHTML resultante de la postal, abierto en el navegador Firefox</desc>
+                                                                <graphic url="introduccion-a-tei-2-11.png"/>
+                                                            </figure>
+                                                            <p>Nótese cómo los elementos <code rend="inline">&lt;foreign&gt;</code> han sido representados en cursivas en el XHTML.<ref type="footnotemark" target="#es_note_11"/>
+                                                            </p>
+                                                            <p>Y este es el resultado de la transformación para la codificación del manuscrito:</p>
+                                                            <figure>
+                                                                <desc>OxGarage: xHTML resultante del manuscrito, abierto en el navegador Firefox</desc>
+                                                                <graphic url="introduccion-a-tei-2-12.png"/>
+                                                            </figure>
+                                                            <p>En este caso OxGarage ha usado paréntesis angulares (<code rend="inline">⟨⟩</code>) para indicar los añadidos, incluido un <code rend="inline">[?]</code> luego de las palabras dudosas (correspondientes a los elementos <code rend="inline">&lt;unclear&gt;</code>).</p>
+                                                            <p>Estos dos ejemplos de conversión pueden parecer algo simples.
+Ciertamente, el motor conversión de OxGarage realiza transformaciones XSLT muy elementales y genéricas.
+Con todo, OxGarage puede ser muy útil para extraer el texto de codificaciones de documentos extensos, para los cuales aún no hayamos programado transformaciones XSLT más elaboradas.</p>
+                                                            <h2>Referencias recomendadas</h2>
+                                                            <list type="unordered">
+                                                                <item>
+                                                                    <p>La documentación completa de TEI (los <emph>TEI Guidelines</emph>) está disponible en la página del consorcio: <ref target="https://tei-c.org/guidelines/">https://tei-c.org/guidelines/</ref> . Si  bien está dispónible en varios idiomas, solo está completa en inglés.</p>
+                                                                </item>
+                                                                <item>
+                                                                    <p>Una buena introducción a TEI es el libro <emph>¿Qué es la iniciativa de codificación de textos? Cómo añadir marcado inteligente a los recursos digitales</emph> de Lou Burnard (Marsella: OpenEdition Press, 2012/2022) <ref target="https://books.openedition.org/oep/15662">disponible gratuitamente en línea</ref>.</p>
+                                                                </item>
+                                                                <item>
+                                                                    <p>Un buen tutorial para XML está disponible en: <ref target="https://www.w3schools.com/xml/">https://www.w3schools.com/xml/</ref> y en: <ref target="https://www.tutorialspoint.com/xml/index.htm">https://www.tutorialspoint.com/xml/index.htm</ref>
+                                                                    </p>
+                                                                </item>
+                                                                <item>
+                                                                    <p>El consorcio TEI también ofrece una buena introducción a XML: <ref target="https://www.tei-c.org/release/doc/tei-p5-doc/en/html/SG.html">https://www.tei-c.org/release/doc/tei-p5-doc/en/html/SG.html</ref>
+                                                                    </p>
+                                                                </item>
+                                                                <item>
+                                                                    <p>La documentación oficial de XML está disponible en la página del consorcio W3C: <ref target="https://www.w3.org/XML/">https://www.w3.org/XML/</ref> También está disponible la documentación para toda la familia XSL (incluido XSLT): <ref target="https://www.w3.org/Style/XSL/">https://www.w3.org/Style/XSL/</ref>
+                                                                    </p>
+                                                                </item>
+                                                                <item>
+                                                                    <p>La Mozilla Foundation también ofrece una buena página sobre XSLT y tecnologías asociadas: <ref target="https://developer.mozilla.org/es/docs/Web/XSLT">https://developer.mozilla.org/es/docs/Web/XSLT</ref> (en español) y <ref target="https://developer.mozilla.org/en-US/docs/Web/XSLT">https://developer.mozilla.org/en-US/docs/Web/XSLT</ref> (en inglés)</p>
+                                                                </item>
+                                                                <item>
+                                                                    <p>La página <ref target="https://tthub.io">TTHUB</ref> contiene una excelente "Introducción a la Text Encoding Initiative" por Susanna Allés Torrent (2019): <ref target="https://tthub.io/aprende/introduccion-a-tei/">https://tthub.io/aprende/introduccion-a-tei/</ref>
+                                                                    </p>
+                                                                </item>
+                                                                <item>
+                                                                    <p>En Programming Historian existe ya publicada una lección introductoria a XML y las transformaciones XSL: <emph>
+                                                                            <ref target="/es/lecciones/transformacion-datos-xml-xsl">Transformación de datos con XML y XSL para su reutilización</ref>
+                                                                        </emph>, de M. H. Beals.</p>
+                                                                </item>
+                                                            </list>
+                                                            <h2>Notas</h2>
+                                                            <p>
+                                                                <ref type="footnotemark" target="#es_note_1"/> : Adoptaremos la convención de usar una <code rend="inline">@</code> para denotar en esta lección un atributo de un elemento de XML. Sin embargo, ese signo no se usa en el código de XML, sino solo en la documentación (como esta lección). Por ejemplo, <code rend="inline">@type</code> significa el atributo <code rend="inline">type</code> en —digamos— <code rend="inline">&lt;div type="recto"&gt;</code>.</p>
+                                                            <p>
+                                                                <ref type="footnotemark" target="#es_note_2"/> : Al respecto véase la <ref target="/es/lecciones/introduccion-a-tei-1#visualizaci%C3%B3n-vs-categorizaci%C3%B3n">primera lección</ref>.</p>
+                                                            <p>
+                                                                <ref type="footnotemark" target="#es_note_3"/> : Un "elemento de autocerrado" es un elemento de XML que no tiene contenido, por ejemplo: <code rend="inline">&lt;name&gt;&lt;/name&gt;</code>, que se abrevia así: <code rend="inline">&lt;name/&gt;</code>.
+Nótese la barra invertida <code rend="inline">/</code>
+                                                                <emph>antes</emph> del cierre de la etiqueta. Suelen usarse en TEI para los denominados elementos "hitos" (<emph>milestones</emph>), como los saltos de línea (<code rend="inline">&lt;lb/&gt;</code>), saltos de página (<code rend="inline">&lt;pb/&gt;</code>) y saltos de columna (<code rend="inline">&lt;cb/&gt;</code>), que carecen de contenido y solo se usan para marcar un lugar preciso en el texto. Los procesadores de XML (como por ejemplo los navegadores web) automáticamente expanden estos elementos en su forma larga, de modo que son completamente sinónimos.</p>
+                                                            <p>
+                                                                <ref type="footnotemark" target="#es_note_4"/> : Hay quienes prefieren usar aquí el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-ab.html">
+                                                                    <code rend="inline">&lt;ab&gt;</code>
+                                                                </ref> (<emph>anonymous block</emph>, "bloque anónimo") en lugar del elemento <code rend="inline">&lt;p&gt;</code>.
+Hacen eso porque consideran, no sin cierta razón, que este no es propiamente un párrafo sino un bloque genérico de texto.</p>
+                                                            <p>
+                                                                <ref type="footnotemark" target="#es_note_5"/> : Agradezco a <ref target="https://github.com/dxvidmr">David Merino Recalde</ref> por esta aclaración. Para nosotros esta distinción no será tan importante por ahora, por lo que usaremos tranquilamente un elemento <code rend="inline">&lt;p&gt;</code>.</p>
+                                                            <p>
+                                                                <ref type="footnotemark" target="#es_note_6"/> : Es importante aclarar que el elemento <code rend="inline">&lt;header&gt;</code> contiene un texto que efectivamente aparece en el documento objeto y que funciona como encabezado en una división; en otras palabras, no es meramente una división lógica de este. Si quisiéramos —digamos en una edición crítica— introducir encabezados que no aparecen efectivamente el texto, sino que contienen un texto introducido por el editor, TEI ofrece el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-supplied.html">
+                                                                    <code rend="inline">&lt;supplied&gt;</code>
+                                                                </ref> ("suplido") para ello. Por ejemplo: <code rend="inline">&lt;header&gt;&lt;supplied&gt;Argumentos en contra&lt;/supplied&gt;&lt;/header&gt;</code>.)</p>
+                                                            <p>
+                                                                <ref type="footnotemark" target="#es_note_7"/> : La diferencia entre <code rend="inline">&lt;q&gt;</code> y <code rend="inline">&lt;quote&gt;</code> quizá sea algo difusa.
+De acuerdo con <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/CO.html#COHQQ">la documentación de TEI</ref>, <code rend="inline">&lt;q&gt;</code> se usa en general para indicar que un texto se menciona y no se usa, lo cual usualmente se representa gráficamente poniendo el texto entre comillas o en cursivas. El elemento <code rend="inline">&lt;quote&gt;</code>, por el contrario, se usa para atribuirle a alguien (a "un autor o narrador") la autoría del texto. En ese sentido, cuando se codifica por completo una citación bibliográfica (con el elemento <code rend="inline">&lt;cit&gt;</code>), en nuestra opinión es recomendable incluir en ella tanto el texto citado (en un elemento <code rend="inline">&lt;quote&gt;</code>) como la referencia bibliográfica (en un elemento <code rend="inline">&lt;bibl&gt;</code>).</p>
+                                                            <p>
+                                                                <ref type="footnotemark" target="#es_note_8"/> : Otra opción sería usar los elementos <code rend="inline">&lt;orig&gt;</code> y <code rend="inline">&lt;reg&gt;</code>, como lo hicimos antes con la postal, para indicar que estamos regularizando una variación ortográfica. La diferencia en últimas una decisión editorial, dependiendo de cómo se interprete la anomalía en el texto original: o bien como un error ortográfico de la autora (quien debió haber usado la tilde), o bien como una variante ortográfica.</p>
+                                                            <p>
+                                                                <ref type="footnotemark" target="#es_note_9"/> : Si quisiéramos introducir una bibliografía completamente estructurada, por ejemplo en el caso de una edición crítica, podríamos utilizar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-biblStruct.html">
+                                                                    <code rend="inline">&lt;biblStruct&gt;</code>
+                                                                </ref> (<emph>structured bibliographic citation</emph>, "citación bibliográfica estructurada").</p>
+                                                            <p>
+                                                                <ref type="footnotemark" target="#es_note_10"/> : Si para nuestros propósitos fuera importante codificar los números de llamado a nota (p. ej. "(1)", "(2)", etcétera), podríamos utilizar el elemento <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-metamark.html">
+                                                                    <code rend="inline">&lt;metamark&gt;</code>
+                                                                </ref> de TEI. Su uso es un poco más complicado, pues requiere referencias cruzadas (con el signo <code rend="inline">#</code>, como vimos arriba). Sería algo como lo siguiente:</p>
+                                                            <ab>
+                                                                <code xml:id="code_introduccion-a-tei-2_42" corresp="code_introduccion-a-tei-2_42.txt" rend="block"/>
+                                                            </ab>
+                                                            <p>
+                                                                <ref type="footnotemark" target="#es_note_11"/> : Más exactamente, OxGarage los transformó en elementos <code rend="inline">&lt;span class="foreign"&gt;</code> que, de acuerdo con el <ref target="https://www.tei-c.org/release/xml/tei/stylesheet/tei.css">CSS</ref> vinculado en el documento xHTML tienen la propiedad <code rend="inline">font-style:italic</code>. En ese sentido, si un lector competente en CSS lo quisiera, podría asignarle otras propiedades CSS a este u otros elementos resultantes de la conversión. Sin embargo, esto no es necesario para producir un resultado relativamente agradable.</p>
+                                                            <!---
 ; LocalWords:  TEI XML autocerrado
 %%% Local Variables:
 %%% mode: markdown
 %%% ispell-local-dictionary: "spanish"
 %%% End:
 -->
-</div></div></div></h3></div></h3></div></h3></div></head></div></div>
-    </body>
-  </text>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h3>
+                                        </div>
+                                    </h3>
+                                </div>
+                            </h3>
+                        </div>
+                    </head>
+                </div>
+            </div>
+        </body>
+    </text>
 </TEI>

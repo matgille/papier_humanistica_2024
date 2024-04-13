@@ -1,424 +1,611 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="exhibicion-con-collection-builder">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Exhibici&#243;n digital m&#237;nima e interactiva con CollectionBuilder</title>
-  <author role="original_author">Jennifer Isasi</author><editor role="reviewers"><persName>Juan Pablo Angarita Bernal</persName><persName>Mat&#237;as Butelman</persName></editor><editor role="editors"><persName>Maria Jos&#233; Afanador-Llach</persName><persName>Isabelle Gribomont</persName></editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phes0060</idno><date type="published">08/21/2022</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. This lesson is original.</p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>En esta lecci&#243;n aprender&#225;s a utilizar la versi&#243;n ligera de CollectionBuilder para publicar una colecci&#243;n digital.</p></abstract><textClass><keywords><term xml:lang="en">website</term><term xml:lang="en">data-visualization</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="es">
-    <body>
-      <div type="2"><head>Objetivos</head>
-<list type="unordered">
-<item>Aprender a utilizar la versi&#243;n ligera de CollectionBuilder</item>
-<item>Localizar la interfaz web al espa&#241;ol</item>
-<item>Publicar una colecci&#243;n digital siguiendo los preceptos "minimal computing"</item>
-</list>
-</div>
-      <div type="2"><head>Pre-requisitos</head>
-<p>Esta lecci&#243;n se va a enfocar en la versi&#243;n m&#225;s sencilla de <ref target="https://collectionbuilder.github.io"><hi rend="bold">CollectionBuilder</hi></ref>, que podr&#225;s manejar desde el navegador web y una cuenta gratuita de GitHub. Para ello, es necesario tener nociones b&#225;sicas de:</p>
-<list type="unordered">
-<item>
-<p>Archivos de im&#225;genes en formato JPEG o PNG y/o archivos de audio en formato MP3<ref type="footnotemark" target="#note_1"/></p>
-<p><ref type="footnotemark" target="#note_1"/> : Puedes aprender a editar archivos de audio para reducir su tama&#241;o con la lecci&#243;n <ref target="/es/lecciones/editar-audio-con-audacity">"Editar audio con Audacity"</ref> de Brandon Walsh y traducida por Jos&#233; Antonio Motilla.</p>
-</item>
-<item>
-<p>Curadur&#237;a de metadatos, guardados en formato CSV</p>
-</item>
-<item>
-<p>Escritura en formato Markdown<ref type="footnotemark" target="#note_2"/></p>
-<p><ref type="footnotemark" target="#note_2"/> : Si necesitas aprender este formato te recomendamos la lecci&#243;n de Sarah Simpkin y traducida por V&#237;ctor Gayol <ref target="/es/lecciones/introduccion-a-markdown">"Introducci&#243;n a Markdown"</ref></p>
-</item>
-<item>
-<p>Manejo de una cuenta y un repositorio b&#225;sico en GitHub</p>
-</item>
-</list>
-</div>
-      <div type="2"><head>Reutilizaci&#243;n de colecciones digitalizadas con Collection Builder</head>
-<p>Los archivos, bibliotecas y museos digitalizan cada vez m&#225;s sus colecciones con tres objetivos clave: primero, quieren preservar una copia digital del objeto f&#237;sico; segundo, buscan ofrecer la copia digital para evitar el desgaste del objeto durante consultas o exposiciones; y tercero, la copia digital sirve para la diseminaci&#243;n de su acervo a corto y largo plazo. No existe un &#250;nico modelo para estas tres tareas y, por ello, las opciones de sistemas inform&#225;ticos para realizar cada una de ellas es muy amplia. Esta lecci&#243;n se enfoca en el tercer objetivo de la digitalizaci&#243;n, a saber, la diseminaci&#243;n de la colecci&#243;n, y te ense&#241;a a utilizar una de las herramientas m&#225;s sencillas de todas las disponibles para crear exposiciones digitales, desde la metodolog&#237;a de la computaci&#243;n m&#237;nima.</p>
-<p>En el contexto de archivos peque&#241;os, CollectionBuilder resulta muy c&#243;modo porque permite publicar im&#225;genes de resoluci&#243;n media de documentos, fotograf&#237;as, obras de arte, etc., as&#237; como grabaciones que quieran circularse o darse a conocer entre la comunidad de usuarios. Y esto puede hacerse desde la reutilizaci&#243;n de archivos ya digitalizados y adaptados para esta plataforma o bien desde copias digitales de menor calidad.</p>
-<p>Se recomienda el uso de CollectionBuilder, por ejemplo, para crear exhibiciones digitales temporales (tres meses, seis meses, etc.), que den acceso a la colecci&#243;n a aquellos usuarios que no tengan acceso a las instalaciones f&#237;sicas del museo o archivo. Tambi&#233;n puede usarse como complemento a las exhibiciones temporales, para proporcionar archivos extra, mayor contexto, etc. Adem&#225;s, puesto que los usuarios pueden descargar los datos de la colecci&#243;n, se puede aprovechar la plataforma como herramienta para promover el an&#225;lisis y la visualizaci&#243;n de datos.</p>
-<p>En caso de contar con un acervo digital de la colecci&#243;n de un archivo o museo, se podr&#225;n reutilizar los archivos digitales en una menor resoluci&#243;n que la original y as&#237; dar salida o acceso a documentos u otros elementos hist&#243;ricos de forma r&#225;pida sin necesidad de tener acceso a internet de alta velocidad.</p>
-<p>CollectionBuilder cuenta con tres versiones de, m&#225;s o menos, la misma herramienta, cada una con funcionalidades algo m&#225;s complejas o mayor nivel de personalizaci&#243;n posible: CB en GitHub Pages, CB Stand Alone y CB CSV. Para crear una colleci&#243;n digital sencilla sin necesidad de tener conocimientos de inform&#225;tica avanzados, nosotros vamos a utilizar su versi&#243;n basada totalmente en GitHub: <hi rend="bold"><ref target="https://github.com/CollectionBuilder/collectionbuilder-gh">collectionbuilder-gh</ref></hi>.  </p>
-<div type="3"><head>&#191;Qu&#233; es CollectionBuilder-GH?</head>
-<p>CollectionBuilder-GH es una herramienta de c&#243;digo abierto para publicar exhibiciones digitales basadas en metadatos y formada por la tecnolog&#237;a de p&#225;ginas web est&#225;ticas. Su objetivo principal es ofrecer un modelo simple para diseminar colecciones de forma pr&#225;ctica y sostenible que, a la vez, no involucre conocimientos de inform&#225;tica avanzada. As&#237;, las exhibiciones est&#225;n formadas por tres archivos b&#225;sicos (hoja de c&#225;lculo con metadatos, archivos audio visuales y un archivo de configuraci&#243;n) y un conjunto de archivos Jekyll basado en GitHub, que sigue la metodolog&#237;a <hi rend="bold"><ref target="https://lib-static.github.io/">Lib-STATIC</ref></hi> desarrollada en la biblioteca de la Universidad de Idaho en Estados Unidos.</p>
-<p>El objetivo de la metodolog&#237;a Lib-STATIC es utilizar la tecnolog&#237;a de webs est&#225;ticas y las habilidades de clasificaci&#243;n y creaci&#243;n de metadatos de los bibliotecarios para crear publicaciones interesantes y con las que el p&#250;blico puede interactuar f&#225;cilmente.</p>
-<p>CollectionBuilder-GH (CB-GH) es una de las alternativas de tipo computaci&#243;n m&#237;nima (minimal computing), que se refiere a "la actividad computacional que se realiza bajo restricciones significativas de hardware, software, educaci&#243;n, capacidad de red, energ&#237;a u otros factores" (<ref target="https://go-dh.github.io/mincomp/about/"><emph>Minimal Computing: a working group of GO::DH</emph></ref>). Precisamente, por su formato, las exhibiciones digitales creadas con CollectionBuilder en GitHub necesitar&#225;n de menos hardware o tecnolog&#237;a y menos ancho de banda de Internet. Adem&#225;s, est&#225; totalmente adaptada a sistemas celulares. Este sistema es una buena alternativa a sistemas de exhibiciones digitales como <ref target="https://es.wikipedia.org/wiki/Omeka">Omeka</ref> y al algo m&#225;s complejo sistema <ref target="https://minicomp.github.io/wax/">Wax</ref>, para aquellos que no tengan recursos inform&#225;ticos avanzados a su alcance, que no dispongan del tiempo para aprender a utilizar algo m&#225;s complicado y, en resumidas cuentas, que quieran reutilizar de forma r&#225;pida las colecciones digitalizadas en sus archivos para dar acceso a su comunidad.</p>
-<p>El trabajo para crear CB-GH est&#225; financiada por una beca National Leadership Grants for Libraries Planning Grant ofrecida por el Instituto de Servicios de Museos y Bibliotecas (<ref target="https://www.imls.gov">IMLS</ref>, por sus siglas en ingl&#233;s). Varias bibliotecas y museos ya han utilizado esta herramienta para la diseminaci&#243;n de sus colecciones u otros prop&#243;sitos, como son <ref target="https://drodz11.github.io/colors-of-ozu/">Colors of Ozu</ref>, de Dave Rodriguez o la <ref target="http://dna.nust.na/heritage_week/">Namibia Heritage Week 2020</ref>, de Namibia University of Science and Technology.</p>
-</div></div>
-      <div type="2"><head>1. Preparar los archivos b&#225;sicos para la colecci&#243;n</head>
-<p>CollectionBuilder-GH est&#225; basado en cuatro componentes b&#225;sicos que generan la p&#225;gina web est&#225;tica en la que puedes publicar exhibiciones para tu proyecto: Jekyll, Git/GitHub, Bootstrap 4 y archivos de datos CSV y YAML. Y es que para preparar la exhibici&#243;n solo necesitar&#225;s preocuparte de tener una colecci&#243;n de objetos que quieras presentar con su correspondiente informaci&#243;n. Para presentarla en la web sin m&#225;s a&#241;adidos, puedes crear y/o editar los dos tipos de documentos explicados a continuaci&#243;n. Explicaremos c&#243;mo editar p&#225;ginas de contexto y los componentes de navegaci&#243;n m&#225;s adelante.</p>
-<div type="3"><head>Colecci&#243;n de objetos</head>
-<p>CollectionBuilder-GH est&#225; pensado para ser utilizado con colecciones peque&#241;as. Para poder utilizar la versi&#243;n gratuita de GitHub, el total de los archivos de la exhibici&#243;n no puede superar 1GB de peso. Por eso, se recomienda que la carpeta de im&#225;genes no supere los 500MB. Puedes realizar la edici&#243;n necesaria en im&#225;genes de alta resoluci&#243;n que ya tengas con cualquier software de editado de im&#225;genes, como <ref target="http://www.gimp.org.es/descargar-gimp.html">GIMP</ref>. Es importante tener en cuenta las siguientes consideraciones:</p>
-<list type="unordered">
-<item>
-<p>Formato de los objetos: GitHub y esta herramienta aceptan los formatos m&#225;s comunes de im&#225;genes y audio con los que ya estar&#225;s familiarizado: jpg, png y mp3. Tambi&#233;n puedes utilizar enlaces externos a objetos en YouTube o Vimeo, pero estos no aparecer&#225;n dentro de la exhibici&#243;n</p>
-</item>
-<item>
-<p>Tama&#241;o de cada archivo: La <ref target="https://es.wikipedia.org/wiki/Resoluci%C3%B3n_de_imagen">resoluci&#243;n de las im&#225;genes</ref> no debe superar los 1200px, esto es, deben ser inferiores a 1MB. Ten en cuenta que utilizar un tama&#241;o mayor a lo anterior no s&#243;lo limitar&#225; el n&#250;mero de im&#225;genes que puedes a&#241;adir (500MB en total) sino que tambi&#233;n ralentizar&#225; la carga de las im&#225;genes para tu audiencia. Si sabes que la mayor&#237;a de los usuarios acceder&#225;n a la colecci&#243;n a trav&#233;s de un tel&#233;fono m&#243;vil y con una conexi&#243;n limitada a Internet, un tama&#241;o de im&#225;genes o audio inferior har&#225; m&#225;s f&#225;cil su tarea</p>
-</item>
-<item>
-<p>Nombre de cada archivo: Debe ser una cadena de caracteres, sin espacios, en min&#250;sculas y sin caracteres especiales como la barra diagonal <code rend="inline">/</code>, aunque puedes usar el gui&#243;n <code rend="inline">-</code> y el gui&#243;n bajo <code rend="inline">_</code> para separar palabras. Vas a utilizar este nombre en la casilla "filename" en los metadatos para conectar el objeto con sus datos</p>
-</item>
-<item>
-<p>Localizaci&#243;n: La colecci&#243;n de objetos u archivos ir&#225;, tal cual, en la carpeta "objects" en el repositorio</p>
-</item>
-</list>
-</div><div type="3"><head>Documento de metadatos</head>
-<p>CollectionBuilder funciona con una simple hoja de metadatos para cada uno de los objetos que queramos mostrar en la colecci&#243;n. Por ejemplo, si descargas <ref target="https://docs.google.com/spreadsheets/d/1Uv9ytll0hysMOH1j-VL1lZx6PWvc1zf3L35sK_4IuzI/edit#gid=0">su plantilla de Google Drive</ref> (en ingl&#233;s) o <ref target="/assets/exhibicion-con-collection-builder/collectionbuilder-metadata-template.csv">de nuestro repositorio</ref>, ver&#225;s que es una hoja de c&#225;lculo con una columna para el ID (identificaci&#243;n) de cada objeto y m&#250;ltiples columnas para las caracter&#237;sticas de estos:</p>
-<figure><desc>Plantilla de metadatos de Collection Builder</desc><graphic url="exhibicion-con-collection-builder01.png"/></figure>
-<p>Puedes trabajar con dicho archivo, editar el archivo "metadata-template.csv" en la carpeta "_data" o generar un archivo de valores separados por comas con los campos obligatorios que mostramos a continuaci&#243;n y despu&#233;s cargarlo al repositorio. En cualquier caso, debes dejar los nombres de cada columna en ingl&#233;s (a lo largo de esta lecci&#243;n se traducen entre par&#233;ntesis para tu referencia) ya que los podemos traducir en un archivo de configuraci&#243;n en la misma carpeta, como veremos m&#225;s abajo.</p>
-<p>A continuaci&#243;n explicamos los campos obligatorios, los campos para generar visualizaciones y los campos totalmente opcionales:</p>
-<div type="4"><head>Campos obligatorios</head>
-<list type="unordered">
-<item>
-<p>objectid (identificaci&#243;n del objeto): Esta es la informaci&#243;n que CB utiliza para identificar cada objeto (imagen o audio) y unirlo a sus metadatos correspondientes. Debe ser una cadena de caracteres, sin espacios, en min&#250;sculas y sin caracteres especiales como la <code rend="inline">/</code> aunque puedes usar el gui&#243;n (<code rend="inline">-</code>) y la barra baja (<code rend="inline">_</code>) para separar palabras. Ejemplo: <code rend="inline">poster_001</code></p>
-</item>
-<item>
-<p>filename (nombre del archivo): Esto corresponde al t&#237;tulo de cada archivo en la colecci&#243;n m&#225;s la extensi&#243;n de formato (.png o .jpg, por ejemplo) o el enlace a la URL del archivo en otro lugar externo. Ejemplo: <code rend="inline">poster_001.jpg</code></p>
-</item>
-<item>
-<p>title (t&#237;tulo): Sigue la idea de t&#237;tulo de objetos de las normas de metadatos y corresponde a un t&#237;tulo que lleve el objeto original. Se recomienda que sea corto y descriptivo. Ejemplo: <code rend="inline"> Coordinadora Nacional de la Mujer Savaldore&#241;a - CONAMUS</code></p>
-</item>
-<item>
-<p>format (formato): Aqu&#237; se indica el formato del objeto mostrado. Es importante que rellenes este campo puesto que CB lo utiliza para crear las visualizaciones interactivas seg&#250;n el tipo de objeto que a&#241;adas. Estas son una de las opciones que puedes usar:</p>
-<list type="unordered">
-<item>Para im&#225;genes: <code rend="inline">image/jpeg o png</code></item>
-<item>Para documentos: <code rend="inline">application/pdf</code></item>
-<item>Para audio: <code rend="inline">audio/mp3</code></item>
-<item>Para video:<code rend="inline">video/mp3</code></item>
-</list>
-</item>
-</list>
-</div><div type="4"><head>Campos para visualizaciones</head>
-<p>CollectionBuilder cuenta con la creaci&#243;n autom&#225;tica de visualizaciones o puntos de entrada a la colecci&#243;n, a trav&#233;s de la informaci&#243;n proporcionada en el archivo de metadatos. Estos pueden ser de gran utilidad para nuestra audiencia pues generar&#225;n visualizaciones interactivas para explorar la colecci&#243;n en diferentes p&#225;ginas. Cada p&#225;gina "extra" necesita un tipo de informaci&#243;n diferente, que se explica a continuaci&#243;n:</p>
-<list type="unordered">
-<item>
-<p>Map (mapa): Crear&#225; un mapa y, para ello, requiere de los campos de metadatos en las columnas latitude (latitud, informaci&#243;n de norte-sur) y longitude  (longitud, informaci&#243;n de este-oeste), es decir, los datos de coordenadas de una localizaci&#243;n correspondiente al objeto que presentas en la exhibici&#243;n. Por ejemplo: una fotograf&#237;a de la catedral de San Salvador llevar&#225; las coordenadas <code rend="inline">43.2145</code> y <code rend="inline">5.5035</code></p>
-</item>
-<item>
-<p>Timeline (l&#237;nea de tiempo): Se refiere a una fecha asociada en el tiempo a cada imagen y genera una p&#225;gina con las im&#225;genes ordenadas por fecha. Por tanto, requiere datos cronol&#243;gicos en la columna date. El formato a seguir es <code rend="inline">aaaa-mm-dd</code> con los cuatro d&#237;gitos del a&#241;o siendo el valor m&#237;nimo que se necesita para formar la l&#237;nea de tiempo. Ejemplos: para el 25 de diciembre de 1989: <code rend="inline">1989-12-25</code></p>
-</item>
-<item>
-<p>Subjects (temas): Forma una nube de palabras con los temas sobre los que trata cada objeto en la columna subject. Puedes colocar m&#250;ltiples temas en cada casilla (por cada objeto) y separarlos por un punto y coma (<code rend="inline">;</code>). Ejemplo: <code rend="inline">catedral; religi&#243;n; edificio</code>. Recuerda que es importante contar con un vocabulario de temas reducido a seguir por todo el equipo y que debe tener siempre la misma forma de escritura: min&#250;sculas o may&#250;sculas, tildes, singular o plural, etc., porque si no, ver&#225;s un tema duplicado (la m&#225;quina no sabe que <code rend="inline">edificio</code> y <code rend="inline">edificios</code> corresponde a una misma cosa)</p>
-</item>
-<item>
-<p>Location (lugares): Es similar a la p&#225;gina de temas ya que formar&#225; una nube de palabras correspondientes a la localizaci&#243;n de las im&#225;genes. Utiliza una coma (<code rend="inline">,</code>) para separar, por ejemplo, una localidad y una regi&#243;n dentro del pa&#237;s, o un pa&#237;s. Puedes incluir varios lugares para una misma imagen usando tambi&#233;n el punto y coma (<code rend="inline">;</code>) para separarlos</p>
-</item>
-</list>
-</div><div type="4"><head>Campos opcionales</head>
-<p>Como en cualquier archivo de metadatos que sea creado por seres humanos y que no siga una plantilla est&#225;tica con campos siempre iguales, puedes a&#241;adir m&#225;s informaci&#243;n para cada objeto en tu colecci&#243;n, siguiendo los intereses de los creadores y la audiencia de la colecci&#243;n digital. Estos que mostramos son solo algunas de las opciones que puedes a&#241;adir:</p>
-<list type="unordered">
-<item>
-<p>creator (creador): Nombre de la persona que cre&#243; el objeto original que se ha digitalizado</p>
-</item>
-<item>
-<p>description (descripci&#243;n): Una nota breve sobre el objeto</p>
-</item>
-<item>
-<p>source (fuente): Designa la fuente del objeto, como puede ser su localizaci&#243;n en la colecci&#243;n f&#237;sica en un archivo y puede seguir su formato correspondiente</p>
-</item>
-<item>
-<p>language (idioma): Puede indicar el idioma asociado al objeto. En caso de a&#241;adirlo, se recomienda seguir el c&#243;digo ISO 659-2 de cada idioma: <code rend="inline">en</code> para ingl&#233;s, <code rend="inline">es</code> para espa&#241;ol, <code rend="inline">pt</code> para portugu&#233;s, etc&#233;tera</p>
-</item>
-<item>
-<p>rights (derechos): Un texto que contenga informaci&#243;n sobre los derechos de la audiencia sobre los objetos digitales</p>
-</item>
-</list>
-</div></div></div>
-      <div type="2"><head>2. "Instalaci&#243;n" de CollectionBuilder</head>
-<p>Lo primero que necesitas es tener una <ref target="https://github.com">cuenta en GitHub</ref> para tu archivo, biblioteca, museo o una cuenta personal. Para instalar CollectionBuilder simplemente tendr&#225;s que clonar su repositorio, cargar tu colecci&#243;n, localizar la web a tu idioma (opcional), configurar la p&#225;gina web y publicar la exhibici&#243;n. Excepto algunos pasos, como los anteriores, todo esto se puede realizar a trav&#233;s del navegador web y a partir de aqu&#237; te ense&#241;o c&#243;mo hacerlo.</p>
-<quote>
-<p>Ver&#225;s que en el perfil de GitHub de CollectionBuilder hay cuatro repositorios. En esta lecci&#243;n nos interesa el que puede ser manejado completamente en/a trav&#233;s de GitHub: collectionbuilder-gh</p>
-</quote>
-<div type="3"><head>Clonar el repositorio a nuestra cuenta GitHub</head>
-<list type="ordered">
-<item>
-<p>Abre el navegador y con&#233;ctate a tu cuenta de GitHub</p>
-</item>
-<item>
-<p>Navega a la p&#225;gina de GitHub de CollectionBuilder y el repositorio que nos interesa en <ref target="https://github.com/CollectionBuilder/collectionbuilder-gh">https://github.com/CollectionBuilder/collectionbuilder-gh</ref></p>
-</item>
-<item>
-<p>Haz click en el bot&#243;n verde que dice "Use this template" (usar esta plantilla)</p>
-<figure><desc>Clonar repositorio" alt="Imagen que indica d&#243;nde clicar para clonar el repositorio.</desc><graphic url="exhibicion-con-collection-builder02.png"/></figure>
-</item>
-<item>
-<p>Se abrir&#225; una ventana nueva con las instrucciones para clonar todos los archivos de <code rend="inline">collectionbuilder-gh</code> en un nuevo repositorio en tu cuenta de GitHub:</p>
-<list type="ordered">
-<item>
-<p>Da un nombre al que ser&#225; tu nuevo repositorio</p>
-</item>
-<item>
-<p>Opcional: Escribe una descripci&#243;n para ese repositorio</p>
-</item>
-<item>
-<p>Puesto que tu cuenta es gratuita, debes dejar el repositorio abierto al p&#250;blico</p>
-</item>
-<item>
-<p>Deja sin marcar la casilla "Include all branches" (incluir todas las ramas)</p>
-</item>
-<item>
-<p>Haz click en el bot&#243;n verde que dice "Create repository from this template" (crear repositorio desde esta plantilla)</p>
-</item>
-</list>
-</item>
-</list>
-<figure><desc>Campos a rellenar para clonar el repositorio" alt="Imagen de los campos a rellenar para clonar el repositorio.</desc><graphic url="exhibicion-con-collection-builder03.png"/></figure>
-<p>Si te aparece una nueva pantalla donde aparece tu nombre de cuenta de GitHub seguido por el nombre que has dado al nuevo repositorio &#161;felicidades! has clonado de forma correcta la base o plantilla de CollectionBuilder para tu exhibici&#243;n.</p>
-<figure><desc>El repositorio ha sido copiado a tu cuenta" alt="Imagen de que nuestra un nuevo repositorio en tu cuenta.</desc><graphic url="exhibicion-con-collection-builder04.png"/></figure>
-<div type="4"><head>Contenido de la copia de CollectionBuilder</head>
-<p>Brevemente, el contenido de cada carpeta es el siguiente:</p>
-<list type="unordered">
-<item>
-<p>_data: Contiene tres tipos de archivos que ayudan a formar el "esqueleto" de la exhibici&#243;n. En formato CSV (valores separados por comas) tenemos, primero, <code rend="inline">metadata-template.csv</code> o una plantilla para los metadatos tal y como deben ir (excepto lo notado arriba) para que la herramienta funcione. Tambi&#233;n a&#241;aden un ejemplo en el archivo <code rend="inline">demo-metadata.csv</code>. Tambi&#233;n encontramos aqu&#237; el vocabulario para las p&#225;ginas de navegar por los objetos (<code rend="inline">config-browse.csv</code>), ver el mapa (<code rend="inline">config-map.csv</code>), los metadatos (<code rend="inline">config-metadata.csv</code>), navegaci&#243;n general o men&#250; (<code rend="inline">config-nav.csv</code>), b&#250;squeda (<code rend="inline">config-search.csv</code>) y una tabla (<code rend="inline">config-table.csv</code>). Finalmente, en esta misma carpeta encontramos el archivo de tipo YML (<ref target="https://es.wikipedia.org/wiki/YAML">formato de serializaci&#243;n de datos legible por humanos</ref>) de configuraci&#243;n del tema de la p&#225;gina y del que no te tienes que preocupar</p>
-</item>
-<item>
-<p>_includes y _layouts: Estas carpetas contienen los archivos HTML que forman muchas de las funcionalidades de la herramienta CollectionBuilder. Para un uso sencillo de la misma y si no tienes conocimientos inform&#225;ticos, es mejor que no te preocupes por editar estos archivos</p>
-</item>
-<item>
-<p>_sass y assets: Aqu&#237; se encuentran los archivos SCSS (<ref target="https://es.wikipedia.org/wiki/Sass">Syntactically Awesome Style Sheets</ref>) que aporta el lado visual a la p&#225;gina web (colores, tama&#241;os de fuentes, etc.) y los archivos JSON (JavaScript Object Notation o <ref target="https://es.wikipedia.org/wiki/JSON">notaci&#243;n de objeto de JavaScript</ref>) que hacen que todo funcione. De nuevo, si no tienes conocimientos de c&#243;mo escribir css o json, es mejor que ignores estos archivos por el momento</p>
-</item>
-<item>
-<p>docs: Aqu&#237; puedes encontrar instrucciones en ingl&#233;s referidas a la creaci&#243;n de mini-iconos para tu p&#225;gina (<code rend="inline">create-favicon.md</code> y <code rend="inline">create-thumbs.md</code>), la funcionalidad para a&#241;adir servicios de google (<code rend="inline">google.md</code>), informaci&#243;n sobre campos de metadatos (<code rend="inline">metadata-info.csv</code>) y otra copia de la plantilla de metadatos (<code rend="inline">metadata-template.csv</code>)  </p>
-</item>
-<item>
-<p>objects: Este es el directorio en el que se guardar&#225;n las im&#225;genes o archivos digitales de la colecci&#243;n con la que quieras crear tu exhibici&#243;n digital</p>
-</item>
-<item>
-<p>pages: Contiene los archivos en formato markdown que forman parte de lo que llamamos la informaci&#243;n contextual de tu colecci&#243;n digital: informaci&#243;n (<code rend="inline">about.md</code>), navegar (<code rend="inline">browse.md</code>), y conjunto de datos (<code rend="inline">data.md</code>) y otros que son, simplemente, el t&#237;tulo de las p&#225;ginas (que cambiaremos a otro idioma) de los objetos (<code rend="inline">item.md</code>), el mapa (<code rend="inline">map.md</code>), la barra de b&#250;squeda (<code rend="inline">search.md</code>), la p&#225;gina de navegaci&#243;n por palabras clave (<code rend="inline">subject.md</code>)  y la l&#237;nea de tiempo que se genera siguiendo el orden de las fechas en los metadatos (<code rend="inline">timeline.md</code>)  </p>
-</item>
-</list>
-<p>Existen tambi&#233;n una serie de archivos individuales ya en la carpeta del repositorio. Solamente tendr&#225;s que preocuparte, ya al final, por el que se llama "_config.yml" y que ser&#225; el que edites para configurar tu p&#225;gina web antes de publicarla (con una URL, t&#237;tulo, informaci&#243;n de derechos, etc.)</p>
-</div></div></div>
-      <div type="2"><head>3. Cargar los archivos b&#225;sicos para la colecci&#243;n</head>
-<p>Una vez que tengas claro qu&#233; archivos van en cada carpeta y hayas creado una colecci&#243;n con objetos de tu elecci&#243;n junto con sus metadados, es momento de cargar todo al repositorio.</p>
-<div type="3"><head>Cargar im&#225;genes</head>
-<p>Como se ha indicado, la colecci&#243;n de im&#225;genes o audios ir&#225; en la carpeta llamada "objects". Para ello, entra en dicha carpeta y sigue estas instrucciones para cargar las im&#225;genes juntas. Aseg&#250;rate de subir las correctas de una vez, pues para editarlas tendr&#225;s que borrar y volver a cargar los archivos.</p>
-<list type="ordered">
-<item>
-<p>Entra en la carpeta "objects"</p>
-</item>
-<item>
-<p>Haz click en el bot&#243;n que dice "Add file" o a&#241;adir archivo arriba a la derecha</p>
-</item>
-<item>
-<p>Haz click en la opci&#243;n "Upload files" o cargar archivos</p>
-<figure><desc>C&#243;mo cargar o subir los objetos a la carpeta objects" alt="Imagen que indica c&#243;mo subir los archivos a la carpeta objects.</desc><graphic url="exhibicion-con-collection-builder05.png"/></figure>
-</item>
-<item>
-<p>Arrastra los archivos a la caja donde dice "Drag files here to add them to your repository" o arrastra hasta aqu&#237; los archivos que quieres a&#241;adir en tu repositorio</p>
-</item>
-<item>
-<p>A&#241;ade una descripci&#243;n simple de lo que acabas de hacer en la caja que dice "Add files via upload" (a&#241;adir archivos mediante carga) y, para seguir buenas pr&#225;cticas, a&#241;ade una descripci&#243;n algo m&#225;s indicativa de lo que acabas de a&#241;adir en la caja de texto</p>
-</item>
-<item>
-<p>Finalmente, aseg&#250;rate de que dejas marcada la opci&#243;n "Commit directly to the <code rend="inline">main</code> branch" (aceptar cambios directamente en la rama <code rend="inline">principal</code>) y  haz click en el bot&#243;n verde que dice "Commit changes" o aceptar cambios</p>
-</item>
-</list>
-<figure><desc>C&#243;mo guardar los cambios realizados" alt="Imagen que indica c&#243;mo guardar los cambios realizados.</desc><graphic url="exhibicion-con-collection-builder06.png"/></figure>
-<p>&#161;Ya est&#225;! Si todo ha ido bien, ahora deber&#237;as ver los archivos de tus im&#225;genes en la carpeta objects.</p>
-</div><div type="3"><head>Cargar metadatos</head>
-<p>Si tienes tu archivo con los metadatos para los objetos en formato CSV en tu computadora, c&#225;rgalo a la carpeta de "_data" siguiendo el mismo proceso de carga de archivos de objetos que acabas de ver.</p>
-<list type="ordered">
-<item>Entra en la carpeta "_data"</item>
-<item>Haz click en el bot&#243;n que dice "Add file" o a&#241;adir archivo arriba a la derecha</item>
-<item>Haz click en la opci&#243;n "Upload files" o cargar archivos</item>
-<item>Arrastra o busca tu archivo CSV de metadatos y c&#225;rgalo (aseg&#250;rate de saber su nombre)</item>
-<item>A&#241;ade una descripci&#243;n a la tarea realizada y acepta los cambios en la rama principal</item>
-</list>
-<p>De forma alternativa, puedes editar el archivo de metadatos existente haciendo clic en el lapicero de edici&#243;n que aparece arriba a la derecha al entrar al archivo. Sigue el formato de separaci&#243;n de columnas.</p>
-</div></div>
-      <div type="2"><head>4. P&#225;ginas de contexto</head>
-<p>Hay una serie de p&#225;ginas en la exhibici&#243;n que contienen lo que podr&#237;amos llamar informaci&#243;n contextual de la colecci&#243;n presentada en esta herramienta. Lo mejor para dar a conocer la colecci&#243;n de tus archivos es agregar informaci&#243;n de contexto y/o interpretativa para tu audiencia, igual que si estuvieran visitando el archivo de forma f&#237;sica y consultando los objetos. Esto es, toda la informaci&#243;n adicional relacionada con la colecci&#243;n en su conjunto y no simplemente de cada objeto en particular o de forma individual: &#191;Qui&#233;n es responsable de la curadur&#237;a de los objetos presentados en la colecci&#243;n digital? &#191;Cu&#225;l es la entidad responsable de la creaci&#243;n y mantenimiento de la p&#225;gina? &#191;Hay alguna entidad que financia el proyecto?, etc. Estas p&#225;ginas est&#225;n escritas en formato de escritura markdown con un sencillo sistema de formato Jekyll que configura su visualizado. Para procesarlas, todas estas p&#225;ginas deben seguir el formato de inicio YAML como este:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_0" corresp="code_exhibicion-con-collection-builder_0.txt" lang="language-yaml" rend="block"/></ab>
-<p>El inicio de YAML necesita tres guiones (<code rend="inline">---</code>) de principio y tres de final. Entre dichos guiones, van los tres elementos necesarios para procesar la p&#225;gina: <code rend="inline">title</code>, <code rend="inline">layout</code> y <code rend="inline">permalink</code>.</p>
-<p>Esta informaci&#243;n no se ver&#225; en la p&#225;gina final de tu colecci&#243;n digital.</p>
-<h4>Formato markdown</h4>
-<p>Para crear o editar estas p&#225;ginas, debes utilizar el formato de marcado para escritura markdown (con extensi&#243;n de formato <code rend="inline">.md</code>). Si no lo conoces, puedes leer esta <ref target="/es/lecciones/introduccion-a-markdown">Introducci&#243;n a Markdown</ref> escrita por Sarah Simpkin.</p>
-<div type="3"><head>Listado de p&#225;ginas contextuales</head>
-<h5>P&#225;gina de Informaci&#243;n (About)</h5>
-<p>Hasta que te sientas c&#243;modo/a creando p&#225;ginas nuevas, lo mejor es utilizar la ya incluida <code rend="inline">about.md</code> con el prop&#243;sito de a&#241;adir esta informaci&#243;n. Navega a la carpeta pages (p&#225;ginas) y entra en el archivo markdown. Ver&#225;s que primero incluye el bloque de YAML explicado m&#225;s arriba, en el que puedes cambiar el t&#237;tulo (<emph>title</emph>) a algo en espa&#241;ol u otro idioma.</p>
-<p>Puedes empezar a escribir, en formato markdown, inmediatamente despu&#233;s del bloque YAML.</p>
-<p>Se incluye adem&#225;s un bloque escrito en <ref target="https://shopify.github.io/liquid/">lenguaje de formato Liquid</ref> (solo en ingl&#233;s) que podr&#225;s utilizar m&#225;s adelante para a&#241;adir alguna imagen en esta p&#225;gina. Este utiliza una combinaci&#243;n de objetos, etiquetas y filtros dentro de los archivos de plantilla, como el que est&#225;s editando, para mostrar contenido din&#225;mico.</p>
-</div><div type="3"><head>Men&#250; de navegaci&#243;n</head>
-<p>Para que las p&#225;ginas de contexto aparezcan en tu p&#225;gina web, deber&#225;s incluir su nombre en el archivo de valores separado por comas llamado <code rend="inline">config-nav.csv</code> de tu repositorio en la carpeta "_data". Si no has cambiado el nombre de archivo para la p&#225;gina de informaci&#243;n <code rend="inline">about.md</code> no necesitas editar este archivo; por el contrario, si lo has cambiado o si necesitas a&#241;adir otra p&#225;gina, aseg&#250;rate de editar tambi&#233;n este archivo.</p>
-</div></div>
-      <div type="2"><head>5. Editar el idioma de la p&#225;gina web en CollectionBuilder</head>
-<p>Puedes cambiar el idioma por defecto de la plataforma al tuyo propio. A diferencia de otros contenidos m&#225;s sencillos de a&#241;adir, el cambio de idioma de la interfaz supone indagar un poco en los archivos de c&#243;gido de la colecci&#243;n y aqu&#237; te ense&#241;amos c&#243;mo. Familiar&#237;zate con <ref target="https://collectionbuilder.github.io/collectionbuilder-gh/">la pagina de ejemplo</ref> que nos ofrece Collection-Builder-gh para saber qu&#233; est&#225;s editando (y podr&#225;s seguir realizando esta localizaci&#243;n una vez publiques y veas tu p&#225;gina web).</p>
-<table>
-<row>
-<cell role="label">Nombre en ingl&#233;s</cell>
-<cell role="label">en espa&#241;ol</cell>
-</row>
-<row>
-<cell>About</cell>
-<cell>M&#225;s informaci&#243;n</cell>
-</row>
-<row>
-<cell>Data</cell>
-<cell>Datos</cell>
-</row>
-<row>
-<cell>Timeline</cell>
-<cell>L&#237;nea de tiempo</cell>
-</row>
-<row>
-<cell>Map</cell>
-<cell>Mapa</cell>
-</row>
-<row>
-<cell>Subjects</cell>
-<cell>Temas</cell>
-</row>
-<row>
-<cell>Browse</cell>
-<cell>Navegar</cell>
-</row>
-<row>
-<cell>Home</cell>
-<cell>Inicio</cell>
-</row>
-</table><div type="3"><head>Informaci&#243;n de metadatos</head>
-<p>Es muy sencillo editar los campos de metadatos para que aparezcan en espa&#241;ol u otro idioma aunque tu archivo contenga el nombre de las columnas en ingl&#233;s. Como arriba, vamos a editar un archivo CSV de configuraci&#243;n dentro de la carpeta "_data", en este caso <code rend="inline">config-metadata.csv</code></p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_1" corresp="code_exhibicion-con-collection-builder_1.txt" rend="block"/></ab>
-<p>&#191;Has a&#241;adido alguna columna que no estaba presente en el modelo o "demo" de Collection Builder? Es un buen momento para a&#241;adir ese campo de informaci&#243;n extra en este archivo si quieres que aparezca junto con cada objeto.</p>
-</div><div type="3"><head>P&#225;gina de Inicio (Home page)</head>
-<p>Puedes editar los botones y varios t&#237;tulos en la pag&#237;na de inicio desde la carpeta "index" (&#237;ndice) en la carpeta "_includes" (incluye). Aqu&#237; podr&#225;s encontrar varios archivos HTML y cada uno pertenece a una tarjeta de la p&#225;gina de inicio.</p>
-<div type="4"><head>Descripci&#243;n</head>
-<p>El archivo <code rend="inline">description.html</code> contiene la informaci&#243;n descriptiva de tu p&#225;gina de inicio y aqu&#237; podemos reemplazar varias palabras a otros idiomas. Las palabras que pueden ser modificadas est&#225;n "fuera" de las etiquetas sem&#225;nticas de formato HTML. Veamos un ejemplo:</p>
-<p>De la l&#237;nea <code rend="inline">&lt;h5 class="card-title"&gt;Description&lt;/h5&gt;</code> podemos reemplazar "Description" por "Descripci&#243;n" puesto que est&#225; fuera de las etiquetas de t&#237;tulo de nivel 5 y clase "tarjeta de t&#237;tulo, enmarcadas entre  <code rend="inline">&lt;&gt;</code> en su apertura y <code rend="inline">&lt;/&gt;</code>.</p>
-<p>M&#225;s abajo, tambi&#233;n puedes editar la l&#237;nea en la que enlazamos la p&#225;gina de inicio con la p&#225;gina de informaci&#243;n sobre el proyecto (en <code rend="inline">about.md</code>). De igual forma, tenemos que identificar la informaci&#243;n que queda fuera de las etiquetas de apertura y cierre en formato HTML (<code rend="inline">&lt;&gt;</code> y  <code rend="inline">&lt;/&gt;</code>):  </p>
-<p><code rend="inline">&lt;a class="btn btn-outline-primary" href="/cb-docs/about.html"&gt;Learn More &amp;raquo;&lt;/a&gt;</code></p>
-<p>Cambia "Learn More " por algo como "Aprende m&#225;s".</p>
-<p>Puedes cambiar el resto de botones y t&#237;tulos de tu p&#225;gina de inicio de esta forma en el resto de archivos de la carpeta mencionada.</p>
-</div></div><div type="3"><head>P&#225;gina de exploraci&#243;n de la colecci&#243;n (Browse)</head>
-<p>La p&#225;gina de navegaci&#243;n de la colecci&#243;n sirve para explorar todos los objetos en tu colecci&#243;n. Puesto que esta p&#225;gina es algo m&#225;s complicada en s&#237; misma por su funcionalidad, tenemos que editar varios archivos para diferentes partes (mostradas en esta captura):</p>
-<figure><desc>Ejemplo de la p&#225;gina para navegar por los objetos de la colecci&#243;n" alt="Captura de la p&#225;gina para navegar por los objetos de la colecci&#243;n.</desc><graphic url="exhibicion-con-collection-builder07.png"/></figure>
-<div type="4"><head>T&#237;tulo</head>
-<p>Ver&#225;s que esta p&#225;gina tiene por t&#237;tulo "Browse Items". Para cambiarlo a otro idioma, busca el archivo markdown <code rend="inline">browse.md</code> en la carpeta "pages" (p&#225;ginas). Aqu&#237;, reemplaza el t&#237;tulo de nivel 2 (marcado con dos s&#237;mbolos de almohadilla o <code rend="inline">#</code>) "Browse Items" por algo como "Explora la colecci&#243;n" (o lo m&#225;s adecuado para tu regi&#243;n.)</p>
-</div><table>
-<row>
-<cell role="label">Palabra original</cell>
-<cell role="label">Palabra en espa&#241;ol</cell>
-</row>
-<row>
-<cell>Loading...</cell>
-<cell>Cargando...</cell>
-</row>
-<row>
-<cell>Title</cell>
-<cell>T&#237;tulo</cell>
-</row>
-<row>
-<cell>Reset</cell>
-<cell>Empezar</cell>
-</row>
-<row>
-<cell>Random</cell>
-<cell>Orden aleatorio</cell>
-</row>
-<row>
-<cell>Sort by</cell>
-<cell>Ordenar por</cell>
-</row>
-</table><div type="4"><head>Conteo de art&#237;culos</head>
-<p>Finalmente, podemos editar el conteo de art&#237;culos disponibles durante la exploraci&#243;n de la colecci&#243;n (que antes de la b&#250;squeda indica el n&#250;mero total de art&#237;culos en la colecci&#243;n) y que ver&#225;s que por defecto dice "# of # items" (n&#186; de n&#186; elementos). Edita el archivo JavaScript <code rend="inline">browse-js.html</code> en las carpetas <hi rend="bold">_includes/js</hi>. Busca la l&#237;nea:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_3" corresp="code_exhibicion-con-collection-builder_3.txt" lang="language-javascript" rend="block"/></ab>
-<p>Reemplaza la preposici&#243;n inglesa "of" por la tuya "de" y el sustantivo "items" por "objetos".</p>
-<p>Vamos a aprovechar que estamos en este archivo para cambiar el texto del bot&#243;n que dice "View Full Record" por "Ver registro completo" en el c&#243;digo:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_4" corresp="code_exhibicion-con-collection-builder_4.txt" lang="language-javascript" rend="block"/></ab>
-</div></div><div type="3"><head>P&#225;ginas de visualizaciones opcionales</head>
-<p>Las p&#225;ginas dedicadas a crear visualizaciones opcionales a partir de los datos a&#241;adidos en el archivo de metadatos tambi&#233;n aparecen con t&#237;tulos en ingl&#233;s que podemos editar a otro idioma. Adem&#225;s, hay algunos ajustes que deber&#225;s hacer para facilitar su visualizaci&#243;n:</p>
-<div type="4"><head>Mapa</head>
-<p>Para editar el bot&#243;n que dice "View item" (ver objeto) en la ventanilla "pop-up" que aparece cuando hacemos click en un objeto en el mapa, buscaremos el archivo <code rend="inline">map-js.html</code> en las carpetas "_includes/js". Busca el siguiente c&#243;digo y reemplaza las palabras "View Item" por "Ver objeto":</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_5" corresp="code_exhibicion-con-collection-builder_5.txt" lang="language-javascript" rend="block"/></ab>
-<p>Para editar los nombres de la informaci&#243;n que aparece en las ventanas o "pop-up" en cada objeto en el mapa, podemos editar la p&#225;gina <code rend="inline">config-map.csv</code> dentro de la carpeta "_data". Deber&#225;s dejar la primera columna (<code rend="inline">field</code>) en ingl&#233;s pero puedes cambiar la segunda (<code rend="inline">display_name</code> o mostrar nombre) a tu idioma:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_6" corresp="code_exhibicion-con-collection-builder_6.txt" lang="language-csv" rend="block"/></ab>
-<div type="5"><head>Cambiar el lugar por defecto del mapa</head>
-<p>Por defecto, en CB-gh aparece la regi&#243;n de Idaho, Estados Unidos en la p&#225;gina que contiene el mapa, sin importar d&#243;nde est&#233;n las coordenadas dadas a nuestros objetos en los metadatos. Para centrar, digamos, el mapa al lugar donde est&#225;n las im&#225;genes de la colecci&#243;n, basta con editar estos dos datos en la secci&#243;n dedicada al mapa en el archivo <code rend="inline">theme.yml</code>en la carpeta "_data":</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_7" corresp="code_exhibicion-con-collection-builder_7.txt" rend="block"/></ab>
-<p>Adem&#225;s, si necesitas m&#225;s o menos zoom sobre el mapa, puedes editar el campo dedicado a ello en la misma secci&#243;n del archivo, con un rango de entre <code rend="inline">0</code> y <code rend="inline">18</code>:</p>
-<p><code rend="inline">zoom-level: 5 </code></p>
-</div></div></div><div type="3"><head>P&#225;gina de datos</head>
-<p>Esta p&#225;gina ofrece un cuadro que, por defecto, aparece en ingl&#233;s. Podemos cambiar dichos t&#233;rminos en el archivo <code rend="inline">config-table.csv</code> en la carpeta "_data". Como arriba, podemos cambiar la segunda columna a espa&#241;ol:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_8" corresp="code_exhibicion-con-collection-builder_8.txt" lang="language-csv" rend="block"/></ab>
-<p><hi rend="bold">Bot&#243;n de descarga</hi>: Hay dos partes a editar. Primero, para cambiar las palabras "Download Data" por "Descargar datos" en el bot&#243;n de descarga de los datos en la parte derecha de la p&#225;gina, entramos al archivo <code rend="inline">data-download-modal.html</code> en la carpeta "_includes" y buscamos la l&#237;nea de c&#243;digo:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_9" corresp="code_exhibicion-con-collection-builder_9.txt" lang="language-html" rend="block"/></ab>
-<p>Cambia "Download Data" por algo como "Descargar datos".</p>
-<p>Por otro lado, para editar las opciones, en ingl&#233;s, que aparecen al hacer click en dicho bot&#243;n de descarga de datos, debemos editar otra parte del c&#243;digo en ese mismo archivo:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_10" corresp="code_exhibicion-con-collection-builder_10.txt" lang="language-html" rend="block"/></ab>
-<p>Cambia el texto dentro de las clases "card-title" y  "card-text":</p>
-<p>"card-title": Metadata completa</p>
-<p>"card-text": Todos los campos de metadatos de la colecci&#243;n est&#225;n disponibles en formato CSV o JSON.</p>
-</div><div type="3"><head>P&#225;gina de Informaci&#243;n (About)</head>
-<p>A parte de los cambios explicados m&#225;s arriba, puedes cambiar ciertas palabras que aparecen por defecto en esta p&#225;gina. Para editar la palabra "Contents" (contenidos) en el men&#250; de navegaci&#243;n entra al archivo <code rend="inline">nav-menu.html</code> en las carpetas "_includes/feature" y busca la siguiente l&#237;nea de c&#243;digo para cambiar la palabra:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_11" corresp="code_exhibicion-con-collection-builder_11.txt" lang="language-html" rend="block"/></ab>
-<p>Si prefieres deshacerte de este men&#250; por completo, puedes borrar la siguiente l&#237;nea de c&#243;digo:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_12" corresp="code_exhibicion-con-collection-builder_12.txt" lang="language-html" rend="block"/></ab>
-</div><div type="3"><head>P&#225;gina de b&#250;squeda</head>
-<p>Como otros sistemas de generaci&#243;n de exposiciones digitales, CB tiene una p&#225;gina que sirve para realizar b&#250;squedas sobre nuestra colecci&#243;n. Para cambiar esta p&#225;gina al espa&#241;ol u otro idioma, vamos a editar el archivo <code rend="inline">search.html</code>en la carpeta "_layouts" y varias l&#237;neas de c&#243;digo:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_13" corresp="code_exhibicion-con-collection-builder_13.txt" lang="language-html" rend="block"/></ab>
-<p>En esta l&#237;nea de arriba reemplaza "Search Operators!" por "Operadores de b&#250;squeda", para cambiar el texto que aparece en el bot&#243;n de b&#250;squeda. Y en la de abajo cambia "Lunr Search Operators" por "Operadores de b&#250;squeda Lunr"</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_14" corresp="code_exhibicion-con-collection-builder_14.txt" lang="language-html" rend="block"/></ab>
-<p>Para indicar a los usuarios qu&#233; tipo de b&#250;squeda pueden realizar, vamos a editar las siguientes l&#237;neas:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_15" corresp="code_exhibicion-con-collection-builder_15.txt" lang="language-html" rend="block"/></ab>
-<p>C&#225;mbialo por:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_16" corresp="code_exhibicion-con-collection-builder_16.txt" lang="language-html" rend="block"/></ab>
-<p>Seguramente nos hemos olvidado de indicar qu&#233; archivo editar para traducir alg&#250;n t&#233;rmino en particular. No obstante, con este recorrido deber&#237;as ser capaz de localizar y editar esa palabra que encuentres trabajando en tu exhibici&#243;n digital en particular.</p>
-</div></div>
-      <div type="2"><head>6. Publicar nuestra exhibici&#243;n digital</head>
-<p>Una vez que tienes todo lo anterior preparado, puedes realizar los &#250;ltimos cambios para poder publicar la exposici&#243;n digital en Internet. Para ello, vamos a editar uno de los archivos inform&#225;ticos m&#225;s importantes en el sistema de computaci&#243;n m&#237;nima que estamos usando: <code rend="inline">_config.yml</code> Despu&#233;s, haremos unos cambios o a&#241;adidos en GitHub mismo para indicarle que debe hacer p&#250;blica la web que hemos creado.</p>
-<div type="3"><head>Instrucciones para el config.yml</head>
-<p>El archivo  <code rend="inline">_config.yml</code>, en formato YAML, es utilizado para generar o configurar la web por Jekyll y GitHub. Aunque no es mucho, hay diferentes variables -rellenadas por defecto con informaci&#243;n aleatoria- que debes editar en este archivo para que todo funcione correctamente. Lo importante est&#225; en el c&#243;digo siguiente, "site settings" o configuraci&#243;n de p&#225;gina:</p>
-<ab><code xml:id="code_exhibicion-con-collection-builder_17" corresp="code_exhibicion-con-collection-builder_17.txt" lang="language-yml" rend="block"/></ab>
-<p>Cambia la informaci&#243;n en las siguientes secciones, sin cambiar el nombre de cada secci&#243;n:</p>
-<list type="unordered">
-<item>
-<p>"title" o t&#237;tulo: Corresponde al t&#237;tulo de tu colecci&#243;n digital</p>
-</item>
-<item>
-<p>"tagline" o subt&#237;tulo: Puede ser una explicaci&#243;n de tu colecci&#243;n digital</p>
-</item>
-<item>
-<p>"description" o descripci&#243;n: Escribe una descripci&#243;n m&#225;s larga sobre lo que contiene la colecci&#243;n</p>
-</item>
-<item>
-<p>"author" o autor/a: Nombre de la entidad o persona creadora de la exposici&#243;n</p>
-</item>
-<item>
-<p>"metadata" o metadatos: Nombre del archivo de metadatos que has cargado anteriormente, sin la terminaci&#243;n de formato (<code rend="inline">.csv</code>)</p>
-</item>
-</list>
-<p>Puesto que vas a utilizar GitHub Pages para publicar esta p&#225;gina web, no necesitas hacer m&#225;s cambios.</p>
-</div><div type="3"><head>Publicar la p&#225;gina GitHub Pages</head>
-<p>&#161;Es el momento de "activar" tu exposici&#243;n digital en la web! Para ello, vamos a realizar unos pasos de configuraci&#243;n dentro de la interfaz de GitHub:</p>
-<list type="ordered">
-<item>Ve a la p&#225;gina del repositorio y busca la p&#225;gina de "Settings" (configuraci&#243;n) arriba a la derecha</item>
-<item>Aqu&#237;, haz click en "Pages" (p&#225;ginas) en el men&#250; de la izquierda</item>
-<item>En la secci&#243;n "Source", haz click en el bot&#243;n donde dice "None" (ninguno/a) y selecciona la opci&#243;n "main" (principal)</item>
-<item>Haz click en "Save" (guardar)</item>
-</list>
-<figure><desc>Publicar la p&#225;gina web." alt="Captura con las instrucciones de publicar la p&#225;gina</desc><graphic url="exhibicion-con-collection-builder08.png"/></figure>
-<p>Al guardar el cambio, aparecer&#225;n nuevas opciones y, lo m&#225;s importante, la URL de tu colecci&#243;n digital:</p>
-<figure><desc>Ejemplo con la publicaci&#243;n de la p&#225;gina." alt="Captura del mensaje al publicar la p&#225;gina</desc><graphic url="exhibicion-con-collection-builder09.png"/></figure>
-<p>&#161;Felicidades! Ya tienes una p&#225;gina web con tu colecci&#243;n digital que puedes compartir con tus usuarios. Haz click en la URL azul o copia y p&#233;gala en un navegador o tel&#233;fono celular para verla.</p>
-</div></div>
-      <div type="2"><head>7. Realizar cambios posteriores y a&#241;adidos</head>
-<p>Si necesitas realizar cambios en la p&#225;gina web, puedes hacerlos en tu repositorio en GitHub como los hechos anteriormente. Puedes cambiar las im&#225;genes y los metadatos, las p&#225;ginas contextuales, etc. Puesto que se trata de una p&#225;gina creada con computaci&#243;n m&#237;nima, se pueden rotar f&#225;cilmente exhibiciones digitales de forma trimestral o anual.</p>
-<p>CollectionBuilder cuenta con funcionalidades extra que puedes ir a&#241;adiendo cuando te sientas m&#225;s c&#243;modo/a con el manejo de los archivos en el respositorio. Adem&#225;s, est&#225;n ampliando la herramienta poco a poco. Visita su p&#225;gina web<ref target="https://collectionbuilder.github.io">https://collectionbuilder.github.io</ref> de vez en cuando para ver nuevas actualizaciones.  </p>
-</div>
-      <div type="2"><head>Agradecimiento</head>
-<p>Esta lecci&#243;n fue escrita a partir de los materiales creados para un taller virtual de capacitaci&#243;n digital para las organizaciones latinoamericanas que colaboran con el repositorio de <ref target="https://ladi.lib.utexas.edu/es">Iniciativas Digitales de Am&#233;rica Latina</ref> de la Universidad de Texas en Austin y financiada por una beca de la Andrew W. Mellon Foundation.</p>
-</div>
-      <div type="2"><head>Notas</head>
-</div>
-    </body>
-  </text>
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Exhibición digital mínima e interactiva con CollectionBuilder</title>
+                <author role="original_author">Jennifer Isasi</author>
+                <editor role="reviewers">
+                    <persName>Juan Pablo Angarita Bernal</persName>
+                    <persName>Matías Butelman</persName>
+                </editor>
+                <editor role="editors">
+                    <persName>Maria José Afanador-Llach</persName>
+                    <persName>Isabelle Gribomont</persName>
+                </editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phes0060</idno>
+                <date type="published">08/21/2022</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>En esta lección aprenderás a utilizar la versión ligera de CollectionBuilder para publicar una colección digital.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">website</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="es">
+        <body>
+            <div type="2">
+                <head>Objetivos</head>
+                <list type="unordered">
+                    <item>Aprender a utilizar la versión ligera de CollectionBuilder</item>
+                    <item>Localizar la interfaz web al español</item>
+                    <item>Publicar una colección digital siguiendo los preceptos "minimal computing"</item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Pre-requisitos</head>
+                <p>Esta lección se va a enfocar en la versión más sencilla de <ref target="https://collectionbuilder.github.io">
+                        <hi rend="bold">CollectionBuilder</hi>
+                    </ref>, que podrás manejar desde el navegador web y una cuenta gratuita de GitHub. Para ello, es necesario tener nociones básicas de:</p>
+                <list type="unordered">
+                    <item>
+                        <p>Archivos de imágenes en formato JPEG o PNG y/o archivos de audio en formato MP3<ref type="footnotemark" target="#es_note_1"/>
+                        </p>
+                        <p>
+                            <ref type="footnotemark" target="#es_note_1"/> : Puedes aprender a editar archivos de audio para reducir su tamaño con la lección <ref target="/es/lecciones/editar-audio-con-audacity">"Editar audio con Audacity"</ref> de Brandon Walsh y traducida por José Antonio Motilla.</p>
+                    </item>
+                    <item>
+                        <p>Curaduría de metadatos, guardados en formato CSV</p>
+                    </item>
+                    <item>
+                        <p>Escritura en formato Markdown<ref type="footnotemark" target="#es_note_2"/>
+                        </p>
+                        <p>
+                            <ref type="footnotemark" target="#es_note_2"/> : Si necesitas aprender este formato te recomendamos la lección de Sarah Simpkin y traducida por Víctor Gayol <ref target="/es/lecciones/introduccion-a-markdown">"Introducción a Markdown"</ref>
+                        </p>
+                    </item>
+                    <item>
+                        <p>Manejo de una cuenta y un repositorio básico en GitHub</p>
+                    </item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Reutilización de colecciones digitalizadas con Collection Builder</head>
+                <p>Los archivos, bibliotecas y museos digitalizan cada vez más sus colecciones con tres objetivos clave: primero, quieren preservar una copia digital del objeto físico; segundo, buscan ofrecer la copia digital para evitar el desgaste del objeto durante consultas o exposiciones; y tercero, la copia digital sirve para la diseminación de su acervo a corto y largo plazo. No existe un único modelo para estas tres tareas y, por ello, las opciones de sistemas informáticos para realizar cada una de ellas es muy amplia. Esta lección se enfoca en el tercer objetivo de la digitalización, a saber, la diseminación de la colección, y te enseña a utilizar una de las herramientas más sencillas de todas las disponibles para crear exposiciones digitales, desde la metodología de la computación mínima.</p>
+                <p>En el contexto de archivos pequeños, CollectionBuilder resulta muy cómodo porque permite publicar imágenes de resolución media de documentos, fotografías, obras de arte, etc., así como grabaciones que quieran circularse o darse a conocer entre la comunidad de usuarios. Y esto puede hacerse desde la reutilización de archivos ya digitalizados y adaptados para esta plataforma o bien desde copias digitales de menor calidad.</p>
+                <p>Se recomienda el uso de CollectionBuilder, por ejemplo, para crear exhibiciones digitales temporales (tres meses, seis meses, etc.), que den acceso a la colección a aquellos usuarios que no tengan acceso a las instalaciones físicas del museo o archivo. También puede usarse como complemento a las exhibiciones temporales, para proporcionar archivos extra, mayor contexto, etc. Además, puesto que los usuarios pueden descargar los datos de la colección, se puede aprovechar la plataforma como herramienta para promover el análisis y la visualización de datos.</p>
+                <p>En caso de contar con un acervo digital de la colección de un archivo o museo, se podrán reutilizar los archivos digitales en una menor resolución que la original y así dar salida o acceso a documentos u otros elementos históricos de forma rápida sin necesidad de tener acceso a internet de alta velocidad.</p>
+                <p>CollectionBuilder cuenta con tres versiones de, más o menos, la misma herramienta, cada una con funcionalidades algo más complejas o mayor nivel de personalización posible: CB en GitHub Pages, CB Stand Alone y CB CSV. Para crear una colleción digital sencilla sin necesidad de tener conocimientos de informática avanzados, nosotros vamos a utilizar su versión basada totalmente en GitHub: <hi rend="bold">
+                        <ref target="https://github.com/CollectionBuilder/collectionbuilder-gh">collectionbuilder-gh</ref>
+                    </hi>.  </p>
+                <div type="3">
+                    <head>¿Qué es CollectionBuilder-GH?</head>
+                    <p>CollectionBuilder-GH es una herramienta de código abierto para publicar exhibiciones digitales basadas en metadatos y formada por la tecnología de páginas web estáticas. Su objetivo principal es ofrecer un modelo simple para diseminar colecciones de forma práctica y sostenible que, a la vez, no involucre conocimientos de informática avanzada. Así, las exhibiciones están formadas por tres archivos básicos (hoja de cálculo con metadatos, archivos audio visuales y un archivo de configuración) y un conjunto de archivos Jekyll basado en GitHub, que sigue la metodología <hi rend="bold">
+                            <ref target="https://lib-static.github.io/">Lib-STATIC</ref>
+                        </hi> desarrollada en la biblioteca de la Universidad de Idaho en Estados Unidos.</p>
+                    <p>El objetivo de la metodología Lib-STATIC es utilizar la tecnología de webs estáticas y las habilidades de clasificación y creación de metadatos de los bibliotecarios para crear publicaciones interesantes y con las que el público puede interactuar fácilmente.</p>
+                    <p>CollectionBuilder-GH (CB-GH) es una de las alternativas de tipo computación mínima (minimal computing), que se refiere a "la actividad computacional que se realiza bajo restricciones significativas de hardware, software, educación, capacidad de red, energía u otros factores" (<ref target="https://go-dh.github.io/mincomp/about/">
+                            <emph>Minimal Computing: a working group of GO::DH</emph>
+                        </ref>). Precisamente, por su formato, las exhibiciones digitales creadas con CollectionBuilder en GitHub necesitarán de menos hardware o tecnología y menos ancho de banda de Internet. Además, está totalmente adaptada a sistemas celulares. Este sistema es una buena alternativa a sistemas de exhibiciones digitales como <ref target="https://es.wikipedia.org/wiki/Omeka">Omeka</ref> y al algo más complejo sistema <ref target="https://minicomp.github.io/wax/">Wax</ref>, para aquellos que no tengan recursos informáticos avanzados a su alcance, que no dispongan del tiempo para aprender a utilizar algo más complicado y, en resumidas cuentas, que quieran reutilizar de forma rápida las colecciones digitalizadas en sus archivos para dar acceso a su comunidad.</p>
+                    <p>El trabajo para crear CB-GH está financiada por una beca National Leadership Grants for Libraries Planning Grant ofrecida por el Instituto de Servicios de Museos y Bibliotecas (<ref target="https://www.imls.gov">IMLS</ref>, por sus siglas en inglés). Varias bibliotecas y museos ya han utilizado esta herramienta para la diseminación de sus colecciones u otros propósitos, como son <ref target="https://drodz11.github.io/colors-of-ozu/">Colors of Ozu</ref>, de Dave Rodriguez o la <ref target="http://dna.nust.na/heritage_week/">Namibia Heritage Week 2020</ref>, de Namibia University of Science and Technology.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>1. Preparar los archivos básicos para la colección</head>
+                <p>CollectionBuilder-GH está basado en cuatro componentes básicos que generan la página web estática en la que puedes publicar exhibiciones para tu proyecto: Jekyll, Git/GitHub, Bootstrap 4 y archivos de datos CSV y YAML. Y es que para preparar la exhibición solo necesitarás preocuparte de tener una colección de objetos que quieras presentar con su correspondiente información. Para presentarla en la web sin más añadidos, puedes crear y/o editar los dos tipos de documentos explicados a continuación. Explicaremos cómo editar páginas de contexto y los componentes de navegación más adelante.</p>
+                <div type="3">
+                    <head>Colección de objetos</head>
+                    <p>CollectionBuilder-GH está pensado para ser utilizado con colecciones pequeñas. Para poder utilizar la versión gratuita de GitHub, el total de los archivos de la exhibición no puede superar 1GB de peso. Por eso, se recomienda que la carpeta de imágenes no supere los 500MB. Puedes realizar la edición necesaria en imágenes de alta resolución que ya tengas con cualquier software de editado de imágenes, como <ref target="http://www.gimp.org.es/descargar-gimp.html">GIMP</ref>. Es importante tener en cuenta las siguientes consideraciones:</p>
+                    <list type="unordered">
+                        <item>
+                            <p>Formato de los objetos: GitHub y esta herramienta aceptan los formatos más comunes de imágenes y audio con los que ya estarás familiarizado: jpg, png y mp3. También puedes utilizar enlaces externos a objetos en YouTube o Vimeo, pero estos no aparecerán dentro de la exhibición</p>
+                        </item>
+                        <item>
+                            <p>Tamaño de cada archivo: La <ref target="https://es.wikipedia.org/wiki/Resoluci%C3%B3n_de_imagen">resolución de las imágenes</ref> no debe superar los 1200px, esto es, deben ser inferiores a 1MB. Ten en cuenta que utilizar un tamaño mayor a lo anterior no sólo limitará el número de imágenes que puedes añadir (500MB en total) sino que también ralentizará la carga de las imágenes para tu audiencia. Si sabes que la mayoría de los usuarios accederán a la colección a través de un teléfono móvil y con una conexión limitada a Internet, un tamaño de imágenes o audio inferior hará más fácil su tarea</p>
+                        </item>
+                        <item>
+                            <p>Nombre de cada archivo: Debe ser una cadena de caracteres, sin espacios, en minúsculas y sin caracteres especiales como la barra diagonal <code rend="inline">/</code>, aunque puedes usar el guión <code rend="inline">-</code> y el guión bajo <code rend="inline">_</code> para separar palabras. Vas a utilizar este nombre en la casilla "filename" en los metadatos para conectar el objeto con sus datos</p>
+                        </item>
+                        <item>
+                            <p>Localización: La colección de objetos u archivos irá, tal cual, en la carpeta "objects" en el repositorio</p>
+                        </item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Documento de metadatos</head>
+                    <p>CollectionBuilder funciona con una simple hoja de metadatos para cada uno de los objetos que queramos mostrar en la colección. Por ejemplo, si descargas <ref target="https://docs.google.com/spreadsheets/d/1Uv9ytll0hysMOH1j-VL1lZx6PWvc1zf3L35sK_4IuzI/edit#gid=0">su plantilla de Google Drive</ref> (en inglés) o <ref target="/assets/exhibicion-con-collection-builder/collectionbuilder-metadata-template.csv">de nuestro repositorio</ref>, verás que es una hoja de cálculo con una columna para el ID (identificación) de cada objeto y múltiples columnas para las características de estos:</p>
+                    <figure>
+                        <desc>Plantilla de metadatos de Collection Builder</desc>
+                        <graphic url="exhibicion-con-collection-builder01.png"/>
+                    </figure>
+                    <p>Puedes trabajar con dicho archivo, editar el archivo "metadata-template.csv" en la carpeta "_data" o generar un archivo de valores separados por comas con los campos obligatorios que mostramos a continuación y después cargarlo al repositorio. En cualquier caso, debes dejar los nombres de cada columna en inglés (a lo largo de esta lección se traducen entre paréntesis para tu referencia) ya que los podemos traducir en un archivo de configuración en la misma carpeta, como veremos más abajo.</p>
+                    <p>A continuación explicamos los campos obligatorios, los campos para generar visualizaciones y los campos totalmente opcionales:</p>
+                    <div type="4">
+                        <head>Campos obligatorios</head>
+                        <list type="unordered">
+                            <item>
+                                <p>objectid (identificación del objeto): Esta es la información que CB utiliza para identificar cada objeto (imagen o audio) y unirlo a sus metadatos correspondientes. Debe ser una cadena de caracteres, sin espacios, en minúsculas y sin caracteres especiales como la <code rend="inline">/</code> aunque puedes usar el guión (<code rend="inline">-</code>) y la barra baja (<code rend="inline">_</code>) para separar palabras. Ejemplo: <code rend="inline">poster_001</code>
+                                </p>
+                            </item>
+                            <item>
+                                <p>filename (nombre del archivo): Esto corresponde al título de cada archivo en la colección más la extensión de formato (.png o .jpg, por ejemplo) o el enlace a la URL del archivo en otro lugar externo. Ejemplo: <code rend="inline">poster_001.jpg</code>
+                                </p>
+                            </item>
+                            <item>
+                                <p>title (título): Sigue la idea de título de objetos de las normas de metadatos y corresponde a un título que lleve el objeto original. Se recomienda que sea corto y descriptivo. Ejemplo: <code rend="inline"> Coordinadora Nacional de la Mujer Savaldoreña - CONAMUS</code>
+                                </p>
+                            </item>
+                            <item>
+                                <p>format (formato): Aquí se indica el formato del objeto mostrado. Es importante que rellenes este campo puesto que CB lo utiliza para crear las visualizaciones interactivas según el tipo de objeto que añadas. Estas son una de las opciones que puedes usar:</p>
+                                <list type="unordered">
+                                    <item>Para imágenes: <code rend="inline">image/jpeg o png</code>
+                                    </item>
+                                    <item>Para documentos: <code rend="inline">application/pdf</code>
+                                    </item>
+                                    <item>Para audio: <code rend="inline">audio/mp3</code>
+                                    </item>
+                                    <item>Para video:<code rend="inline">video/mp3</code>
+                                    </item>
+                                </list>
+                            </item>
+                        </list>
+                    </div>
+                    <div type="4">
+                        <head>Campos para visualizaciones</head>
+                        <p>CollectionBuilder cuenta con la creación automática de visualizaciones o puntos de entrada a la colección, a través de la información proporcionada en el archivo de metadatos. Estos pueden ser de gran utilidad para nuestra audiencia pues generarán visualizaciones interactivas para explorar la colección en diferentes páginas. Cada página "extra" necesita un tipo de información diferente, que se explica a continuación:</p>
+                        <list type="unordered">
+                            <item>
+                                <p>Map (mapa): Creará un mapa y, para ello, requiere de los campos de metadatos en las columnas latitude (latitud, información de norte-sur) y longitude  (longitud, información de este-oeste), es decir, los datos de coordenadas de una localización correspondiente al objeto que presentas en la exhibición. Por ejemplo: una fotografía de la catedral de San Salvador llevará las coordenadas <code rend="inline">43.2145</code> y <code rend="inline">5.5035</code>
+                                </p>
+                            </item>
+                            <item>
+                                <p>Timeline (línea de tiempo): Se refiere a una fecha asociada en el tiempo a cada imagen y genera una página con las imágenes ordenadas por fecha. Por tanto, requiere datos cronológicos en la columna date. El formato a seguir es <code rend="inline">aaaa-mm-dd</code> con los cuatro dígitos del año siendo el valor mínimo que se necesita para formar la línea de tiempo. Ejemplos: para el 25 de diciembre de 1989: <code rend="inline">1989-12-25</code>
+                                </p>
+                            </item>
+                            <item>
+                                <p>Subjects (temas): Forma una nube de palabras con los temas sobre los que trata cada objeto en la columna subject. Puedes colocar múltiples temas en cada casilla (por cada objeto) y separarlos por un punto y coma (<code rend="inline">;</code>). Ejemplo: <code rend="inline">catedral; religión; edificio</code>. Recuerda que es importante contar con un vocabulario de temas reducido a seguir por todo el equipo y que debe tener siempre la misma forma de escritura: minúsculas o mayúsculas, tildes, singular o plural, etc., porque si no, verás un tema duplicado (la máquina no sabe que <code rend="inline">edificio</code> y <code rend="inline">edificios</code> corresponde a una misma cosa)</p>
+                            </item>
+                            <item>
+                                <p>Location (lugares): Es similar a la página de temas ya que formará una nube de palabras correspondientes a la localización de las imágenes. Utiliza una coma (<code rend="inline">,</code>) para separar, por ejemplo, una localidad y una región dentro del país, o un país. Puedes incluir varios lugares para una misma imagen usando también el punto y coma (<code rend="inline">;</code>) para separarlos</p>
+                            </item>
+                        </list>
+                    </div>
+                    <div type="4">
+                        <head>Campos opcionales</head>
+                        <p>Como en cualquier archivo de metadatos que sea creado por seres humanos y que no siga una plantilla estática con campos siempre iguales, puedes añadir más información para cada objeto en tu colección, siguiendo los intereses de los creadores y la audiencia de la colección digital. Estos que mostramos son solo algunas de las opciones que puedes añadir:</p>
+                        <list type="unordered">
+                            <item>
+                                <p>creator (creador): Nombre de la persona que creó el objeto original que se ha digitalizado</p>
+                            </item>
+                            <item>
+                                <p>description (descripción): Una nota breve sobre el objeto</p>
+                            </item>
+                            <item>
+                                <p>source (fuente): Designa la fuente del objeto, como puede ser su localización en la colección física en un archivo y puede seguir su formato correspondiente</p>
+                            </item>
+                            <item>
+                                <p>language (idioma): Puede indicar el idioma asociado al objeto. En caso de añadirlo, se recomienda seguir el código ISO 659-2 de cada idioma: <code rend="inline">en</code> para inglés, <code rend="inline">es</code> para español, <code rend="inline">pt</code> para portugués, etcétera</p>
+                            </item>
+                            <item>
+                                <p>rights (derechos): Un texto que contenga información sobre los derechos de la audiencia sobre los objetos digitales</p>
+                            </item>
+                        </list>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>2. "Instalación" de CollectionBuilder</head>
+                <p>Lo primero que necesitas es tener una <ref target="https://github.com">cuenta en GitHub</ref> para tu archivo, biblioteca, museo o una cuenta personal. Para instalar CollectionBuilder simplemente tendrás que clonar su repositorio, cargar tu colección, localizar la web a tu idioma (opcional), configurar la página web y publicar la exhibición. Excepto algunos pasos, como los anteriores, todo esto se puede realizar a través del navegador web y a partir de aquí te enseño cómo hacerlo.</p>
+                <quote>
+                    <p>Verás que en el perfil de GitHub de CollectionBuilder hay cuatro repositorios. En esta lección nos interesa el que puede ser manejado completamente en/a través de GitHub: collectionbuilder-gh</p>
+                </quote>
+                <div type="3">
+                    <head>Clonar el repositorio a nuestra cuenta GitHub</head>
+                    <list type="ordered">
+                        <item>
+                            <p>Abre el navegador y conéctate a tu cuenta de GitHub</p>
+                        </item>
+                        <item>
+                            <p>Navega a la página de GitHub de CollectionBuilder y el repositorio que nos interesa en <ref target="https://github.com/CollectionBuilder/collectionbuilder-gh">https://github.com/CollectionBuilder/collectionbuilder-gh</ref>
+                            </p>
+                        </item>
+                        <item>
+                            <p>Haz click en el botón verde que dice "Use this template" (usar esta plantilla)</p>
+                            <figure>
+                                <desc>Clonar repositorio" alt="Imagen que indica dónde clicar para clonar el repositorio.</desc>
+                                <graphic url="exhibicion-con-collection-builder02.png"/>
+                            </figure>
+                        </item>
+                        <item>
+                            <p>Se abrirá una ventana nueva con las instrucciones para clonar todos los archivos de <code rend="inline">collectionbuilder-gh</code> en un nuevo repositorio en tu cuenta de GitHub:</p>
+                            <list type="ordered">
+                                <item>
+                                    <p>Da un nombre al que será tu nuevo repositorio</p>
+                                </item>
+                                <item>
+                                    <p>Opcional: Escribe una descripción para ese repositorio</p>
+                                </item>
+                                <item>
+                                    <p>Puesto que tu cuenta es gratuita, debes dejar el repositorio abierto al público</p>
+                                </item>
+                                <item>
+                                    <p>Deja sin marcar la casilla "Include all branches" (incluir todas las ramas)</p>
+                                </item>
+                                <item>
+                                    <p>Haz click en el botón verde que dice "Create repository from this template" (crear repositorio desde esta plantilla)</p>
+                                </item>
+                            </list>
+                        </item>
+                    </list>
+                    <figure>
+                        <desc>Campos a rellenar para clonar el repositorio" alt="Imagen de los campos a rellenar para clonar el repositorio.</desc>
+                        <graphic url="exhibicion-con-collection-builder03.png"/>
+                    </figure>
+                    <p>Si te aparece una nueva pantalla donde aparece tu nombre de cuenta de GitHub seguido por el nombre que has dado al nuevo repositorio ¡felicidades! has clonado de forma correcta la base o plantilla de CollectionBuilder para tu exhibición.</p>
+                    <figure>
+                        <desc>El repositorio ha sido copiado a tu cuenta" alt="Imagen de que nuestra un nuevo repositorio en tu cuenta.</desc>
+                        <graphic url="exhibicion-con-collection-builder04.png"/>
+                    </figure>
+                    <div type="4">
+                        <head>Contenido de la copia de CollectionBuilder</head>
+                        <p>Brevemente, el contenido de cada carpeta es el siguiente:</p>
+                        <list type="unordered">
+                            <item>
+                                <p>_data: Contiene tres tipos de archivos que ayudan a formar el "esqueleto" de la exhibición. En formato CSV (valores separados por comas) tenemos, primero, <code rend="inline">metadata-template.csv</code> o una plantilla para los metadatos tal y como deben ir (excepto lo notado arriba) para que la herramienta funcione. También añaden un ejemplo en el archivo <code rend="inline">demo-metadata.csv</code>. También encontramos aquí el vocabulario para las páginas de navegar por los objetos (<code rend="inline">config-browse.csv</code>), ver el mapa (<code rend="inline">config-map.csv</code>), los metadatos (<code rend="inline">config-metadata.csv</code>), navegación general o menú (<code rend="inline">config-nav.csv</code>), búsqueda (<code rend="inline">config-search.csv</code>) y una tabla (<code rend="inline">config-table.csv</code>). Finalmente, en esta misma carpeta encontramos el archivo de tipo YML (<ref target="https://es.wikipedia.org/wiki/YAML">formato de serialización de datos legible por humanos</ref>) de configuración del tema de la página y del que no te tienes que preocupar</p>
+                            </item>
+                            <item>
+                                <p>_includes y _layouts: Estas carpetas contienen los archivos HTML que forman muchas de las funcionalidades de la herramienta CollectionBuilder. Para un uso sencillo de la misma y si no tienes conocimientos informáticos, es mejor que no te preocupes por editar estos archivos</p>
+                            </item>
+                            <item>
+                                <p>_sass y assets: Aquí se encuentran los archivos SCSS (<ref target="https://es.wikipedia.org/wiki/Sass">Syntactically Awesome Style Sheets</ref>) que aporta el lado visual a la página web (colores, tamaños de fuentes, etc.) y los archivos JSON (JavaScript Object Notation o <ref target="https://es.wikipedia.org/wiki/JSON">notación de objeto de JavaScript</ref>) que hacen que todo funcione. De nuevo, si no tienes conocimientos de cómo escribir css o json, es mejor que ignores estos archivos por el momento</p>
+                            </item>
+                            <item>
+                                <p>docs: Aquí puedes encontrar instrucciones en inglés referidas a la creación de mini-iconos para tu página (<code rend="inline">create-favicon.md</code> y <code rend="inline">create-thumbs.md</code>), la funcionalidad para añadir servicios de google (<code rend="inline">google.md</code>), información sobre campos de metadatos (<code rend="inline">metadata-info.csv</code>) y otra copia de la plantilla de metadatos (<code rend="inline">metadata-template.csv</code>)  </p>
+                            </item>
+                            <item>
+                                <p>objects: Este es el directorio en el que se guardarán las imágenes o archivos digitales de la colección con la que quieras crear tu exhibición digital</p>
+                            </item>
+                            <item>
+                                <p>pages: Contiene los archivos en formato markdown que forman parte de lo que llamamos la información contextual de tu colección digital: información (<code rend="inline">about.md</code>), navegar (<code rend="inline">browse.md</code>), y conjunto de datos (<code rend="inline">data.md</code>) y otros que son, simplemente, el título de las páginas (que cambiaremos a otro idioma) de los objetos (<code rend="inline">item.md</code>), el mapa (<code rend="inline">map.md</code>), la barra de búsqueda (<code rend="inline">search.md</code>), la página de navegación por palabras clave (<code rend="inline">subject.md</code>)  y la línea de tiempo que se genera siguiendo el orden de las fechas en los metadatos (<code rend="inline">timeline.md</code>)  </p>
+                            </item>
+                        </list>
+                        <p>Existen también una serie de archivos individuales ya en la carpeta del repositorio. Solamente tendrás que preocuparte, ya al final, por el que se llama "_config.yml" y que será el que edites para configurar tu página web antes de publicarla (con una URL, título, información de derechos, etc.)</p>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>3. Cargar los archivos básicos para la colección</head>
+                <p>Una vez que tengas claro qué archivos van en cada carpeta y hayas creado una colección con objetos de tu elección junto con sus metadados, es momento de cargar todo al repositorio.</p>
+                <div type="3">
+                    <head>Cargar imágenes</head>
+                    <p>Como se ha indicado, la colección de imágenes o audios irá en la carpeta llamada "objects". Para ello, entra en dicha carpeta y sigue estas instrucciones para cargar las imágenes juntas. Asegúrate de subir las correctas de una vez, pues para editarlas tendrás que borrar y volver a cargar los archivos.</p>
+                    <list type="ordered">
+                        <item>
+                            <p>Entra en la carpeta "objects"</p>
+                        </item>
+                        <item>
+                            <p>Haz click en el botón que dice "Add file" o añadir archivo arriba a la derecha</p>
+                        </item>
+                        <item>
+                            <p>Haz click en la opción "Upload files" o cargar archivos</p>
+                            <figure>
+                                <desc>Cómo cargar o subir los objetos a la carpeta objects" alt="Imagen que indica cómo subir los archivos a la carpeta objects.</desc>
+                                <graphic url="exhibicion-con-collection-builder05.png"/>
+                            </figure>
+                        </item>
+                        <item>
+                            <p>Arrastra los archivos a la caja donde dice "Drag files here to add them to your repository" o arrastra hasta aquí los archivos que quieres añadir en tu repositorio</p>
+                        </item>
+                        <item>
+                            <p>Añade una descripción simple de lo que acabas de hacer en la caja que dice "Add files via upload" (añadir archivos mediante carga) y, para seguir buenas prácticas, añade una descripción algo más indicativa de lo que acabas de añadir en la caja de texto</p>
+                        </item>
+                        <item>
+                            <p>Finalmente, asegúrate de que dejas marcada la opción "Commit directly to the <code rend="inline">main</code> branch" (aceptar cambios directamente en la rama <code rend="inline">principal</code>) y  haz click en el botón verde que dice "Commit changes" o aceptar cambios</p>
+                        </item>
+                    </list>
+                    <figure>
+                        <desc>Cómo guardar los cambios realizados" alt="Imagen que indica cómo guardar los cambios realizados.</desc>
+                        <graphic url="exhibicion-con-collection-builder06.png"/>
+                    </figure>
+                    <p>¡Ya está! Si todo ha ido bien, ahora deberías ver los archivos de tus imágenes en la carpeta objects.</p>
+                </div>
+                <div type="3">
+                    <head>Cargar metadatos</head>
+                    <p>Si tienes tu archivo con los metadatos para los objetos en formato CSV en tu computadora, cárgalo a la carpeta de "_data" siguiendo el mismo proceso de carga de archivos de objetos que acabas de ver.</p>
+                    <list type="ordered">
+                        <item>Entra en la carpeta "_data"</item>
+                        <item>Haz click en el botón que dice "Add file" o añadir archivo arriba a la derecha</item>
+                        <item>Haz click en la opción "Upload files" o cargar archivos</item>
+                        <item>Arrastra o busca tu archivo CSV de metadatos y cárgalo (asegúrate de saber su nombre)</item>
+                        <item>Añade una descripción a la tarea realizada y acepta los cambios en la rama principal</item>
+                    </list>
+                    <p>De forma alternativa, puedes editar el archivo de metadatos existente haciendo clic en el lapicero de edición que aparece arriba a la derecha al entrar al archivo. Sigue el formato de separación de columnas.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>4. Páginas de contexto</head>
+                <p>Hay una serie de páginas en la exhibición que contienen lo que podríamos llamar información contextual de la colección presentada en esta herramienta. Lo mejor para dar a conocer la colección de tus archivos es agregar información de contexto y/o interpretativa para tu audiencia, igual que si estuvieran visitando el archivo de forma física y consultando los objetos. Esto es, toda la información adicional relacionada con la colección en su conjunto y no simplemente de cada objeto en particular o de forma individual: ¿Quién es responsable de la curaduría de los objetos presentados en la colección digital? ¿Cuál es la entidad responsable de la creación y mantenimiento de la página? ¿Hay alguna entidad que financia el proyecto?, etc. Estas páginas están escritas en formato de escritura markdown con un sencillo sistema de formato Jekyll que configura su visualizado. Para procesarlas, todas estas páginas deben seguir el formato de inicio YAML como este:</p>
+                <ab>
+                    <code lang="language-yaml" xml:id="code_exhibicion-con-collection-builder_0" corresp="code_exhibicion-con-collection-builder_0.txt" rend="block"/>
+                </ab>
+                <p>El inicio de YAML necesita tres guiones (<code rend="inline">---</code>) de principio y tres de final. Entre dichos guiones, van los tres elementos necesarios para procesar la página: <code rend="inline">title</code>, <code rend="inline">layout</code> y <code rend="inline">permalink</code>.</p>
+                <p>Esta información no se verá en la página final de tu colección digital.</p>
+                <h4>Formato markdown</h4>
+                <p>Para crear o editar estas páginas, debes utilizar el formato de marcado para escritura markdown (con extensión de formato <code rend="inline">.md</code>). Si no lo conoces, puedes leer esta <ref target="/es/lecciones/introduccion-a-markdown">Introducción a Markdown</ref> escrita por Sarah Simpkin.</p>
+                <div type="3">
+                    <head>Listado de páginas contextuales</head>
+                    <h5>Página de Información (About)</h5>
+                    <p>Hasta que te sientas cómodo/a creando páginas nuevas, lo mejor es utilizar la ya incluida <code rend="inline">about.md</code> con el propósito de añadir esta información. Navega a la carpeta pages (páginas) y entra en el archivo markdown. Verás que primero incluye el bloque de YAML explicado más arriba, en el que puedes cambiar el título (<emph>title</emph>) a algo en español u otro idioma.</p>
+                    <p>Puedes empezar a escribir, en formato markdown, inmediatamente después del bloque YAML.</p>
+                    <p>Se incluye además un bloque escrito en <ref target="https://shopify.github.io/liquid/">lenguaje de formato Liquid</ref> (solo en inglés) que podrás utilizar más adelante para añadir alguna imagen en esta página. Este utiliza una combinación de objetos, etiquetas y filtros dentro de los archivos de plantilla, como el que estás editando, para mostrar contenido dinámico.</p>
+                </div>
+                <div type="3">
+                    <head>Menú de navegación</head>
+                    <p>Para que las páginas de contexto aparezcan en tu página web, deberás incluir su nombre en el archivo de valores separado por comas llamado <code rend="inline">config-nav.csv</code> de tu repositorio en la carpeta "_data". Si no has cambiado el nombre de archivo para la página de información <code rend="inline">about.md</code> no necesitas editar este archivo; por el contrario, si lo has cambiado o si necesitas añadir otra página, asegúrate de editar también este archivo.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>5. Editar el idioma de la página web en CollectionBuilder</head>
+                <p>Puedes cambiar el idioma por defecto de la plataforma al tuyo propio. A diferencia de otros contenidos más sencillos de añadir, el cambio de idioma de la interfaz supone indagar un poco en los archivos de cógido de la colección y aquí te enseñamos cómo. Familiarízate con <ref target="https://collectionbuilder.github.io/collectionbuilder-gh/">la pagina de ejemplo</ref> que nos ofrece Collection-Builder-gh para saber qué estás editando (y podrás seguir realizando esta localización una vez publiques y veas tu página web).</p>
+                <head>Menú de navegación (Navigation Menu)</head>
+                <p>Es muy sencillo cambiar a otro idioma las palabras que aparecen en la barra o el menú de navegación de tu web desde el archivo <code rend="inline">config-nav.csv</code> en la carpeta "_data". Se trata de un archivo de valores separados por comas con dos columnas. Edita las palabras de la columna "display_name" (lo que se muestra) por la palabra aquí en español (u otro idioma):</p>
+                <table>
+                    <row>
+                        <cell role="label">Nombre en inglés</cell>
+                        <cell role="label">en español</cell>
+                    </row>
+                    <row>
+                        <cell>Home</cell>
+                        <cell>Inicio</cell>
+                    </row>
+                    <row>
+                        <cell>Browse</cell>
+                        <cell>Navegar</cell>
+                    </row>
+                    <row>
+                        <cell>Subjects</cell>
+                        <cell>Temas</cell>
+                    </row>
+                    <row>
+                        <cell>Map</cell>
+                        <cell>Mapa</cell>
+                    </row>
+                    <row>
+                        <cell>Timeline</cell>
+                        <cell>Línea de tiempo</cell>
+                    </row>
+                    <row>
+                        <cell>Data</cell>
+                        <cell>Datos</cell>
+                    </row>
+                    <row>
+                        <cell>About</cell>
+                        <cell>Más información</cell>
+                    </row>
+                </table>
+                <p>Si quieres añadir la página con nube de palabras de localizaciones, solamente tienes que añadir una línea con la palabra "Localizaciones". Y si quieres quitar una de las páginas de tu web, simplemente borra la línea.</p>
+                <div type="3">
+                    <head>Información de metadatos</head>
+                    <p>Es muy sencillo editar los campos de metadatos para que aparezcan en español u otro idioma aunque tu archivo contenga el nombre de las columnas en inglés. Como arriba, vamos a editar un archivo CSV de configuración dentro de la carpeta "_data", en este caso <code rend="inline">config-metadata.csv</code>
+                    </p>
+                    <ab>
+                        <code xml:id="code_exhibicion-con-collection-builder_1" corresp="code_exhibicion-con-collection-builder_1.txt" rend="block"/>
+                    </ab>
+                    <p>¿Has añadido alguna columna que no estaba presente en el modelo o "demo" de Collection Builder? Es un buen momento para añadir ese campo de información extra en este archivo si quieres que aparezca junto con cada objeto.</p>
+                </div>
+                <div type="3">
+                    <head>Página de Inicio (Home page)</head>
+                    <p>Puedes editar los botones y varios títulos en la pagína de inicio desde la carpeta "index" (índice) en la carpeta "_includes" (incluye). Aquí podrás encontrar varios archivos HTML y cada uno pertenece a una tarjeta de la página de inicio.</p>
+                    <div type="4">
+                        <head>Descripción</head>
+                        <p>El archivo <code rend="inline">description.html</code> contiene la información descriptiva de tu página de inicio y aquí podemos reemplazar varias palabras a otros idiomas. Las palabras que pueden ser modificadas están "fuera" de las etiquetas semánticas de formato HTML. Veamos un ejemplo:</p>
+                        <p>De la línea <code rend="inline">&lt;h5 class="card-title"&gt;Description&lt;/h5&gt;</code> podemos reemplazar "Description" por "Descripción" puesto que está fuera de las etiquetas de título de nivel 5 y clase "tarjeta de título, enmarcadas entre  <code rend="inline">&lt;&gt;</code> en su apertura y <code rend="inline">&lt;/&gt;</code>.</p>
+                        <p>Más abajo, también puedes editar la línea en la que enlazamos la página de inicio con la página de información sobre el proyecto (en <code rend="inline">about.md</code>). De igual forma, tenemos que identificar la información que queda fuera de las etiquetas de apertura y cierre en formato HTML (<code rend="inline">&lt;&gt;</code> y  <code rend="inline">&lt;/&gt;</code>):  </p>
+                        <p>
+                            <code rend="inline">&lt;a class="btn btn-outline-primary" href="/cb-docs/about.html"&gt;Learn More &amp;raquo;&lt;/a&gt;</code>
+                        </p>
+                        <p>Cambia "Learn More " por algo como "Aprende más".</p>
+                        <p>Puedes cambiar el resto de botones y títulos de tu página de inicio de esta forma en el resto de archivos de la carpeta mencionada.</p>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>Página de exploración de la colección (Browse)</head>
+                    <p>La página de navegación de la colección sirve para explorar todos los objetos en tu colección. Puesto que esta página es algo más complicada en sí misma por su funcionalidad, tenemos que editar varios archivos para diferentes partes (mostradas en esta captura):</p>
+                    <figure>
+                        <desc>Ejemplo de la página para navegar por los objetos de la colección" alt="Captura de la página para navegar por los objetos de la colección.</desc>
+                        <graphic url="exhibicion-con-collection-builder07.png"/>
+                    </figure>
+                    <div type="4">
+                        <head>Título</head>
+                        <p>Verás que esta página tiene por título "Browse Items". Para cambiarlo a otro idioma, busca el archivo markdown <code rend="inline">browse.md</code> en la carpeta "pages" (páginas). Aquí, reemplaza el título de nivel 2 (marcado con dos símbolos de almohadilla o <code rend="inline">#</code>) "Browse Items" por algo como "Explora la colección" (o lo más adecuado para tu región.)</p>
+                    </div>
+                    <head>Opciones de filtrado</head>
+                    <p>Para editar los botones cerca de la caja de filtrado en esta página, hay que editar el archivo <code rend="inline">browse.html</code>en la carpeta "_layouts" (plano). Con la función de búsqueda de caracteres de tu computadora (ctrl + F), busca las palabras fuera de las etiquetas HTML (ejemplo <code rend="inline">&gt;Random&lt;</code>), que aquí aparecen en la primera columna, y reemplázalas por las palabras de la segunda:</p>
+                    <table>
+                        <row>
+                            <cell role="label">Palabra original</cell>
+                            <cell role="label">Palabra en español</cell>
+                        </row>
+                        <row>
+                            <cell>Sort by</cell>
+                            <cell>Ordenar por</cell>
+                        </row>
+                        <row>
+                            <cell>Random</cell>
+                            <cell>Orden aleatorio</cell>
+                        </row>
+                        <row>
+                            <cell>Reset</cell>
+                            <cell>Empezar</cell>
+                        </row>
+                        <row>
+                            <cell>Title</cell>
+                            <cell>Título</cell>
+                        </row>
+                        <row>
+                            <cell>Loading...</cell>
+                            <cell>Cargando...</cell>
+                        </row>
+                    </table>
+                    <p>Hay dos elementos que no están fuera de las etiquetas HTML pero que también podemos editar para localizar más nuestra página; se trata de "filtrar" y "buscar":</p>
+                    <ab>
+                        <code lang="language-html" xml:id="code_exhibicion-con-collection-builder_2" corresp="code_exhibicion-con-collection-builder_2.txt" rend="block"/>
+                    </ab>
+                    <div type="4">
+                        <head>Conteo de artículos</head>
+                        <p>Finalmente, podemos editar el conteo de artículos disponibles durante la exploración de la colección (que antes de la búsqueda indica el número total de artículos en la colección) y que verás que por defecto dice "# of # items" (nº de nº elementos). Edita el archivo JavaScript <code rend="inline">browse-js.html</code> en las carpetas <hi rend="bold">_includes/js</hi>. Busca la línea:</p>
+                        <ab>
+                            <code lang="language-javascript" xml:id="code_exhibicion-con-collection-builder_3" corresp="code_exhibicion-con-collection-builder_3.txt" rend="block"/>
+                        </ab>
+                        <p>Reemplaza la preposición inglesa "of" por la tuya "de" y el sustantivo "items" por "objetos".</p>
+                        <p>Vamos a aprovechar que estamos en este archivo para cambiar el texto del botón que dice "View Full Record" por "Ver registro completo" en el código:</p>
+                        <ab>
+                            <code lang="language-javascript" xml:id="code_exhibicion-con-collection-builder_4" corresp="code_exhibicion-con-collection-builder_4.txt" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>Páginas de visualizaciones opcionales</head>
+                    <p>Las páginas dedicadas a crear visualizaciones opcionales a partir de los datos añadidos en el archivo de metadatos también aparecen con títulos en inglés que podemos editar a otro idioma. Además, hay algunos ajustes que deberás hacer para facilitar su visualización:</p>
+                    <div type="4">
+                        <head>Mapa</head>
+                        <p>Para editar el botón que dice "View item" (ver objeto) en la ventanilla "pop-up" que aparece cuando hacemos click en un objeto en el mapa, buscaremos el archivo <code rend="inline">map-js.html</code> en las carpetas "_includes/js". Busca el siguiente código y reemplaza las palabras "View Item" por "Ver objeto":</p>
+                        <ab>
+                            <code lang="language-javascript" xml:id="code_exhibicion-con-collection-builder_5" corresp="code_exhibicion-con-collection-builder_5.txt" rend="block"/>
+                        </ab>
+                        <p>Para editar los nombres de la información que aparece en las ventanas o "pop-up" en cada objeto en el mapa, podemos editar la página <code rend="inline">config-map.csv</code> dentro de la carpeta "_data". Deberás dejar la primera columna (<code rend="inline">field</code>) en inglés pero puedes cambiar la segunda (<code rend="inline">display_name</code> o mostrar nombre) a tu idioma:</p>
+                        <ab>
+                            <code lang="language-csv" xml:id="code_exhibicion-con-collection-builder_6" corresp="code_exhibicion-con-collection-builder_6.txt" rend="block"/>
+                        </ab>
+                        <div type="5">
+                            <head>Cambiar el lugar por defecto del mapa</head>
+                            <p>Por defecto, en CB-gh aparece la región de Idaho, Estados Unidos en la página que contiene el mapa, sin importar dónde estén las coordenadas dadas a nuestros objetos en los metadatos. Para centrar, digamos, el mapa al lugar donde están las imágenes de la colección, basta con editar estos dos datos en la sección dedicada al mapa en el archivo <code rend="inline">theme.yml</code>en la carpeta "_data":</p>
+                            <ab>
+                                <code xml:id="code_exhibicion-con-collection-builder_7" corresp="code_exhibicion-con-collection-builder_7.txt" rend="block"/>
+                            </ab>
+                            <p>Además, si necesitas más o menos zoom sobre el mapa, puedes editar el campo dedicado a ello en la misma sección del archivo, con un rango de entre <code rend="inline">0</code> y <code rend="inline">18</code>:</p>
+                            <p>
+                                <code rend="inline">zoom-level: 5 </code>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>Página de datos</head>
+                    <p>Esta página ofrece un cuadro que, por defecto, aparece en inglés. Podemos cambiar dichos términos en el archivo <code rend="inline">config-table.csv</code> en la carpeta "_data". Como arriba, podemos cambiar la segunda columna a español:</p>
+                    <ab>
+                        <code lang="language-csv" xml:id="code_exhibicion-con-collection-builder_8" corresp="code_exhibicion-con-collection-builder_8.txt" rend="block"/>
+                    </ab>
+                    <p>
+                        <hi rend="bold">Botón de descarga</hi>: Hay dos partes a editar. Primero, para cambiar las palabras "Download Data" por "Descargar datos" en el botón de descarga de los datos en la parte derecha de la página, entramos al archivo <code rend="inline">data-download-modal.html</code> en la carpeta "_includes" y buscamos la línea de código:</p>
+                    <ab>
+                        <code lang="language-html" xml:id="code_exhibicion-con-collection-builder_9" corresp="code_exhibicion-con-collection-builder_9.txt" rend="block"/>
+                    </ab>
+                    <p>Cambia "Download Data" por algo como "Descargar datos".</p>
+                    <p>Por otro lado, para editar las opciones, en inglés, que aparecen al hacer click en dicho botón de descarga de datos, debemos editar otra parte del código en ese mismo archivo:</p>
+                    <ab>
+                        <code lang="language-html" xml:id="code_exhibicion-con-collection-builder_10" corresp="code_exhibicion-con-collection-builder_10.txt" rend="block"/>
+                    </ab>
+                    <p>Cambia el texto dentro de las clases "card-title" y  "card-text":</p>
+                    <p>"card-title": Metadata completa</p>
+                    <p>"card-text": Todos los campos de metadatos de la colección están disponibles en formato CSV o JSON.</p>
+                </div>
+                <div type="3">
+                    <head>Página de Información (About)</head>
+                    <p>A parte de los cambios explicados más arriba, puedes cambiar ciertas palabras que aparecen por defecto en esta página. Para editar la palabra "Contents" (contenidos) en el menú de navegación entra al archivo <code rend="inline">nav-menu.html</code> en las carpetas "_includes/feature" y busca la siguiente línea de código para cambiar la palabra:</p>
+                    <ab>
+                        <code lang="language-html" xml:id="code_exhibicion-con-collection-builder_11" corresp="code_exhibicion-con-collection-builder_11.txt" rend="block"/>
+                    </ab>
+                    <p>Si prefieres deshacerte de este menú por completo, puedes borrar la siguiente línea de código:</p>
+                    <ab>
+                        <code lang="language-html" xml:id="code_exhibicion-con-collection-builder_12" corresp="code_exhibicion-con-collection-builder_12.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Página de búsqueda</head>
+                    <p>Como otros sistemas de generación de exposiciones digitales, CB tiene una página que sirve para realizar búsquedas sobre nuestra colección. Para cambiar esta página al español u otro idioma, vamos a editar el archivo <code rend="inline">search.html</code>en la carpeta "_layouts" y varias líneas de código:</p>
+                    <ab>
+                        <code lang="language-html" xml:id="code_exhibicion-con-collection-builder_13" corresp="code_exhibicion-con-collection-builder_13.txt" rend="block"/>
+                    </ab>
+                    <p>En esta línea de arriba reemplaza "Search Operators!" por "Operadores de búsqueda", para cambiar el texto que aparece en el botón de búsqueda. Y en la de abajo cambia "Lunr Search Operators" por "Operadores de búsqueda Lunr"</p>
+                    <ab>
+                        <code lang="language-html" xml:id="code_exhibicion-con-collection-builder_14" corresp="code_exhibicion-con-collection-builder_14.txt" rend="block"/>
+                    </ab>
+                    <p>Para indicar a los usuarios qué tipo de búsqueda pueden realizar, vamos a editar las siguientes líneas:</p>
+                    <ab>
+                        <code lang="language-html" xml:id="code_exhibicion-con-collection-builder_15" corresp="code_exhibicion-con-collection-builder_15.txt" rend="block"/>
+                    </ab>
+                    <p>Cámbialo por:</p>
+                    <ab>
+                        <code lang="language-html" xml:id="code_exhibicion-con-collection-builder_16" corresp="code_exhibicion-con-collection-builder_16.txt" rend="block"/>
+                    </ab>
+                    <p>Seguramente nos hemos olvidado de indicar qué archivo editar para traducir algún término en particular. No obstante, con este recorrido deberías ser capaz de localizar y editar esa palabra que encuentres trabajando en tu exhibición digital en particular.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>6. Publicar nuestra exhibición digital</head>
+                <p>Una vez que tienes todo lo anterior preparado, puedes realizar los últimos cambios para poder publicar la exposición digital en Internet. Para ello, vamos a editar uno de los archivos informáticos más importantes en el sistema de computación mínima que estamos usando: <code rend="inline">_config.yml</code> Después, haremos unos cambios o añadidos en GitHub mismo para indicarle que debe hacer pública la web que hemos creado.</p>
+                <div type="3">
+                    <head>Instrucciones para el config.yml</head>
+                    <p>El archivo  <code rend="inline">_config.yml</code>, en formato YAML, es utilizado para generar o configurar la web por Jekyll y GitHub. Aunque no es mucho, hay diferentes variables -rellenadas por defecto con información aleatoria- que debes editar en este archivo para que todo funcione correctamente. Lo importante está en el código siguiente, "site settings" o configuración de página:</p>
+                    <ab>
+                        <code lang="language-yml" xml:id="code_exhibicion-con-collection-builder_17" corresp="code_exhibicion-con-collection-builder_17.txt" rend="block"/>
+                    </ab>
+                    <p>Cambia la información en las siguientes secciones, sin cambiar el nombre de cada sección:</p>
+                    <list type="unordered">
+                        <item>
+                            <p>"title" o título: Corresponde al título de tu colección digital</p>
+                        </item>
+                        <item>
+                            <p>"tagline" o subtítulo: Puede ser una explicación de tu colección digital</p>
+                        </item>
+                        <item>
+                            <p>"description" o descripción: Escribe una descripción más larga sobre lo que contiene la colección</p>
+                        </item>
+                        <item>
+                            <p>"author" o autor/a: Nombre de la entidad o persona creadora de la exposición</p>
+                        </item>
+                        <item>
+                            <p>"metadata" o metadatos: Nombre del archivo de metadatos que has cargado anteriormente, sin la terminación de formato (<code rend="inline">.csv</code>)</p>
+                        </item>
+                    </list>
+                    <p>Puesto que vas a utilizar GitHub Pages para publicar esta página web, no necesitas hacer más cambios.</p>
+                </div>
+                <div type="3">
+                    <head>Publicar la página GitHub Pages</head>
+                    <p>¡Es el momento de "activar" tu exposición digital en la web! Para ello, vamos a realizar unos pasos de configuración dentro de la interfaz de GitHub:</p>
+                    <list type="ordered">
+                        <item>Ve a la página del repositorio y busca la página de "Settings" (configuración) arriba a la derecha</item>
+                        <item>Aquí, haz click en "Pages" (páginas) en el menú de la izquierda</item>
+                        <item>En la sección "Source", haz click en el botón donde dice "None" (ninguno/a) y selecciona la opción "main" (principal)</item>
+                        <item>Haz click en "Save" (guardar)</item>
+                    </list>
+                    <figure>
+                        <desc>Publicar la página web." alt="Captura con las instrucciones de publicar la página</desc>
+                        <graphic url="exhibicion-con-collection-builder08.png"/>
+                    </figure>
+                    <p>Al guardar el cambio, aparecerán nuevas opciones y, lo más importante, la URL de tu colección digital:</p>
+                    <figure>
+                        <desc>Ejemplo con la publicación de la página." alt="Captura del mensaje al publicar la página</desc>
+                        <graphic url="exhibicion-con-collection-builder09.png"/>
+                    </figure>
+                    <p>¡Felicidades! Ya tienes una página web con tu colección digital que puedes compartir con tus usuarios. Haz click en la URL azul o copia y pégala en un navegador o teléfono celular para verla.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>7. Realizar cambios posteriores y añadidos</head>
+                <p>Si necesitas realizar cambios en la página web, puedes hacerlos en tu repositorio en GitHub como los hechos anteriormente. Puedes cambiar las imágenes y los metadatos, las páginas contextuales, etc. Puesto que se trata de una página creada con computación mínima, se pueden rotar fácilmente exhibiciones digitales de forma trimestral o anual.</p>
+                <p>CollectionBuilder cuenta con funcionalidades extra que puedes ir añadiendo cuando te sientas más cómodo/a con el manejo de los archivos en el respositorio. Además, están ampliando la herramienta poco a poco. Visita su página web<ref target="https://collectionbuilder.github.io">https://collectionbuilder.github.io</ref> de vez en cuando para ver nuevas actualizaciones.  </p>
+            </div>
+            <div type="2">
+                <head>Agradecimiento</head>
+                <p>Esta lección fue escrita a partir de los materiales creados para un taller virtual de capacitación digital para las organizaciones latinoamericanas que colaboran con el repositorio de <ref target="https://ladi.lib.utexas.edu/es">Iniciativas Digitales de América Latina</ref> de la Universidad de Texas en Austin y financiada por una beca de la Andrew W. Mellon Foundation.</p>
+            </div>
+            <div type="2">
+                <head>Notas</head>
+            </div>
+        </body>
+    </text>
 </TEI>

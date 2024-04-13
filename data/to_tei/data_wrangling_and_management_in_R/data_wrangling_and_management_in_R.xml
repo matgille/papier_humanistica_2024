@@ -1,42 +1,68 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="data_wrangling_and_management_in_R">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Data Wrangling and Management in R</title>
-  <author role="original_author">Nabeel Siddiqui</author><editor role="reviewers"><persName>Lauren Tilton</persName><persName>Ryan Deschamps</persName></editor><editor role="editors">Ian Milligan</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phen0063</idno><date type="published">07/31/2017</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#manipulacao-transformacao-dados-R #administracion-de-datos-en-r"/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>This tutorial explores how scholars can organize 'tidy' data, understand R packages to manipulate data, and conduct basic data analysis.</p></abstract><textClass><keywords><term xml:lang="en">data-manipulation</term><term xml:lang="en">data-management</term><term xml:lang="en">distant-reading</term><term xml:lang="en">r</term><term xml:lang="en">data-visualization</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="en">
-    <body>
-      <div type="1"><head>Assumptions</head>
-<p>This lesson makes a few assumptions about your understanding of R. If
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Data Wrangling and Management in R</title>
+                <author role="original_author">Nabeel Siddiqui</author>
+                <editor role="reviewers">
+                    <persName>Lauren Tilton</persName>
+                    <persName>Ryan Deschamps</persName>
+                </editor>
+                <editor role="editors">Ian Milligan</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0063</idno>
+                <date type="published">07/31/2017</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#manipulacao-transformacao-dados-R #administracion-de-datos-en-r"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>This tutorial explores how scholars can organize 'tidy' data, understand R packages to manipulate data, and conduct basic data analysis.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">data-management</term>
+                    <term xml:lang="en">distant-reading</term>
+                    <term xml:lang="en">r</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="1">
+                <head>Assumptions</head>
+                <p>This lesson makes a few assumptions about your understanding of R. If
 you have not completed the <ref target="/lessons/r-basics-with-tabular-data">R Basics with Tabular
 Data</ref>
 lesson, I suggest you complete that first. Having a background in
 another programming language will also be beneficial. If you need a
 place to start, I recommend working through the <emph>Programming
 Historian's</emph> excellent Python tutorials.</p>
-</div>
-      <div type="1"><head>Lesson Goals</head>
-<p>By the end of this lesson, you will:</p>
-<list type="ordered">
-<item>Know how to organize data to be "tidy" and why this is important.</item>
-<item>Understand the dplyr package and use it to manipulate and wrangle
+            </div>
+            <div type="1">
+                <head>Lesson Goals</head>
+                <p>By the end of this lesson, you will:</p>
+                <list type="ordered">
+                    <item>Know how to organize data to be "tidy" and why this is important.</item>
+                    <item>Understand the dplyr package and use it to manipulate and wrangle
 with data.</item>
-<item>Become acquainted with the pipe operator in R and observe how it can
+                    <item>Become acquainted with the pipe operator in R and observe how it can
 assist you in creating more readable code.</item>
-<item>Learn to work through some basic examples of data manipulation to
+                    <item>Learn to work through some basic examples of data manipulation to
 gain a foundation in exploratory data analysis.</item>
-</list>
-</div>
-      <div type="1"><head>Introduction</head>
-<p>Data you find "in the wild" will rarely be in a format necessary for
+                </list>
+            </div>
+            <div type="1">
+                <head>Introduction</head>
+                <p>Data you find "in the wild" will rarely be in a format necessary for
 analysis, and you will need to manipulate it before exploring the
 questions you are interested in. This may take more time than doing the
 analysis itself! In this tutorial, we will learn some basic techniques
@@ -44,99 +70,124 @@ for manipulating, managing, and wrangling with our data in R.
 Specifically, we will rely on the philosophy of <ref target="https://www.jstatsoft.org/article/view/v059i10">"tidy
 data"</ref> as articulated by
 Hadley Wickham.</p>
-<p>According to <ref target="http://hadley.nz/">Wickham</ref>, data is "tidy" when it meets
+                <p>According to <ref target="http://hadley.nz/">Wickham</ref>, data is "tidy" when it meets
 three key criteria:</p>
-<list type="ordered">
-<item>Each observation is in a row.</item>
-<item>Each variable is in a column.</item>
-<item>Each value has its own cell.</item>
-</list>
-<p>Being observant of these criteria allows us to recognize when data is
+                <list type="ordered">
+                    <item>Each observation is in a row.</item>
+                    <item>Each variable is in a column.</item>
+                    <item>Each value has its own cell.</item>
+                </list>
+                <p>Being observant of these criteria allows us to recognize when data is
 organized or unorganized. It also provides us a standardized schema and
 set of tools for cleaning up some of the most common ways that datasets
 are "messy:"</p>
-<list type="ordered">
-<item>Column headers are values, not variable names.</item>
-<item>Multiple variables are stored in one column.</item>
-<item>Variables are stored in both rows and columns.</item>
-<item>Multiple types of observational units are stored in the same table.</item>
-<item>A single observational unit is stored in multiple tables.</item>
-</list>
-<p>Perhaps most importantly, keeping our data in this format allows us to
+                <list type="ordered">
+                    <item>Column headers are values, not variable names.</item>
+                    <item>Multiple variables are stored in one column.</item>
+                    <item>Variables are stored in both rows and columns.</item>
+                    <item>Multiple types of observational units are stored in the same table.</item>
+                    <item>A single observational unit is stored in multiple tables.</item>
+                </list>
+                <p>Perhaps most importantly, keeping our data in this format allows us to
 use a collection of packages in the
 <ref target="http://tidyverse.org/">"tidyverse,"</ref> which are designed to specifically
 work with tidy data. By making sure that our input and output are tidy,
 we only have to use a small set of tools to solve a large number of
 questions. In addition, we can combine, manipulate, and split tidy
 datasets as we see fit.</p>
-<p>In this tutorial, we will be focusing on the
+                <p>In this tutorial, we will be focusing on the
 <ref target="https://cran.r-project.org/web/packages/dplyr/index.html">dplyr</ref>
 package of the tidyverse, but it is worth briefly mentioning some others
 we will be running into:</p>
-<p><ref target="http://magrittr.tidyverse.org"><hi rend="bold">magittr</hi></ref>--This package gives us
+                <p>
+                    <ref target="http://magrittr.tidyverse.org">
+                        <hi rend="bold">magittr</hi>
+                    </ref>--This package gives us
 access to the forward pipe operator and makes our code easier to read.
-<ref target="http://ggplot2.tidyverse.org/"><hi rend="bold">ggplot2</hi></ref>--This package utilizes the
+<ref target="http://ggplot2.tidyverse.org/">
+                        <hi rend="bold">ggplot2</hi>
+                    </ref>--This package utilizes the
 <ref target="http://www.springer.com/us/book/9780387245447">"Grammar of Graphics"</ref>
 to provide an easy way to visualize our data.
-<ref target="http://readr.tidyverse.org"><hi rend="bold">readr</hi></ref>--This package makes available a
+<ref target="http://readr.tidyverse.org">
+                        <hi rend="bold">readr</hi>
+                    </ref>--This package makes available a
 faster and more streamlined method of importing rectangular data, such
 as csv files.
-<ref target="http://tibble.tidyverse.org/"><hi rend="bold">tibble</hi></ref>--This package provides us
+<ref target="http://tibble.tidyverse.org/">
+                        <hi rend="bold">tibble</hi>
+                    </ref>--This package provides us
 access to a reconceptualization of data frames that are easier to work
 with and print.</p>
-<p>If you have not already done so, you should install and load the
+                <p>If you have not already done so, you should install and load the
 "tidyverse" before beginning. In addition, make sure that you have the
 <ref target="https://cran.rstudio.com/">latest version of R</ref> and the <ref target="https://www.rstudio.com/products/rstudio/download/">latest version
 of R Studio</ref>
 installed for your respective platform.</p>
-<p>Copy the following code into RStudio. To run it, you need to highlight
+                <p>Copy the following code into RStudio. To run it, you need to highlight
 the lines and press Ctrl+Enter (Command+Enter on Mac OS):</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_0" corresp="code_data_wrangling_and_management_in_R_0.txt" rend="block"/></ab>
-</div>
-      <div type="1"><head>An Example of dplyr in Action</head>
-<p>Let's go through an example to see how dplyr can aid us as historians by
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_0" corresp="code_data_wrangling_and_management_in_R_0.txt" rend="block"/>
+                </ab>
+            </div>
+            <div type="1">
+                <head>An Example of dplyr in Action</head>
+                <p>Let's go through an example to see how dplyr can aid us as historians by
 inputting U.S. decennial census data from 1790 to 2010. Download the
 data by <ref target="/assets/introductory_state_example.csv">clicking
 here</ref>
 and place it in the folder that you will use to work through the examples
 in this tutorial.</p>
-<p>Since the data is in a csv file, we are going to use the read_csv()
+                <p>Since the data is in a csv file, we are going to use the read_csv()
 command in tidyverse's
 <ref target="https://cran.r-project.org/web/packages/readr/vignettes/readr.html">readr</ref>
 package.</p>
-<p>The read_csv function takes the path of a file we want to import from
+                <p>The read_csv function takes the path of a file we want to import from
 as a variable so make sure that you have it set up correctly.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_1" corresp="code_data_wrangling_and_management_in_R_1.txt" rend="block"/></ab>
-<p>After you import the data, you will notice that there are three columns:
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_1" corresp="code_data_wrangling_and_management_in_R_1.txt" rend="block"/>
+                </ab>
+                <p>After you import the data, you will notice that there are three columns:
 one for the population, one for the year, and one for the state. This
 data is already in a tidy format providing us a multitude of options for
 further exploration.</p>
-<p>For this example, let's visualize the population growth of California and
+                <p>For this example, let's visualize the population growth of California and
 New York to gain a better understanding of Western migration. We will
 use dplyr to filter our data so that it only contains information about
 the states we are interested in, and we will use ggplot2 to visualize
 this information. This exercise is just to provide you a taste of what
 dplyr can do, so don't worry if you don't understand the code at this
 time.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_2" corresp="code_data_wrangling_and_management_in_R_2.txt" rend="block"/></ab>
-<figure><desc>Graph of California and New York population</desc><graphic url="california_new_york_population.png"/></figure>
-<p>As we can see, the population of California has grown considerably
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_2" corresp="code_data_wrangling_and_management_in_R_2.txt" rend="block"/>
+                </ab>
+                <figure>
+                    <desc>Graph of California and New York population</desc>
+                    <graphic url="california_new_york_population.png"/>
+                </figure>
+                <p>As we can see, the population of California has grown considerably
 compared to New York. While this particular example may seem obvious
 given the history of U.S. migration, the code itself provides us a
 foundation that we can build on to ask a multitude of similar questions.
 For instance, with a quick change of code, we can create a similar graph
 with two different states such as Mississippi and Virginia.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_3" corresp="code_data_wrangling_and_management_in_R_3.txt" rend="block"/></ab>
-<figure><desc>Graph of Mississippi and Virginia population</desc><graphic url="mississippi_virginia_population.png"/></figure>
-<p>Quickly making changes to our code and reanalyzing our data is a
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_3" corresp="code_data_wrangling_and_management_in_R_3.txt" rend="block"/>
+                </ab>
+                <figure>
+                    <desc>Graph of Mississippi and Virginia population</desc>
+                    <graphic url="mississippi_virginia_population.png"/>
+                </figure>
+                <p>Quickly making changes to our code and reanalyzing our data is a
 fundamental part of exploratory data analysis (EDA). Rather than trying
 to "prove" a hypothesis, exploratory data analysis helps us understand
 our data better and ask questions about it. For historians, EDA provides
 an easy means of knowing when to dig deeper into a subject and when to
 step back, and it is an area where R excels.</p>
-</div>
-      <div type="1"><head>Pipe Operator</head>
-<p>Before looking at dplyr, we need to go over the pipe operator (%&gt;%)
+            </div>
+            <div type="1">
+                <head>Pipe Operator</head>
+                <p>Before looking at dplyr, we need to go over the pipe operator (%&gt;%)
 in R since we will often run into it in our examples. As mentioned
 earlier, the pipe operator is part of the
 <ref target="https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html">magrittr</ref>
@@ -145,69 +196,88 @@ package created by <ref target="http://stefanbache.dk/">Stefan Milton Bache</ref
 Its name is an homage to surrealest painter Rene Magritte, whose "The
 Treachery of Images" famously depicted a pipe with the words "this is
 not a pipe" underneath in French.</p>
-<p>The pipe operator allows you to pass what is to the left of the pipe as
+                <p>The pipe operator allows you to pass what is to the left of the pipe as
 the first variable in a function specified on the right. Although it may
 seem strange at first, once you learn it, you will find that it makes
 your code more readable by avoiding nested statements. Don't worry if
 all this is a little confusing right now. It will become more clear as
 we go through the examples.</p>
-<p>Let's say that we are interested in getting the square root of each
+                <p>Let's say that we are interested in getting the square root of each
 population value and then summing all the square roots before getting
 the mean. Obviously, this isn't a useful measurement, but it demonstrates
 just how quickly R code can become difficult to read. Normally, we would
 nest such statements:</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_4" corresp="code_data_wrangling_and_management_in_R_4.txt" rend="block"/></ab>
-<p>As you can see, with enough nested commands, it is hard to remember how
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_4" corresp="code_data_wrangling_and_management_in_R_4.txt" rend="block"/>
+                </ab>
+                <p>As you can see, with enough nested commands, it is hard to remember how
 many parenthesis you need and makes the code awkward to read. To mitigate
 this, some people may create temporary vectors in between each function
 call.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_5" corresp="code_data_wrangling_and_management_in_R_5.txt" rend="block"/></ab>
-<p>Although you get the same answer, this is a lot more readable. However,
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_5" corresp="code_data_wrangling_and_management_in_R_5.txt" rend="block"/>
+                </ab>
+                <p>Although you get the same answer, this is a lot more readable. However,
 it can quickly clutter your workspace if you forget to delete the
 temporary vectors. The pipe operator does all this for you. Here is the
 same code using the pipe operator.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_6" corresp="code_data_wrangling_and_management_in_R_6.txt" rend="block"/></ab>
-<p>This is a lot easier to read, and you could make it even more clear by
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_6" corresp="code_data_wrangling_and_management_in_R_6.txt" rend="block"/>
+                </ab>
+                <p>This is a lot easier to read, and you could make it even more clear by
 writing this on multiple lines.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_7" corresp="code_data_wrangling_and_management_in_R_7.txt" rend="block"/></ab>
-<p>Please note that the vectors or data frames that the pipe operator
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_7" corresp="code_data_wrangling_and_management_in_R_7.txt" rend="block"/>
+                </ab>
+                <p>Please note that the vectors or data frames that the pipe operator
 creates are discarded after the operation is complete. If you want to
 store them, you should pass them to a new variable.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_8" corresp="code_data_wrangling_and_management_in_R_8.txt" rend="block"/></ab>
-</div>
-      <div type="1"><head>We Need a New Dataset</head>
-<p>Now that we have an understanding of the pipe operator, we are ready to
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_8" corresp="code_data_wrangling_and_management_in_R_8.txt" rend="block"/>
+                </ab>
+            </div>
+            <div type="1">
+                <head>We Need a New Dataset</head>
+                <p>Now that we have an understanding of the pipe operator, we are ready to
 begin looking at and wrangling with some data. Unfortunately, for
 historians, there are only a few easily available datasets--perhaps you
 can help change this by making yours available to the public! We are
 going to rely on the <ref target="https://www.google.com/search?q=cran%20historydata">history
 data</ref> package
 created by <ref target="http://lincolnmullen.com/">Lincoln Mullen</ref>.</p>
-<p>Lets go ahead and install and load the package:</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_9" corresp="code_data_wrangling_and_management_in_R_9.txt" rend="block"/></ab>
-<p>This packages contains samples of historical datasets--the earlier U.S.
+                <p>Lets go ahead and install and load the package:</p>
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_9" corresp="code_data_wrangling_and_management_in_R_9.txt" rend="block"/>
+                </ab>
+                <p>This packages contains samples of historical datasets--the earlier U.S.
 Census data sample was taken from this package. Throughout this
 tutorial, we are specifically going to work with the early_colleges
 dataset that contains data about colleges founded before 1848. Lets
 start by loading the data and view it.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_10" corresp="code_data_wrangling_and_management_in_R_10.txt" rend="block"/></ab>
-<p>As you can observe, this dataset contains the current name of the college, its
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_10" corresp="code_data_wrangling_and_management_in_R_10.txt" rend="block"/>
+                </ab>
+                <p>As you can observe, this dataset contains the current name of the college, its
 original name, the city and state where it was founded, when the college was
 established, and its sponsorship. As we discussed earlier, before we can
 work with a dataset, it is important to think about how to organize the
 data. Let's see if any of our data is not in a "tidy" format. Do you see
 any cells that do not match the three criteria for tidy data?</p>
-<p>If you guessed the sponsorship of Harvard, you are correct. In addition
+                <p>If you guessed the sponsorship of Harvard, you are correct. In addition
 to noting the original sponsorship, it also mentions that it changed
 sponsorship in 1805. Usually, you want to keep as much information about
 your data that you can, but for the purposes of this tutorial, we are
 going to change the column to only have the original sponsorship.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_11" corresp="code_data_wrangling_and_management_in_R_11.txt" rend="block"/></ab>
-<p>Now that we have our data in a tidy format, we can shape it through the
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_11" corresp="code_data_wrangling_and_management_in_R_11.txt" rend="block"/>
+                </ab>
+                <p>Now that we have our data in a tidy format, we can shape it through the
 dplyr package.</p>
-</div>
-      <div type="1"><head>What is Dplyr?</head>
-<p><ref target="https://cran.rstudio.com/web/packages/dplyr/vignettes/dplyr.html">Dplyr</ref>
+            </div>
+            <div type="1">
+                <head>What is Dplyr?</head>
+                <p>
+                    <ref target="https://cran.rstudio.com/web/packages/dplyr/vignettes/dplyr.html">Dplyr</ref>
 is another part of the tidyverse that provides functions for
 manipulating and transforming your data. Because we are keeping our data
 "tidy," we only need a small set of tools to explore our data. Compared
@@ -218,66 +288,95 @@ most cases, intuitive. Each function in dplyr corresponds to these verbs,
 with the five key ones being filter, select, arrange, mutate, and
 summarise--dplyr uses the British spelling. Let's go through each of them
 individually to see how they work in practice.</p>
-<h3>Select</h3>
-<p>If we look at the early_colleges data, we can observe that there are a
+                <h3>Select</h3>
+                <p>If we look at the early_colleges data, we can observe that there are a
 lot of NA's in the original names column. NA signifies that the data is
 not available, and we may want to view our data with this column
 removed. dplyr's select() function gives us the ability to do this. It
 takes the data frame you want to manipulate as the first argument, followed by a
 list signifying which columns you would like to keep:</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_12" corresp="code_data_wrangling_and_management_in_R_12.txt" rend="block"/></ab>
-<p>Let's also go ahead and see how to write this using the pipe operator
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_12" corresp="code_data_wrangling_and_management_in_R_12.txt" rend="block"/>
+                </ab>
+                <p>Let's also go ahead and see how to write this using the pipe operator
 (%&gt;%):</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_13" corresp="code_data_wrangling_and_management_in_R_13.txt" rend="block"/></ab>
-<p>Referencing each of the columns that we want to keep just to get rid of
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_13" corresp="code_data_wrangling_and_management_in_R_13.txt" rend="block"/>
+                </ab>
+                <p>Referencing each of the columns that we want to keep just to get rid of
 one is a little tedous. We can use the minus symbol (-) to demonstrate
 that we want to remove a column.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_14" corresp="code_data_wrangling_and_management_in_R_14.txt" rend="block"/></ab>
-<h3>Filter</h3>
-<p>The filter() function does the same thing as the select function but
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_14" corresp="code_data_wrangling_and_management_in_R_14.txt" rend="block"/>
+                </ab>
+                <h3>Filter</h3>
+                <p>The filter() function does the same thing as the select function but
 rather than choosing the column name, we can use it to filter rows using
 a test requirement. For instance, we can view all the colleges that
 existed before the turn of the century.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_15" corresp="code_data_wrangling_and_management_in_R_15.txt" rend="block"/></ab>
-<h3>Mutate</h3>
-<p>The mutate command allows you to add a column to your data frame. Right
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_15" corresp="code_data_wrangling_and_management_in_R_15.txt" rend="block"/>
+                </ab>
+                <h3>Mutate</h3>
+                <p>The mutate command allows you to add a column to your data frame. Right
 now, we have the city and state in two separate columns. We can use the
 paste command to combine two strings and specify a seperator. Let's place
 them in a single column called "location."</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_16" corresp="code_data_wrangling_and_management_in_R_16.txt" rend="block"/></ab>
-<p>Again, you need to remember that dplyr does not save the data or
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_16" corresp="code_data_wrangling_and_management_in_R_16.txt" rend="block"/>
+                </ab>
+                <p>Again, you need to remember that dplyr does not save the data or
 manipulate the original. Instead, it creates a temporary data frame at
 each step. If you want to keep it, you need to create a permanent
 variable.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_17" corresp="code_data_wrangling_and_management_in_R_17.txt" rend="block"/></ab>
-<h3>Arrange</h3>
-<p>The arrange() function allows us to order our columns in a new way.
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_17" corresp="code_data_wrangling_and_management_in_R_17.txt" rend="block"/>
+                </ab>
+                <h3>Arrange</h3>
+                <p>The arrange() function allows us to order our columns in a new way.
 Currently, the colleges are organized by year in ascending order. Lets
 place them in descending order of establishment, in this case, from the end of the Mexican-American War.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_18" corresp="code_data_wrangling_and_management_in_R_18.txt" rend="block"/></ab>
-<h3>Summarise</h3>
-<p>The last key function in dplyr is summarise()--note the British
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_18" corresp="code_data_wrangling_and_management_in_R_18.txt" rend="block"/>
+                </ab>
+                <h3>Summarise</h3>
+                <p>The last key function in dplyr is summarise()--note the British
 spelling. Summarise() takes a function or operation, and is usually used
 to create a data frame that contains summary statistics for plotting. We
 will use it to calculate the average year that colleges before 1848 were
 founded.</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_19" corresp="code_data_wrangling_and_management_in_R_19.txt" rend="block"/></ab>
-</div>
-      <div type="1"><head>Putting it All Together</head>
-<p>Now that we have gone through the five main verbs for dplyr, we can use
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_19" corresp="code_data_wrangling_and_management_in_R_19.txt" rend="block"/>
+                </ab>
+            </div>
+            <div type="1">
+                <head>Putting it All Together</head>
+                <p>Now that we have gone through the five main verbs for dplyr, we can use
 them to create a quick visualization of our data. Let's go ahead and
 create a bar graph showing the number of secular and non-secular
 colleges founded before the U.S. War of 1812:</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_20" corresp="code_data_wrangling_and_management_in_R_20.txt" rend="block"/></ab>
-<figure><desc>Number of secular and non-secular colleges before War of 1812</desc><graphic url="college_secular_before_1812.png"/></figure>
-<p>Again, by making a quick change to our code, we can also look at the
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_20" corresp="code_data_wrangling_and_management_in_R_20.txt" rend="block"/>
+                </ab>
+                <figure>
+                    <desc>Number of secular and non-secular colleges before War of 1812</desc>
+                    <graphic url="college_secular_before_1812.png"/>
+                </figure>
+                <p>Again, by making a quick change to our code, we can also look at the
 number of secular versus non-secular colleges founded after the start of
 the War of 1812:</p>
-<ab><code xml:id="code_data_wrangling_and_management_in_R_21" corresp="code_data_wrangling_and_management_in_R_21.txt" rend="block"/></ab>
-<p>(<figure><desc>Number of secular and non-secular colleges after War of 1812</desc><graphic url="college_secular_after_1812.png"/></figure></p>
-</div>
-      <div type="1"><head>Conclusion</head>
-<p>This tutorial should put you well on the way to thinking about how to
+                <ab>
+                    <code xml:id="code_data_wrangling_and_management_in_R_21" corresp="code_data_wrangling_and_management_in_R_21.txt" rend="block"/>
+                </ab>
+                <p>(<figure>
+                        <desc>Number of secular and non-secular colleges after War of 1812</desc>
+                        <graphic url="college_secular_after_1812.png"/>
+                    </figure>
+                </p>
+            </div>
+            <div type="1">
+                <head>Conclusion</head>
+                <p>This tutorial should put you well on the way to thinking about how to
 organize and manipulate your data in R. Later, you will probably want to
 graph your data in some way. I recommend that you begin looking at the
 <ref target="https://ggplot2.tidyverse.org/">ggplot2</ref> package for a set of tools that work
@@ -285,7 +384,7 @@ well with dplyr. In addition, you may want to examine some of the
 other functions that come with dplyr to hone your skills. Either way,
 this should provide a good foundation to build on and cover a lot of
 the common problems you will encounter.</p>
-</div>
-    </body>
-  </text>
+            </div>
+        </body>
+    </text>
 </TEI>

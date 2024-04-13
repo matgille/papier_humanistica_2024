@@ -1,0 +1,130 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="normalizar-datos">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Normalizar datos de texto con Python</title>
+                <author role="original_author">
+                    <persName>William J. Turkel</persName>
+                    <persName>Adam Crymble</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Jim Clifford</persName>
+                    <persName>Francesca Benatti</persName>
+                    <persName>Frederik Elwert</persName>
+                </editor>
+                <author role="translators">Víctor Gayol</author>
+                <editor role="translation-reviewers">
+                    <persName>Jairo A. Melo</persName>
+                    <persName>Maria José Afanador-Llach</persName>
+                    <persName>Antonio Rojas Castro</persName>
+                </editor>
+                <editor role="editors">Miriam Posner</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">03/15/2017</date>
+                <idno type="doi">10.46430/phes0020</idno>
+                <date type="published">07/17/2012</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#normalizing-data"/>.</p>
+                <p>There are other translations: <ref target="#normalizacao-dados-textuais-python"/>
+                </p>
+                <p>There are other translations: <ref target="#normalizacao-dados-textuais-python"/>
+                </p>
+                <p>There are other translations: <ref target="#normalizacao-dados-textuais-python"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>En esta lección haremos que la lista que creamos en'De HTML a lista de palabras (parte 2)' sea más fácil de analizar al “normalizar” los datos.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="es">
+        <body>
+            <div type="2">
+                <head>Objetivos de la lección</head>
+                <p>La lista que creamos en <ref target="/es/lecciones/de-html-a-lista-de-palabras-2">De HTML a lista de palabras (parte 2)</ref> necesita cierta "normalización" antes de que podamos usarla más adelante. Vamos a hacer esto aplicando métodos adicionales para cadenas de caracteres, así como utilizar <emph>expresiones regulares</emph>. Una vez normalizadas seremos capaces de analizar nuestros datos de una manera más fácil.</p>
+            </div>
+            <div type="2">
+                <head>Archivos necesarios para esta lección</head>
+                <list type="unordered">
+                    <item>
+                        <emph>html-a-lista-1.py</emph>
+                    </item>
+                    <item>
+                        <emph>obo.py</emph>
+                    </item>
+                </list>
+                <p>Si no tienes estos archivos de la lección previa, puedes descargar un <ref target="/assets/python-es-lecciones3.zip">zip</ref>.</p>
+            </div>
+            <div type="2">
+                <head>Limpiar la lista</head>
+                <p>En <ref target="/es/lecciones/de-html-a-lista-de-palabras-2">De HTML a lista de palabras (parte 2)</ref>, escribimos un programa en Python llamado <emph>html-a-lista-1.py</emph> que descargó una <ref target="https://www.oldbaileyonline.org/browse.jsp?id=t17800628-33&amp;div=t17800628-33">página Web</ref>, retiró el formato HTML y los metadatos y nos devolvió una lista de "palabras" como la que se muestra más abajo. Técnicamente, estas entidades son llamadas "<emph>tokens</emph>" (o "<emph>componente léxico</emph>") en vez de "palabras". Estos incluyen cosas que nos son palabras estrictamente hablando (como la abreviatura &amp;c. de "etcétera"). También incluyen algunas cosas que se podrían considerar componentes de más de una palabra.  El posesivo "Akerman's" en idioma inglés, por ejemplo, algunas veces es analizado por los lingüístas como dos palabras: "Akerman" más un marcador posesivo. En inglés también, ¿"o'clock" es una o dos palabras? Y así.</p>
+                <p>Regresa a tu programa <emph>html-a-lista-1.py</emph> y asegúrate de que tus resultados se vean como algo por el estilo de esto:</p>
+                <ab>
+                    <code xml:id="code_normalizar-datos_0" corresp="code_normalizar-datos_0.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Por sí misma, esta habilidad de separar el documento en palabras no nos ayuda mucho porque nosotros ya sabemos cómo leerlo. Sin embargo, podemos usar el texto para hacer cosas que normalmente no son posibles sin un programa especial. Vamos a comenzar por computar la frecuencia de los <emph>tokens</emph> y otras unidades lingüísticas, una medida clásica de un texto.</p>
+                <p>Queda claro que nuestra lista va a necesitar cierta limpieza antes de que la podamos utilizar para contar frecuencias. Conservando la práctica establecida en <ref target="/es/lecciones/de-html-a-lista-de-palabras-1">De HTML a lista de palabras (parte 1)</ref>, tratemos de describir nuestro algoritmo primero en lenguaje llano. Queremos saber la frecuencia con la que aparece cada palabra con significado en la transcripción del juicio. De tal manera, los pasos a seguir deben verse de la siguiente manera:</p>
+                <list type="unordered">
+                    <item>Convierte todas las palabras a minúsculas para que "BENJAMIN" y "benjamin" sean contadas como una misma palabra</item>
+                    <item>Retira cualquier carácter extraño o inusual</item>
+                    <item>Cuenta el número de veces que aparece cada palabra</item>
+                    <item>Retira palabras demasiado comunes como "eso", "el", "y", etc.</item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Convertir a minúsculas</head>
+                <p>Típicamente los componentes léxicos (<emph>tokens</emph>) son compactados como minúsculas cuando se cuentan frecuencias, así que lo haremos utilizando el método de cadena "lower" que aprendimos en <ref target="/es/lecciones/manipular-cadenas-de-caracteres-en-python">Manipular cadenas de caracteres en Python</ref>. Ya que este es un método para cadenas, tendremos que aplicarlo en la cadena <emph>texto</emph> en el programa <emph>html-a-lista-1.py</emph>. Enmienda <emph>html-a-lista-1.py</emph> añadiendo la etiqueta de cadena <code rend="inline">lower()</code> al final de la cadena <emph>texto</emph>.</p>
+                <ab>
+                    <code xml:id="code_normalizar-datos_1" corresp="code_normalizar-datos_1.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Ahora debes ver la misma lista de palabras que antes pero con todos los caracteres en minúsculas.</p>
+                <p>Al "llamar" métodos uno tras otro, como en este caso, podemos mantener nuestro código corto y hacer algunos cambios muy significativos en nuestro programa.</p>
+                <p>Como hemos dicho antes, Python facilita hacer mucho con muy poco código.</p>
+                <p>En este punto podríamos mirar con atención otras entradas del <emph>Old Bailey</emph> en línea así como una amplia gama de otras fuentes potenciales para asegurarnos de que no hay otros caracteres especiales que podrían causar problemas más adelante. También podríamos tratar de anticipar situaciones en las que no queremos deshacernos de cierta puntuación (por ejemplo, los distintivos de cantidades monetarios como "$1629" o “£1295”, de fechas, o el reconocer que "1629-40" tiene un significado distinto que "1629 40"). Esto es lo que a lo programadores profesionales se les paga por hacer: trata de pensar en todo lo que podría ir mal y trátalo de antemano.</p>
+                <p>Veámoslo desde otra perspectiva. Nuestro objetivo principal es desarrollar técnicas que un historiador puede utilizar durante el proceso de investigación. Esto significa que casi siempre preferimos soluciones aproximadamente correctas que puedan desarrollarse rápidamente. Así que, en lugar de invertir tiempo en hacer nuestro programa sólido de cara a excepciones, simplemente queremos deshacernos de todo aquello que no sea un carácter con o sin acentos o un número arábigo. La programación generalmente es un proceso de "refinamiento paso a paso". Empiezas con un problema y partes de una solución, y luego sigues refinando tu solución hasta que tienes algo que funciona mejor.</p>
+            </div>
+            <div type="2">
+                <head>Expresiones regulares en Python</head>
+                <p>Hemos eliminado las mayúsculas. Ahora nos toca deshacernos de los signos de puntuación. Si dejamos la puntuación, ésta echa a perder nuestras cuentas de frecuencia. ¿Queremos que "evening?" sea contada como "evening" y "1780." como "1780"? ¡Por supuesto!</p>
+                <p>Es posible utilizar el método de cadena "replace" para retirar cada tipo de puntuación:</p>
+                <ab>
+                    <code xml:id="code_normalizar-datos_2" corresp="code_normalizar-datos_2.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Pero esto no es verdaderamente eficiente. Ateniéndonos a nuestro objetivo de crear programas breves y poderosos, vamos a utilizar un mecanismo llamado "expresiones regulares". Las expresiones regulares son provistas por varios lenguajes de programación en un abanico de formas distintas.</p>
+                <p>Las expresiones regulares te permiten buscar patrones bien definidos y pueden acortar drásticamente la longitud de tu código. Por ejemplo, si deseas saber si una subcadena coincidió con una letra del alfabeto, en lugar de utilizar la sentencia <emph>if / else</emph> para comprobar la coincidencia con la letra "a", luego la "b" y luego la "c", y así sucesivamente, se podría utilizar una expresión regular para ver si cualquier letra entre la "a" y la "z" coincide con la subcadena. O bien, puedes comprobar la presencia de un dígito o una letra mayúscula, o de cualquier carácter alfanumérico, un retorno de carro o cualquier combinación de los anteriores y mucho más.</p>
+                <p>En Python, las expresiones regulares están disponibles como un módulo de Python. Para acelerar el procesamiento, éste no se carga automáticamente porque no todos los programas lo requieren. Por lo tanto, tendrás que importar (<code rend="inline">import</code>) el módulo (llamado <emph>re</emph>) de la misma manera en la que has importado tu propio módulo <emph>obo.py</emph>.</p>
+                <p>Dado que nos interesan solamente los caracteres alfanuméricos, vamos a crear una expresión regular que aislará sólo estos y eliminará el resto. Copia la siguiente función y pégala al final del módulo <emph>obo.py</emph>. Puedes dejar las otras funciones en el módulo solo, ya que seguiremos utilizándolas.</p>
+                <ab>
+                    <code xml:id="code_normalizar-datos_3" corresp="code_normalizar-datos_3.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>La expresión regular en el código anterior es el material dentro de la cadena, en otras palabras <code rend="inline">W+</code>. La <code rend="inline">W</code> es la abreviatura de la clase de <emph>caracteres no-alfanuméricos</emph>. En una expresión regular de Python, el signo de adición (+) coincide con una o más copias de un carácter dado. La expresión <code rend="inline">re.UNICODE</code> le dice al intérprete que queremos que incluya los caracteres de todas las lenguas del mundo en nuestra definición de "alfanumérico", así como de la A a la Z, de a-z y de 0-9 en inglés. Las expresiones regulares deben ser compiladas antes de poder ser utilizadas, que es lo que hace el resto de la declaración. No te preocupes en entender ahora mismo la parte de la compilación.</p>
+                <p>Cuando redefinamos nuestro programa <emph>html-a-lista-1.py</emph>, entonces se verá como esto:</p>
+                <ab>
+                    <code xml:id="code_normalizar-datos_4" corresp="code_normalizar-datos_4.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Cuando ejecutes el programa y veas a través de su salida en el panel de "comando de salida", verás que ha hecho un maravilloso trabajo. Este código separará expresiones con guiones como "coach-wells" en dos palabras y convertirá la partícula posesiva "s" o "o'clock" en palabras separadas perdiéndo el apóstrofe. Pero es una aproximación lo suficientemente buena a lo que queremos, así que podemos proceder a contar frecuencias antes de intentar mejorarlo. (Si trabajas con fuentes documentales en más de una lengua, necesitaras aprender más acerca del estándar <ref target="http://unicode.org/">Unicode</ref> y acerca del <ref target="https://web.archive.org/web/20180502053841/http://www.diveintopython.net/xml_processing/unicode.html">soporte de Python</ref> para el mismo).</p>
+            </div>
+            <div type="2">
+                <head>Lecturas sugeridas</head>
+                <p>Para una práctica extra en expresiones regulares, encontrarás que el Capítulo 7 del libro de Mark Pilgrim <ref target="https://web.archive.org/web/20180416143856/http://www.diveintopython.net/regular_expressions/index.html">Dive into Python</ref> es un tutorial muy útil.</p>
+                <div type="3">
+                    <head>Sicronización de código</head>
+                    <p>Para seguir a lo largo de las lecciones futuras es importante que tengas los archivos correctos y programas en el directorio "programming-historian" de tu disco duro. Al final de cada lección puedes descargar el archivo zip "python-es-lecciones" para asegurarte que tienes el código correcto.</p>
+                    <list type="unordered">
+                        <item>python-es-lecciones4.zip (<ref target="/assets/python-es-lecciones4.zip">zip sync</ref>)</item>
+                    </list>
+                </div>
+            </div>
+        </body>
+    </text>
+</TEI>

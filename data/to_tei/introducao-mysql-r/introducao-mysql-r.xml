@@ -1,404 +1,757 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="introducao-mysql-r">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Introdu&#231;&#227;o ao MySQL com R</title>
-  <author role="original_author">Jeff Blackadar</author><editor role="reviewers"><persName>Jesse Sadler</persName><persName>Simon Appleford</persName></editor><author role="translators">J&#233;ssica Evelyn Santos</author><editor role="translation-reviewers"><persName>D&#225;lia Guerreiro</persName><persName>Leonardo F. Nascimento</persName></editor><editor role="editors">Amanda Visconti</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phpt0025</idno><date type="published">05/03/2018</date><date type="translated">12/18/2021</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#getting-started-with-mysql-using-r"/>.</p><p>There are other translations: <ref target=""/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Esta li&#231;&#227;o ajudar&#225; a armazenar grandes quantidades de dados hist&#243;ricos de maneira estruturada, pesquisar e filtrar esses dados e visualizar alguns dos dados como um gr&#225;fico.</p></abstract><textClass><keywords><term xml:lang="en">data-manipulation</term><term xml:lang="en">distant-reading</term><term xml:lang="en">r</term><term xml:lang="en">data-visualization</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="pt">
-    <body><p>Esta li&#231;&#227;o &#233; direcionada aos que desejam armazenar grandes quantidades de dados de projetos de hist&#243;ria digital de uma forma estruturada. Usaremos um sistema de gerenciamento de dados chamado MySQL para armazenar os dados.</p>
-<p>A linguagem R permite realizar an&#225;lises e armazenar dados sem que um banco de dados relacional seja utilizado. No entanto, h&#225; situa&#231;&#245;es nas quais a inclus&#227;o de bancos de dados &#233; muito &#250;til, dentre elas:</p>
-<list type="unordered">
-<item>Publicar os resultados de um script em R num <emph>web site</emph> com dados interativos </item>
-<item>Manipular mais dados do que o R pode armazenar em sua pr&#243;pria mem&#243;ria</item>
-<item>Quando os dados j&#225; est&#227;o armazenados num banco de dados relacional</item>
-<item>Trabalhar com dados de entidades diferentes que s&#227;o relacionados uns com os outros. Um exemplo seria um banco de dados de soldados de dois ex&#233;rcitos distintos que lutaram numa batalha, onde gostar&#237;amos de saber qual esquadr&#227;o, pelot&#227;o, companhia e brigada cada soldado fazia parte.</item>
-</list>
-<p>Uma breve discuss&#227;o do tema pode ser encontrada no <ref target="hhttps://perma.cc/5VYV-L5PG"><emph>blog</emph> de Jason A. French's</ref><ref type="footnotemark" target="#note_1"/>.</p>
-<p>Ao final desta li&#231;&#227;o, ser&#225; poss&#237;vel instalar um sistema de gerenciamento de banco de dados em seu computador, criar uma tabela de banco de dados, armazenar informa&#231;&#245;es na tabela e realizar consultas dos dados. Na conclus&#227;o da li&#231;&#227;o, utilizaremos uma consulta do banco de dados para construir um gr&#225;fico. </p>
-<p>Usaremos a linguagem de programa&#231;&#227;o R para os exemplos, mas as t&#233;cnicas podem ser utilizadas com outras linguagens, como Python. </p>
-<p>Para fazer essa li&#231;&#227;o ser&#225; necess&#225;rio um computador com permiss&#227;o para instalar os programas R e RStudio, entre outros, se j&#225; n&#227;o estiverem instalados. Al&#233;m da programa&#231;&#227;o em R, tamb&#233;m instalaremos alguns componentes de um sistema de gerenciamento de banco de dados chamado MySQL, que funciona nos sistemas operacionais Windows, Mac e Linux.</p>
-<p>Possuir algum conhecimento de instala&#231;&#227;o de programas e organiza&#231;&#227;o de dados em campos &#233; &#250;til para essa li&#231;&#227;o, cujo n&#237;vel de dificuldade &#233; mediano. </p>
-<div type="2"><head>Introdu&#231;&#227;o</head>
-<p>O MySQL &#233; um banco de dados relacional usado para armazenar e consultar informa&#231;&#245;es. Esta li&#231;&#227;o utilizar&#225; a linguagem R para fornecer um tutorial e exemplos para:</p>
-<list type="unordered">
-<item>Configurar e realizar uma conex&#227;o a uma tabela no MySQL</item>
-<item>Armazenar registros em tabelas</item>
-<item>Consultar informa&#231;&#245;es de tabelas</item>
-</list>
-<p>Neste tutorial, construiremos um banco de dados de artigos de peri&#243;dicos que cont&#233;m palavras de uma busca numa hemeroteca digital. O script armazenar&#225; o t&#237;tulo, a data publicada e a URL de cada artigo num banco de dados. Utilizaremos outro script para realizar consultas no banco de dados e procurar por padr&#245;es historicamente relevantes. Os dados de amostra ser&#227;o fornecidos pelo arquivo de peri&#243;dicos <ref target="https://perma.cc/9EHD-EVEX">Welsh Newspapers Online</ref>. Estamos trabalhando com o objetivo de produzir uma lista de artigos &#224; qual possamos consultar informa&#231;&#245;es. Ao final da li&#231;&#227;o, vamos executar uma consulta para gerar um gr&#225;fico do n&#250;mero de artigos de peri&#243;dicos no banco de dados, para verificar se h&#225; um padr&#227;o relevante. </p>
-</div><div type="2"><head>Programas necess&#225;rios</head>
-<p>R, R Studio, MySQL Server e MySQL Workbench s&#227;o os programas necess&#225;rios para esta li&#231;&#227;o. Algumas notas sobre a instala&#231;&#227;o desses pacotes de programas podem ser encontradas abaixo. </p>
-<div type="3"><head>R</head>
-<p>Na li&#231;&#227;o <ref target="/pt/licoes/processamento-basico-texto-r">Processamento B&#225;sico de Texto em R</ref><ref type="footnotemark" target="#note_2"/>, Taylor Arnold e Lauren Tilton fornecem um resumo excelente do conhecimento da linguagem R necess&#225;ria para esta li&#231;&#227;o. Apenas um conhecimento b&#225;sico de R &#233; esperado. A li&#231;&#227;o <ref target="/pt/licoes/nocoes-basicas-R-dados-tabulares">No&#231;&#245;es b&#225;sicas de R com dados tabulares</ref>, de Taryn Dewar,<ref type="footnotemark" target="#note_3"/> aborda como instalar o R e se familiarizar com a linguagem.</p>
-<div type="4"><head>Download do R</head>
-<p>Voc&#234; pode realizar o download do R no <ref target="https://cran.r-project.org/">Comprehensive R Archive Network</ref>. Clique no link que corresponde ao sistema operacional do seu computador. Selecione <emph>base</emph> para instalar o R pela primeira vez. Uma vez que o ficheiro foi baixado, clique no ficheiro para executar o instalador. </p>
-</div></div><div type="3"><head>RStudio</head>
-<p>Os exemplos desta li&#231;&#227;o utilizam o RStudio, que &#233; uma interface de desenvolvimento para escrever e executar scripts em R. Esta li&#231;&#227;o usou a vers&#227;o 1.4.1717 do RStudio.</p>
-<div type="4"><head>Download do RStudio</head>
-<p>Fa&#231;a o download do RStudio atrav&#233;s do <ref target="https://www.rstudio.com/products/rstudio/#Desktop">rstudio.com</ref> e instale-o. J&#225; que o RStudio &#233; de c&#243;digo aberto, voc&#234; pode selecionar a vers&#227;o gratuita do RStudio Desktop, rolar a p&#225;gina para baixo e clicar num dos instaladores que corresponda ao sistema operacional de seu computador. Uma vez que o download foi realizado, clique no ficheiro para executar o instalador. </p>
-</div></div><div type="3"><head>MySQL</head>
-<p>SQL significa <emph>Structured Query Language</emph> (Linguagem estruturada de consulta), que &#233; um conjunto de comandos para armazenar e recuperar informa&#231;&#245;es a partir de um banco de dados relacional. MySQL &#233; um tipo de sistema de gerenciamento de banco de dados relacionais. H&#225; muitos outros, como Microsoft SQL Server, IBM DB2 e Microsoft Access. Esta li&#231;&#227;o utiliza o MySQL porque &#233; um programa de c&#243;digo aberto, utilizado por uma grande comunidade, tem uma longa trajet&#243;ria e possui uma vers&#227;o gratuita que pode ser utilizada. </p>
-<div type="4"><head>Realizando o download e instalando o MySQL</head>
-<p>Nesta se&#231;&#227;o, iremos instalar o MySQL, que &#233; o sistema que mant&#233;m o banco de dados, assim como o MySQL Workbench, que &#233; onde se trabalha para configurar a estrutura do banco de dados. Para usar o MySQL,o MySQL Workbench n&#227;o &#233; necess&#225;rio, podem ser utilizados apenas comandos digitados. Esta li&#231;&#227;o utiliza o MySQL Workbench porque &#233; uma <emph>GUI</emph> (Interface gr&#225;fica do usu&#225;rio) que facilita o aprendizado de MySQL. </p>
-<p>Conclua essas instru&#231;&#245;es para instalar o MySQL Community Server e o MySQL Workbench em seu computador.</p>
-</div><div type="4"><head>MySQL Community Server</head>
-<p>Este &#233; o servidor onde o banco de dados &#233; armazenado. Sua instala&#231;&#227;o &#233; necess&#225;ria para que seja poss&#237;vel conectar e armazenar os dados. Abaixo, faremos o download dos ficheiros, a instala&#231;&#227;o e iniciaremos o servidor. Esta li&#231;&#227;o utilizou a vers&#227;o 8.0.21 do MySQL e 8.0.26 do MySQL Workbench.</p>
-<div type="5"><head>Fazendo o download do ficheiro de instala&#231;&#227;o do MySQL Community Server</head>
-<p>Clique neste link: <ref target="https://dev.mysql.com/downloads/mysql/">https://dev.mysql.com/downloads/mysql/</ref>. Role a p&#225;gina para baixo e selecione o sistema operacional que corresponde ao seu computador. Se necess&#225;rio, clique em <hi rend="bold">Select Operating System</hi> para selecionar o sistema operacional. Uma vez feita essa opera&#231;&#227;o, clique no bot&#227;o azul <hi rend="bold">Go to Download Page</hi>. Depois clique no bot&#227;o azul <hi rend="bold">Download</hi>. Na p&#225;gina de download, role para baixo e ter&#225; a op&#231;&#227;o de come&#231;ar o download clicando em <hi rend="bold">No thanks, just start my download</hi> (N&#227;o, obrigado, apenas inicie o download).</p>
-</div><div type="5"><head>Instala&#231;&#227;o do MySQL Community Server</head>
-<p>Abaixo se encontram as dicas de instala&#231;&#227;o para PC e Mac:</p>
-<div type="6"><head>Dicas de instala&#231;&#227;o para PC</head>
-<p>A maneira recomendada de instalar os componentes do MySQL &#233; atrav&#233;s do instalador do MySQL para Windows. Com o ficheiro j&#225; baixado, clique duas vezes no ficheiro para instal&#225;-lo. Siga as instru&#231;&#245;es para aceitar a licen&#231;a (nota de tradu&#231;&#227;o: com o instalador MySQL para Windows pode optar por fazer de uma vez s&#243; a instala&#231;&#227;o do MySQL Server e do MySQL Workbench; para isso, escolha os respectivos componentes e siga as instru&#231;&#245;es abaixo).
-Depois que os componentes forem instalados, ser&#227;o solicitadas as seguintes op&#231;&#245;es:</p>
-<h7>1. Escolhendo um tipo de configura&#231;&#227;o</h7>
-<p>Selecione: <hi rend="bold">Developer Default</hi> (Padr&#227;o do desenvolvedor). Esta op&#231;&#227;o <emph>instala o MySQL Server e as ferramentas necess&#225;rias para o desenvolvimento da aplica&#231;&#227;o. Isto &#233; &#250;til se pretendes desenvolver aplica&#231;&#245;es para um servidor existente.</emph>
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Introdução ao MySQL com R</title>
+                <author role="original_author">Jeff Blackadar</author>
+                <editor role="reviewers">
+                    <persName>Jesse Sadler</persName>
+                    <persName>Simon Appleford</persName>
+                </editor>
+                <author role="translators">Jéssica Evelyn Santos</author>
+                <editor role="translation-reviewers">
+                    <persName>Dália Guerreiro</persName>
+                    <persName>Leonardo F. Nascimento</persName>
+                </editor>
+                <editor role="editors">Amanda Visconti</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">12/18/2021</date>
+                <idno type="doi">10.46430/phpt0025</idno>
+                <date type="published">05/03/2018</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#getting-started-with-mysql-using-r"/>.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Esta lição ajudará a armazenar grandes quantidades de dados históricos de maneira estruturada, pesquisar e filtrar esses dados e visualizar alguns dos dados como um gráfico.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">distant-reading</term>
+                    <term xml:lang="en">r</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <p>Esta lição é direcionada aos que desejam armazenar grandes quantidades de dados de projetos de história digital de uma forma estruturada. Usaremos um sistema de gerenciamento de dados chamado MySQL para armazenar os dados.</p>
+            <p>A linguagem R permite realizar análises e armazenar dados sem que um banco de dados relacional seja utilizado. No entanto, há situações nas quais a inclusão de bancos de dados é muito útil, dentre elas:</p>
+            <list type="unordered">
+                <item>Publicar os resultados de um script em R num <emph>web site</emph> com dados interativos </item>
+                <item>Manipular mais dados do que o R pode armazenar em sua própria memória</item>
+                <item>Quando os dados já estão armazenados num banco de dados relacional</item>
+                <item>Trabalhar com dados de entidades diferentes que são relacionados uns com os outros. Um exemplo seria um banco de dados de soldados de dois exércitos distintos que lutaram numa batalha, onde gostaríamos de saber qual esquadrão, pelotão, companhia e brigada cada soldado fazia parte.</item>
+            </list>
+            <p>Uma breve discussão do tema pode ser encontrada no <ref target="hhttps://perma.cc/5VYV-L5PG">
+                    <emph>blog</emph> de Jason A. French's</ref>
+                <ref type="footnotemark" target="#pt_note_1"/>.</p>
+            <p>Ao final desta lição, será possível instalar um sistema de gerenciamento de banco de dados em seu computador, criar uma tabela de banco de dados, armazenar informações na tabela e realizar consultas dos dados. Na conclusão da lição, utilizaremos uma consulta do banco de dados para construir um gráfico. </p>
+            <p>Usaremos a linguagem de programação R para os exemplos, mas as técnicas podem ser utilizadas com outras linguagens, como Python. </p>
+            <p>Para fazer essa lição será necessário um computador com permissão para instalar os programas R e RStudio, entre outros, se já não estiverem instalados. Além da programação em R, também instalaremos alguns componentes de um sistema de gerenciamento de banco de dados chamado MySQL, que funciona nos sistemas operacionais Windows, Mac e Linux.</p>
+            <p>Possuir algum conhecimento de instalação de programas e organização de dados em campos é útil para essa lição, cujo nível de dificuldade é mediano. </p>
+            <div type="2">
+                <head>Introdução</head>
+                <p>O MySQL é um banco de dados relacional usado para armazenar e consultar informações. Esta lição utilizará a linguagem R para fornecer um tutorial e exemplos para:</p>
+                <list type="unordered">
+                    <item>Configurar e realizar uma conexão a uma tabela no MySQL</item>
+                    <item>Armazenar registros em tabelas</item>
+                    <item>Consultar informações de tabelas</item>
+                </list>
+                <p>Neste tutorial, construiremos um banco de dados de artigos de periódicos que contém palavras de uma busca numa hemeroteca digital. O script armazenará o título, a data publicada e a URL de cada artigo num banco de dados. Utilizaremos outro script para realizar consultas no banco de dados e procurar por padrões historicamente relevantes. Os dados de amostra serão fornecidos pelo arquivo de periódicos <ref target="https://perma.cc/9EHD-EVEX">Welsh Newspapers Online</ref>. Estamos trabalhando com o objetivo de produzir uma lista de artigos à qual possamos consultar informações. Ao final da lição, vamos executar uma consulta para gerar um gráfico do número de artigos de periódicos no banco de dados, para verificar se há um padrão relevante. </p>
+            </div>
+            <div type="2">
+                <head>Programas necessários</head>
+                <p>R, R Studio, MySQL Server e MySQL Workbench são os programas necessários para esta lição. Algumas notas sobre a instalação desses pacotes de programas podem ser encontradas abaixo. </p>
+                <div type="3">
+                    <head>R</head>
+                    <p>Na lição <ref target="/pt/licoes/processamento-basico-texto-r">Processamento Básico de Texto em R</ref>
+                        <ref type="footnotemark" target="#pt_note_2"/>, Taylor Arnold e Lauren Tilton fornecem um resumo excelente do conhecimento da linguagem R necessária para esta lição. Apenas um conhecimento básico de R é esperado. A lição <ref target="/pt/licoes/nocoes-basicas-R-dados-tabulares">Noções básicas de R com dados tabulares</ref>, de Taryn Dewar,<ref type="footnotemark" target="#pt_note_3"/> aborda como instalar o R e se familiarizar com a linguagem.</p>
+                    <div type="4">
+                        <head>Download do R</head>
+                        <p>Você pode realizar o download do R no <ref target="https://cran.r-project.org/">Comprehensive R Archive Network</ref>. Clique no link que corresponde ao sistema operacional do seu computador. Selecione <emph>base</emph> para instalar o R pela primeira vez. Uma vez que o ficheiro foi baixado, clique no ficheiro para executar o instalador. </p>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>RStudio</head>
+                    <p>Os exemplos desta lição utilizam o RStudio, que é uma interface de desenvolvimento para escrever e executar scripts em R. Esta lição usou a versão 1.4.1717 do RStudio.</p>
+                    <div type="4">
+                        <head>Download do RStudio</head>
+                        <p>Faça o download do RStudio através do <ref target="https://www.rstudio.com/products/rstudio/#Desktop">rstudio.com</ref> e instale-o. Já que o RStudio é de código aberto, você pode selecionar a versão gratuita do RStudio Desktop, rolar a página para baixo e clicar num dos instaladores que corresponda ao sistema operacional de seu computador. Uma vez que o download foi realizado, clique no ficheiro para executar o instalador. </p>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>MySQL</head>
+                    <p>SQL significa <emph>Structured Query Language</emph> (Linguagem estruturada de consulta), que é um conjunto de comandos para armazenar e recuperar informações a partir de um banco de dados relacional. MySQL é um tipo de sistema de gerenciamento de banco de dados relacionais. Há muitos outros, como Microsoft SQL Server, IBM DB2 e Microsoft Access. Esta lição utiliza o MySQL porque é um programa de código aberto, utilizado por uma grande comunidade, tem uma longa trajetória e possui uma versão gratuita que pode ser utilizada. </p>
+                    <div type="4">
+                        <head>Realizando o download e instalando o MySQL</head>
+                        <p>Nesta seção, iremos instalar o MySQL, que é o sistema que mantém o banco de dados, assim como o MySQL Workbench, que é onde se trabalha para configurar a estrutura do banco de dados. Para usar o MySQL,o MySQL Workbench não é necessário, podem ser utilizados apenas comandos digitados. Esta lição utiliza o MySQL Workbench porque é uma <emph>GUI</emph> (Interface gráfica do usuário) que facilita o aprendizado de MySQL. </p>
+                        <p>Conclua essas instruções para instalar o MySQL Community Server e o MySQL Workbench em seu computador.</p>
+                    </div>
+                    <div type="4">
+                        <head>MySQL Community Server</head>
+                        <p>Este é o servidor onde o banco de dados é armazenado. Sua instalação é necessária para que seja possível conectar e armazenar os dados. Abaixo, faremos o download dos ficheiros, a instalação e iniciaremos o servidor. Esta lição utilizou a versão 8.0.21 do MySQL e 8.0.26 do MySQL Workbench.</p>
+                        <div type="5">
+                            <head>Fazendo o download do ficheiro de instalação do MySQL Community Server</head>
+                            <p>Clique neste link: <ref target="https://dev.mysql.com/downloads/mysql/">https://dev.mysql.com/downloads/mysql/</ref>. Role a página para baixo e selecione o sistema operacional que corresponde ao seu computador. Se necessário, clique em <hi rend="bold">Select Operating System</hi> para selecionar o sistema operacional. Uma vez feita essa operação, clique no botão azul <hi rend="bold">Go to Download Page</hi>. Depois clique no botão azul <hi rend="bold">Download</hi>. Na página de download, role para baixo e terá a opção de começar o download clicando em <hi rend="bold">No thanks, just start my download</hi> (Não, obrigado, apenas inicie o download).</p>
+                        </div>
+                        <div type="5">
+                            <head>Instalação do MySQL Community Server</head>
+                            <p>Abaixo se encontram as dicas de instalação para PC e Mac:</p>
+                            <div type="6">
+                                <head>Dicas de instalação para PC</head>
+                                <p>A maneira recomendada de instalar os componentes do MySQL é através do instalador do MySQL para Windows. Com o ficheiro já baixado, clique duas vezes no ficheiro para instalá-lo. Siga as instruções para aceitar a licença (nota de tradução: com o instalador MySQL para Windows pode optar por fazer de uma vez só a instalação do MySQL Server e do MySQL Workbench; para isso, escolha os respectivos componentes e siga as instruções abaixo).
+Depois que os componentes forem instalados, serão solicitadas as seguintes opções:</p>
+                            </div>
+                            <div type="6">
+                                <head>1. Escolhendo um tipo de configuração</head>
+                                <p>Selecione: <hi rend="bold">Developer Default</hi> (Padrão do desenvolvedor). Esta opção <emph>instala o MySQL Server e as ferramentas necessárias para o desenvolvimento da aplicação. Isto é útil se pretendes desenvolver aplicações para um servidor existente.</emph>
 (Ver abaixo)</p>
-<figure><desc>Configure o tipo de padr&#227;o do desenvolvedor</desc><graphic url="introducao-ao-mysql-e-r-1.PNG"/></figure>
-<h7>2. Verificar Requisitos</h7>
-<p>Clique no bot&#227;o <hi rend="bold">Execute</hi> caso haja requisitos pendentes (<emph>failing requirements</emph>) listados na checagem de requisitos. A lista de requisitos pode ser diferente da mostrada aqui. Uma vez que o processo de executar instalar os requisitos pendentes, clique no bot&#227;o <emph>Next</emph> .
+                                <figure>
+                                    <desc>Configure o tipo de padrão do desenvolvedor</desc>
+                                    <graphic url="introducao-ao-mysql-e-r-1.PNG"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>2. Verificar Requisitos</head>
+                                <p>Clique no botão <hi rend="bold">Execute</hi> caso haja requisitos pendentes (<emph>failing requirements</emph>) listados na checagem de requisitos. A lista de requisitos pode ser diferente da mostrada aqui. Uma vez que o processo de executar instalar os requisitos pendentes, clique no botão <emph>Next</emph> .
 (Ver abaixo)</p>
-<figure><desc>Clique no bot&#227;o *Execute* se necess&#225;rio</desc><graphic url="introducao-ao-mysql-e-r-2.PNG"/></figure>
-<h7>3. Tipo e Rede (1)</h7>
-<p>Selecione: <hi rend="bold">Standalone MySQL Server</hi>
+                                <figure>
+                                    <desc>Clique no botão *Execute* se necessário</desc>
+                                    <graphic url="introducao-ao-mysql-e-r-2.PNG"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>3. Tipo e Rede (1)</head>
+                                <p>Selecione: <hi rend="bold">Standalone MySQL Server</hi>
 (Ver abaixo)</p>
-<figure><desc>Select Standalone MySQL Server</desc><graphic url="getting-started-with-mysql-7.png"/></figure>
-<h7>4. Tipo e Rede (2)</h7>
-<p><emph>Config type</emph>: Selecione: <hi rend="bold">Development Computer</hi>
-Checar: TCP/IP.  Port number (N&#250;mero da porta): 3306.
+                                <figure>
+                                    <desc>Select Standalone MySQL Server</desc>
+                                    <graphic url="getting-started-with-mysql-7.png"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>4. Tipo e Rede (2)</head>
+                                <p>
+                                    <emph>Config type</emph>: Selecione: <hi rend="bold">Development Computer</hi>
+Checar: TCP/IP.  Port number (Número da porta): 3306.
 (Ver abaixo)</p>
-<figure><desc>Development Computer TCPIP Port 3306</desc><graphic url="introducao-ao-mysql-e-r-4.png"/></figure>
-<h7>5. Contas e Fun&#231;&#245;es</h7>
-<figure><desc>Digite a senha *root* e depois guarde-a em local seguro</desc><graphic url="introducao-ao-mysql-e-r-5.png"/></figure>
-<h7>6. Servi&#231;o do Windows</h7>
-<p>As configura&#231;&#245;es aqui s&#227;o opcionais, mas achamos mais f&#225;cil configurar o MySQL como um servi&#231;o do Windows e inclui-lo na inicializa&#231;&#227;o autom&#225;tica. Um servi&#231;o do Windows &#233; um processo que &#233; executado no computador enquanto se est&#225; trabalhando. &#201; poss&#237;vel mudar as configura&#231;&#245;es do servi&#231;o do Windows posteriormente, para iniciar o MySQL manualmente, para impedir que o programa inicialize quando n&#227;o for necess&#225;rio. </p>
-<figure><desc>MySQL como um servi&#231;o do Windows</desc><graphic url="introducao-ao-mysql-e-r-6.png"/></figure>
-<p>Clique nos bot&#245;es <emph>Execute</emph> e <emph>Next</emph> para finalizar a instala&#231;&#227;o e inicializar o servidor.</p>
-<h7>7. MySQL Workbench e Senha Root</h7>
-<p>Procure por MySQL Workbench no menu de inicializa&#231;&#227;o do Windows, sob o item MySQL. Se est&#225; l&#225;, clique para iniciar. Caso n&#227;o esteja, clique no instalador do MySQL - Community para executar novamente a instala&#231;&#227;o e adicionar o MySQL Workbench aos componentes instalados.
-Depois de aberto o MySQL Workbench, clique na inst&#226;ncia local do seu MySQL Server.
+                                <figure>
+                                    <desc>Development Computer TCPIP Port 3306</desc>
+                                    <graphic url="introducao-ao-mysql-e-r-4.png"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>5. Contas e Funções</head>
+                                <figure>
+                                    <desc>Digite a senha *root* e depois guarde-a em local seguro</desc>
+                                    <graphic url="introducao-ao-mysql-e-r-5.png"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>6. Serviço do Windows</head>
+                                <p>As configurações aqui são opcionais, mas achamos mais fácil configurar o MySQL como um serviço do Windows e inclui-lo na inicialização automática. Um serviço do Windows é um processo que é executado no computador enquanto se está trabalhando. É possível mudar as configurações do serviço do Windows posteriormente, para iniciar o MySQL manualmente, para impedir que o programa inicialize quando não for necessário. </p>
+                                <figure>
+                                    <desc>MySQL como um serviço do Windows</desc>
+                                    <graphic url="introducao-ao-mysql-e-r-6.png"/>
+                                </figure>
+                                <p>Clique nos botões <emph>Execute</emph> e <emph>Next</emph> para finalizar a instalação e inicializar o servidor.</p>
+                            </div>
+                            <div type="6">
+                                <head>7. MySQL Workbench e Senha Root</head>
+                                <p>Procure por MySQL Workbench no menu de inicialização do Windows, sob o item MySQL. Se está lá, clique para iniciar. Caso não esteja, clique no instalador do MySQL - Community para executar novamente a instalação e adicionar o MySQL Workbench aos componentes instalados.
+Depois de aberto o MySQL Workbench, clique na instância local do seu MySQL Server.
 Quando a senha <emph>root</emph> for solicitada, digite a senha criada na etapa <emph>5. Accounts and Roles</emph>.
 (Ver abaixo)</p>
-<figure><desc>Senha Root</desc><graphic url="introducao-ao-mysql-e-r-7.png"/></figure>
-</div><div type="6"><head>Dicas de instala&#231;&#227;o para um Mac</head>
-<h7>1. Instala&#231;&#227;o do MySQL Community Server</h7>
-<p>Com o ficheiro de instala&#231;&#227;o do MySQL Community Server baixado, clique duas vezes no ficheiro para instal&#225;-lo.  (Ver abaixo)</p>
-<figure><desc>Ficheiro de instala&#231;&#227;o</desc><graphic url="introducao-ao-mysql-e-r-8.png"/></figure>
-<h7>2. Guarde a senha tempor&#225;ria</h7>
-<p>Siga as instru&#231;&#245;es para aceitar a licen&#231;a e o local de instala&#231;&#227;o. <hi rend="bold">Importante: Uma senha tempor&#225;ria ser&#225; solicitada. Guarde-a cuidadosamente.</hi>  (Veja o exemplo abaixo.  Sua senha tempor&#225;ria ser&#225; diferente da mostrada abaixo.) Se um erro for cometido, &#233; poss&#237;vel remover o servidor instalado e reinstal&#225;-lo, mas essa &#233; uma pequena complica&#231;&#227;o. Um dos revisores dessa li&#231;&#227;o achou que <ref target="https://perma.cc/J4Q5-SLK5">essa resposta do StackOverflow</ref> pode auxiliar nesta etapa.</p>
-<figure><desc>Senha tempor&#225;ria</desc><graphic url="getting-started-with-mysql-18.png"/></figure>
-<p>Conclu&#237;da a instala&#231;&#227;o, iremos alterar a senha <emph>root</emph> para o servidor do MySQL.</p>
-<h7>3. Modifique a senha do servidor do MySQL</h7>
-<p><hi rend="bold">Esta se&#231;&#227;o da li&#231;&#227;o causou dificuldade para algumas pessoas. Leve o tempo que for necess&#225;rio e note, por favor, que os comandos do MySQL terminam com um ponto e v&#237;rgula. Observe-os em alguns dos comandos abaixo.</hi></p>
-<p>3.1. Abra uma janela do terminal </p>
-<p>3.2. Adicione /usr/local/mysql/bin ao PATH atrav&#233;s do comando abaixo. O PATH &#233; uma lista de diret&#243;rios que o computador considera quando um comando &#233; digitado para executar um programa. No pr&#243;ximo passo abaixo, ao executar o <emph>mysql</emph>, o PATH busca pelos diret&#243;rios que cont&#233;m o programa <emph>mysql</emph>.  O PATH procura pelo <emph>mysql</emph> no diret&#243;rio <emph>/usr/local/mysql/bin</emph> e o executa. O PATH apenas salva o caminho completo que for digitado, nesse caso, <emph>/usr/local/mysql/bin/mysql</emph>, para um programa quando se quer execut&#225;-lo.</p>
-<ab><code xml:id="code_introducao-mysql-r_0" corresp="code_introducao-mysql-r_0.txt" rend="block"/></ab>
-<p>3.3. Inicie o servidor do MySQL.</p>
-<p>V&#225; at&#233; System Preferences &gt; imagem do MySQL &gt; clique em "Start MySQL server".</p>
-<p>3.4. Inicie uma sess&#227;o no MySQL. No comando abaixo, depois de <emph>--password</emph>, digite a senha guardada no passo <emph>2. Guarde a senha tempor&#225;ria</emph>.</p>
-<ab><code xml:id="code_introducao-mysql-r_1" corresp="code_introducao-mysql-r_1.txt" rend="block"/></ab>
-<p>3.5. Configure a senha <emph>root</emph> para uma <hi rend="bold">nova</hi> senha. Escolha e guarde a nova senha cuidadosamente. No <emph>prompt</emph> mysql&gt; , digite o seguinte comando, substituindo a nova senha entre aspas simples no comando SET PASSWORD=PASSWORD('password') com a nova senha criada.</p>
-<ab><code xml:id="code_introducao-mysql-r_2" corresp="code_introducao-mysql-r_2.txt" rend="block"/></ab>
-<p>3.6. Reinicie o computador. Depois de reiniciar, &#233; poss&#237;vel que seja necess&#225;rio repetir a etapa <emph>3.3 Inicie o servidor do MySQL</emph> acima.</p>
-<h7>4. Download do MySQL Workbench</h7>
-<p>Clique nesse link: <ref target="http://dev.mysql.com/downloads/workbench/">http://dev.mysql.com/downloads/workbench/</ref>. Role a p&#225;gina para baixo e clique em <hi rend="bold">Select Operating System</hi> para selecionar o sistema operacional que corresponde ao seu computador. Se necess&#225;rio, clique em <hi rend="bold">Select OS Version</hi> para selecionar a vers&#227;o do sistema operacional. Feito isso, clique no bot&#227;o azul de <hi rend="bold">Download</hi>. Na p&#225;gina de download, role para baixo e ter&#225; a op&#231;&#227;o de iniciar o download ao clicar em <hi rend="bold">No thanks, just start my download.</hi> (N&#227;o, obrigado, apenas inicie o download.)</p>
-<p>Com o ficheiro baixado, clique duas vezes para instal&#225;-lo. Feita a instala&#231;&#227;o do MySQL Workbench de acordo com as instru&#231;&#245;es na tela, arraste o &#237;cone para a pasta de aplica&#231;&#245;es da esquerda. (Ver abaixo)</p>
-<figure><desc>MySQL Workbench</desc><graphic url="introducao-ao-mysql-e-r-10.png"/></figure>
-</div></div></div></div></div><table>
-<row>
-<cell role="label">nome</cell>
-<cell role="label">n&#250;mero de telefone</cell>
-<cell role="label">endere&#231;o de e-mail</cell>
-</row>
-<row>
-<cell>Pat Abraham</cell>
-<cell>613-555-1212</cell>
-<cell><ref target="mailto:pat@zmail.ca">pat@zmail.ca</ref></cell>
-</row>
-</table><div type="2"><head>Adicione uma tabela</head>
-<list type="ordered">
-<item>No MySQL Workbench, procure no lado esquerdo no painel <hi rend="bold">Navigator</hi>, na aba <hi rend="bold">SCHEMAS</hi>, por <hi rend="bold">periodicos_resultados_pesquisa</hi>.</item>
-<item>Clique em <hi rend="bold">Tables</hi> com o lado direito do mouse e depois clique em <hi rend="bold">Create Table</hi>.</item>
-<item>Para <hi rend="bold">Table Name:</hi> digite <hi rend="bold">tbl_periodicos_resultados_pesquisa</hi></item>
-</list>
-<div type="3"><head>Adicione colunas &#224; tabela</head>
-<p>Adicione essas colunas:</p>
-<list type="ordered">
-<item><hi rend="bold">id</hi> Data type: <hi rend="bold">INT</hi>. Clique PK (Primary Key), NN (Not Null) e AI (Auto Increment).  Esta coluna de <emph>id</emph> ser&#225; usada para relacionar registros nesta tabela com registros em outras tabelas. </item>
-<item><hi rend="bold">titulo_artigo</hi> Data type: <hi rend="bold">VARCHAR(99)</hi>. Esta coluna armazenar&#225; o t&#237;tulo de cada resultado de artigo que coletarmos da busca.</item>
-<item><hi rend="bold">data_publicacao_artigo</hi> Data type: <hi rend="bold">DATETIME</hi>. Esta coluna armazenar&#225; a data em que o peri&#243;dico foi publicado.</item>
-<item><hi rend="bold">url_artigo</hi> Data type: <hi rend="bold">VARCHAR(99)</hi>. Esta coluna armazenar&#225; a url de cada resultado que coletarmos da pesquisa.</item>
-<item><hi rend="bold">termo_busca_usado</hi> Data type: <hi rend="bold">VARCHAR(45)</hi>. Esta coluna ir&#225; armazenar a palavra que usamos para buscar os peri&#243;dicos.
-Clique no bot&#227;o <hi rend="bold">Apply</hi>.</item>
-</list>
-<p>Se preferir, todas as etapas acima podem ser realizadas com um comando. Este comando pode ser executado na janela de <emph>Query</emph> para criar a tabela com as colunas indicadas acima. </p>
-<ab><code xml:id="code_introducao-mysql-r_5" corresp="code_introducao-mysql-r_5.txt" rend="block"/></ab>
-<p><emph>Dica: Leve o tempo que for necess&#225;rio para pensar sobre a elabora&#231;&#227;o da tabela e sua nomea&#231;&#227;o, uma vez que um banco de dados bem elaborado ser&#225; mais f&#225;cil de trabalhar e entender.</emph></p>
-</div><div type="3"><head>Adicione um usu&#225;rio para se conectar ao banco de dados</head>
-<p>Um usu&#225;rio &#233; uma conta que tem permiss&#227;o para se conectar a um banco de dados. Abaixo, adicionaremos um novo usu&#225;rio para que essa conta apenas se conecte a esse novo banco de dados. Usar essa conta de usu&#225;rio para uma conex&#227;o com esse banco de dados limita a exposi&#231;&#227;o a outros bancos de dados, caso a senha para este usu&#225;rio seja comprometida. Dar ao usu&#225;rio os privil&#233;gios m&#237;nimos requeridos para realizar o necess&#225;rio reduz o risco, caso outra pessoa tiver acesso &#224; senha de usu&#225;rio. Por exemplo, se um usu&#225;rio pode apenas ler um banco de dados, &#233; um risco menor se a senha for descoberta do que um usu&#225;rio que tamb&#233;m pode alterar ou apagar o banco de dados. </p>
-<p>No menu do MySQL Workbench, clique em <hi rend="bold">Server</hi> e depois em <hi rend="bold">Users and Privileges</hi></p>
-<p><hi rend="bold">Usu&#225;rios de Mac</hi> - Em alguns computadores Mac, como meu laptop de teste, o painel de <hi rend="bold">Schema Privileges</hi> n&#227;o &#233; exibido corretamente.  Veja a nota abaixo da captura de tela se isso ocorrer.</p>
-<p>Clique no bot&#227;o <hi rend="bold">Add Account</hi> e complete os detalhes para a nova conta de usu&#225;rio na caixa de di&#225;logo:</p>
-<list type="ordered">
-<item>Login Name: <hi rend="bold">periodicos_pesquisa_usuario</hi></item>
-<item>Authentication Type: selecione <hi rend="bold">Standard</hi></item>
-<item>Limit to Hosts Matching: <hi rend="bold">localhost</hi></item>
-<item>Tecle <emph>Enter</emph> e confirme uma senha <emph>AlgoDificil</emph></item>
-<item>Clique na aba <hi rend="bold">Administrative Roles</hi>.  Certifique-se de que nada est&#225; marcado. Esta conta &#233; apenas para acessar o banco de dados. </item>
-<item>Clique na aba <hi rend="bold">Schema Privileges</hi> e clique <hi rend="bold">Add Entry</hi>.</item>
-<item>Na caixa de di&#225;logo <hi rend="bold">New Schema Privilege Definition</hi>, clique na caixa de sele&#231;&#227;o <hi rend="bold">Selected schema:</hi> e selecione <hi rend="bold">periodicos_resultados_pesquisa</hi>. Clique OK.</item>
-<item>Clique em todas as op&#231;&#245;es de <emph>Object Rights</emph>: SELECT, INSERT, UPDATE, DELETE, EXECUTE, SHOW VIEW, como mostrado na imagem abaixo. (Este usu&#225;rio precisar&#225; fazer muitas coisas posteriormente na li&#231;&#227;o, por isso, estamos lhe concendendo v&#225;rias permiss&#245;es.)</item>
-<item>Clique em <hi rend="bold">Apply</hi>.</item>
-</list>
-<figure><desc>Configurando permiss&#245;es para a nova conta</desc><graphic url="introducao-ao-mysql-e-r-13.PNG"/></figure>
-<div type="4"><head>Schema Privileges n&#227;o exibidos corretamente</head>
-<p>Alguns computadores Mac, como meu laptop de teste, n&#227;o exibem corretamente o painel de <hi rend="bold">Schema Privileges</hi>. Nesse caso, &#233; poss&#237;vel realizar a tarefa acima atrav&#233;s de um <emph>script</emph> usando uma janela de Query. </p>
-<p>Se o usu&#225;rio j&#225; foi criado acima, execute o seguinte comando para lhe conceder privil&#233;gios de usu&#225;rio:</p>
-<ab><code xml:id="code_introducao-mysql-r_6" corresp="code_introducao-mysql-r_6.txt" rend="block"/></ab>
-<p>Se o usu&#225;rio n&#227;o foi criado ainda, execute estes dois comandos para criar um usu&#225;rio e depois lhe conceder privil&#233;gios de usu&#225;rio:</p>
-<ab><code xml:id="code_introducao-mysql-r_7" corresp="code_introducao-mysql-r_7.txt" rend="block"/></ab>
-</div><div type="4"><head>MySQL vers&#227;o 8 e tipo de autentica&#231;&#227;o de usu&#225;rio.</head>
-<p>Quando um usu&#225;rio &#233; criado no MySQL 8 Workbench o <hi rend="bold">Authentication Type</hi> (tipo de autentica&#231;&#227;o) &#233; configurado para o padr&#227;o <hi rend="bold">caching_sha2_password</hi>. Esse tipo de autentica&#231;&#227;o causa um erro para o pacote R que usaremos para conectar o banco de dados mais tarde nesta li&#231;&#227;o. O erro &#233; <emph>Authentication plugin 'caching_sha2_password' cannot be loaded</emph> e &#233; descrito no <ref target="https://perma.cc/7NVR-TSYT">Stack Overflow</ref>.</p>
-<p>Para evitar esse erro, podemos modificar o tipo de autentica&#231;&#227;o do usu&#225;rio para padr&#227;o (Standard). Para fazer isso, execute o seguinte comando na janela de <emph>Query</emph>:</p>
-<ab><code xml:id="code_introducao-mysql-r_8" corresp="code_introducao-mysql-r_8.txt" rend="block"/></ab>
-</div></div></div><div type="2"><head>Crie um R Script que se conecte ao banco de dados</head>
-<p>Abra o RStudio, que foi instalado anteriormente na li&#231;&#227;o. Veja a se&#231;&#227;o <ref target="#rstudio">RStudio</ref>. </p>
-<p>Agora usaremos o RStudio para escrever um novo R Script e salv&#225;-lo com o nome periodicos_resultados_pesquisa.R. </p>
-<p>V&#225; em File &gt; New File &gt; R Script e depois salve o novo ficheiro com o nome periodicos_resultados_pesquisa.R.</p>
-<p>Usaremos o pacote RMariaDB para realizar a conex&#227;o com o MySQL. (Se tiver curiosidade, a documenta&#231;&#227;o para o pacote RMariaDB pode ser encontrada <ref target="https://perma.cc/FX5P-DAW7">aqui</ref>.)</p>
-<p>Se n&#227;o possui o pacote RMariaDB instalado (o que &#233; prov&#225;vel, caso seja a primeira vez que usa o RStudio), instale-o utilizando o <emph>console</emph> do RStudio. Ap&#243;s abrir o RStudio, copie e cole o seguinte para a janela da esquerda no &gt;, e depois d&#234; enter:</p>
-<ab><code xml:id="code_introducao-mysql-r_9" corresp="code_introducao-mysql-r_9.txt" rend="block"/></ab>
-<p>Adicione o seguinte comando ao script periodicos_resultados_pesquisa.R (janela de cima, &#224; esquerda) </p>
-<ab><code xml:id="code_introducao-mysql-r_10" corresp="code_introducao-mysql-r_10.txt" rend="block"/></ab>
-<div type="3"><head>Conectando a um banco de dados com uma senha</head>
-<p>Primeiro, nos conectaremos ao banco de dados usando uma senha. (Depois utilizaremos um meio de conex&#227;o melhor). Por hora, usaremos uma vari&#225;vel para armazenar a senha. Cada vez que iniciar o R, ser&#225; necess&#225;rio apagar esta vari&#225;vel, mas isso &#233; melhor do que publicar uma senha <emph>hardcoded</emph> caso compartilhe seus scripts, como pode fazer usando o GitHub.</p>
-<p>No console do RStudio, digite o comando abaixo, substituindo <emph>AlgoDificil</emph> com a senha criada para periodicos_pesquisa_usuario nos passos realizados acima para adicionar um usu&#225;rio ao banco de dados.</p>
-<ab><code xml:id="code_introducao-mysql-r_11" corresp="code_introducao-mysql-r_11.txt" rend="block"/></ab>
-<p>Adicione as seguintes declara&#231;&#245;es em R ao ficheiro periodicos_resultados_pesquisa.R file e salve-o.</p>
-<p>Para executar este script, selecione todo o texto e clique no bot&#227;o <emph>Run</emph> (Executar). (H&#225; outras maneiras de executar apenas uma parte do script ou o script inteiro. Se tiver curiosidade, procure no menu abaixo de Code &gt; Run Region. O comando CTRL+ALT+R executa todo o c&#243;digo em R no script.)</p>
-<ab><code xml:id="code_introducao-mysql-r_12" corresp="code_introducao-mysql-r_12.txt" rend="block"/></ab>
-<p>No console, dever&#225; visualizar:</p>
-<ab><code xml:id="code_introducao-mysql-r_13" corresp="code_introducao-mysql-r_13.txt" rend="block"/></ab>
-<p>Sucesso! O que conseguiu:</p>
-<list type="ordered">
-<item>Conectar ao banco de dados com dbConnect.</item>
-<item>Listar a tabela no banco de dados com dbListTables.</item>
-<item>Desconectar do banco de dados usando dbDisconnect.</item>
-</list>
-<div type="4"><head>Conectar-se ao banco de dados com uma senha armazenada num ficheiro de configura&#231;&#227;o</head>
-<p>O exemplo acima de conex&#227;o &#233; uma das maneiras de conectar-se. O m&#233;todo de conex&#227;o descrito abaixo armazena a informa&#231;&#227;o da conex&#227;o do banco de dados num ficheiro de configura&#231;&#227;o, para que n&#227;o seja necess&#225;rio digitar uma senha numa vari&#225;vel todas as vezes que uma sess&#227;o no R for iniciada. Acredito que esse &#233; um processo minucioso, mas &#233; uma maneira mais padronizada e segura de proteger as credenciais usadas para acessar seu banco de dados. Esse m&#233;todo de conex&#227;o ser&#225; usado no c&#243;digo para o restante desse tutorial, mas pode ser substitu&#237;do pelo m&#233;todo de conex&#227;o mais simples mostrado acima se preferir. </p>
-<div type="5"><head>Crie o ficheiro .cnf para armazenar a informa&#231;&#227;o de conex&#227;o com o banco de dados MySQL</head>
-<list type="ordered">
-<item>Abra um editor de texto, como o notepad, nano ou TextEdit e cole os itens abaixo, modificando a senha para a criada para periodicos_pesquisa_usuario nas etapas acima para adicionar um usu&#225;rio e conect&#225;-lo ao banco de dados. </item>
-</list>
-<ab><code xml:id="code_introducao-mysql-r_14" corresp="code_introducao-mysql-r_14.txt" rend="block"/></ab>
-<list start="2" type="ordered">
-<item>
-<p>Salve este ficheiro em algum local fora do diret&#243;rio de trabalho do R. Salvei o meu no mesmo diret&#243;rio de outros ficheiros de configura&#231;&#227;o do MySQL. No PC, o caminho foi o seguinte: C:\Program Files\MySQL\MySQL Server 8.0. Dependendo de seu sistema operacional e da vers&#227;o do MySQL, esse local pode estar em outro lugar. No Mac, usei /Users/blackadar/Documents/ como a pasta de destino. Testei colocar este ficheiro em lugares diferentes, apenas &#233; necess&#225;rio que o R possa localiz&#225;-lo quando o script for executado. Nomeie o ficheiro como <hi rend="bold">periodicos_resultados_pesquisa.cnf</hi>.</p>
-</item>
-<item>
-<p>Atualize o script periodicos_resultados_pesquisa.R acima para conectar-se ao banco de dados usando o ficheiro de configura&#231;&#227;o. </p>
-</item>
-</list>
-<ab><code xml:id="code_introducao-mysql-r_15" corresp="code_introducao-mysql-r_15.txt" rend="block"/></ab>
-<list start="4" type="ordered">
-<item>Execute seu script.</item>
-</list>
-<p>No console, entre outras linhas, dever&#225; ver novamente:</p>
-<ab><code xml:id="code_introducao-mysql-r_16" corresp="code_introducao-mysql-r_16.txt" rend="block"/></ab>
-<p>De maneira bem sucedida, a conex&#227;o com o banco de dados foi realizada utilizando um ficheiro de configura&#231;&#227;o. </p>
-</div></div></div></div><div type="2"><head>Armazenando dados numa tabela com o SQL</head>
-<p>Nesta se&#231;&#227;o da li&#231;&#227;o, criaremos uma declara&#231;&#227;o no SQL para inserir uma linha de dados no banco de dados sobre esse <ref target="https://perma.cc/C8MR-WYV2">artigo de peri&#243;dico</ref>. Iremos inserir primeiro o registro no MySQL Workbench e depois faremos isso no R.</p>
-<list type="ordered">
-<item>
-<p>No MySQL Workbench, clique na imagem categorizada como SQL+ para criar uma nova aba para o SQL executar consultas (ou v&#225; ao menu "File" e escolha a op&#231;&#227;o "New Query Tab"). </p>
-</item>
-<item>
-<p>Cole a declara&#231;&#227;o abaixo na janela de Query. Esta a&#231;&#227;o ir&#225; inserir um registro na tabela.</p>
-<ab><code xml:id="code_introducao-mysql-r_17" corresp="code_introducao-mysql-r_17.txt" rend="block"/></ab>
-</item>
-<item>
-<p>Clique na imagem de rel&#226;mpago/raio na aba do SQL para executar a declara&#231;&#227;o SQL. </p>
-</item>
-</list>
-<figure><desc>Inserindo um registro numa tabela usando MySQL Workbench</desc><graphic url="introducao-ao-mysql-e-r-14.png"/></figure>
-<table>
-<row>
-<cell role="label">SQL</cell>
-<cell role="label">Significado</cell>
-</row>
-<row>
-<cell>'German+Submarine');</cell>
-<cell>campo termo_busca_usado</cell>
-</row>
-<row>
-<cell>LEFT(RTRIM('http://newspapers.library.wales/view/4121281/4121288/94/'),99),</cell>
-<cell>campo url_artigo. Este campo &#233; um VARCHAR(99), portanto tem um m&#225;ximo de 99 caracteres. Inserir uma URL mais longa que 99 caracteres causaria um erro, portanto, duas fun&#231;&#245;es s&#227;o utilizadas para controlar isso. RTRIM() reduz espa&#231;os residuais &#224; direita da URL. LEFT(value,99) retorna apenas os 99 caracteres mais &#224; esquerda da URL reduzida. Esta URL &#233; mais curta que isso, ent&#227;o essas fun&#231;&#245;es est&#227;o aqui apenas como exemplo.</cell>
-</row>
-<row>
-<cell>'1915-05-21',</cell>
-<cell>campo data_publicacao_artigo</cell>
-</row>
-<row>
-<cell>VALUES('THE LOST LUSITANIA.',</cell>
-<cell>O valor a ser inserido no campo titulo_artigo</cell>
-</row>
-<row>
-<cell>termo_busca_usado)</cell>
-<cell>"</cell>
-</row>
-<row>
-<cell>url_artigo,</cell>
-<cell>"</cell>
-</row>
-<row>
-<cell>data_publicacao_artigo,</cell>
-<cell>"</cell>
-</row>
-<row>
-<cell>titulo_artigo,</cell>
-<cell>nome do campo a ser preenchido por um valor</cell>
-</row>
-<row>
-<cell>INSERT INTO tbl_periodicos_resultados_pesquisa (</cell>
-<cell>Insere um registro na tabela nomeada tbl_periodicos_resultados_pesquisa</cell>
-</row>
-</table><div type="3"><head>Consultando dados numa tabela com o SQL</head>
-<p>Nesta se&#231;&#227;o da li&#231;&#227;o, criaremos uma declara&#231;&#227;o no SQL para selecionar uma linha de dados do banco de dados que inserimos. Selecionaremos o primeiro registro no MySQL Workbench e depois faremos isso no R.</p>
-<list type="ordered">
-<item>
-<p>Cole a declara&#231;&#227;o abaixo numa janela de query no MySQL Workbench. Isto ir&#225; selecionar registros da tabela. </p>
-<ab><code xml:id="code_introducao-mysql-r_19" corresp="code_introducao-mysql-r_19.txt" rend="block"/></ab>
-</item>
-<item>
-<p>Clique na imagem de rel&#226;mpago/raio na aba do SQL para execut&#225;-la. Dever&#225; visualizar o t&#237;tulo do artigo "THE LOST LUSITANIA." na grade de resultados. Ver abaixo. </p>
-</item>
-</list>
-<figure><desc>Selecionando registros de uma tabela usando MySQL Workbench</desc><graphic url="introducao-ao-mysql-e-r-15.png"/></figure>
-<p>Opcional: Modifique a declara&#231;&#227;o SELECT acima alterando os campos selecionados e execute novamente. Adicione mais de um campo para a declara&#231;&#227;o SELECT e execute:</p>
-<ab><code xml:id="code_introducao-mysql-r_20" corresp="code_introducao-mysql-r_20.txt" rend="block"/></ab>
-</div><div type="3"><head>Armazenando dados numa tabela com SQL usando R</head>
-<p>Vamos fazer isso usando R! Abaixo se encontra uma vers&#227;o expandida do R Script que usamos para nos conectar ao banco de dados. Para sermos concisos, os tr&#234;s primeiros coment&#225;rios que t&#237;nhamos no R Script mostrado acima foram removidos. N&#227;o s&#227;o mais necess&#225;rios.</p>
-<p>Na linha 4 do script abaixo, lembre-se de modificar o caminho do rmariadb.settingsfile que corresponde &#224; localiza&#231;&#227;o desse ficheiro em seu computador.</p>
-<ab><code xml:id="code_introducao-mysql-r_21" corresp="code_introducao-mysql-r_21.txt" rend="block"/></ab>
-<p>No script acima, realizamos duas etapas para inserir um registro:</p>
-<list type="ordered">
-<item>Defina a declara&#231;&#227;o INSERT na linha com: query &lt;- "INSERT INTO tbl_periodicos_resultados_pesquisa (</item>
-<item>Execute a declara&#231;&#227;o INSERT armazenada na vari&#225;vel da consulta com: rsInsert &lt;- dbSendQuery(artigosDb, query)</item>
-</list>
-<p>Execute o script acima no R Studio e depois execute uma declara&#231;&#227;o SELECT no MySQL Workbench. Consegue visualizar o novo registro adicionado?</p>
-<div type="4"><head>Realize uma limpeza nos dados de teste</head>
-<p>Neste ponto &#233; prov&#225;vel que haja mais de um registro com o t&#237;tulo de artigo "THE LOST LUSITANIA.", o que &#233; razo&#225;vel para a testagem, mas n&#227;o queremos dados duplicados. Iremos remover os dados de teste e come&#231;ar novamente. Usando a janela de query no MySQL Workbench, execute a declara&#231;&#227;o SQL:</p>
-<ab><code xml:id="code_introducao-mysql-r_22" corresp="code_introducao-mysql-r_22.txt" rend="block"/></ab>
-<p>No painel Action Output do MySQL Workbench dever&#225; visualizar:</p>
-<ab><code xml:id="code_introducao-mysql-r_23" corresp="code_introducao-mysql-r_23.txt" rend="block"/></ab>
-<p>Para praticar o que acabamos de fazer:</p>
-<list type="ordered">
-<item>Execute uma declara&#231;&#227;o SELECT novamente. N&#227;o dever&#225; receber linhas de retorno.</item>
-<item>Execute novamente o script em R acima para inserir um registro. </item>
-<item>Realize uma declara&#231;&#227;o SELECT. Dever&#225;s visualizar uma linha de dados.</item>
-</list>
-</div><div type="4"><head>Modifique a declara&#231;&#227;o INSERT para usar vari&#225;veis</head>
-<p>Iremos inserir muitos dados na tabela usando o R, ent&#227;o mudaremos a declara&#231;&#227;o INSERT para usar vari&#225;veis. Veja no c&#243;digo abaixo o destaque <emph># Compila o query.</emph></p>
-<ab><code xml:id="code_introducao-mysql-r_24" corresp="code_introducao-mysql-r_24.txt" rend="block"/></ab>
-<p>Vamos testar esse script:</p>
-<list type="ordered">
-<item>Execute uma declara&#231;&#227;o SELECT e observe as linhas que possui.</item>
-<item>Execute o script em R acima para inserir outro registro. </item>
-<item>Realize a declara&#231;&#227;o SELECT. Dever&#225; visualizar uma linha adicional de dados. </item>
-</list>
-</div><div type="4"><head>Erros do SQL</head>
-<p>Vamos criar um simples erro no SQL para visualizar o que acontece.</p>
-<p>No R, modifique:</p>
-<ab><code xml:id="code_introducao-mysql-r_25" corresp="code_introducao-mysql-r_25.txt" rend="block"/></ab>
-<p>para</p>
-<ab><code xml:id="code_introducao-mysql-r_26" corresp="code_introducao-mysql-r_26.txt" rend="block"/></ab>
-<p>e execute novamente o script. </p>
-<p>No console R, h&#225; um erro:</p>
-<ab><code xml:id="code_introducao-mysql-r_27" corresp="code_introducao-mysql-r_27.txt" rend="block"/></ab>
-<p>&#201; poss&#237;vel verificar, com uma declara&#231;&#227;o SELECT, se n&#227;o h&#225; registro na tabela com um t&#237;tulo de artigo denominado <emph>THE LOST LUSITANIA'S RUDDER</emph>.</p>
-<p>As aspas simples fazem parte da sintaxe do SQL e indicam uma entrada textual. Se estiverem no lugar errado, provocam um erro. Temos que lidar com casos nos quais h&#225; dados com aspas. O SQL aceita duas aspas numa declara&#231;&#227;o de inser&#231;&#227;o para representar aspas em dados('').</p>
-<p>Lidaremos com as aspas utilizando uma fun&#231;&#227;o <code rend="inline">gsub</code> para substituir aspas simples por aspas duplas, como mostrado abaixo. </p>
-<ab><code xml:id="code_introducao-mysql-r_28" corresp="code_introducao-mysql-r_28.txt" rend="block"/></ab>
-<p>Agora que a quest&#227;o das aspas no t&#237;tulo do artigo est&#225; resolvida, execute novamente o script e depois confira com uma declara&#231;&#227;o SELECT no MySQL Workbench.</p>
-<ab><code xml:id="code_introducao-mysql-r_29" corresp="code_introducao-mysql-r_29.txt" rend="block"/></ab>
-<p>Uma vez que o registro teste foi visualizado, digite TRUNCATE tbl_periodicos_resultados_pesquisa para remover esses dados de teste.</p>
-</div></div></div><table>
-<row>
-<cell role="label">Fun&#231;&#227;o</cell>
-<cell role="label">Significado</cell>
-</row>
-<row>
-<cell>append = TRUE )</cell>
-<cell>Adiciona os valores ao que j&#225; existe na tabela. Se esse script rodar novamente, todas as linhas em dadosAmostraJardim ser&#227;o adicionadas &#224; mesma tabela novamente.</cell>
-</row>
-<row>
-<cell>name = "tbl_periodicos_resultados_pesquisa",</cell>
-<cell>Insere os valores de dadosAmostraJardim para a tabela tbl_periodicos_resultados_pesquisa</cell>
-</row>
-<row>
-<cell>row.names = FALSE,</cell>
-<cell>Nenhum nome de linha foi especificado.</cell>
-</row>
-<row>
-<cell>value = dadosAmostraJardim,</cell>
-<cell>Insere os valores do data frame dadosAmostraJardim para a tabela.</cell>
-</row>
-<row>
-<cell>dbWriteTable(artigosDb,</cell>
-<cell>Use  a conex&#227;o do banco de dados MySQL artigosDb.</cell>
-</row>
-</table><div type="2"><head>Selecionado dados de uma tabela com SQL usando R</head>
-<p>Nosso objetivo aqui &#233; usar a tabela de artigos que importamos e criar um gr&#225;fico do n&#250;mero de artigos publicados nos <emph>Welsh Newspapers</emph> (jornais galeses) ao longo de cada m&#234;s da Primeira Guerra Mundial que corresponda aos termos de busca <emph>allotment</emph>(loteamento) e <emph>garden</emph> (jardim), e <emph>German</emph> (alem&#227;o) e <emph>submarine</emph>(submarino).</p>
-<p>O script abaixo consulta o banco de dados e produz o gr&#225;fico de linha abaixo. Leia o script e observe o que est&#225; acontecendo. Segue uma explica&#231;&#227;o do script. </p>
-<ab><code xml:id="code_introducao-mysql-r_35" corresp="code_introducao-mysql-r_35.txt" rend="block"/></ab>
-<table>
-<row>
-<cell role="label">SQL</cell>
-<cell role="label">Significado</cell>
-</row>
-<row>
-<cell>ORDER BY YEAR(data_publicacao_artigo),MONTH(data_publicacao_artigo);</cell>
-<cell>Coloca os resultados ordenados por data, o que &#233; &#250;til j&#225; que queremos construir um gr&#225;fico por data.</cell>
-</row>
-<row>
-<cell>GROUP BY YEAR(data_publicacao_artigo),MONTH(data_publicacao_artigo)</cell>
-<cell>Esta declara&#231;&#227;o GROUP BY &#233; importante para a contagem (COUNT) acima. Aqui os dados est&#227;o agrupados por m&#234;s e ano, para que seja poss&#237;vel contar todos os registros no grupo.</cell>
-</row>
-<row>
-<cell>FROM tbl_periodicos_resultados_pesquisa</cell>
-<cell>Este &#233; o banco de dados a partir do qual estamos selecionando os dados.</cell>
-</row>
-<row>
-<cell>COUNT(CONCAT(MONTH(data_publicacao_artigo),' ',YEAR(data_publicacao_artigo)))) as 'count'</cell>
-<cell>Fornece uma contagem do n&#250;mero de artigos publicados que compartilham o mesmo m&#234;s e ano de publica&#231;&#227;o. CONCAT representa a a&#231;&#227;o concatenar,  que cria um &#250;nico valor textual de dois ou mais valores textuais, nesse caso, o m&#234;s e o ano.</cell>
-</row>
-<row>
-<cell>SELECT (</cell>
-<cell>SELECT - Seleciona os dados que correspondem &#224; condi&#231;&#227;o na cl&#225;usula WHERE na tabela do banco de dados nomeado .</cell>
-</row>
-</table></div><div type="2"><head>Indo mais longe com o MySQL</head>
-<p>Se deseja colocar um banco de dados num website, uma maneira de faz&#234;-lo &#233; usando MySQL e a linguagem PHP para construir as p&#225;ginas do site. Um exemplo deste tipo de website &#233; o que constru&#237; para <ref target="https://perma.cc/237N-DD9E">buscar edi&#231;&#245;es do "the Equity newspaper"</ref>. O livro de Larry Ullman's, <emph>PHP and MySQL for Dynamic Web Sites</emph>, aborda como configurar e conectar um banco de dados usando MySQL e PHP de uma maneira resistente &#224; hackers.</p>
-<p>Para exemplos do uso de SQL para ordenar e agrupar dados, assim com tamb&#233;m realizar c&#225;lculos, veja: <ref target="http://web.archive.org/web/20171228130133/https://www.ntu.edu.sg/home/ehchua/programming/sql/MySQL_Beginner.html">MySQL by Examples for Beginners</ref> ou MySQL <ref target="https://perma.cc/84HN-9DBL">Examples of Common Queries</ref>.</p>
-</div><div type="2"><head>Conclus&#227;o</head>
-<p>Espero que tenha obtido o conhecimento para configurar uma tabela de banco de dados, conect&#225;-lo e armazenar registros. Embora tenhamos abordado apenas uma pequena parte das diferentes maneiras de realizar consultas nos dados, espero tamb&#233;m que saiba a t&#233;cnica de uso das declara&#231;&#245;es SELECT para que possa utiliz&#225;-las em seus futuros projetos de hist&#243;ria digital.</p>
-</div><div type="2"><head>Cr&#233;ditos</head>
-<p>Finalizei esta li&#231;&#227;o gra&#231;as ao suporte do <ref target="https://perma.cc/S7PP-FY5U">George Garth Graham Undergraduate Digital History Research Fellowship</ref>.</p>
-<p>Agrade&#231;o &#224; Dr&#170;. Amanda Visconti pelo suporte e orienta&#231;&#227;o ao longo da prepara&#231;&#227;o desta li&#231;&#227;o.</p>
-</div><div type="2"><head>Refer&#234;ncias</head>
-<p>Ullman, L. 2005. <emph>PHP and MySQL for Dynamic Web Sites, 2nd ed.</emph> Berkeley, Calif: Peachpit.</p>
-</div><div type="2"><head>Notas</head>
-<p><ref type="footnotemark" target="#note_1"/> : Jason A. French, "Using R With MySQL Databases," blog (3 July 2014), <ref target="https://perma.cc/5VYV-L5PG">http://www.jason-french.com/blog/2014/07/03/using-r-with-mysql-databases/</ref>.</p>
-<p><ref type="footnotemark" target="#note_2"/> : Taylor Arnold and Lauren Tilton, "Basic Text Processing in R," Programming Historian (27 March 2017), <ref target="/pt/licoes/processamento-basico-texto-r">tradu&#231;&#227;o para portugu&#234;s</ref>.</p>
-<p><ref type="footnotemark" target="#note_3"/> : Taryn Dewar, "R Basics with Tabular Data," Programming Historian (05 September 2016), <ref target="/pt/licoes/nocoes-basicas-R-dados-tabulares">tradu&#231;&#227;o para portugu&#234;s</ref>.</p>
-<p>O script em R usado para recolher dados de amostra se encontra <ref target="https://perma.cc/87AE-LJRG">aqui</ref>.</p>
-</div></body>
-  </text>
+                                <figure>
+                                    <desc>Senha Root</desc>
+                                    <graphic url="introducao-ao-mysql-e-r-7.png"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>Dicas de instalação para um Mac</head>
+                            </div>
+                            <div type="6">
+                                <head>1. Instalação do MySQL Community Server</head>
+                                <p>Com o ficheiro de instalação do MySQL Community Server baixado, clique duas vezes no ficheiro para instalá-lo.  (Ver abaixo)</p>
+                                <figure>
+                                    <desc>Ficheiro de instalação</desc>
+                                    <graphic url="introducao-ao-mysql-e-r-8.png"/>
+                                </figure>
+                            </div>
+                            <div type="6">
+                                <head>2. Guarde a senha temporária</head>
+                                <p>Siga as instruções para aceitar a licença e o local de instalação. <hi rend="bold">Importante: Uma senha temporária será solicitada. Guarde-a cuidadosamente.</hi>  (Veja o exemplo abaixo.  Sua senha temporária será diferente da mostrada abaixo.) Se um erro for cometido, é possível remover o servidor instalado e reinstalá-lo, mas essa é uma pequena complicação. Um dos revisores dessa lição achou que <ref target="https://perma.cc/J4Q5-SLK5">essa resposta do StackOverflow</ref> pode auxiliar nesta etapa.</p>
+                                <figure>
+                                    <desc>Senha temporária</desc>
+                                    <graphic url="getting-started-with-mysql-18.png"/>
+                                </figure>
+                                <p>Concluída a instalação, iremos alterar a senha <emph>root</emph> para o servidor do MySQL.</p>
+                            </div>
+                            <div type="6">
+                                <head>3. Modifique a senha do servidor do MySQL</head>
+                                <p>
+                                    <hi rend="bold">Esta seção da lição causou dificuldade para algumas pessoas. Leve o tempo que for necessário e note, por favor, que os comandos do MySQL terminam com um ponto e vírgula. Observe-os em alguns dos comandos abaixo.</hi>
+                                </p>
+                                <p>3.1. Abra uma janela do terminal </p>
+                                <p>3.2. Adicione /usr/local/mysql/bin ao PATH através do comando abaixo. O PATH é uma lista de diretórios que o computador considera quando um comando é digitado para executar um programa. No próximo passo abaixo, ao executar o <emph>mysql</emph>, o PATH busca pelos diretórios que contém o programa <emph>mysql</emph>.  O PATH procura pelo <emph>mysql</emph> no diretório <emph>/usr/local/mysql/bin</emph> e o executa. O PATH apenas salva o caminho completo que for digitado, nesse caso, <emph>/usr/local/mysql/bin/mysql</emph>, para um programa quando se quer executá-lo.</p>
+                                <ab>
+                                    <code xml:id="code_introducao-mysql-r_0" corresp="code_introducao-mysql-r_0.txt" rend="block"/>
+                                </ab>
+                                <p>3.3. Inicie o servidor do MySQL.</p>
+                                <p>Vá até System Preferences &gt; imagem do MySQL &gt; clique em "Start MySQL server".</p>
+                                <p>3.4. Inicie uma sessão no MySQL. No comando abaixo, depois de <emph>--password</emph>, digite a senha guardada no passo <emph>2. Guarde a senha temporária</emph>.</p>
+                                <ab>
+                                    <code xml:id="code_introducao-mysql-r_1" corresp="code_introducao-mysql-r_1.txt" rend="block"/>
+                                </ab>
+                                <p>3.5. Configure a senha <emph>root</emph> para uma <hi rend="bold">nova</hi> senha. Escolha e guarde a nova senha cuidadosamente. No <emph>prompt</emph> mysql&gt; , digite o seguinte comando, substituindo a nova senha entre aspas simples no comando SET PASSWORD=PASSWORD('password') com a nova senha criada.</p>
+                                <ab>
+                                    <code xml:id="code_introducao-mysql-r_2" corresp="code_introducao-mysql-r_2.txt" rend="block"/>
+                                </ab>
+                                <p>3.6. Reinicie o computador. Depois de reiniciar, é possível que seja necessário repetir a etapa <emph>3.3 Inicie o servidor do MySQL</emph> acima.</p>
+                            </div>
+                            <div type="6">
+                                <head>4. Download do MySQL Workbench</head>
+                                <p>Clique nesse link: <ref target="http://dev.mysql.com/downloads/workbench/">http://dev.mysql.com/downloads/workbench/</ref>. Role a página para baixo e clique em <hi rend="bold">Select Operating System</hi> para selecionar o sistema operacional que corresponde ao seu computador. Se necessário, clique em <hi rend="bold">Select OS Version</hi> para selecionar a versão do sistema operacional. Feito isso, clique no botão azul de <hi rend="bold">Download</hi>. Na página de download, role para baixo e terá a opção de iniciar o download ao clicar em <hi rend="bold">No thanks, just start my download.</hi> (Não, obrigado, apenas inicie o download.)</p>
+                                <p>Com o ficheiro baixado, clique duas vezes para instalá-lo. Feita a instalação do MySQL Workbench de acordo com as instruções na tela, arraste o ícone para a pasta de aplicações da esquerda. (Ver abaixo)</p>
+                                <figure>
+                                    <desc>MySQL Workbench</desc>
+                                    <graphic url="introducao-ao-mysql-e-r-10.png"/>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <head>Crie um banco de dados</head>
+            <p>Aqui iremos criar um banco de dados que serve como um contentor para as tabelas nas quais armazenaremos informações. Uma tabela é a estrutura que mantém os dados que queremos armazenar. Tabelas contém muitas linhas de registros. Um exemplo de informações básicas de contato conteria campos para nome, número de telefone e endereço de e-mail. Numa tabela, os campos são organizados por <emph>colunas</emph>.</p>
+            <p>Aqui está uma tabela de amostra com uma linha de dados que representa um registro:</p>
+            <table>
+                <row>
+                    <cell role="label">nome</cell>
+                    <cell role="label">número de telefone</cell>
+                    <cell role="label">endereço de e-mail</cell>
+                </row>
+                <row>
+                    <cell>Pat Abraham</cell>
+                    <cell>613-555-1212</cell>
+                    <cell>
+                        <ref target="mailto:pat@zmail.ca">pat@zmail.ca</ref>
+                    </cell>
+                </row>
+            </table>
+            <div type="3">
+                <head>Abra o MySQL Workbench</head>
+                <p>Abra o MySQL Workbench. Clique duas vezes em <emph>Local Instance MySQL80</emph> (num Mac isto pode aparecer como <emph>Local Instance 3306</emph>). É possível que a senha <emph>root</emph> criada nas etapas acima seja solicitada. Em alguns Macs, uma aba de <emph>Query</emph> será aberta; se não for, abra uma aba de <emph>Query</emph> utilizando: <emph>File &gt; New Query Tab</emph>.</p>
+            </div>
+            <div type="3">
+                <head>Crie um banco de dados</head>
+                <p>Agora iremos criar um novo banco de dados. Utilizando o MySQL Workbench, realize os seguintes passos: </p>
+                <list type="ordered">
+                    <item>
+                        <p>Na  janela de <hi rend="bold">Query</hi>, digite:</p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_3" corresp="code_introducao-mysql-r_3.txt" rend="block"/>
+                        </ab>
+                    </item>
+                    <item>
+                        <p>Execute o comando CREATE DATABASE.  Clique no <hi rend="bold">relâmpago/raio</hi> ou, utilizando o menu, clique em <emph>Query</emph> e então em <emph>Execute Current Statement</emph>.</p>
+                    </item>
+                    <item>
+                        <p>O novo banco de dados <hi rend="bold">periodicos_resultados_pesquisa</hi> deve estar visível na aba <hi rend="bold">SCHEMAS</hi>, no canto superior esquerdo da tela. Se não conseguir visualizar um item chamado periodicos_resultados_pesquisa, clique no botão de atualizar.</p>
+                    </item>
+                </list>
+                <p>(Ver abaixo:)</p>
+                <figure>
+                    <desc>Crie um banco de dados no MySQL Workbench</desc>
+                    <graphic url="introducao-ao-mysql-e-r-11.png"/>
+                </figure>
+            </div>
+            <div type="3">
+                <head>USE o banco de dados</head>
+                <p>Em seguida, iremos inserir uma declaração USE para informar ao MySQL qual banco de dados será usado. Isto se torna mais importante quando se tem mais de um banco de dados no computador. </p>
+                <p>Na janela de <hi rend="bold">Query</hi>, apague todo o comando CREATE DATABASE e digite:</p>
+                <ab>
+                    <code xml:id="code_introducao-mysql-r_4" corresp="code_introducao-mysql-r_4.txt" rend="block"/>
+                </ab>
+                <p>Novamente, clique no <hi rend="bold">relâmpago/raio</hi> ou, usando o menu, clique em <emph>Query</emph> e então em <emph>Execute Current Statement</emph>. É possível usar a tecla de teclado para isso. Num Mac, use <emph>Command+Return</emph>. Num PC, use <emph>Ctrl+Shift+Enter</emph>. A partir desse ponto da lição, todas as vezes que um comando for digitado na janela de <emph>Query</emph> será executado desta maneira.</p>
+                <p>(Ver abaixo:)</p>
+                <figure>
+                    <desc>USE um banco de dados no MySQL Workbench</desc>
+                    <graphic url="introducao-ao-mysql-e-r-12.png"/>
+                </figure>
+            </div>
+            <div type="2">
+                <head>Adicione uma tabela</head>
+                <list type="ordered">
+                    <item>No MySQL Workbench, procure no lado esquerdo no painel <hi rend="bold">Navigator</hi>, na aba <hi rend="bold">SCHEMAS</hi>, por <hi rend="bold">periodicos_resultados_pesquisa</hi>.</item>
+                    <item>Clique em <hi rend="bold">Tables</hi> com o lado direito do mouse e depois clique em <hi rend="bold">Create Table</hi>.</item>
+                    <item>Para <hi rend="bold">Table Name:</hi> digite <hi rend="bold">tbl_periodicos_resultados_pesquisa</hi>
+                    </item>
+                </list>
+                <div type="3">
+                    <head>Adicione colunas à tabela</head>
+                    <p>Adicione essas colunas:</p>
+                    <list type="ordered">
+                        <item>
+                            <hi rend="bold">id</hi> Data type: <hi rend="bold">INT</hi>. Clique PK (Primary Key), NN (Not Null) e AI (Auto Increment).  Esta coluna de <emph>id</emph> será usada para relacionar registros nesta tabela com registros em outras tabelas. </item>
+                        <item>
+                            <hi rend="bold">titulo_artigo</hi> Data type: <hi rend="bold">VARCHAR(99)</hi>. Esta coluna armazenará o título de cada resultado de artigo que coletarmos da busca.</item>
+                        <item>
+                            <hi rend="bold">data_publicacao_artigo</hi> Data type: <hi rend="bold">DATETIME</hi>. Esta coluna armazenará a data em que o periódico foi publicado.</item>
+                        <item>
+                            <hi rend="bold">url_artigo</hi> Data type: <hi rend="bold">VARCHAR(99)</hi>. Esta coluna armazenará a url de cada resultado que coletarmos da pesquisa.</item>
+                        <item>
+                            <hi rend="bold">termo_busca_usado</hi> Data type: <hi rend="bold">VARCHAR(45)</hi>. Esta coluna irá armazenar a palavra que usamos para buscar os periódicos.
+Clique no botão <hi rend="bold">Apply</hi>.</item>
+                    </list>
+                    <p>Se preferir, todas as etapas acima podem ser realizadas com um comando. Este comando pode ser executado na janela de <emph>Query</emph> para criar a tabela com as colunas indicadas acima. </p>
+                    <ab>
+                        <code xml:id="code_introducao-mysql-r_5" corresp="code_introducao-mysql-r_5.txt" rend="block"/>
+                    </ab>
+                    <p>
+                        <emph>Dica: Leve o tempo que for necessário para pensar sobre a elaboração da tabela e sua nomeação, uma vez que um banco de dados bem elaborado será mais fácil de trabalhar e entender.</emph>
+                    </p>
+                </div>
+                <div type="3">
+                    <head>Adicione um usuário para se conectar ao banco de dados</head>
+                    <p>Um usuário é uma conta que tem permissão para se conectar a um banco de dados. Abaixo, adicionaremos um novo usuário para que essa conta apenas se conecte a esse novo banco de dados. Usar essa conta de usuário para uma conexão com esse banco de dados limita a exposição a outros bancos de dados, caso a senha para este usuário seja comprometida. Dar ao usuário os privilégios mínimos requeridos para realizar o necessário reduz o risco, caso outra pessoa tiver acesso à senha de usuário. Por exemplo, se um usuário pode apenas ler um banco de dados, é um risco menor se a senha for descoberta do que um usuário que também pode alterar ou apagar o banco de dados. </p>
+                    <p>No menu do MySQL Workbench, clique em <hi rend="bold">Server</hi> e depois em <hi rend="bold">Users and Privileges</hi>
+                    </p>
+                    <p>
+                        <hi rend="bold">Usuários de Mac</hi> - Em alguns computadores Mac, como meu laptop de teste, o painel de <hi rend="bold">Schema Privileges</hi> não é exibido corretamente.  Veja a nota abaixo da captura de tela se isso ocorrer.</p>
+                    <p>Clique no botão <hi rend="bold">Add Account</hi> e complete os detalhes para a nova conta de usuário na caixa de diálogo:</p>
+                    <list type="ordered">
+                        <item>Login Name: <hi rend="bold">periodicos_pesquisa_usuario</hi>
+                        </item>
+                        <item>Authentication Type: selecione <hi rend="bold">Standard</hi>
+                        </item>
+                        <item>Limit to Hosts Matching: <hi rend="bold">localhost</hi>
+                        </item>
+                        <item>Tecle <emph>Enter</emph> e confirme uma senha <emph>AlgoDificil</emph>
+                        </item>
+                        <item>Clique na aba <hi rend="bold">Administrative Roles</hi>.  Certifique-se de que nada está marcado. Esta conta é apenas para acessar o banco de dados. </item>
+                        <item>Clique na aba <hi rend="bold">Schema Privileges</hi> e clique <hi rend="bold">Add Entry</hi>.</item>
+                        <item>Na caixa de diálogo <hi rend="bold">New Schema Privilege Definition</hi>, clique na caixa de seleção <hi rend="bold">Selected schema:</hi> e selecione <hi rend="bold">periodicos_resultados_pesquisa</hi>. Clique OK.</item>
+                        <item>Clique em todas as opções de <emph>Object Rights</emph>: SELECT, INSERT, UPDATE, DELETE, EXECUTE, SHOW VIEW, como mostrado na imagem abaixo. (Este usuário precisará fazer muitas coisas posteriormente na lição, por isso, estamos lhe concendendo várias permissões.)</item>
+                        <item>Clique em <hi rend="bold">Apply</hi>.</item>
+                    </list>
+                    <figure>
+                        <desc>Configurando permissões para a nova conta</desc>
+                        <graphic url="introducao-ao-mysql-e-r-13.PNG"/>
+                    </figure>
+                    <div type="4">
+                        <head>Schema Privileges não exibidos corretamente</head>
+                        <p>Alguns computadores Mac, como meu laptop de teste, não exibem corretamente o painel de <hi rend="bold">Schema Privileges</hi>. Nesse caso, é possível realizar a tarefa acima através de um <emph>script</emph> usando uma janela de Query. </p>
+                        <p>Se o usuário já foi criado acima, execute o seguinte comando para lhe conceder privilégios de usuário:</p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_6" corresp="code_introducao-mysql-r_6.txt" rend="block"/>
+                        </ab>
+                        <p>Se o usuário não foi criado ainda, execute estes dois comandos para criar um usuário e depois lhe conceder privilégios de usuário:</p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_7" corresp="code_introducao-mysql-r_7.txt" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4">
+                        <head>MySQL versão 8 e tipo de autenticação de usuário.</head>
+                        <p>Quando um usuário é criado no MySQL 8 Workbench o <hi rend="bold">Authentication Type</hi> (tipo de autenticação) é configurado para o padrão <hi rend="bold">caching_sha2_password</hi>. Esse tipo de autenticação causa um erro para o pacote R que usaremos para conectar o banco de dados mais tarde nesta lição. O erro é <emph>Authentication plugin 'caching_sha2_password' cannot be loaded</emph> e é descrito no <ref target="https://perma.cc/7NVR-TSYT">Stack Overflow</ref>.</p>
+                        <p>Para evitar esse erro, podemos modificar o tipo de autenticação do usuário para padrão (Standard). Para fazer isso, execute o seguinte comando na janela de <emph>Query</emph>:</p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_8" corresp="code_introducao-mysql-r_8.txt" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Crie um R Script que se conecte ao banco de dados</head>
+                <p>Abra o RStudio, que foi instalado anteriormente na lição. Veja a seção <ref target="#rstudio">RStudio</ref>. </p>
+                <p>Agora usaremos o RStudio para escrever um novo R Script e salvá-lo com o nome periodicos_resultados_pesquisa.R. </p>
+                <p>Vá em File &gt; New File &gt; R Script e depois salve o novo ficheiro com o nome periodicos_resultados_pesquisa.R.</p>
+                <p>Usaremos o pacote RMariaDB para realizar a conexão com o MySQL. (Se tiver curiosidade, a documentação para o pacote RMariaDB pode ser encontrada <ref target="https://perma.cc/FX5P-DAW7">aqui</ref>.)</p>
+                <p>Se não possui o pacote RMariaDB instalado (o que é provável, caso seja a primeira vez que usa o RStudio), instale-o utilizando o <emph>console</emph> do RStudio. Após abrir o RStudio, copie e cole o seguinte para a janela da esquerda no &gt;, e depois dê enter:</p>
+                <ab>
+                    <code xml:id="code_introducao-mysql-r_9" corresp="code_introducao-mysql-r_9.txt" rend="block"/>
+                </ab>
+                <p>Adicione o seguinte comando ao script periodicos_resultados_pesquisa.R (janela de cima, à esquerda) </p>
+                <ab>
+                    <code xml:id="code_introducao-mysql-r_10" corresp="code_introducao-mysql-r_10.txt" rend="block"/>
+                </ab>
+                <div type="3">
+                    <head>Conectando a um banco de dados com uma senha</head>
+                    <p>Primeiro, nos conectaremos ao banco de dados usando uma senha. (Depois utilizaremos um meio de conexão melhor). Por hora, usaremos uma variável para armazenar a senha. Cada vez que iniciar o R, será necessário apagar esta variável, mas isso é melhor do que publicar uma senha <emph>hardcoded</emph> caso compartilhe seus scripts, como pode fazer usando o GitHub.</p>
+                    <p>No console do RStudio, digite o comando abaixo, substituindo <emph>AlgoDificil</emph> com a senha criada para periodicos_pesquisa_usuario nos passos realizados acima para adicionar um usuário ao banco de dados.</p>
+                    <ab>
+                        <code xml:id="code_introducao-mysql-r_11" corresp="code_introducao-mysql-r_11.txt" rend="block"/>
+                    </ab>
+                    <p>Adicione as seguintes declarações em R ao ficheiro periodicos_resultados_pesquisa.R file e salve-o.</p>
+                    <p>Para executar este script, selecione todo o texto e clique no botão <emph>Run</emph> (Executar). (Há outras maneiras de executar apenas uma parte do script ou o script inteiro. Se tiver curiosidade, procure no menu abaixo de Code &gt; Run Region. O comando CTRL+ALT+R executa todo o código em R no script.)</p>
+                    <ab>
+                        <code xml:id="code_introducao-mysql-r_12" corresp="code_introducao-mysql-r_12.txt" rend="block"/>
+                    </ab>
+                    <p>No console, deverá visualizar:</p>
+                    <ab>
+                        <code xml:id="code_introducao-mysql-r_13" corresp="code_introducao-mysql-r_13.txt" rend="block"/>
+                    </ab>
+                    <p>Sucesso! O que conseguiu:</p>
+                    <list type="ordered">
+                        <item>Conectar ao banco de dados com dbConnect.</item>
+                        <item>Listar a tabela no banco de dados com dbListTables.</item>
+                        <item>Desconectar do banco de dados usando dbDisconnect.</item>
+                    </list>
+                    <div type="4">
+                        <head>Conectar-se ao banco de dados com uma senha armazenada num ficheiro de configuração</head>
+                        <p>O exemplo acima de conexão é uma das maneiras de conectar-se. O método de conexão descrito abaixo armazena a informação da conexão do banco de dados num ficheiro de configuração, para que não seja necessário digitar uma senha numa variável todas as vezes que uma sessão no R for iniciada. Acredito que esse é um processo minucioso, mas é uma maneira mais padronizada e segura de proteger as credenciais usadas para acessar seu banco de dados. Esse método de conexão será usado no código para o restante desse tutorial, mas pode ser substituído pelo método de conexão mais simples mostrado acima se preferir. </p>
+                        <div type="5">
+                            <head>Crie o ficheiro .cnf para armazenar a informação de conexão com o banco de dados MySQL</head>
+                            <list type="ordered">
+                                <item>Abra um editor de texto, como o notepad, nano ou TextEdit e cole os itens abaixo, modificando a senha para a criada para periodicos_pesquisa_usuario nas etapas acima para adicionar um usuário e conectá-lo ao banco de dados. </item>
+                            </list>
+                            <ab>
+                                <code xml:id="code_introducao-mysql-r_14" corresp="code_introducao-mysql-r_14.txt" rend="block"/>
+                            </ab>
+                            <list type="ordered">
+                                <item>
+                                    <p>Salve este ficheiro em algum local fora do diretório de trabalho do R. Salvei o meu no mesmo diretório de outros ficheiros de configuração do MySQL. No PC, o caminho foi o seguinte: C:\Program Files\MySQL\MySQL Server 8.0. Dependendo de seu sistema operacional e da versão do MySQL, esse local pode estar em outro lugar. No Mac, usei /Users/blackadar/Documents/ como a pasta de destino. Testei colocar este ficheiro em lugares diferentes, apenas é necessário que o R possa localizá-lo quando o script for executado. Nomeie o ficheiro como <hi rend="bold">periodicos_resultados_pesquisa.cnf</hi>.</p>
+                                </item>
+                                <item>
+                                    <p>Atualize o script periodicos_resultados_pesquisa.R acima para conectar-se ao banco de dados usando o ficheiro de configuração. </p>
+                                </item>
+                            </list>
+                            <ab>
+                                <code xml:id="code_introducao-mysql-r_15" corresp="code_introducao-mysql-r_15.txt" rend="block"/>
+                            </ab>
+                            <list type="ordered">
+                                <item>Execute seu script.</item>
+                            </list>
+                            <p>No console, entre outras linhas, deverá ver novamente:</p>
+                            <ab>
+                                <code xml:id="code_introducao-mysql-r_16" corresp="code_introducao-mysql-r_16.txt" rend="block"/>
+                            </ab>
+                            <p>De maneira bem sucedida, a conexão com o banco de dados foi realizada utilizando um ficheiro de configuração. </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Armazenando dados numa tabela com o SQL</head>
+                <p>Nesta seção da lição, criaremos uma declaração no SQL para inserir uma linha de dados no banco de dados sobre esse <ref target="https://perma.cc/C8MR-WYV2">artigo de periódico</ref>. Iremos inserir primeiro o registro no MySQL Workbench e depois faremos isso no R.</p>
+                <list type="ordered">
+                    <item>
+                        <p>No MySQL Workbench, clique na imagem categorizada como SQL+ para criar uma nova aba para o SQL executar consultas (ou vá ao menu "File" e escolha a opção "New Query Tab"). </p>
+                    </item>
+                    <item>
+                        <p>Cole a declaração abaixo na janela de Query. Esta ação irá inserir um registro na tabela.</p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_17" corresp="code_introducao-mysql-r_17.txt" rend="block"/>
+                        </ab>
+                    </item>
+                    <item>
+                        <p>Clique na imagem de relâmpago/raio na aba do SQL para executar a declaração SQL. </p>
+                    </item>
+                </list>
+                <figure>
+                    <desc>Inserindo um registro numa tabela usando MySQL Workbench</desc>
+                    <graphic url="introducao-ao-mysql-e-r-14.png"/>
+                </figure>
+                <head>Explicação da declaração INSERT</head>
+                <table>
+                    <row>
+                        <cell role="label">SQL</cell>
+                        <cell role="label">Significado</cell>
+                    </row>
+                    <row>
+                        <cell>INSERT INTO tbl_periodicos_resultados_pesquisa (</cell>
+                        <cell>Insere um registro na tabela nomeada tbl_periodicos_resultados_pesquisa</cell>
+                    </row>
+                    <row>
+                        <cell>titulo_artigo,</cell>
+                        <cell>nome do campo a ser preenchido por um valor</cell>
+                    </row>
+                    <row>
+                        <cell>data_publicacao_artigo,</cell>
+                        <cell>"</cell>
+                    </row>
+                    <row>
+                        <cell>url_artigo,</cell>
+                        <cell>"</cell>
+                    </row>
+                    <row>
+                        <cell>termo_busca_usado)</cell>
+                        <cell>"</cell>
+                    </row>
+                    <row>
+                        <cell>VALUES('THE LOST LUSITANIA.',</cell>
+                        <cell>O valor a ser inserido no campo titulo_artigo</cell>
+                    </row>
+                    <row>
+                        <cell>'1915-05-21',</cell>
+                        <cell>campo data_publicacao_artigo</cell>
+                    </row>
+                    <row>
+                        <cell>LEFT(RTRIM('http://newspapers.library.wales/view/4121281/4121288/94/'),99),</cell>
+                        <cell>campo url_artigo. Este campo é um VARCHAR(99), portanto tem um máximo de 99 caracteres. Inserir uma URL mais longa que 99 caracteres causaria um erro, portanto, duas funções são utilizadas para controlar isso. RTRIM() reduz espaços residuais à direita da URL. LEFT(value,99) retorna apenas os 99 caracteres mais à esquerda da URL reduzida. Esta URL é mais curta que isso, então essas funções estão aqui apenas como exemplo.</cell>
+                    </row>
+                    <row>
+                        <cell>'German+Submarine');</cell>
+                        <cell>campo termo_busca_usado</cell>
+                    </row>
+                </table>
+                <p>Opcional: Modifique a declaração INSERT acima e execute-a algumas vezes. Por exemplo:</p>
+                <ab>
+                    <code xml:id="code_introducao-mysql-r_18" corresp="code_introducao-mysql-r_18.txt" rend="block"/>
+                </ab>
+                <div type="3">
+                    <head>Consultando dados numa tabela com o SQL</head>
+                    <p>Nesta seção da lição, criaremos uma declaração no SQL para selecionar uma linha de dados do banco de dados que inserimos. Selecionaremos o primeiro registro no MySQL Workbench e depois faremos isso no R.</p>
+                    <list type="ordered">
+                        <item>
+                            <p>Cole a declaração abaixo numa janela de query no MySQL Workbench. Isto irá selecionar registros da tabela. </p>
+                            <ab>
+                                <code xml:id="code_introducao-mysql-r_19" corresp="code_introducao-mysql-r_19.txt" rend="block"/>
+                            </ab>
+                        </item>
+                        <item>
+                            <p>Clique na imagem de relâmpago/raio na aba do SQL para executá-la. Deverá visualizar o título do artigo "THE LOST LUSITANIA." na grade de resultados. Ver abaixo. </p>
+                        </item>
+                    </list>
+                    <figure>
+                        <desc>Selecionando registros de uma tabela usando MySQL Workbench</desc>
+                        <graphic url="introducao-ao-mysql-e-r-15.png"/>
+                    </figure>
+                    <p>Opcional: Modifique a declaração SELECT acima alterando os campos selecionados e execute novamente. Adicione mais de um campo para a declaração SELECT e execute:</p>
+                    <ab>
+                        <code xml:id="code_introducao-mysql-r_20" corresp="code_introducao-mysql-r_20.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Armazenando dados numa tabela com SQL usando R</head>
+                    <p>Vamos fazer isso usando R! Abaixo se encontra uma versão expandida do R Script que usamos para nos conectar ao banco de dados. Para sermos concisos, os três primeiros comentários que tínhamos no R Script mostrado acima foram removidos. Não são mais necessários.</p>
+                    <p>Na linha 4 do script abaixo, lembre-se de modificar o caminho do rmariadb.settingsfile que corresponde à localização desse ficheiro em seu computador.</p>
+                    <ab>
+                        <code xml:id="code_introducao-mysql-r_21" corresp="code_introducao-mysql-r_21.txt" rend="block"/>
+                    </ab>
+                    <p>No script acima, realizamos duas etapas para inserir um registro:</p>
+                    <list type="ordered">
+                        <item>Defina a declaração INSERT na linha com: query &lt;- "INSERT INTO tbl_periodicos_resultados_pesquisa (</item>
+                        <item>Execute a declaração INSERT armazenada na variável da consulta com: rsInsert &lt;- dbSendQuery(artigosDb, query)</item>
+                    </list>
+                    <p>Execute o script acima no R Studio e depois execute uma declaração SELECT no MySQL Workbench. Consegue visualizar o novo registro adicionado?</p>
+                    <div type="4">
+                        <head>Realize uma limpeza nos dados de teste</head>
+                        <p>Neste ponto é provável que haja mais de um registro com o título de artigo "THE LOST LUSITANIA.", o que é razoável para a testagem, mas não queremos dados duplicados. Iremos remover os dados de teste e começar novamente. Usando a janela de query no MySQL Workbench, execute a declaração SQL:</p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_22" corresp="code_introducao-mysql-r_22.txt" rend="block"/>
+                        </ab>
+                        <p>No painel Action Output do MySQL Workbench deverá visualizar:</p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_23" corresp="code_introducao-mysql-r_23.txt" rend="block"/>
+                        </ab>
+                        <p>Para praticar o que acabamos de fazer:</p>
+                        <list type="ordered">
+                            <item>Execute uma declaração SELECT novamente. Não deverá receber linhas de retorno.</item>
+                            <item>Execute novamente o script em R acima para inserir um registro. </item>
+                            <item>Realize uma declaração SELECT. Deverás visualizar uma linha de dados.</item>
+                        </list>
+                    </div>
+                    <div type="4">
+                        <head>Modifique a declaração INSERT para usar variáveis</head>
+                        <p>Iremos inserir muitos dados na tabela usando o R, então mudaremos a declaração INSERT para usar variáveis. Veja no código abaixo o destaque <emph># Compila o query.</emph>
+                        </p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_24" corresp="code_introducao-mysql-r_24.txt" rend="block"/>
+                        </ab>
+                        <p>Vamos testar esse script:</p>
+                        <list type="ordered">
+                            <item>Execute uma declaração SELECT e observe as linhas que possui.</item>
+                            <item>Execute o script em R acima para inserir outro registro. </item>
+                            <item>Realize a declaração SELECT. Deverá visualizar uma linha adicional de dados. </item>
+                        </list>
+                    </div>
+                    <div type="4">
+                        <head>Erros do SQL</head>
+                        <p>Vamos criar um simples erro no SQL para visualizar o que acontece.</p>
+                        <p>No R, modifique:</p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_25" corresp="code_introducao-mysql-r_25.txt" rend="block"/>
+                        </ab>
+                        <p>para</p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_26" corresp="code_introducao-mysql-r_26.txt" rend="block"/>
+                        </ab>
+                        <p>e execute novamente o script. </p>
+                        <p>No console R, há um erro:</p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_27" corresp="code_introducao-mysql-r_27.txt" rend="block"/>
+                        </ab>
+                        <p>É possível verificar, com uma declaração SELECT, se não há registro na tabela com um título de artigo denominado <emph>THE LOST LUSITANIA'S RUDDER</emph>.</p>
+                        <p>As aspas simples fazem parte da sintaxe do SQL e indicam uma entrada textual. Se estiverem no lugar errado, provocam um erro. Temos que lidar com casos nos quais há dados com aspas. O SQL aceita duas aspas numa declaração de inserção para representar aspas em dados('').</p>
+                        <p>Lidaremos com as aspas utilizando uma função <code rend="inline">gsub</code> para substituir aspas simples por aspas duplas, como mostrado abaixo. </p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_28" corresp="code_introducao-mysql-r_28.txt" rend="block"/>
+                        </ab>
+                        <p>Agora que a questão das aspas no título do artigo está resolvida, execute novamente o script e depois confira com uma declaração SELECT no MySQL Workbench.</p>
+                        <ab>
+                            <code xml:id="code_introducao-mysql-r_29" corresp="code_introducao-mysql-r_29.txt" rend="block"/>
+                        </ab>
+                        <p>Uma vez que o registro teste foi visualizado, digite TRUNCATE tbl_periodicos_resultados_pesquisa para remover esses dados de teste.</p>
+                    </div>
+                </div>
+            </div>
+            <head>Armazenando um ficheiro de valores separados por vírgulas (.csv) no banco de dados MySQL</head>
+            <p>Na próxima parte da lição, vamos realizar consultas na tabela do banco de dados. Nosso objetivo é obter dados suficientes na tabela para construir um gráfico. Para nos prepararmos para isso, carregaremos alguns dados de amostra de um ficheiro de valores separados por vírgulas (.csv).</p>
+            <p>Faça o download dos ficheiros .csv para o seu diretório de trabalho do R. Esses ficheiros estão armazenados no GitHub, então faça o download da versão <emph>Raw</emph> dos ficheiros.</p>
+            <list type="ordered">
+                <item>
+                    <ref target="/assets/getting-started-with-mysql-using-r/dados-amostra-jardim.csv">dados-amostra-jardim.csv</ref> Esta é uma lista de artigos de periódicos galeses publicados durante a Primeira Guerra Mundial que correspondem aos termos de busca "<emph>allotment</emph>"(loteamento) e "<emph>garden</emph>"(jardim).</item>
+                <item>
+                    <ref target="/assets/getting-started-with-mysql-using-r/dados-amostra-submarino.csv">dados-amostra-submarino.csv</ref> Esta é uma lista de artigos de periódicos galeses publicados durante a Primeira Guerra Mundial que correspondem aos termos de busca "<emph>German</emph>"(alemão) e "<emph>submarine</emph>"(submarino).</item>
+            </list>
+            <p>No R, execute a função read.csv() e depois visualize o data frame com os dados amostrais.</p>
+            <ab>
+                <code xml:id="code_introducao-mysql-r_30" corresp="code_introducao-mysql-r_30.txt" rend="block"/>
+            </ab>
+            <p>Muitos dados serão visualizados, incluindo os que se encontram abaixo. Cheque a aba "Environment" (ambiente) na parte direita do RStudio. O Data Frame dadosAmostraJardim deve conter "1242 obs. of 4 variables".</p>
+            <ab>
+                <code xml:id="code_introducao-mysql-r_31" corresp="code_introducao-mysql-r_31.txt" rend="block"/>
+            </ab>
+            <p>Observe que nesses dados de amostra, os nomes dos campos estão incluídos no cabeçalho por conveniência:  titulo_artigo, data_publicacao_artigo, url_artigo e termo_busca_usado.</p>
+            <p>Como observado acima, nosso objetivo aqui é inserir os dados de amostra que estão armazenados no data frame dadosAmostraJardim na tabela MySQL periodicos_resultados_pesquisa.  Podemos fazer isso de diferentes maneiras. Uma delas é repetir para cada linha de dado do data frame e executar um comando INSERT, como fizemos acima. Aqui, no entanto, usaremos um comando para inserir todas as linhas em dadosAmostraJardim de uma vez: <emph>dbWriteTable</emph>. Não execute essa declaração ainda, apenas a leia.</p>
+            <ab>
+                <code xml:id="code_introducao-mysql-r_32" corresp="code_introducao-mysql-r_32.txt" rend="block"/>
+            </ab>
+            <table>
+                <row>
+                    <cell role="label">Função</cell>
+                    <cell role="label">Significado</cell>
+                </row>
+                <row>
+                    <cell>dbWriteTable(artigosDb,</cell>
+                    <cell>Use  a conexão do banco de dados MySQL artigosDb.</cell>
+                </row>
+                <row>
+                    <cell>value = dadosAmostraJardim,</cell>
+                    <cell>Insere os valores do data frame dadosAmostraJardim para a tabela.</cell>
+                </row>
+                <row>
+                    <cell>row.names = FALSE,</cell>
+                    <cell>Nenhum nome de linha foi especificado.</cell>
+                </row>
+                <row>
+                    <cell>name = "tbl_periodicos_resultados_pesquisa",</cell>
+                    <cell>Insere os valores de dadosAmostraJardim para a tabela tbl_periodicos_resultados_pesquisa</cell>
+                </row>
+                <row>
+                    <cell>append = TRUE )</cell>
+                    <cell>Adiciona os valores ao que já existe na tabela. Se esse script rodar novamente, todas as linhas em dadosAmostraJardim serão adicionadas à mesma tabela novamente.</cell>
+                </row>
+            </table>
+            <p>Ainda não estamos preparados para executar o comando dbWriteTable(). Primeiro precisamos nos conectar ao banco de dados. Aqui está o script para fazer isso, assim como para carregar o data frame dados-amostra-submarino.csv. Leia-o e execute-o.</p>
+            <ab>
+                <code xml:id="code_introducao-mysql-r_33" corresp="code_introducao-mysql-r_33.txt" rend="block"/>
+            </ab>
+            <p>Se o script for executado mais de uma vez, serão gerados registros duplicados. Se isso acontecer, apenas execute o comando TRUNCATE na tabela e execute o script novamente, mas apenas uma vez. É possível verificar se o número de registros é o correto. No MySQL Workbench, execute o seguinte na janela de Query:</p>
+            <ab>
+                <code xml:id="code_introducao-mysql-r_34" corresp="code_introducao-mysql-r_34.txt" rend="block"/>
+            </ab>
+            <p>A contagem deve retornar 2880 registros. 1242 de dadosAmostraJardim e 1638 de dadosAmostraSubmarino.</p>
+            <div type="2">
+                <head>Selecionado dados de uma tabela com SQL usando R</head>
+                <p>Nosso objetivo aqui é usar a tabela de artigos que importamos e criar um gráfico do número de artigos publicados nos <emph>Welsh Newspapers</emph> (jornais galeses) ao longo de cada mês da Primeira Guerra Mundial que corresponda aos termos de busca <emph>allotment</emph>(loteamento) e <emph>garden</emph> (jardim), e <emph>German</emph> (alemão) e <emph>submarine</emph>(submarino).</p>
+                <p>O script abaixo consulta o banco de dados e produz o gráfico de linha abaixo. Leia o script e observe o que está acontecendo. Segue uma explicação do script. </p>
+                <ab>
+                    <code xml:id="code_introducao-mysql-r_35" corresp="code_introducao-mysql-r_35.txt" rend="block"/>
+                </ab>
+                <head>Explicação do script de seleção de dados e criação do gráfico.</head>
+                <p>O método que conecta o banco de dados é explicado <ref target="#Conectando-a-um-banco-de-dados-com-uma-senha">acima</ref>.</p>
+                <p>Este script seleciona dois resultados de um conjunto de dados e cria um gráfico com esses dados. Um dos resultados é a combinação dos artigos de periódicos com a busca pelos termos "German+Submarine". Eles são consultados através da declaração SELECT:</p>
+                <ab>
+                    <code xml:id="code_introducao-mysql-r_36" corresp="code_introducao-mysql-r_36.txt" rend="block"/>
+                </ab>
+                <table>
+                    <row>
+                        <cell role="label">SQL</cell>
+                        <cell role="label">Significado</cell>
+                    </row>
+                    <row>
+                        <cell>SELECT (</cell>
+                        <cell>SELECT - Seleciona os dados que correspondem à condição na cláusula WHERE na tabela do banco de dados nomeado .</cell>
+                    </row>
+                    <row>
+                        <cell>COUNT(CONCAT(MONTH(data_publicacao_artigo),' ',YEAR(data_publicacao_artigo)))) as 'count'</cell>
+                        <cell>Fornece uma contagem do número de artigos publicados que compartilham o mesmo mês e ano de publicação. CONCAT representa a ação concatenar,  que cria um único valor textual de dois ou mais valores textuais, nesse caso, o mês e o ano.</cell>
+                    </row>
+                    <row>
+                        <cell>FROM tbl_periodicos_resultados_pesquisa</cell>
+                        <cell>Este é o banco de dados a partir do qual estamos selecionando os dados.</cell>
+                    </row>
+                    <row>
+                        <cell>GROUP BY YEAR(data_publicacao_artigo),MONTH(data_publicacao_artigo)</cell>
+                        <cell>Esta declaração GROUP BY é importante para a contagem (COUNT) acima. Aqui os dados estão agrupados por mês e ano, para que seja possível contar todos os registros no grupo.</cell>
+                    </row>
+                    <row>
+                        <cell>ORDER BY YEAR(data_publicacao_artigo),MONTH(data_publicacao_artigo);</cell>
+                        <cell>Coloca os resultados ordenados por data, o que é útil já que queremos construir um gráfico por data.</cell>
+                    </row>
+                </table>
+                <p>As declarações abaixo executam a consulta e colocam o resultado <emph>rs</emph> num data frame <emph>dbRows</emph>:</p>
+                <ab>
+                    <code xml:id="code_introducao-mysql-r_37" corresp="code_introducao-mysql-r_37.txt" rend="block"/>
+                </ab>
+                <p>Abaixo, o data frame <emph>dbRows</emph> é colocado numa série temporal com a função <emph>ts()</emph>, para que seja possível plotar para cada mês, iniciando de agosto de 1914.</p>
+                <ab>
+                    <code xml:id="code_introducao-mysql-r_38" corresp="code_introducao-mysql-r_38.txt" rend="block"/>
+                </ab>
+                <p>Abaixo, os dados na série temporal <emph>qts1</emph> são plotados num gráfico:</p>
+                <ab>
+                    <code xml:id="code_introducao-mysql-r_39" corresp="code_introducao-mysql-r_39.txt" rend="block"/>
+                </ab>
+                <p>O que isso difere da parte do script que gera o gráfico dos artigos correspondentes à busca dos termos "Allotment And Garden"? Não muito, definitivamente. Apenas usamos a função <emph>lines()</emph> para plotar os resultados no mesmo gráfico que construímos acima.</p>
+                <ab>
+                    <code xml:id="code_introducao-mysql-r_40" corresp="code_introducao-mysql-r_40.txt" rend="block"/>
+                </ab>
+                <div type="4">
+                    <head>Resultados da seleção de dados e da criação do gráfico</head>
+                    <p>Aqui abaixo está o gráfico que deveria aparecer:</p>
+                    <figure>
+                        <desc>Plotagem do número de artigos de periódicos publicados cada mês que correspondem aos termos de busca</desc>
+                        <graphic url="introducao-ao-mysql-e-r-16.png"/>
+                    </figure>
+                </div>
+            </div>
+            <div type="2">
+                <head>Indo mais longe com o MySQL</head>
+                <p>Se deseja colocar um banco de dados num website, uma maneira de fazê-lo é usando MySQL e a linguagem PHP para construir as páginas do site. Um exemplo deste tipo de website é o que construí para <ref target="https://perma.cc/237N-DD9E">buscar edições do "the Equity newspaper"</ref>. O livro de Larry Ullman's, <emph>PHP and MySQL for Dynamic Web Sites</emph>, aborda como configurar e conectar um banco de dados usando MySQL e PHP de uma maneira resistente à hackers.</p>
+                <p>Para exemplos do uso de SQL para ordenar e agrupar dados, assim com também realizar cálculos, veja: <ref target="http://web.archive.org/web/20171228130133/https://www.ntu.edu.sg/home/ehchua/programming/sql/MySQL_Beginner.html">MySQL by Examples for Beginners</ref> ou MySQL <ref target="https://perma.cc/84HN-9DBL">Examples of Common Queries</ref>.</p>
+            </div>
+            <div type="2">
+                <head>Conclusão</head>
+                <p>Espero que tenha obtido o conhecimento para configurar uma tabela de banco de dados, conectá-lo e armazenar registros. Embora tenhamos abordado apenas uma pequena parte das diferentes maneiras de realizar consultas nos dados, espero também que saiba a técnica de uso das declarações SELECT para que possa utilizá-las em seus futuros projetos de história digital.</p>
+            </div>
+            <div type="2">
+                <head>Créditos</head>
+                <p>Finalizei esta lição graças ao suporte do <ref target="https://perma.cc/S7PP-FY5U">George Garth Graham Undergraduate Digital History Research Fellowship</ref>.</p>
+                <p>Agradeço à Drª. Amanda Visconti pelo suporte e orientação ao longo da preparação desta lição.</p>
+            </div>
+            <div type="2">
+                <head>Referências</head>
+                <p>Ullman, L. 2005. <emph>PHP and MySQL for Dynamic Web Sites, 2nd ed.</emph> Berkeley, Calif: Peachpit.</p>
+            </div>
+            <div type="2">
+                <head>Notas</head>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_1"/> : Jason A. French, "Using R With MySQL Databases," blog (3 July 2014), <ref target="https://perma.cc/5VYV-L5PG">http://www.jason-french.com/blog/2014/07/03/using-r-with-mysql-databases/</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_2"/> : Taylor Arnold and Lauren Tilton, "Basic Text Processing in R," Programming Historian (27 March 2017), <ref target="/pt/licoes/processamento-basico-texto-r">tradução para português</ref>.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_3"/> : Taryn Dewar, "R Basics with Tabular Data," Programming Historian (05 September 2016), <ref target="/pt/licoes/nocoes-basicas-R-dados-tabulares">tradução para português</ref>.</p>
+                <p>O script em R usado para recolher dados de amostra se encontra <ref target="https://perma.cc/87AE-LJRG">aqui</ref>.</p>
+            </div>
+        </body>
+    </text>
 </TEI>

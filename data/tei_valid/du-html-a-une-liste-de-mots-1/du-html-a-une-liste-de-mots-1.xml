@@ -1,0 +1,167 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="du-html-a-une-liste-de-mots-1">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Du HTML à une liste de mots (partie 1)</title>
+                <author role="original_author">
+                    <persName>William J. Turkel</persName>
+                    <persName>Adam Crymble</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Jim Clifford</persName>
+                    <persName>Frederik Elwert</persName>
+                </editor>
+                <author role="translators">Célian Ringwald</author>
+                <editor role="translation-reviewers">
+                    <persName>Marina Giardinetti</persName>
+                    <persName>Marie Flesch</persName>
+                </editor>
+                <editor role="editors">Miriam Posner</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">09/13/2023</date>
+                <idno type="doi">10.46430/phfr0026</idno>
+                <date type="published">07/17/2012</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#from-html-to-list-of-words-1"/>.</p>
+                <p>There are other translations: <ref target="#de-html-a-lista-de-palabras-1 #HTML-lista-palavras-1"/>
+                </p>
+                <p>There are other translations: <ref target="#de-html-a-lista-de-palabras-1 #HTML-lista-palavras-1"/>
+                </p>
+                <p>There are other translations: <ref target="#de-html-a-lista-de-palabras-1 #HTML-lista-palavras-1"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Dans cette leçon en deux parties, nous allons utiliser les compétences acquises dans la leçon &amp;laquo;&amp;nbsp;Télécharger des pages web avec Python&amp;nbsp;&amp;raquo;, et voir comment supprimer les *balises HTML* de la page de la transcription du procès-verbal de Benjamin Bowsey en 1780 dans le but de créer un texte propre et réutilisable. Nous réaliserons cette tâche en utilisant les *opérateurs et méthodes de chaines de caractères* propres à Python, ainsi que nos compétences relatives à la *lecture attentive*. Nous introduirons ensuite les concepts de *boucles* et *d’instructions conditionnelles* afin de répéter notre processus de traitement et de tester certaines conditions nous permettant de séparer le contenu des balises HTML. Pour finir, nous convertirons les données obtenues et enregistrées sous la forme d’un texte sans balises HTML en une *liste de mots* qui pourra par la suite être triée, indexée et investie lors d’analyses statistiques.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="fr">
+        <body>
+            <div type="2">
+                <head>Objectifs de la leçon</head>
+                <p>Dans cette leçon en deux parties, nous allons utiliser les compétences acquises dans la leçon <ref target="/fr/lecons/telecharger-des-pages-web-avec-python">Télécharger des pages web avec Python</ref>, et voir comment supprimer les <emph>balises HTML</emph> de la page de la <ref target="https://www.oldbaileyonline.org/browse.jsp?id=t17800628-33&amp;div=t17800628-33">transcription du procès-verbal de Benjamin Bowsey en 1780</ref> dans le but de créer un texte propre et réutilisable. Nous réaliserons cette tâche en utilisant les <emph>opérateurs et méthodes de chaines de caractères</emph> propres à Python, ainsi que nos compétences relatives à la <ref target="https://perma.cc/V4GX-9N5R">
+                        <emph>lecture attentive</emph>
+                    </ref>. Nous introduirons ensuite les concepts de <emph>boucles</emph> et <emph>d’instructions conditionnelles</emph> afin de répéter notre processus de traitement et de tester certaines conditions nous permettant de séparer le contenu des balises HTML. Pour finir, nous convertirons les données obtenues et enregistrées sous la forme d’un texte sans balises HTML en une <emph>liste de mots</emph> qui pourra par la suite être triée, indexée et investie lors d’analyses statistiques.</p>
+            </div>
+            <div type="2">
+                <head>Enjeux de la leçon</head>
+                <p>Pour rendre plus clair l’objectif de la séance, ouvrez le fichier <code rend="inline">obo-t17800628-33.html</code> que vous avez créé lors de la leçon <ref target="/fr/lecons/telecharger-des-pages-web-avec-python">Télécharger des pages web avec Python</ref>.  <ref target="/assets/obo-t17800628-33.html">Ouvrez cette page web et téléchargez son code source</ref> si ce n’est pas le cas (via la commande Ctrl+S sur Windows ou ⌘-S sur Mac). Inspectez ensuite le code HTML de ce document. En fonction du navigateur web que vous avez, il est possible d’accéder au code source d’une page en cliquant sur l’onglet <code rend="inline">Tools -&gt; Web Developer -&gt; Page Source</code>. Il est aussi généralement possible d’y accéder via les commandes Ctrl+U (Windows) ou ⌘-Option-U (Mac).</p>
+                <p>En parcourant le fichier, vous remarquerez que celui-ci est composé de balises HTML mélangées avec du texte. Si vous êtes néophyte en matière de développement web, nous vous recommandons de consulter les tutoriels de la W3 School et de la Mozilla Foundation :</p>
+                <list type="unordered">
+                    <item>HTML : <ref target="https://www.w3schools.com/html/">W3 School</ref> / <ref target="https://perma.cc/9NFS-5Z3G">Mozilla Fondation</ref>
+                    </item>
+                    <item>CSS : <ref target="https://perma.cc/6HLV-LBKQ">W3 School</ref> / <ref target="https://perma.cc/BR5N-BDEH">Mozilla Fondation</ref>
+                    </item>
+                </list>
+                <p>Ces tutoriels vous permettront de vous familiariser avec la syntaxe de ces formats et de mieux comprendre le contexte d’utilisation des balises HTML lorsque vous les rencontrerez.</p>
+                <div type="3">
+                    <head>Matériel nécessaire au suivi de la leçon</head>
+                    <list type="unordered">
+                        <item>le fichier de la transcription du procès : <ref target="/assets/obo-t17800628-33.html">
+                                <code rend="inline">obo-t17800628-33.html</code>
+                            </ref>
+                        </item>
+                        <item>un éditeur de texte permettant de compiler du code Python. Dans la série de leçons d’introduction à Python du <emph>Programming Historian en français</emph>, nous utilisons Komodo Edit (cf. <ref target="/fr/lecons/introduction-et-installation">la leçon d’introduction de la série</ref>), mais <ref target="https://perma.cc/X98A-KME8">il en existe beaucoup d’autres</ref>.</item>
+                    </list>
+                </div>
+            </div>
+            <div type="2">
+                <head>Conception de l’algorithme</head>
+                <p>Puisque le but est de se défaire du balisage HTML, la première étape de ce tutoriel consiste donc à créer un algorithme nous permettant d’extraire seulement le texte de la transcription (sans balises HTML).</p>
+                <p>Un algorithme est un ensemble de procédures suffisamment détaillées pour être implémentées sur un ordinateur. Lors de la conception d’un algorithme, il est conseillé dans un premier temps, de poser sur le papier son fonctionnement. C’est une manière d’expliciter ce que l’on souhaite faire avant de traduire cela en un code informatique. Pour construire cet algorithme, une lecture vigilante de la page et de sa structure sera notamment nécessaire afin de pouvoir envisager par la suite un moyen de capturer le contenu du compte rendu du procès.</p>
+                <p>À la lecture du code source de <code rend="inline">obo-t17800628-33.html</code>, vous remarquerez que le contenu de la transcription n’est pas visible dès le début du fichier. Au lieu de cela, vous trouverez de nombreuses balises HTML relatives aux métadonnées. Le contenu qui nous intéresse n’est alors visible qu’à partir de la ligne 81 !</p>
+                <ab>
+                    <code xml:id="code_du-html-a-une-liste-de-mots-1_0" corresp="code_du-html-a-une-liste-de-mots-1_0.txt" lang="language-html" rend="block"/>
+                </ab>
+                <p>Nous nous intéressons uniquement à la transcription du procès, et non pas aux métadonnées contenues dans les balises. Toutefois, vous remarquerez que les différentes parties de la transcription débutent après ces métadonnées. L’emplacement de ces balises est donc potentiellement un indice utile nous permettant d’isoler le texte de la transcription.</p>
+                <p>En un coup d’œil, vous remarquerez que la transcription du procès commence avec une balise HTML : <code rend="inline">&lt;p&gt;</code>, qui marque ici le début d’un paragraphe. Il s’agit là du premier paragraphe de notre document. Nous allons donc utiliser cette information pour identifier le début du texte de la transcription. Dans le cas présent, nous avons de la chance, car il s’avère que cette balise est un moyen fiable nous permettant de repérer le début d’une partie de la transcription (vous pouvez vérifier les autres parties du procès et vous verrez que c’est la même chose).</p>
+                <p>Le texte du procès se termine à la ligne 82 avec une autre balise HTML : <code rend="inline">&lt;br/&gt;</code>, qui indique un passage à la ligne. Il s’agit ici du dernier passage à la ligne du document. Ces deux balises (la balise de début de paragraphe et le dernier saut de ligne) nous offrent un moyen d’isoler le texte que nous ciblons. Les sites web bien conçus ont la plupart du temps une syntaxe unique permettant de signaler la fin d’un contenu. En général, il suffit de bien inspecter les pages / le code HTML pour repérer ces indices.</p>
+                <p>La prochaine étape est donc de supprimer les balises HTML contenues au sein du contenu textuel. Maintenant, vous savez que les balises HTML se trouvent toujours entre deux chevrons. Il y a fort à parier que si vous supprimez tout ce qui est contenu entre chevrons, vous supprimerez alors par la même occasion tout ce qui est attribué à la syntaxe HTML. Réaliser cette opération permettrait alors d'extraire seulement le contenu des transcriptions. Notez que nous faisons ici l’hypothèse que celles-ci ne contiennent pas de symboles mathématiques, tels que « inférieur à » ou
+« supérieur à ». Si Bowsey était un mathématicien, cette hypothèse serait alors plus fragile.</p>
+                <p>Nous allons maintenant décrire la procédure de notre algorithme explicitement en français :</p>
+                <p>Pour isoler le contenu de la transcription :</p>
+                <list type="unordered">
+                    <item>Charger le document HTML contenant la transcription.</item>
+                    <item>Chercher dans le code HTML et mémoriser l’emplacement de la première balise <code rend="inline">&lt;p&gt;</code>.</item>
+                    <item>Chercher dans le code HTML et mémoriser l’emplacement de la dernière balise <code rend="inline">&lt;/br&gt;</code>.</item>
+                    <item>Sauvegarder dans une variable de type <emph>chaine de caractères</emph> nommée <code rend="inline">pageContents</code> tout ce qui se situe entre la balise <code rend="inline">&lt;p&gt;</code> et <code rend="inline">&lt;/br&gt;</code>.</item>
+                </list>
+                <p>Nous disposons maintenant de la transcription du texte, qui contient pour le moment encore quelques balises HTML. Pour nettoyer celui-ci, nous allons donc :</p>
+                <list type="unordered">
+                    <item>Inspecter un à un chaque caractère de la chaine <code rend="inline">pageContents</code>.</item>
+                    <item>Si le caractère passé en revue est un chevron ouvrant (<code rend="inline">&lt;</code>), nous sommes donc à partir de celui au sein d’une balise HTML et nous allons ignorer les prochains caractères.</item>
+                    <item>Si le caractère passé en revue est un chevron fermant (<code rend="inline">&gt;</code>), nous ressortons d’une balise HTML. Nous ignorerons ce caractère, mais serons à partir de celui-ci attentifs aux prochains.</item>
+                    <item>Si nous ne sommes pas à l’intérieur d’une balise HTML, nous ajouterons alors le caractère courant dans une nouvelle variable : <code rend="inline">text</code>.</item>
+                </list>
+                <p>Enfin :</p>
+                <list type="unordered">
+                    <item>Nous découperons notre chaine de caractères (<code rend="inline">pageContents</code>) en une liste de mots que nous utiliserons ensuite.</item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Isoler le contenu de la transcription</head>
+                <p>La suite de ce tutoriel tirera parti des commandes Python introduites dans la leçon <ref target="/fr/lecons/manipuler-chaines-caracteres-python">Manipuler des chaines de caractères en Python</ref>, notamment dans la première partie de notre algorithme, afin de supprimer tous les caractères avant la balise <code rend="inline">&lt;p&gt;</code> et après la balise <code rend="inline">&lt;/br&gt;</code>.</p>
+                <p>Récapitulons, notre algorithme :</p>
+                <list type="unordered">
+                    <item>Chargera le texte de la transcription.</item>
+                    <item>Cherchera dans le code HTML la location de la première balise <code rend="inline">&lt;p&gt;</code> et enregistrera sa position.</item>
+                    <item>Cherchera dans le code HTML la location de la dernière balise <code rend="inline">&lt;/br&gt;</code> et enregistrera sa position.</item>
+                    <item>Sauvegardera tout ce qui se situe après la balise <code rend="inline">&lt;p&gt;</code> et avant la balise <code rend="inline">&lt;/br&gt;</code> dans une <emph>chaine de caractères</emph> : <code rend="inline">pageContents</code>.</item>
+                </list>
+                <p>Pour réaliser cela, nous utiliserons les <emph>méthodes de chaine de caractères</emph>
+                    <code rend="inline">find</code> (qui renvoie la première position dans une chaine d’un caractère donné) et <code rend="inline">.rfind()</code> (qui renvoie la dernière position dans une chaine d’un caractère donné). Cela nous permettra de récupérer la sous-chaine de caractères contenant le contenu textuel compris entre les deux indices renvoyés par ces méthodes.</p>
+                <p>Pour illustrer et comprendre comment ces méthodes fonctionnent, vous pouvez tester cet exemple, qui renvoie la position du premier paragraphe et celle du dernier, à travers la recherche des balises <code rend="inline">&lt;p&gt;</code> et<code rend="inline">&lt;/br&gt;</code> :</p>
+                <ab>
+                    <code xml:id="code_du-html-a-une-liste-de-mots-1_1" corresp="code_du-html-a-une-liste-de-mots-1_1.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Au fur et à mesure de l’implémentation, nous prendrons soin de bien séparer nos fichiers de travail. Nous appelons <code rend="inline">obo.py</code> (pour « Old Bailey Online ») le fichier dans lequel nous inscrivons le code que nous souhaiterons réutiliser ; <code rend="inline">obo.py</code> sera alors un module. Nous avons abordé la notion de module dans le tutoriel <ref target="/fr/lecons/reutilisation-de-code-et-modularite">Réutilisation de code et modularité</ref> dans lequel nous avions enregistré nos fonctions dans un fichier nommé <code rend="inline">greet.py</code>.</p>
+                <p>Créez donc un nouveau fichier nommé <code rend="inline">obo.py</code> et sauvegardez-le dans votre répertoire <code rend="inline">programming-historian</code>. Nous utiliserons ce fichier pour faire appel aux fonctions dont nous aurons besoin durant le traitement de The Old Bailey Online. Entrez ou copiez le code suivant de votre fichier.</p>
+                <ab>
+                    <code xml:id="code_du-html-a-une-liste-de-mots-1_2" corresp="code_du-html-a-une-liste-de-mots-1_2.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Créez ensuite un nouveau fichier, <code rend="inline">trial-content.py</code>, dans lequel vous copierez par la suite le code suivant :</p>
+                <ab>
+                    <code xml:id="code_du-html-a-une-liste-de-mots-1_3" corresp="code_du-html-a-une-liste-de-mots-1_3.txt" lang="language-python" rend="block"/>
+                </ab>
+                <p>Lorsque vous exécutez <code rend="inline">trial-content.py</code>, le programme ira dans un premier temps chercher le contenu de la page web de la transcription du procès de Bowsey, puis ira rechercher dans le module <code rend="inline">obo.py</code> la fonction <code rend="inline">stripTags</code> . Le programme utilisera cette fonction pour extraire le contenu compris entre la première balise <code rend="inline">&lt;p&gt;</code> et la dernière balise <code rend="inline">&lt;/br&gt;</code>. Si tout est correct, cela nous renverra bien le contenu de la transcription de Bowsey, avec, comme nous le prévoyons, quelques balises HTML. </p>
+                <p>Il se peut que vous obteniez en réponse une épaisse ligne noire dans votre sortie de commande, mais ne vous inquiétiez pas. La sortie de l’éditeur de texte Komodo Edit est limitée à un nombre maximum de caractères qu’il est possible d’afficher, après lequel les caractères s’écriront littéralement les uns sur les autres à l’écran, donnant l’apparence d’une tache noire. Pas de panique, le texte est dans ce cas bien ici, mais vous ne pouvez pas le lire ; afin de résoudre ce problème d’affichage, vous pouvez copier/coller ce texte dans un nouveau fichier, à titre de vérification.</p>
+                <p>Prenons maintenant un moment pour nous assurer que vous avez bien compris comment fonctionne <code rend="inline">trial-contents.py</code>, qui est capable d’utiliser les fonctions présentes dans <code rend="inline">obo.py</code>. La fonction <code rend="inline">stripTags</code> du module <code rend="inline">obo.py</code> a besoin d’être lancée avec un argument. En d’autres termes, pour lancer cette fonction correctement, nous avons donc besoin de lui fournir cette information. La fonction <code rend="inline">stripTags</code> de <code rend="inline">obo.py</code> a besoin d’une seule chose : une chaine de caractères nommée <code rend="inline">pageContents</code>. Mais vous remarquerez que lorsque l’on appelle la fonction <code rend="inline">stripTags</code> à la fin de notre programme (<code rend="inline">trialcontents.py</code>) nous ne mentionnons pas de variable nommée <code rend="inline">pageContents</code>. Au lieu de cela, la fonction reçoit une variable nommée HTML comme argument. Cela peut être déroutant pour de nombreuses personnes lorsqu’elles commencent à programmer. Quand l’on déclare une fonction et ses arguments, nous ne sommes pas obligé⸱e⸱s de nommer les variables d’entrée de la même manière. Tant que le type de l’argument est le correct, tout devrait fonctionner comme prévu, peu importe le nom que nous lui donnons. </p>
+                <p>Dans notre cas, nous souhaitons faire passer à l’argument <code rend="inline">pageContents</code> le contenu de notre variable <emph>HTML</emph>. Vous auriez pu lui passer n’importe quelle chaine de caractères, y compris celle que vous aviez saisie directement entre les parenthèses. Essayez de relancer <code rend="inline">trial-content.py</code>, en remplaçant l’argument fourni à <code rend="inline">stripTags</code> par « J’aime beaucoup les chiens » et observez ce qui se passe. Notez qu’en fonction de la manière dont vous définissez votre fonction (et ce qu’elle est censée faire), votre argument peut être autre chose qu’une chaine de caractères : un <emph>entier</emph>, par exemple. Pour mieux appréhender les différents types de données disponibles à travers Python, nous vous invitons à consulter <ref target="https://perma.cc/QH3X-BS79">les cours de Zeste de Savoir</ref> sur le sujet.</p>
+            </div>
+            <div type="2">
+                <head>Lectures suggérées</head>
+                <list type="unordered">
+                    <item>
+Lutz, Mark. <emph>Learning Python</emph> (5th edition). O’Reilly Media, Inc., 2013.<list type="unordered">
+                            <item>Ch. 7: Strings</item>
+                            <item>Ch. 8: Lists and Dictionaries</item>
+                            <item>Ch. 10: Introducing Python Statements</item>
+                            <item>Ch. 15: Function Basics</item>
+                        </list>
+                    </item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Synchronisation du code</head>
+                <p>Pour suivre les leçons à venir, il est important que vous ayez les bons fichiers et programmes dans votre répertoire <code rend="inline">programming-historian</code>. À la fin de chaque chapitre, vous pouvez télécharger le fichier zip contenant le matériel de cours du the programming-historian afin de vous assurer d’avoir le bon code. Notez que nous avons supprimé les fichiers inutiles des leçons précédentes. Votre répertoire peut contenir plus de fichiers ; ce n’est pas grave, l’important est de s’assurer que les codes que nous utiliserons par la suite fonctionneront.</p>
+                <list type="unordered">
+                    <item>
+                        <ref target="/assets/python-lessons2.zip">
+                            <code rend="inline">programming-historian-2.zip</code>
+                        </ref>
+                    </item>
+                </list>
+            </div>
+        </body>
+    </text>
+</TEI>

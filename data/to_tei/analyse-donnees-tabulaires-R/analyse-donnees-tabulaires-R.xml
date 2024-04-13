@@ -1,237 +1,393 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="analyse-donnees-tabulaires-R">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Analyser des donn&#233;es tabulaires avec R</title>
-  <author role="original_author">Taryn Dewar</author><editor role="reviewers"><persName>James Baker</persName><persName>John Russell</persName></editor><author role="translators">Marie Flesch</author><editor role="translation-reviewers"><persName>Brian Chauvel</persName><persName>C&#233;lian Ringwald</persName></editor><editor role="editors">Adam Crymble</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phfr0027</idno><date type="published">09/05/2016</date><date type="translated">09/29/2023</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#r-basics-with-tabular-data"/>.</p><p>There are other translations: <ref target="#nocoes-basicas-R-dados-tabulares #datos-tabulares-en-r"/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Cette le&#231;on montre comment analyser rapidement de grands jeux de donn&#233;es tabulaires, pour rendre la recherche plus rapide et plus efficace.</p></abstract><textClass><keywords><term xml:lang="en">data-manipulation</term><term xml:lang="en">r</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="fr">
-    <body>
-      <div type="2"><head>Objectifs de la le&#231;on</head>
-<p>De plus en plus de documents historiques &#233;tant d&#233;sormais num&#233;ris&#233;s, &#234;tre capable d&#8217;analyser rapidement de grands volumes de donn&#233;es tabulaires peut rendre le travail de recherche plus rapide et efficace.</p>
-<p><ref target="https://www.r-project.org/">R</ref> est un langage de programmation con&#231;u pour r&#233;aliser des analyses statistiques. Il permet de r&#233;aliser des analyses quantitatives &#224; partir de donn&#233;es historiques ou d&#8217;autres types de donn&#233;es, comme par exemple des tests statistiques ou autres m&#233;thodes. Comme on peut r&#233;ex&#233;cuter le m&#234;me code autant de fois que l&#8217;on veut sur les m&#234;mes donn&#233;es, R permet de faire des analyses rapidement et d&#8217;obtenir des r&#233;sultats reproductibles. Une fois le code sauvegard&#233;, on peut le r&#233;utiliser ou le modifier pour d&#8217;autres projets de recherche, ce qui fait de R un outil extr&#234;mement flexible.</p>
-<p>Ce tutoriel ne requiert aucune connaissance pr&#233;alable de R. C'est une introduction au langage R et &#224; certaines de ses fonctions de base. Il vous guide dans l&#8217;installation de R, passe en revue certains des outils que l&#8217;on peut utiliser dans R et explique comment travailler avec des jeux de donn&#233;es pour faire des travaux de recherche. Il prend la forme d&#8217;une s&#233;rie de mini-le&#231;ons&#8239;&#160;; celles-ci montrent quels types de sources sont adapt&#233;s &#224; R et fournissent des exemples de calculs permettant d&#8217;identifier des informations pertinentes pour la recherche historique, et plus largement pour la recherche en sciences humaines et sociales. Dans cette le&#231;on, nous verrons &#233;galement diff&#233;rentes fa&#231;ons d&#8217;importer des donn&#233;es dans R, comme la cr&#233;ation de tableaux de donn&#233;es et le chargement de fichiers CSV.</p>
-</div>
-      <div type="2"><head>&#192; qui s&#8217;adresse cette le&#231;on ?</head>
-<p>R est id&#233;al pour analyser de grands jeux de donn&#233;es qu&#8217;il serait trop chronophage d&#8217;examiner manuellement. Une fois que vous avez compris comment &#233;crire certaines fonctions de base et comment importer vos propres fichiers de donn&#233;es, vous pouvez analyser et visualiser les donn&#233;es rapidement et efficacement.</p>
-<p>Bien que R soit un excellent outil pour les donn&#233;es tabulaires, vous trouverez peut-&#234;tre plus utile d&#8217;utiliser d&#8217;autres approches pour analyser des donn&#233;es non tabulaires comme les archives de journaux. Si vous souhaitez &#233;tudier ce type de sources, nous vous conseillons de consulter les autres le&#231;ons de <emph><ref target="/fr/lecons/">Programming Historian en fran&#231;ais</ref></emph>.</p>
-</div>
-      <div type="2"><head>Installer R</head>
-<p>R est un langage de programmation et un environnement permettant de travailler avec des donn&#233;es. Il peut &#234;tre ex&#233;cut&#233; &#224; l&#8217;aide de la console de R, de la <ref target="/en/lessons/intro-to-bash">ligne de commande (le&#231;on en anglais)</ref> ou de l&#8217;<ref target="https://posit.co/">interface R Studio</ref>. Dans ce tutoriel, nous allons utiliser la console de R. Pour commencer &#224; utiliser R, t&#233;l&#233;chargez le programme sur <ref target="https://cran.r-project.org/">CRAN (The Comprehensive R Archive Network)</ref>. R est compatible avec Linux, Mac et Windows.</p>
-<p>Quand vous ouvrez la console de R pour la premi&#232;re fois, elle apparait dans une fen&#234;tre qui ressemble &#224; celle-ci&#160;:</p>
-<figure><desc>Figure 1. La console R sur un Mac</desc><graphic url="fr-tr-analyse-donnees-tabulaires-R-1.png"/></figure>
-</div>
-      <div type="2"><head>Utiliser la console de R</head>
-<p>Quand on d&#233;bute avec R, la console de R est l&#8217;endroit id&#233;al pour commencer &#224; travailler, parce qu&#8217;elle a &#233;t&#233; con&#231;ue sp&#233;cifiquement pour ce langage et offre des fonctionnalit&#233;s propres &#224; R.</p>
-<p>C&#8217;est dans cette console que vous saisirez les commandes. Pour effacer le contenu de la console, cliquez sur <hi rend="bold">&#201;dition</hi> dans la barre de menu et s&#233;lectionnez <hi rend="bold">Effacer Console</hi>. Le contenu de la console disparaitra. Vous pouvez &#233;galement modifier l&#8217;apparence de la console en cliquant sur la roue des couleurs en haut de la console sur un Mac ou en s&#233;lectionnant <hi rend="bold">Pr&#233;f&#233;rences</hi> dans le menu <hi rend="bold">&#201;dition</hi> sur un PC. Vous pouvez &#233;galement changer la couleur de l&#8217;arri&#232;re-plan de l&#8217;&#233;cran et la couleur des polices de caract&#232;res utilis&#233;e pour les fonctions.</p>
-</div>
-      <div type="2"><head>Utiliser des jeux de donn&#233;es</head>
-<p>Avant de travailler avec vos propres donn&#233;es, il est utile d&#8217;utiliser les jeux de donn&#233;es int&#233;gr&#233;s &#224; R pour comprendre comment R fonctionne. Vous pouvez les rechercher en entrant <code rend="inline">data()</code> dans la console. La liste de tous les jeux de donn&#233;es disponibles s&#8217;affichera dans une nouvelle fen&#234;tre. Cette liste comprend les titres et une courte description des donn&#233;es.</p>
-<p>Vous allez dans un premier temps charger le jeu de donn&#233;es <code rend="inline">AirPassengers</code><ref type="footnotemark" target="#note_1"/>, qui est <ref target="https://perma.cc/7WAS-5DQZ">une s&#233;rie temporelle</ref>, dans votre session R. Tapez <code rend="inline">data(AirPassengers)</code> et appuyez sur <emph>Entr&#233;e</emph>. Pour visualiser les donn&#233;es, tapez <code rend="inline">AirPassengers</code> sur la ligne suivante, puis appuyez &#224; nouveau sur <emph>Entr&#233;e</emph>. Vous verrez alors un tableau indiquant le nombre de passagers qui ont voyag&#233; sur des compagnies a&#233;riennes internationales entre janvier 1949 et d&#233;cembre 1960, exprim&#233; en milliers de personnes. Voici ce qui devrait s&#8217;afficher&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_0" corresp="code_analyse-donnees-tabulaires-R_0.txt" rend="block"/></ab>
-<p>Vous pouvez maintenant utiliser R pour r&#233;pondre &#224; un certain nombre de questions bas&#233;es sur ces donn&#233;es. Par exemple, pendant quels mois de l&#8217;ann&#233;e les voyageurs &#233;taient-ils les plus nombreux&#8239;?  Y a-t-il eu une augmentation des vols internationaux au fil du temps&#8239;? Vous pourriez probablement trouver les r&#233;ponses &#224; ces questions en parcourant simplement la s&#233;rie, mais vous ne seriez pas aussi rapide que votre ordinateur. De plus, examiner une s&#233;rie de valeurs manuellement devient tr&#232;s compliqu&#233; quand il y a beaucoup plus de donn&#233;es.</p>
-</div>
-      <div type="2"><head>Les fonctions de base de R</head>
-<p>R peut &#234;tre utilis&#233; pour r&#233;aliser des calculs qui peuvent vous &#234;tre utiles pour effectuer des recherches sur vos jeux de donn&#233;es. Par exemple, vous pouvez obtenir la <ref target="https://perma.cc/923S-KSZZ">moyenne</ref>, la <ref target="https://perma.cc/3LR9-8W3K">m&#233;diane</ref>, la valeur minimale et la valeur maximale. Pour calculer la moyenne et la m&#233;diane de la s&#233;rie <code rend="inline">AirPassengers</code>, il faut &#233;crire respectivement <code rend="inline">mean(AirPassengers)</code> et <code rend="inline">median(AirPassengers)</code> dans la console. Il est &#233;galement possible de calculer plusieurs mesures &#224; la fois. Pour obtenir un r&#233;sum&#233; des donn&#233;es, entrez <code rend="inline">summary(AirPassengers)</code> dans la console. Vous obtiendrez ainsi la valeur minimale et la valeur maximale ainsi que la moyenne, la m&#233;diane, le premier et le troisi&#232;me <ref target="https://perma.cc/UQ7W-E36U">quartiles</ref>.</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_1" corresp="code_analyse-donnees-tabulaires-R_1.txt" rend="block"/></ab>
-<p>La fonction <code rend="inline">summary()</code> (r&#233;sum&#233;) montre que de janvier 1949 &#224; d&#233;cembre 1960, le nombre minimum de passagers par mois est de 104&#8239;000 et que le nombre maximum est de 622&#8239;000. La moyenne (&#171;&#160;mean&#160;&#187;) indique qu&#8217;environ 280&#8239;300 personnes ont voyag&#233; chaque mois sur la dur&#233;e pendant laquelle ont &#233;t&#233; recueillies les donn&#233;es. Ces valeurs peuvent &#234;tre utiles pour d&#233;terminer la fa&#231;on dont le nombre de passagers varie dans le temps.</p>
-<div type="3"><head>S&#233;lectionner des valeurs dans un vecteur</head>
-<p>Cette fonction est bien pratique pour avoir une vue d&#8217;ensemble d&#8217;une s&#233;rie de valeurs num&#233;riques, mais comment faire pour analyser un sous-ensemble du jeu de donn&#233;es, comme une ann&#233;e particuli&#232;re ou certains mois&#8239;? On peut s&#233;lectionner certaines observations (correspondant par exemple &#224; un mois) ou ensembles d&#8217;observations (comme les valeurs d&#8217;une ann&#233;e) pour faire diff&#233;rents calculs. Par exemple, on peut s&#233;lectionner la premi&#232;re valeur de la s&#233;rie <code rend="inline">AirPassengers</code> en indiquant sa position entre crochets&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_2" corresp="code_analyse-donnees-tabulaires-R_2.txt" rend="block"/></ab>
-<p>On peut &#233;galement additionner le nombre de passagers sur deux mois afin de d&#233;terminer le nombre total de personnes qui ont voyag&#233; pendant cette p&#233;riode. Ici, nous allons additionner les deux premi&#232;res valeurs d&#8217;<code rend="inline">AirPassengers</code> dans la console en indiquant la position du premier et du second mois de la s&#233;rie. Apr&#232;s avoir appuy&#233; sur <emph>Entr&#233;e</emph>, vous devriez obtenir ceci&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_3" corresp="code_analyse-donnees-tabulaires-R_3.txt" rend="block"/></ab>
-<p>Le r&#233;sultat indique le nombre total de passagers, exprim&#233; en milliers de personnes, qui ont voyag&#233; en janvier et en f&#233;vrier 1949 (c&#8217;est-&#224;-dire la premi&#232;re et la deuxi&#232;me valeur de la s&#233;rie <code rend="inline">AirPassengers</code>).</p>
-<p>Notez que vous pouvez ex&#233;cuter la m&#234;me op&#233;ration en s&#233;lectionnant une plage de valeurs avec l&#8217;op&#233;rateur <code rend="inline">:</code>, puis en leur appliquant la fonction <code rend="inline">sum()</code>. Affichez, puis sommez les deux premi&#232;res valeurs de la s&#233;rie <code rend="inline">AirPassengers</code>&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_4" corresp="code_analyse-donnees-tabulaires-R_4.txt" rend="block"/></ab>
-</div><div type="3"><head>Assigner des valeurs &#224; un objet</head>
-<p>R peut faire bien plus que ce type de calcul simple. En assignant les valeurs &#224; des <ref target="https://perma.cc/SV4K-57VJ">objets</ref> enregistr&#233;s dans votre session de travail, vous pourrez les manipuler plus facilement. Par exemple, on peut cr&#233;er un objet <code rend="inline">Jan1949</code>, qui contient le nombre de passagers en janvier 1949. &#201;crivez <code rend="inline">Jan1949 &lt;- 112</code> dans la console, puis <code rend="inline">Jan1949</code> sur la ligne suivante. Le signe <code rend="inline">&lt;-</code> assigne la valeur <code rend="inline">112</code> &#224; l&#8217;objet <code rend="inline">Jan1949</code>. Vous devriez obtenir ceci&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_5" corresp="code_analyse-donnees-tabulaires-R_5.txt" rend="block"/></ab>
-<p>R &#233;tant sensible &#224; la casse, il est essentiel d&#8217;utiliser exactement la m&#234;me orthographe quand on cr&#233;e un objet et quand on s&#8217;en sert pour faire des calculs ou d&#8217;autres actions. Notez que dans R, les noms d&#8217;objets commencent n&#233;cessairement par une lettre (majuscule ou minuscule). Consultez l&#8217;article de Rasmus B&#229;&#229;th, <ref target="https://perma.cc/ME6W-JZJQ">The State of Naming Conventions in R</ref> (en anglais), pour plus d&#8217;informations sur les meilleures fa&#231;ons de nommer les objets dans R. </p>
-<p>Pour nommer vos objets, vous pouvez utiliser des lettres (<code rend="inline">x</code>, <code rend="inline">y</code>, etc.) mais, quand vous travaillez avec vos propres donn&#233;es, il est plus pratique d&#8217;utiliser des noms repr&#233;sentatifs du contenu de la variable. Par exemple, avec les donn&#233;es <code rend="inline">AirPassengers</code>, choisir des noms d&#8217;objets correspondant &#224; certains mois ou ann&#233;es permet de savoir pr&#233;cis&#233;ment ce qu&#8217;ils contiennent.</p>
-<p>Pour supprimer un objet de la console, tapez <code rend="inline">rm()</code> en indiquant le nom de l&#8217;objet dont vous voulez vous d&#233;barrasser entre les parenth&#232;ses, puis appuyez sur <emph>Entr&#233;e</emph>. Pour voir tous les objets que vous avez cr&#233;&#233;s, tapez <code rend="inline">ls()</code> dans la console et appuyez sur <emph>Entr&#233;e</emph>. Cela vous aidera &#224; &#233;viter d&#8217;utiliser le m&#234;me nom pour plusieurs objets. C&#8217;est &#233;galement important car R stocke tous les objets que vous cr&#233;ez dans sa m&#233;moire&#8239;; donc, m&#234;me si vous ne voyez pas un objet nomm&#233; <code rend="inline">x</code> dans la console, il peut avoir &#233;t&#233; cr&#233;&#233; auparavant et vous pourriez accidentellement l&#8217;&#233;craser en cr&#233;ant un nouvel objet appel&#233; <code rend="inline">x</code>.</p>
-<p>Voici la liste des objets que nous avons cr&#233;&#233;s jusqu&#8217;&#224; pr&#233;sent&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_6" corresp="code_analyse-donnees-tabulaires-R_6.txt" rend="block"/></ab>
-<p>On a donc l&#8217;objet <code rend="inline">AirPassengers</code> et l&#8217;objet <code rend="inline">Jan1949</code>. Nous allons maintenant supprimer l&#8217;objet <code rend="inline">Jan1949</code> et taper &#224; nouveau <code rend="inline">ls()</code>. On voit ceci&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_7" corresp="code_analyse-donnees-tabulaires-R_7.txt" rend="block"/></ab>
-<p>Si une fonction ne fonctionne pas ou si vous ne parvenez pas &#224; r&#233;soudre une erreur, tapez <code rend="inline">help()</code> dans la console pour ouvrir la page d&#8217;aide. Vous pouvez aussi faire une recherche en cliquant <hi rend="bold">Aide</hi> dans la barre de menu de la console de R. Si vous voulez changer quelque chose dans le code que vous avez d&#233;j&#224; &#233;crit, vous pouvez r&#233;&#233;crire le code sur une nouvelle ligne. Pour gagner du temps, utilisez les touches directionnelles de votre clavier (fl&#232;che vers le haut et fl&#232;che vers le bas) pour trouver par autocompl&#233;tion la ligne de code que vous souhaitez modifier.</p>
-<div type="4"><head>Mise en pratique</head>
-<list type="ordered">
-<item>
-<p>Cr&#233;ez deux objets correspondant aux valeurs de janvier 1950 et de janvier 1960 du jeu de donn&#233;es <code rend="inline">AirPassengers</code>. Sur la ligne suivante, additionnez les deux objets.</p>
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Analyser des données tabulaires avec R</title>
+                <author role="original_author">Taryn Dewar</author>
+                <editor role="reviewers">
+                    <persName>James Baker</persName>
+                    <persName>John Russell</persName>
+                </editor>
+                <author role="translators">Marie Flesch</author>
+                <editor role="translation-reviewers">
+                    <persName>Brian Chauvel</persName>
+                    <persName>Célian Ringwald</persName>
+                </editor>
+                <editor role="editors">Adam Crymble</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">09/29/2023</date>
+                <idno type="doi">10.46430/phfr0027</idno>
+                <date type="published">09/05/2016</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#r-basics-with-tabular-data"/>.</p>
+                <p>There are other translations: <ref target="#nocoes-basicas-R-dados-tabulares #datos-tabulares-en-r"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Cette leçon montre comment analyser rapidement de grands jeux de données tabulaires, pour rendre la recherche plus rapide et plus efficace.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">r</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="fr">
+        <body>
+            <div type="2">
+                <head>Objectifs de la leçon</head>
+                <p>De plus en plus de documents historiques étant désormais numérisés, être capable d’analyser rapidement de grands volumes de données tabulaires peut rendre le travail de recherche plus rapide et efficace.</p>
+                <p>
+                    <ref target="https://www.r-project.org/">R</ref> est un langage de programmation conçu pour réaliser des analyses statistiques. Il permet de réaliser des analyses quantitatives à partir de données historiques ou d’autres types de données, comme par exemple des tests statistiques ou autres méthodes. Comme on peut réexécuter le même code autant de fois que l’on veut sur les mêmes données, R permet de faire des analyses rapidement et d’obtenir des résultats reproductibles. Une fois le code sauvegardé, on peut le réutiliser ou le modifier pour d’autres projets de recherche, ce qui fait de R un outil extrêmement flexible.</p>
+                <p>Ce tutoriel ne requiert aucune connaissance préalable de R. C'est une introduction au langage R et à certaines de ses fonctions de base. Il vous guide dans l’installation de R, passe en revue certains des outils que l’on peut utiliser dans R et explique comment travailler avec des jeux de données pour faire des travaux de recherche. Il prend la forme d’une série de mini-leçons  ; celles-ci montrent quels types de sources sont adaptés à R et fournissent des exemples de calculs permettant d’identifier des informations pertinentes pour la recherche historique, et plus largement pour la recherche en sciences humaines et sociales. Dans cette leçon, nous verrons également différentes façons d’importer des données dans R, comme la création de tableaux de données et le chargement de fichiers CSV.</p>
+            </div>
+            <div type="2">
+                <head>À qui s’adresse cette leçon ?</head>
+                <p>R est idéal pour analyser de grands jeux de données qu’il serait trop chronophage d’examiner manuellement. Une fois que vous avez compris comment écrire certaines fonctions de base et comment importer vos propres fichiers de données, vous pouvez analyser et visualiser les données rapidement et efficacement.</p>
+                <p>Bien que R soit un excellent outil pour les données tabulaires, vous trouverez peut-être plus utile d’utiliser d’autres approches pour analyser des données non tabulaires comme les archives de journaux. Si vous souhaitez étudier ce type de sources, nous vous conseillons de consulter les autres leçons de <emph>
+                        <ref target="/fr/lecons/">Programming Historian en français</ref>
+                    </emph>.</p>
+            </div>
+            <div type="2">
+                <head>Installer R</head>
+                <p>R est un langage de programmation et un environnement permettant de travailler avec des données. Il peut être exécuté à l’aide de la console de R, de la <ref target="/en/lessons/intro-to-bash">ligne de commande (leçon en anglais)</ref> ou de l’<ref target="https://posit.co/">interface R Studio</ref>. Dans ce tutoriel, nous allons utiliser la console de R. Pour commencer à utiliser R, téléchargez le programme sur <ref target="https://cran.r-project.org/">CRAN (The Comprehensive R Archive Network)</ref>. R est compatible avec Linux, Mac et Windows.</p>
+                <p>Quand vous ouvrez la console de R pour la première fois, elle apparait dans une fenêtre qui ressemble à celle-ci :</p>
+                <figure>
+                    <desc>Figure 1. La console R sur un Mac</desc>
+                    <figDesc>La console de R sur un ordinateur Mac telle qu'elle apparait quand on l'ouvre</figDesc>
+                    <graphic url="fr-tr-analyse-donnees-tabulaires-R-1.png"/>
+                </figure>
+            </div>
+            <div type="2">
+                <head>Utiliser la console de R</head>
+                <p>Quand on débute avec R, la console de R est l’endroit idéal pour commencer à travailler, parce qu’elle a été conçue spécifiquement pour ce langage et offre des fonctionnalités propres à R.</p>
+                <p>C’est dans cette console que vous saisirez les commandes. Pour effacer le contenu de la console, cliquez sur <hi rend="bold">Édition</hi> dans la barre de menu et sélectionnez <hi rend="bold">Effacer Console</hi>. Le contenu de la console disparaitra. Vous pouvez également modifier l’apparence de la console en cliquant sur la roue des couleurs en haut de la console sur un Mac ou en sélectionnant <hi rend="bold">Préférences</hi> dans le menu <hi rend="bold">Édition</hi> sur un PC. Vous pouvez également changer la couleur de l’arrière-plan de l’écran et la couleur des polices de caractères utilisée pour les fonctions.</p>
+            </div>
+            <div type="2">
+                <head>Utiliser des jeux de données</head>
+                <p>Avant de travailler avec vos propres données, il est utile d’utiliser les jeux de données intégrés à R pour comprendre comment R fonctionne. Vous pouvez les rechercher en entrant <code rend="inline">data()</code> dans la console. La liste de tous les jeux de données disponibles s’affichera dans une nouvelle fenêtre. Cette liste comprend les titres et une courte description des données.</p>
+                <p>Vous allez dans un premier temps charger le jeu de données <code rend="inline">AirPassengers</code>
+                    <ref type="footnotemark" target="#fr_note_1"/>, qui est <ref target="https://perma.cc/7WAS-5DQZ">une série temporelle</ref>, dans votre session R. Tapez <code rend="inline">data(AirPassengers)</code> et appuyez sur <emph>Entrée</emph>. Pour visualiser les données, tapez <code rend="inline">AirPassengers</code> sur la ligne suivante, puis appuyez à nouveau sur <emph>Entrée</emph>. Vous verrez alors un tableau indiquant le nombre de passagers qui ont voyagé sur des compagnies aériennes internationales entre janvier 1949 et décembre 1960, exprimé en milliers de personnes. Voici ce qui devrait s’afficher :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_0" corresp="code_analyse-donnees-tabulaires-R_0.txt" rend="block"/>
+                </ab>
+                <p>Vous pouvez maintenant utiliser R pour répondre à un certain nombre de questions basées sur ces données. Par exemple, pendant quels mois de l’année les voyageurs étaient-ils les plus nombreux ?  Y a-t-il eu une augmentation des vols internationaux au fil du temps ? Vous pourriez probablement trouver les réponses à ces questions en parcourant simplement la série, mais vous ne seriez pas aussi rapide que votre ordinateur. De plus, examiner une série de valeurs manuellement devient très compliqué quand il y a beaucoup plus de données.</p>
+            </div>
+            <div type="2">
+                <head>Les fonctions de base de R</head>
+                <p>R peut être utilisé pour réaliser des calculs qui peuvent vous être utiles pour effectuer des recherches sur vos jeux de données. Par exemple, vous pouvez obtenir la <ref target="https://perma.cc/923S-KSZZ">moyenne</ref>, la <ref target="https://perma.cc/3LR9-8W3K">médiane</ref>, la valeur minimale et la valeur maximale. Pour calculer la moyenne et la médiane de la série <code rend="inline">AirPassengers</code>, il faut écrire respectivement <code rend="inline">mean(AirPassengers)</code> et <code rend="inline">median(AirPassengers)</code> dans la console. Il est également possible de calculer plusieurs mesures à la fois. Pour obtenir un résumé des données, entrez <code rend="inline">summary(AirPassengers)</code> dans la console. Vous obtiendrez ainsi la valeur minimale et la valeur maximale ainsi que la moyenne, la médiane, le premier et le troisième <ref target="https://perma.cc/UQ7W-E36U">quartiles</ref>.</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_1" corresp="code_analyse-donnees-tabulaires-R_1.txt" rend="block"/>
+                </ab>
+                <p>La fonction <code rend="inline">summary()</code> (résumé) montre que de janvier 1949 à décembre 1960, le nombre minimum de passagers par mois est de 104 000 et que le nombre maximum est de 622 000. La moyenne (« mean ») indique qu’environ 280 300 personnes ont voyagé chaque mois sur la durée pendant laquelle ont été recueillies les données. Ces valeurs peuvent être utiles pour déterminer la façon dont le nombre de passagers varie dans le temps.</p>
+                <div type="3">
+                    <head>Sélectionner des valeurs dans un vecteur</head>
+                    <p>Cette fonction est bien pratique pour avoir une vue d’ensemble d’une série de valeurs numériques, mais comment faire pour analyser un sous-ensemble du jeu de données, comme une année particulière ou certains mois ? On peut sélectionner certaines observations (correspondant par exemple à un mois) ou ensembles d’observations (comme les valeurs d’une année) pour faire différents calculs. Par exemple, on peut sélectionner la première valeur de la série <code rend="inline">AirPassengers</code> en indiquant sa position entre crochets :</p>
+                    <ab>
+                        <code xml:id="code_analyse-donnees-tabulaires-R_2" corresp="code_analyse-donnees-tabulaires-R_2.txt" rend="block"/>
+                    </ab>
+                    <p>On peut également additionner le nombre de passagers sur deux mois afin de déterminer le nombre total de personnes qui ont voyagé pendant cette période. Ici, nous allons additionner les deux premières valeurs d’<code rend="inline">AirPassengers</code> dans la console en indiquant la position du premier et du second mois de la série. Après avoir appuyé sur <emph>Entrée</emph>, vous devriez obtenir ceci :</p>
+                    <ab>
+                        <code xml:id="code_analyse-donnees-tabulaires-R_3" corresp="code_analyse-donnees-tabulaires-R_3.txt" rend="block"/>
+                    </ab>
+                    <p>Le résultat indique le nombre total de passagers, exprimé en milliers de personnes, qui ont voyagé en janvier et en février 1949 (c’est-à-dire la première et la deuxième valeur de la série <code rend="inline">AirPassengers</code>).</p>
+                    <p>Notez que vous pouvez exécuter la même opération en sélectionnant une plage de valeurs avec l’opérateur <code rend="inline">:</code>, puis en leur appliquant la fonction <code rend="inline">sum()</code>. Affichez, puis sommez les deux premières valeurs de la série <code rend="inline">AirPassengers</code> :</p>
+                    <ab>
+                        <code xml:id="code_analyse-donnees-tabulaires-R_4" corresp="code_analyse-donnees-tabulaires-R_4.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Assigner des valeurs à un objet</head>
+                    <p>R peut faire bien plus que ce type de calcul simple. En assignant les valeurs à des <ref target="https://perma.cc/SV4K-57VJ">objets</ref> enregistrés dans votre session de travail, vous pourrez les manipuler plus facilement. Par exemple, on peut créer un objet <code rend="inline">Jan1949</code>, qui contient le nombre de passagers en janvier 1949. Écrivez <code rend="inline">Jan1949 &lt;- 112</code> dans la console, puis <code rend="inline">Jan1949</code> sur la ligne suivante. Le signe <code rend="inline">&lt;-</code> assigne la valeur <code rend="inline">112</code> à l’objet <code rend="inline">Jan1949</code>. Vous devriez obtenir ceci :</p>
+                    <ab>
+                        <code xml:id="code_analyse-donnees-tabulaires-R_5" corresp="code_analyse-donnees-tabulaires-R_5.txt" rend="block"/>
+                    </ab>
+                    <p>R étant sensible à la casse, il est essentiel d’utiliser exactement la même orthographe quand on crée un objet et quand on s’en sert pour faire des calculs ou d’autres actions. Notez que dans R, les noms d’objets commencent nécessairement par une lettre (majuscule ou minuscule). Consultez l’article de Rasmus Bååth, <ref target="https://perma.cc/ME6W-JZJQ">The State of Naming Conventions in R</ref> (en anglais), pour plus d’informations sur les meilleures façons de nommer les objets dans R. </p>
+                    <p>Pour nommer vos objets, vous pouvez utiliser des lettres (<code rend="inline">x</code>, <code rend="inline">y</code>, etc.) mais, quand vous travaillez avec vos propres données, il est plus pratique d’utiliser des noms représentatifs du contenu de la variable. Par exemple, avec les données <code rend="inline">AirPassengers</code>, choisir des noms d’objets correspondant à certains mois ou années permet de savoir précisément ce qu’ils contiennent.</p>
+                    <p>Pour supprimer un objet de la console, tapez <code rend="inline">rm()</code> en indiquant le nom de l’objet dont vous voulez vous débarrasser entre les parenthèses, puis appuyez sur <emph>Entrée</emph>. Pour voir tous les objets que vous avez créés, tapez <code rend="inline">ls()</code> dans la console et appuyez sur <emph>Entrée</emph>. Cela vous aidera à éviter d’utiliser le même nom pour plusieurs objets. C’est également important car R stocke tous les objets que vous créez dans sa mémoire ; donc, même si vous ne voyez pas un objet nommé <code rend="inline">x</code> dans la console, il peut avoir été créé auparavant et vous pourriez accidentellement l’écraser en créant un nouvel objet appelé <code rend="inline">x</code>.</p>
+                    <p>Voici la liste des objets que nous avons créés jusqu’à présent :</p>
+                    <ab>
+                        <code xml:id="code_analyse-donnees-tabulaires-R_6" corresp="code_analyse-donnees-tabulaires-R_6.txt" rend="block"/>
+                    </ab>
+                    <p>On a donc l’objet <code rend="inline">AirPassengers</code> et l’objet <code rend="inline">Jan1949</code>. Nous allons maintenant supprimer l’objet <code rend="inline">Jan1949</code> et taper à nouveau <code rend="inline">ls()</code>. On voit ceci :</p>
+                    <ab>
+                        <code xml:id="code_analyse-donnees-tabulaires-R_7" corresp="code_analyse-donnees-tabulaires-R_7.txt" rend="block"/>
+                    </ab>
+                    <p>Si une fonction ne fonctionne pas ou si vous ne parvenez pas à résoudre une erreur, tapez <code rend="inline">help()</code> dans la console pour ouvrir la page d’aide. Vous pouvez aussi faire une recherche en cliquant <hi rend="bold">Aide</hi> dans la barre de menu de la console de R. Si vous voulez changer quelque chose dans le code que vous avez déjà écrit, vous pouvez réécrire le code sur une nouvelle ligne. Pour gagner du temps, utilisez les touches directionnelles de votre clavier (flèche vers le haut et flèche vers le bas) pour trouver par autocomplétion la ligne de code que vous souhaitez modifier.</p>
+                    <div type="4">
+                        <head>Mise en pratique</head>
+                        <list type="ordered">
+                            <item>
+                                <p>Créez deux objets correspondant aux valeurs de janvier 1950 et de janvier 1960 du jeu de données <code rend="inline">AirPassengers</code>. Sur la ligne suivante, additionnez les deux objets.</p>
+                            </item>
+                            <item>
+                                <p>Utilisez les objets que vous venez de créer pour trouver la différence entre le nombre de passagers en 1960 et en 1950.</p>
+                            </item>
+                        </list>
+                    </div>
+                    <div type="4">
+                        <head>Solutions</head>
+                        <list type="ordered">
+                            <item>
 </item>
-<item>
-<p>Utilisez les objets que vous venez de cr&#233;er pour trouver la diff&#233;rence entre le nombre de passagers en 1960 et en 1950.</p>
+                        </list>
+                        <p>Créez deux objets correspondant aux valeurs de janvier 1950 et de janvier 1960 du jeu de données <code rend="inline">AirPassengers</code>. Sur la ligne suivante, additionnez les deux objets.</p>
+                        <ab>
+                            <code xml:id="code_analyse-donnees-tabulaires-R_8" corresp="code_analyse-donnees-tabulaires-R_8.txt" rend="block"/>
+                        </ab>
+                        <p>Le résultat indique que 532 000 personnes ont voyagé sur des vols internationaux en janvier 1950 et en janvier 1960.</p>
+                        <list type="ordered">
+                            <item>
 </item>
-</list>
-</div><div type="4"><head>Solutions</head>
-<list type="ordered">
-<item>
+                        </list>
+                        <p>Utilisez les objets que vous venez de créer pour trouver la différence entre le nombre de passagers en 1960 et en 1950.</p>
+                        <ab>
+                            <code xml:id="code_analyse-donnees-tabulaires-R_9" corresp="code_analyse-donnees-tabulaires-R_9.txt" rend="block"/>
+                        </ab>
+                        <p>Cela signifie qu’il y a eu 302 000 passagers de plus sur les vols internationaux en janvier 1960 qu’en janvier 1950.</p>
+                    </div>
+                </div>
+                <div type="3">
+                    <head>Créer une variable : combiner une série de valeurs dans un vecteur</head>
+                    <p>Créer un objet pour chaque valeur peut être fastidieux, surtout quand on choisit des noms assez longs. À la place, on peut créer une variable qui contient plusieurs valeurs, comme toutes les valeurs correspondant à une année. Pour ce faire, il faut créer une série de valeurs que l’on appelle « vecteur » en utilisant la fonction <code rend="inline">c()</code>. <code rend="inline">c()</code> veut dire « combiner » et permet de mettre plusieurs valeurs dans une même variable. Par exemple, on peut créer un vecteur contenant les données de l’année 1949 d’<code rend="inline">AirPassengers</code>, que l’on va appeler <code rend="inline">Air49</code> :</p>
+                    <ab>
+                        <code xml:id="code_analyse-donnees-tabulaires-R_10" corresp="code_analyse-donnees-tabulaires-R_10.txt" rend="block"/>
+                    </ab>
+                    <p>On peut accéder à chaque élément du vecteur en indiquant le nom de la variable et la position de l’élément, ce que l’on appelle l’indexation par position. Celle-ci commence à 1. Ci-dessous, <code rend="inline">Air49[2]</code> renvoie la valeur correspondant à février 1949, soit <code rend="inline">118</code>.</p>
+                    <ab>
+                        <code xml:id="code_analyse-donnees-tabulaires-R_11" corresp="code_analyse-donnees-tabulaires-R_11.txt" rend="block"/>
+                    </ab>
+                    <p>On peut créer une série de valeurs consécutives en utilisant un signe deux-points. Voici un exemple :</p>
+                    <ab>
+                        <code xml:id="code_analyse-donnees-tabulaires-R_12" corresp="code_analyse-donnees-tabulaires-R_12.txt" rend="block"/>
+                    </ab>
+                    <p>En utilisant ces connaissances, vous pouvez utiliser l’expression suivante pour créer une variable contenant les valeurs de l’année 1949 d’<code rend="inline">AirPassengers</code> :</p>
+                    <ab>
+                        <code xml:id="code_analyse-donnees-tabulaires-R_13" corresp="code_analyse-donnees-tabulaires-R_13.txt" rend="block"/>
+                    </ab>
+                    <p>
+                        <code rend="inline">Air49</code> renvoie les douze premières observations de la série temporelle <code rend="inline">AirPassengers</code>. Vous obtenez donc la même variable que celle que nous avons créée plus haut, mais cette méthode est plus rapide et réduit le risque de faire une faute de frappe.</p>
+                    <p>Pour obtenir le nombre total de passagers en 1949, vous pouvez additionner tous les éléments du vecteur en utilisant la fonction <code rend="inline">sum()</code> :</p>
+                    <ab>
+                        <code xml:id="code_analyse-donnees-tabulaires-R_14" corresp="code_analyse-donnees-tabulaires-R_14.txt" rend="block"/>
+                    </ab>
+                    <p>En 1949, environ 1 520 000 personnes ont voyagé sur des vols internationaux.</p>
+                    <p>Enfin, la fonction <code rend="inline">length()</code> permet de connaitre le nombre d’éléments d’un vecteur :</p>
+                    <ab>
+                        <code xml:id="code_analyse-donnees-tabulaires-R_15" corresp="code_analyse-donnees-tabulaires-R_15.txt" rend="block"/>
+                    </ab>
+                    <div type="4">
+                        <head>Mise en pratique</head>
+                        <list type="ordered">
+                            <item>Créez une variable correspondant à l’année 1950 du jeu de données <code rend="inline">AirPassengers</code>.</item>
+                            <item>Affichez le deuxième élément de ce vecteur.</item>
+                            <item>Combien d’éléments y a-t-il dans la variable que vous avez créée dans la question 1 ?</item>
+                            <item>Combien y a-t-il eu de passagers en 1950 ?</item>
+                        </list>
+                    </div>
+                    <div type="4">
+                        <head>Solutions</head>
+                        <list type="ordered">
+                            <item>
 </item>
-</list>
-<p>Cr&#233;ez deux objets correspondant aux valeurs de janvier 1950 et de janvier 1960 du jeu de donn&#233;es <code rend="inline">AirPassengers</code>. Sur la ligne suivante, additionnez les deux objets.</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_8" corresp="code_analyse-donnees-tabulaires-R_8.txt" rend="block"/></ab>
-<p>Le r&#233;sultat indique que 532&#8239;000 personnes ont voyag&#233; sur des vols internationaux en janvier 1950 et en janvier 1960.</p>
-<list start="2" type="ordered">
-<item>
+                        </list>
+                        <ab>
+                            <code xml:id="code_analyse-donnees-tabulaires-R_16" corresp="code_analyse-donnees-tabulaires-R_16.txt" rend="block"/>
+                        </ab>
+                        <list type="ordered">
+                            <item>
 </item>
-</list>
-<p>Utilisez les objets que vous venez de cr&#233;er pour trouver la diff&#233;rence entre le nombre de passagers en 1960 et en 1950.</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_9" corresp="code_analyse-donnees-tabulaires-R_9.txt" rend="block"/></ab>
-<p>Cela signifie qu&#8217;il y a eu 302&#8239;000 passagers de plus sur les vols internationaux en janvier 1960 qu&#8217;en janvier 1950.</p>
-</div></div><div type="3"><head>Cr&#233;er une variable&#160;: combiner une s&#233;rie de valeurs dans un vecteur</head>
-<p>Cr&#233;er un objet pour chaque valeur peut &#234;tre fastidieux, surtout quand on choisit des noms assez longs. &#192; la place, on peut cr&#233;er une variable qui contient plusieurs valeurs, comme toutes les valeurs correspondant &#224; une ann&#233;e. Pour ce faire, il faut cr&#233;er une s&#233;rie de valeurs que l&#8217;on appelle &#171;&#160;vecteur&#160;&#187; en utilisant la fonction <code rend="inline">c()</code>. <code rend="inline">c()</code> veut dire &#171;&#160;combiner&#160;&#187; et permet de mettre plusieurs valeurs dans une m&#234;me variable. Par exemple, on peut cr&#233;er un vecteur contenant les donn&#233;es de l&#8217;ann&#233;e 1949 d&#8217;<code rend="inline">AirPassengers</code>, que l&#8217;on va appeler <code rend="inline">Air49</code>&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_10" corresp="code_analyse-donnees-tabulaires-R_10.txt" rend="block"/></ab>
-<p>On peut acc&#233;der &#224; chaque &#233;l&#233;ment du vecteur en indiquant le nom de la variable et la position de l&#8217;&#233;l&#233;ment, ce que l&#8217;on appelle l&#8217;indexation par position. Celle-ci commence &#224; 1. Ci-dessous, <code rend="inline">Air49[2]</code> renvoie la valeur correspondant &#224; f&#233;vrier 1949, soit <code rend="inline">118</code>.</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_11" corresp="code_analyse-donnees-tabulaires-R_11.txt" rend="block"/></ab>
-<p>On peut cr&#233;er une s&#233;rie de valeurs cons&#233;cutives en utilisant un signe deux-points. Voici un exemple&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_12" corresp="code_analyse-donnees-tabulaires-R_12.txt" rend="block"/></ab>
-<p>En utilisant ces connaissances, vous pouvez utiliser l&#8217;expression suivante pour cr&#233;er une variable contenant les valeurs de l&#8217;ann&#233;e 1949 d&#8217;<code rend="inline">AirPassengers</code>&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_13" corresp="code_analyse-donnees-tabulaires-R_13.txt" rend="block"/></ab>
-<p><code rend="inline">Air49</code> renvoie les douze premi&#232;res observations de la s&#233;rie temporelle <code rend="inline">AirPassengers</code>. Vous obtenez donc la m&#234;me variable que celle que nous avons cr&#233;&#233;e plus haut, mais cette m&#233;thode est plus rapide et r&#233;duit le risque de faire une faute de frappe.</p>
-<p>Pour obtenir le nombre total de passagers en 1949, vous pouvez additionner tous les &#233;l&#233;ments du vecteur en utilisant la fonction <code rend="inline">sum()</code>&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_14" corresp="code_analyse-donnees-tabulaires-R_14.txt" rend="block"/></ab>
-<p>En 1949, environ 1&#8239;520&#8239;000 personnes ont voyag&#233; sur des vols internationaux.</p>
-<p>Enfin, la fonction <code rend="inline">length()</code> permet de connaitre le nombre d&#8217;&#233;l&#233;ments d&#8217;un vecteur&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_15" corresp="code_analyse-donnees-tabulaires-R_15.txt" rend="block"/></ab>
-<div type="4"><head>Mise en pratique</head>
-<list type="ordered">
-<item>Cr&#233;ez une variable correspondant &#224; l&#8217;ann&#233;e 1950 du jeu de donn&#233;es <code rend="inline">AirPassengers</code>.</item>
-<item>Affichez le deuxi&#232;me &#233;l&#233;ment de ce vecteur.</item>
-<item>Combien d&#8217;&#233;l&#233;ments y a-t-il dans la variable que vous avez cr&#233;&#233;e dans la question 1&#8239;?</item>
-<item>Combien y a-t-il eu de passagers en 1950&#8239;?</item>
-</list>
-</div><div type="4"><head>Solutions</head>
-<list type="ordered">
-<item>
+                        </list>
+                        <ab>
+                            <code xml:id="code_analyse-donnees-tabulaires-R_17" corresp="code_analyse-donnees-tabulaires-R_17.txt" rend="block"/>
+                        </ab>
+                        <list type="ordered">
+                            <item>
 </item>
-</list>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_16" corresp="code_analyse-donnees-tabulaires-R_16.txt" rend="block"/></ab>
-<list start="2" type="ordered">
-<item>
+                        </list>
+                        <ab>
+                            <code xml:id="code_analyse-donnees-tabulaires-R_18" corresp="code_analyse-donnees-tabulaires-R_18.txt" rend="block"/>
+                        </ab>
+                        <list type="ordered">
+                            <item>
 </item>
-</list>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_17" corresp="code_analyse-donnees-tabulaires-R_17.txt" rend="block"/></ab>
-<list start="3" type="ordered">
-<item>
+                        </list>
+                        <ab>
+                            <code xml:id="code_analyse-donnees-tabulaires-R_19" corresp="code_analyse-donnees-tabulaires-R_19.txt" rend="block"/>
+                        </ab>
+                        <p>Pour connaitre l’évolution du nombre de passagers au fil du temps, on peut créer une variable pour chacune des années du jeu de données et utiliser certains des outils que nous avons vus. Voici une liste des variables pour les années 1949 à 1960, suivie du nombre total de passagers pour chaque année :</p>
+                        <ab>
+                            <code xml:id="code_analyse-donnees-tabulaires-R_20" corresp="code_analyse-donnees-tabulaires-R_20.txt" rend="block"/>
+                        </ab>
+                        <p>Ces informations nous permettent de constater que le nombre de passagers a augmenté avec le temps. On peut aller plus loin et essayer de savoir à quelles périodes de l’année les gens allaient le plus souvent en vacances, ou calculer l’augmentation du nombre de passagers au fil du temps sous forme de pourcentage.</p>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Travailler avec de grands jeux de données</head>
+                <p>Les méthodes que nous avons utilisées plus haut ne sont pas adaptées aux jeux de données qui comptent plusieurs milliers d’observations, voire plus, décrites par des dizaines ou des centaines de variables. Compter les observations pour trouver les valeurs qui nous intéressent serait extrêmement fastidieux. Imaginez par exemple à quel point il serait difficile de trouver les informations correspondant à l’année numéro 96 dans un jeu de données couvrant 150 années.</p>
+                <p>Vous pouvez tout simplement sélectionner des lignes ou des colonnes spécifiques si le jeu de données est dans un format adéquat, de préférence de type <code rend="inline">data.frame</code>. Chargez le jeu de données <code rend="inline">mtcars</code> dans la console et affichez son type avec la fonction <code rend="inline">class()</code> :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_21" corresp="code_analyse-donnees-tabulaires-R_21.txt" rend="block"/>
+                </ab>
+                <p>Affichez le contenu de ce jeu de données :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_22" corresp="code_analyse-donnees-tabulaires-R_22.txt" rend="block"/>
+                </ab>
+                <p>Ce <ref target="https://perma.cc/8UPR-C52G">jeu de données</ref> fournit un aperçu des tests réalisés sur des voitures (<emph>Motor Trend Car Road Tests</emph>) par le magazine <emph>Motor Trend</emph> en 1974 <ref type="footnotemark" target="#fr_note_2"/>. Il contient plusieurs informations, dont le nombre de miles qu’une voiture peut parcourir avec un gallon US de carburant (un gallon correspond à 3,78 litres et un mile à 1,61 kilomètre), le nombre de cylindres de chaque modèle, son nombre de chevaux, sa puissance, son poids, le rapport de l’essieu arrière, et d’autres caractéristiques. Ces données peuvent être utilisées pour savoir quelles caractéristiques ont rendu chaque modèle plus ou moins fiable au fil du temps.</p>
+                <p>Vous pouvez sélectionner des colonnes en saisissant le nom du jeu de données suivi de crochets et du numéro de la ligne ou de la colonne qui vous intéresse. Ainsi, dans l’expression <code rend="inline">dataset[x,y]</code>, <code rend="inline">dataset</code> correspond au jeu de données avec lequel vous travaillez, <code rend="inline">x</code> est la ligne et <code rend="inline">y</code> est la colonne.</p>
+                <p>Si vous voulez visualiser la première ligne du jeu de données <code rend="inline">mtcars</code>, il faut écrire ceci dans la console :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_23" corresp="code_analyse-donnees-tabulaires-R_23.txt" rend="block"/>
+                </ab>
+                <p>Pour afficher le contenu d’une colonne, ici la deuxième, écrivez :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_24" corresp="code_analyse-donnees-tabulaires-R_24.txt" rend="block"/>
+                </ab>
+                <p>Vous obtenez ainsi toutes les valeurs de la catégorie <code rend="inline">cyl</code>, ou « cylindre ». On constate que la plupart des modèles de voitures ont des moteurs à quatre, six ou huit cylindres. Vous pouvez également sélectionner une seule observation en précisant une valeur pour <code rend="inline">x</code> (la ligne) et une valeur pour <code rend="inline">y</code> (la colonne) :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_25" corresp="code_analyse-donnees-tabulaires-R_25.txt" rend="block"/>
+                </ab>
+                <p>R renvoie l’observation située dans la première ligne et la deuxième colonne. Grâce à cette technique de sélection des données, vous pouvez obtenir le résumé statistique d’une ligne ou d’une colonne sans avoir à compter le nombre d’observations dans le jeu de données. Par exemple, <code rend="inline">summary(mtcars[,1])</code> renvoie le résumé statistique de la colonne <code rend="inline">mpg</code> (nombre de miles par gallon) pour toutes les voitures du jeu de données <code rend="inline">mtcars</code> :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_26" corresp="code_analyse-donnees-tabulaires-R_26.txt" rend="block"/>
+                </ab>
+                <p>Le résumé statistique indique que la voiture qui consomme le moins est la Toyota Corolla, avec 33,9 miles par gallon, et que la voiture la plus gourmande en carburant est la Lincoln Continental, qui permet seulement de parcourir 10,4 miles par gallon. Pour identifier les voitures correspondant aux valeurs, il suffit de regarder le tableau de données. Cette méthode est bien plus pratique pour trouver une valeur rapidement que d’essayer de faire le calcul dans sa tête ou de fouiller la feuille de calcul d’un tableur.</p>
+            </div>
+            <div type="2">
+                <head>Data frames</head>
+                <p>Maintenant que vous comprenez mieux les fonctions de base de R, vous pouvez vous en servir pour analyser vos propres données. Pour les jeux de données de petite taille, vous pouvez créer vos propres tableaux de données, ou « data frames ». Savoir construire des tableaux est très utile car si vous avez peu de données vous pouvez simplement en créer un au lieu d’importer un fichier CSV. Le plus simple, pour construire un data frame, est de créer au moins deux variables, ou vecteurs, et de les associer. Nous allons en créer un avec des données qui se trouvent sur le site d’Old Bailey, la Cour centrale de la Couronne britannique :</p>
+                <figure>
+                    <desc>Figure 2. Le jeu de données des affaires pénales d’[Old Bailey](https://www.oldbaileyonline.org/) par décennie, de 1670 à 1800.</desc>
+                    <figDesc>Tableau représentant les affaires pénales d'Old Bailey, par catégorie, des années 1670 à 1800</figDesc>
+                    <graphic url="fr-tr-analyse-donnees-tabulaires-R-2.png"/>
+                </figure>
+                <p>Le site d’Old Bailey fournit des statistiques et des informations sur les affaires pénales traitées par la Cour centrale de la Couronne britannique entre 1674 et 1913. On pourrait par exemple analyser le nombre d’infractions de vol et de vol avec violence pour les décennies comprises entre 1670 à 1710 en plaçant les valeurs dans un data frame.</p>
+                <p>Commençons par créer les variables <code rend="inline">Vols</code> et <code rend="inline">VolsAvecViolence</code>, en indiquant les valeurs correspondant à chaque décennie :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_27" corresp="code_analyse-donnees-tabulaires-R_27.txt" rend="block"/>
+                </ab>
+                <p>Pour créer un data frame, on utilise la fonction <code rend="inline">data.frame()</code>, qui permet de juxtaposer les valeurs de plusieurs vecteurs de même taille. Nous allons associer les variables <code rend="inline">Vols</code>et <code rend="inline">VolsAvecViolence</code> dans l’objet <code rend="inline">Crimes</code> ci-dessous :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_28" corresp="code_analyse-donnees-tabulaires-R_28.txt" rend="block"/>
+                </ab>
+                <p>La fonction <code rend="inline">t()</code> permet de « transposer » le data frame, c’est-à-dire de transformer les lignes en colonnes et vice versa :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_29" corresp="code_analyse-donnees-tabulaires-R_29.txt" rend="block"/>
+                </ab>
+                <p>Maintenant que nous avons notre data frame, nous pouvons afficher le contenu des variables en indiquant le nom du data frame suivi de l’opérateur <code rend="inline">$</code>et du du nom de la colonne désirée :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_30" corresp="code_analyse-donnees-tabulaires-R_30.txt" rend="block"/>
+                </ab>
+                <p>Nous pouvons effectuer des calculs, en calculant par exemple le nombre total de vols :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_31" corresp="code_analyse-donnees-tabulaires-R_31.txt" rend="block"/>
+                </ab>
+                <p>Le nombre total d’infractions de vol et de vol avec violence :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_32" corresp="code_analyse-donnees-tabulaires-R_32.txt" rend="block"/>
+                </ab>
+                <p>Ou bien le nombre moyen de vols avec violence par décennie :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_33" corresp="code_analyse-donnees-tabulaires-R_33.txt" rend="block"/>
+                </ab>
+                <p>La fonction <code rend="inline">apply()</code> permet d’exécuter la même fonction sur chaque ligne ou colonne d’un data frame. Elle prend trois arguments : le nom du data frame , <code rend="inline">1</code> pour appliquer la fonction sur les lignes ou <code rend="inline">2</code> sur les colonnes, et enfin le nom de la fonction que l’on veut exécuter sur le data frame :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_34" corresp="code_analyse-donnees-tabulaires-R_34.txt" rend="block"/>
+                </ab>
+                <p>L’exemple ci-dessus montre comment utiliser la fonction <code rend="inline">apply()</code> sur le data frame <code rend="inline">Crimes</code> pour calculer la moyenne de chaque ligne, afin de connaitre le nombre moyen de l’ensemble des vols (avec ou sans violence) commis pendant chaque décennie. Pour obtenir la moyenne de chaque colonne, il faut indiquer <code rend="inline">2</code> à la place de <code rend="inline">1</code> dans la fonction :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_35" corresp="code_analyse-donnees-tabulaires-R_35.txt" rend="block"/>
+                </ab>
+                <p>Le résultat indique le nombre moyen de vols et le nombre moyen de vols avec violence entre 1670 à 1710.</p>
+                <h4>Mise en pratique</h4>
+                <list type="ordered">
+                    <item>Créez deux variables intitulées <code rend="inline">ViolationsPaix</code>, contenant les valeurs <code rend="inline">2,3,3</code>,  et <code rend="inline">Meurtres</code>, contenant les valeurs <code rend="inline">44,51,1</code>. Elles indiquent le nombre de <hi rend="bold">Breaking Peace</hi> (Violations de la Paix) — une catégorie qui comprend diverses infractions comme les agressions, menaces et <ref target="https://fr.wikipedia.org/wiki/Voie_de_fait">voies de fait</ref>) — et le nombre de meurtres entre 1710 et 1730, selon le tableau d’Old Bailey présenté plus haut. </item>
+                    <item>Utilisez la fonction <code rend="inline">data.frame()</code> pour combiner <code rend="inline">ViolationsPaix</code> et <code rend="inline">Meurtres</code> dans un data frame que vous appellerez <code rend="inline">Crimes3</code>. Affichez le data frame.</item>
+                    <item>Calculez la moyenne de chaque colonne du data frame créé dans la question 2 en utilisant la fonction <code rend="inline">apply()</code>.</item>
+                </list>
+                <h4>Solutions</h4>
+                <list type="ordered">
+                    <item>
 </item>
-</list>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_18" corresp="code_analyse-donnees-tabulaires-R_18.txt" rend="block"/></ab>
-<list start="4" type="ordered">
-<item>
+                </list>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_36" corresp="code_analyse-donnees-tabulaires-R_36.txt" rend="block"/>
+                </ab>
+                <list type="ordered">
+                    <item>
 </item>
-</list>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_19" corresp="code_analyse-donnees-tabulaires-R_19.txt" rend="block"/></ab>
-<p>Pour connaitre l&#8217;&#233;volution du nombre de passagers au fil du temps, on peut cr&#233;er une variable pour chacune des ann&#233;es du jeu de donn&#233;es et utiliser certains des outils que nous avons vus. Voici une liste des variables pour les ann&#233;es 1949 &#224; 1960, suivie du nombre total de passagers pour chaque ann&#233;e&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_20" corresp="code_analyse-donnees-tabulaires-R_20.txt" rend="block"/></ab>
-<p>Ces informations nous permettent de constater que le nombre de passagers a augment&#233; avec le temps. On peut aller plus loin et essayer de savoir &#224; quelles p&#233;riodes de l&#8217;ann&#233;e les gens allaient le plus souvent en vacances, ou calculer l&#8217;augmentation du nombre de passagers au fil du temps sous forme de pourcentage.</p>
-</div></div></div>
-      <div type="2"><head>Travailler avec de grands jeux de donn&#233;es</head>
-<p>Les m&#233;thodes que nous avons utilis&#233;es plus haut ne sont pas adapt&#233;es aux jeux de donn&#233;es qui comptent plusieurs milliers d&#8217;observations, voire plus, d&#233;crites par des dizaines ou des centaines de variables. Compter les observations pour trouver les valeurs qui nous int&#233;ressent serait extr&#234;mement fastidieux. Imaginez par exemple &#224; quel point il serait difficile de trouver les informations correspondant &#224; l&#8217;ann&#233;e num&#233;ro 96 dans un jeu de donn&#233;es couvrant 150 ann&#233;es.</p>
-<p>Vous pouvez tout simplement s&#233;lectionner des lignes ou des colonnes sp&#233;cifiques si le jeu de donn&#233;es est dans un format ad&#233;quat, de pr&#233;f&#233;rence de type <code rend="inline">data.frame</code>. Chargez le jeu de donn&#233;es <code rend="inline">mtcars</code> dans la console et affichez son type avec la fonction <code rend="inline">class()</code>&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_21" corresp="code_analyse-donnees-tabulaires-R_21.txt" rend="block"/></ab>
-<p>Affichez le contenu de ce jeu de donn&#233;es&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_22" corresp="code_analyse-donnees-tabulaires-R_22.txt" rend="block"/></ab>
-<p>Ce <ref target="https://perma.cc/8UPR-C52G">jeu de donn&#233;es</ref> fournit un aper&#231;u des tests r&#233;alis&#233;s sur des voitures (<emph>Motor Trend Car Road Tests</emph>) par le magazine <emph>Motor Trend</emph> en 1974 <ref type="footnotemark" target="#note_2"/>. Il contient plusieurs informations, dont le nombre de miles qu&#8217;une voiture peut parcourir avec un gallon US de carburant (un gallon correspond &#224; 3,78&#160;litres et un mile &#224; 1,61&#160;kilom&#232;tre), le nombre de cylindres de chaque mod&#232;le, son nombre de chevaux, sa puissance, son poids, le rapport de l&#8217;essieu arri&#232;re, et d&#8217;autres caract&#233;ristiques. Ces donn&#233;es peuvent &#234;tre utilis&#233;es pour savoir quelles caract&#233;ristiques ont rendu chaque mod&#232;le plus ou moins fiable au fil du temps.</p>
-<p>Vous pouvez s&#233;lectionner des colonnes en saisissant le nom du jeu de donn&#233;es suivi de crochets et du num&#233;ro de la ligne ou de la colonne qui vous int&#233;resse. Ainsi, dans l&#8217;expression <code rend="inline">dataset[x,y]</code>, <code rend="inline">dataset</code> correspond au jeu de donn&#233;es avec lequel vous travaillez, <code rend="inline">x</code> est la ligne et <code rend="inline">y</code> est la colonne.</p>
-<p>Si vous voulez visualiser la premi&#232;re ligne du jeu de donn&#233;es <code rend="inline">mtcars</code>, il faut &#233;crire ceci dans la console&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_23" corresp="code_analyse-donnees-tabulaires-R_23.txt" rend="block"/></ab>
-<p>Pour afficher le contenu d&#8217;une colonne, ici la deuxi&#232;me, &#233;crivez&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_24" corresp="code_analyse-donnees-tabulaires-R_24.txt" rend="block"/></ab>
-<p>Vous obtenez ainsi toutes les valeurs de la cat&#233;gorie <code rend="inline">cyl</code>, ou &#171;&#160;cylindre&#160;&#187;. On constate que la plupart des mod&#232;les de voitures ont des moteurs &#224; quatre, six ou huit cylindres. Vous pouvez &#233;galement s&#233;lectionner une seule observation en pr&#233;cisant une valeur pour <code rend="inline">x</code> (la ligne) et une valeur pour <code rend="inline">y</code> (la colonne)&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_25" corresp="code_analyse-donnees-tabulaires-R_25.txt" rend="block"/></ab>
-<p>R renvoie l&#8217;observation situ&#233;e dans la premi&#232;re ligne et la deuxi&#232;me colonne. Gr&#226;ce &#224; cette technique de s&#233;lection des donn&#233;es, vous pouvez obtenir le r&#233;sum&#233; statistique d&#8217;une ligne ou d&#8217;une colonne sans avoir &#224; compter le nombre d&#8217;observations dans le jeu de donn&#233;es. Par exemple, <code rend="inline">summary(mtcars[,1])</code> renvoie le r&#233;sum&#233; statistique de la colonne <code rend="inline">mpg</code> (nombre de miles par gallon) pour toutes les voitures du jeu de donn&#233;es <code rend="inline">mtcars</code>&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_26" corresp="code_analyse-donnees-tabulaires-R_26.txt" rend="block"/></ab>
-<p>Le r&#233;sum&#233; statistique indique que la voiture qui consomme le moins est la Toyota Corolla, avec 33,9&#160;miles par gallon, et que la voiture la plus gourmande en carburant est la Lincoln Continental, qui permet seulement de parcourir 10,4&#160;miles par gallon. Pour identifier les voitures correspondant aux valeurs, il suffit de regarder le tableau de donn&#233;es. Cette m&#233;thode est bien plus pratique pour trouver une valeur rapidement que d&#8217;essayer de faire le calcul dans sa t&#234;te ou de fouiller la feuille de calcul d&#8217;un tableur.</p>
-</div>
-      <div type="2"><head>Data frames</head>
-<p>Maintenant que vous comprenez mieux les fonctions de base de R, vous pouvez vous en servir pour analyser vos propres donn&#233;es. Pour les jeux de donn&#233;es de petite taille, vous pouvez cr&#233;er vos propres tableaux de donn&#233;es, ou &#171;&#160;data frames&#160;&#187;. Savoir construire des tableaux est tr&#232;s utile car si vous avez peu de donn&#233;es vous pouvez simplement en cr&#233;er un au lieu d&#8217;importer un fichier CSV. Le plus simple, pour construire un data frame, est de cr&#233;er au moins deux variables, ou vecteurs, et de les associer. Nous allons en cr&#233;er un avec des donn&#233;es qui se trouvent sur le site d&#8217;Old Bailey, la Cour centrale de la Couronne britannique&#160;:</p>
-<figure><desc>Figure 2. Le jeu de donn&#233;es des affaires p&#233;nales d&#8217;[Old Bailey](https://www.oldbaileyonline.org/) par d&#233;cennie, de 1670 &#224; 1800.</desc><graphic url="fr-tr-analyse-donnees-tabulaires-R-2.png"/></figure>
-<p>Le site d&#8217;Old Bailey fournit des statistiques et des informations sur les affaires p&#233;nales trait&#233;es par la Cour centrale de la Couronne britannique entre 1674 et 1913. On pourrait par exemple analyser le nombre d&#8217;infractions de vol et de vol avec violence pour les d&#233;cennies comprises entre 1670 &#224; 1710 en pla&#231;ant les valeurs dans un data frame.</p>
-<p>Commen&#231;ons par cr&#233;er les variables <code rend="inline">Vols</code> et <code rend="inline">VolsAvecViolence</code>, en indiquant les valeurs correspondant &#224; chaque d&#233;cennie&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_27" corresp="code_analyse-donnees-tabulaires-R_27.txt" rend="block"/></ab>
-<p>Pour cr&#233;er un data frame, on utilise la fonction <code rend="inline">data.frame()</code>, qui permet de juxtaposer les valeurs de plusieurs vecteurs de m&#234;me taille. Nous allons associer les variables <code rend="inline">Vols</code>et <code rend="inline">VolsAvecViolence</code> dans l&#8217;objet <code rend="inline">Crimes</code> ci-dessous&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_28" corresp="code_analyse-donnees-tabulaires-R_28.txt" rend="block"/></ab>
-<p>La fonction <code rend="inline">t()</code> permet de &#171;&#160;transposer&#160;&#187; le data frame, c&#8217;est-&#224;-dire de transformer les lignes en colonnes et vice versa&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_29" corresp="code_analyse-donnees-tabulaires-R_29.txt" rend="block"/></ab>
-<p>Maintenant que nous avons notre data frame, nous pouvons afficher le contenu des variables en indiquant le nom du data frame suivi de l&#8217;op&#233;rateur <code rend="inline">$</code>et du du nom de la colonne d&#233;sir&#233;e&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_30" corresp="code_analyse-donnees-tabulaires-R_30.txt" rend="block"/></ab>
-<p>Nous pouvons effectuer des calculs, en calculant par exemple le nombre total de vols&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_31" corresp="code_analyse-donnees-tabulaires-R_31.txt" rend="block"/></ab>
-<p>Le nombre total d&#8217;infractions de vol et de vol avec violence&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_32" corresp="code_analyse-donnees-tabulaires-R_32.txt" rend="block"/></ab>
-<p>Ou bien le nombre moyen de vols avec violence par d&#233;cennie&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_33" corresp="code_analyse-donnees-tabulaires-R_33.txt" rend="block"/></ab>
-<p>La fonction <code rend="inline">apply()</code> permet d&#8217;ex&#233;cuter la m&#234;me fonction sur chaque ligne ou colonne d&#8217;un data frame. Elle prend trois arguments&#160;: le nom du data frame , <code rend="inline">1</code> pour appliquer la fonction sur les lignes ou <code rend="inline">2</code> sur les colonnes, et enfin le nom de la fonction que l&#8217;on veut ex&#233;cuter sur le data frame&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_34" corresp="code_analyse-donnees-tabulaires-R_34.txt" rend="block"/></ab>
-<p>L&#8217;exemple ci-dessus montre comment utiliser la fonction <code rend="inline">apply()</code> sur le data frame <code rend="inline">Crimes</code> pour calculer la moyenne de chaque ligne, afin de connaitre le nombre moyen de l&#8217;ensemble des vols (avec ou sans violence) commis pendant chaque d&#233;cennie. Pour obtenir la moyenne de chaque colonne, il faut indiquer <code rend="inline">2</code> &#224; la place de <code rend="inline">1</code> dans la fonction&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_35" corresp="code_analyse-donnees-tabulaires-R_35.txt" rend="block"/></ab>
-<p>Le r&#233;sultat indique le nombre moyen de vols et le nombre moyen de vols avec violence entre 1670 &#224; 1710.</p>
-<h4>Mise en pratique</h4>
-<list type="ordered">
-<item>Cr&#233;ez deux variables intitul&#233;es <code rend="inline">ViolationsPaix</code>, contenant les valeurs <code rend="inline">2,3,3</code>,  et <code rend="inline">Meurtres</code>, contenant les valeurs <code rend="inline">44,51,1</code>. Elles indiquent le nombre de <hi rend="bold">Breaking Peace</hi> (Violations de la Paix) &#8212; une cat&#233;gorie qui comprend diverses infractions comme les agressions, menaces et <ref target="https://fr.wikipedia.org/wiki/Voie_de_fait">voies de fait</ref>) &#8212; et le nombre de meurtres entre 1710 et 1730, selon le tableau d&#8217;Old Bailey pr&#233;sent&#233; plus haut. </item>
-<item>Utilisez la fonction <code rend="inline">data.frame()</code> pour combiner <code rend="inline">ViolationsPaix</code> et <code rend="inline">Meurtres</code> dans un data frame que vous appellerez <code rend="inline">Crimes3</code>. Affichez le data frame.</item>
-<item>Calculez la moyenne de chaque colonne du data frame cr&#233;&#233; dans la question 2 en utilisant la fonction <code rend="inline">apply()</code>.</item>
-</list>
-<h4>Solutions</h4>
-<list type="ordered">
-<item>
+                </list>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_37" corresp="code_analyse-donnees-tabulaires-R_37.txt" rend="block"/>
+                </ab>
+                <list type="ordered">
+                    <item>
 </item>
-</list>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_36" corresp="code_analyse-donnees-tabulaires-R_36.txt" rend="block"/></ab>
-<list start="2" type="ordered">
-<item>
-</item>
-</list>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_37" corresp="code_analyse-donnees-tabulaires-R_37.txt" rend="block"/></ab>
-<list start="3" type="ordered">
-<item>
-</item>
-</list>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_38" corresp="code_analyse-donnees-tabulaires-R_38.txt" rend="block"/></ab>
-<p>Cr&#233;er un data frame soi-m&#234;me peut &#234;tre utile quand on a peu de donn&#233;es. Toutefois, ce n&#8217;est pas toujours la meilleure solution car cela peut &#234;tre fastidieux. Il est parfois plus pratique de cr&#233;er un fichier avec un tableur comme Excel ou Open Office. Vous pourrez ainsi vous assurer que toutes les informations que vous voulez analyser sont organis&#233;es correctement, puis importer le fichier dans R.</p>
-</div>
-      <div type="2"><head>Charger votre propre jeu de donn&#233;es dans R</head>
-<p>Maintenant que vous vous &#234;tes entrain&#233;&#183;e avec des donn&#233;es simples, vous pouvez commencer &#224; travailler avec vos propres donn&#233;es. Celles-ci se trouvent sans doute sur une feuille de calcul cr&#233;&#233;e avec un tableur. Comment les charger dans R&#8239;? Il y a plusieurs solutions. Tout d&#8217;abord, vous pouvez charger une feuille de calcul Excel directement dans R. Il est &#233;galement possible d&#8217;importer un fichier CSV ou TXT dans R.</p>
-<p>Pour charger directement un fichier Excel dans la console de R, il faut d&#8217;abord avoir install&#233; le package <code rend="inline">readxl</code> en tapant <code rend="inline">install.packages("readxl")</code> dans la console puis en appuyant sur <emph>Entr&#233;e</emph>. Vous devrez ensuite charger le package, ce que vous pouvez faire de deux fa&#231;ons&#160;: en entrant <code rend="inline">library(readxl)</code> dans la console, ou en cliquant sur <hi rend="bold">Gestionnaire de packages</hi> dans l&#8217;onglet <hi rend="bold">Packages &amp; Donn&#233;es</hi> du menu de R et cochant la case situ&#233;e &#224; gauche du package <code rend="inline">readxl</code>. Ensuite, vous pourrez s&#233;lectionner un fichier et le charger dans R. Voici un exemple qui montre comment faire&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_39" corresp="code_analyse-donnees-tabulaires-R_39.txt" rend="block"/></ab>
-<p>Apr&#232;s la commande <code rend="inline">read_excel</code>, indiquez le nom de votre fichier dans les parenth&#232;ses, en le mettant entre guillemets. Les nombres ci-dessus correspondent aux donn&#233;es entr&#233;es dans mon fichier. On peut voir que les lignes sont num&#233;rot&#233;es et que les colonnes ont le nom que je leur ai donn&#233; dans ma feuille de calcul Excel.</p>
-<p>Quand vous chargez des donn&#233;es dans R, assurez-vous que votre fichier se trouve bien dans le r&#233;pertoire de travail de votre ordinateur. Pour le v&#233;rifier vous pouvez utiliser la fonction <code rend="inline">dir()</code>, qui affiche la liste des fichiers et des sous-r&#233;pertoires du r&#233;pertoire de travail, ou la fonction <code rend="inline">getwd()</code>, qui renvoie le chemin du r&#233;pertoire de travail. Vous pouvez changer le r&#233;pertoire de travail en allant sur l&#8217;onglet <hi rend="bold">Divers</hi> du menu de R, puis en cliquant sur <hi rend="bold">Changer de R&#233;pertoire de Travail</hi> et en s&#233;lectionnant le r&#233;pertoire de votre choix. Si le fichier que vous voulez charger n&#8217;est pas dans le r&#233;pertoire de travail, R ne pourra pas le trouver.</p>
-<p>On peut &#233;galement charger des fichiers CSV dans R, ce qui est la m&#233;thode la plus commun&#233;ment utilis&#233;e. Un fichier <ref target="https://fr.wikipedia.org/wiki/Comma-separated_values">CSV</ref>, ou &#171;&#160;comma-separated values&#160;&#187; (valeurs s&#233;par&#233;es par des virgules), est un fichier contenant des donn&#233;es tabulaires et dans lequel les virgules correspondent aux s&#233;parations entre les colonnes. Vous pouvez enregistrer tous les documents Excel au format <code rend="inline">.csv</code> et ensuite les charger dans R. Pour ce faire, il faut donner un nom &#224; votre fichier en utilisant la commande <code rend="inline">&lt;-</code> et l&#8217;expression <code rend="inline">read.csv(file="nom-du-fichier.csv", header=TRUE, sep=",")</code> dans la console. <code rend="inline">nom-du-fichier</code> indique &#224; R quel fichier ouvrir et l&#8217;argument <code rend="inline">header=TRUE</code> pr&#233;cise que la premi&#232;re ligne est compos&#233;e des noms des colonnes et non d&#8217;observations. <code rend="inline">sep</code> signifie que les valeurs sont s&#233;par&#233;es par des virgules.</p>
-<p>Il est important de noter ici que les tableurs configur&#233;s en langue fran&#231;aise utilisent g&#233;n&#233;ralement des points-virgules pour s&#233;parer les colonnes et non des virgules. Pourquoi&#8239;? Parce qu&#8217;en fran&#231;ais les virgules servent &#224; s&#233;parer les d&#233;cimales. Si vous utilisez la fonction ci-dessus, vous risquez de ne pas pouvoir charger votre fichier correctement. Il y a deux solutions simples&#160;: utiliser la fonction <code rend="inline">read.csv()</code> en indiquant le point-virgule comme s&#233;parateur (<code rend="inline">read.csv(file="nom-du-fichier.csv",header=TRUE,sep=";")</code>) ou utiliser la fonction <code rend="inline">read.csv2()</code> de la fa&#231;on suivante&#160;: <code rend="inline">read.csv(file="nom-du-fichier.csv")</code>. Enfin, si votre fichier comporte des nombres avec d&#233;cimales s&#233;par&#233;es par des virgules, il faudra remplacer les virgules par des points avant d&#8217;ouvrir votre fichier (par exemple en utilisant la fonctionnalit&#233; <hi rend="bold">Rechercher et Remplacer</hi>. Sinon, R consid&#232;rera les nombres comme du texte.</p>
-<p>Un fichier CSV peut contenir de tr&#232;s nombreuses donn&#233;es, mais nous allons faire simple pour commencer. Nous allons cr&#233;er un fichier CSV, avec Excel ou tout autre tableur, en utilisant les donn&#233;es d&#8217;Old Bailey utilis&#233;es dans la section sur les data frames. On a besoin de trois colonnes&#160;: une colonne <hi rend="bold">Date</hi> qui indique les d&#233;cennies 1710, 1720 et 1730, une colonne <hi rend="bold">ViolationsPaix</hi> qui indique le nombre de violations de la paix (<hi rend="bold">Breaking Peace</hi> dans le tableau de donn&#233;es d'Old Bailey) et une colonne <hi rend="bold">Meurtres</hi> qui indique le nombre de meurtres (<hi rend="bold">Killing</hi>*) correspondant &#224; chaque d&#233;cennie. </p>
-<p>Enregistrez le fichier au format CSV (et non CSV2) en lui donnant le nom <code rend="inline">OldBailey.csv</code>. Puis, chargez les donn&#233;es dans R en suivant les explications ci-dessus. Normalement, vous devriez voir ceci&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_40" corresp="code_analyse-donnees-tabulaires-R_40.txt" rend="block"/></ab>
-<p>Vous pouvez maintenant acc&#233;der aux donn&#233;es dans R et effectuer les calculs de votre choix. Les fichiers CSV peuvent &#234;tre bien plus complexes que l&#8217;exemple fourni ci-dessus, bien entendu, et ils peuvent tous &#234;tre ouverts dans R.</p>
-<p>Les fichiers TXT (ou fichiers texte brut) peuvent &#234;tre import&#233;s dans R d&#8217;une fa&#231;on similaire aux fichiers CSV&#160;: utilisez la fonction <code rend="inline">read.table()</code>, avec la m&#234;me syntaxe que pour la fonction <code rend="inline">read.csv</code>.</p>
-</div>
-      <div type="2"><head>Enregistrer des donn&#233;es dans R</head>
-<p>Vous savez d&#233;sormais comment charger des donn&#233;es dans R et vous avez des bases vous permettant de les analyser. Vous pouvez sauvegarder vos donn&#233;es sous un autre format, en utilisant par exemple la fonction <code rend="inline">write.csv()</code> pour cr&#233;er un fichier CSV.  </p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_41" corresp="code_analyse-donnees-tabulaires-R_41.txt" rend="block"/></ab>
-<p>Il est &#233;galement possible de cr&#233;er un fichier Excel avec la fonction <code rend="inline">write.xlsx()</code>. Installez le package <code rend="inline">xlsx</code>, chargez-le dans R et cr&#233;ez un fichier Excel avec les donn&#233;es d&#8217;Old Bailey&#160;:</p>
-<ab><code xml:id="code_analyse-donnees-tabulaires-R_42" corresp="code_analyse-donnees-tabulaires-R_42.txt" rend="block"/></ab>
-</div>
-      <div type="2"><head>Conclusion et autres ressources</head>
-<p>Ce tutoriel vous a pr&#233;sent&#233; les bases de R pour travailler avec des donn&#233;es tabulaires. R est un outil tr&#232;s utile pour la recherche en sciences humaines et sociales, notamment parce qu&#8217;il permet de cr&#233;er des analyses reproductibles et d&#8217;analyser des donn&#233;es rapidement, sans mettre en place un syst&#232;me complexe. Maintenant que vous avez quelques bases, vous pouvez explorer les autres fonctions de R pour faire des analyses statistiques, r&#233;aliser des graphiques et cr&#233;er vos propres fonctions.</p>
-<p>Pour en savoir plus sur R, consultez le <ref target="https://cran.r-project.org/doc/manuals/r-release/R-intro.html">manuel de R</ref> (en anglais).</p>
-<p>Vous trouverez en ligne de nombreux tutoriels sur R. Nous vous conseillons&#160;:</p>
-<list type="unordered">
-<item><ref target="http://web.archive.org/web/20191015004305/https://www.nceas.ucsb.edu/files/scicomp/Dloads/RProgramming/BestFirstRTutorial.pdf">R: A self-learn tutorial</ref> (en anglais). Ce tutoriel passe en revue plusieurs fonctions et propose des exercices pour s&#8217;entrainer.</item>
-<item><ref target="https://www.datacamp.com/courses/introduction-a-r">Introduction &#224; R</ref>. Cours propos&#233; par le site Datacamp qui vous permet de vous entrainer en ligne (gratuit, mais il faut s&#8217;inscrire pour y acc&#233;der). Les exercices interactifs permettent d&#8217;identifier vos erreurs et d&#8217;apprendre &#224; &#233;crire du code plus efficacement.</item>
-<item><ref target="https://r.developpez.com/tutoriels/r/debutants/#Lno-I">R pour les d&#233;butants</ref>. &#201;crit par Emmanuel Paradis, il s&#8217;agit d&#8217;un des premiers manuels francophones d&#8217;introduction &#224; R.</item>
-<item>L&#8217;ouvrage <ref target="https://dh-r.lincolnmullen.com/">Computational Historical Thinking</ref>. &#201;crit par Lincoln A. Mullen, c&#8217;est une ressource pr&#233;cieuse pour les historiennes et historiens qui souhaitent utiliser R pour faire leurs travaux de recherche.  </item>
-</list>
-</div>
-      <div type="2"><head>Notes</head>
-<p><ref type="footnotemark" target="#note_1"/> : Box, Jenkins and Reinsel (1976), <emph>Time Series Analysis, Forecasting and Control</emph>. Third Edition. Holden-Day. Series G.
-<ref type="footnotemark" target="#note_2"/> : Henderson and Velleman (1981), <emph>Building multiple regression models interactively</emph>. Biometrics, 37, 391&#208;411.</p>
-</div>
-    </body>
-  </text>
+                </list>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_38" corresp="code_analyse-donnees-tabulaires-R_38.txt" rend="block"/>
+                </ab>
+                <p>Créer un data frame soi-même peut être utile quand on a peu de données. Toutefois, ce n’est pas toujours la meilleure solution car cela peut être fastidieux. Il est parfois plus pratique de créer un fichier avec un tableur comme Excel ou Open Office. Vous pourrez ainsi vous assurer que toutes les informations que vous voulez analyser sont organisées correctement, puis importer le fichier dans R.</p>
+            </div>
+            <div type="2">
+                <head>Charger votre propre jeu de données dans R</head>
+                <p>Maintenant que vous vous êtes entrainé·e avec des données simples, vous pouvez commencer à travailler avec vos propres données. Celles-ci se trouvent sans doute sur une feuille de calcul créée avec un tableur. Comment les charger dans R ? Il y a plusieurs solutions. Tout d’abord, vous pouvez charger une feuille de calcul Excel directement dans R. Il est également possible d’importer un fichier CSV ou TXT dans R.</p>
+                <p>Pour charger directement un fichier Excel dans la console de R, il faut d’abord avoir installé le package <code rend="inline">readxl</code> en tapant <code rend="inline">install.packages("readxl")</code> dans la console puis en appuyant sur <emph>Entrée</emph>. Vous devrez ensuite charger le package, ce que vous pouvez faire de deux façons : en entrant <code rend="inline">library(readxl)</code> dans la console, ou en cliquant sur <hi rend="bold">Gestionnaire de packages</hi> dans l’onglet <hi rend="bold">Packages &amp; Données</hi> du menu de R et cochant la case située à gauche du package <code rend="inline">readxl</code>. Ensuite, vous pourrez sélectionner un fichier et le charger dans R. Voici un exemple qui montre comment faire :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_39" corresp="code_analyse-donnees-tabulaires-R_39.txt" rend="block"/>
+                </ab>
+                <p>Après la commande <code rend="inline">read_excel</code>, indiquez le nom de votre fichier dans les parenthèses, en le mettant entre guillemets. Les nombres ci-dessus correspondent aux données entrées dans mon fichier. On peut voir que les lignes sont numérotées et que les colonnes ont le nom que je leur ai donné dans ma feuille de calcul Excel.</p>
+                <p>Quand vous chargez des données dans R, assurez-vous que votre fichier se trouve bien dans le répertoire de travail de votre ordinateur. Pour le vérifier vous pouvez utiliser la fonction <code rend="inline">dir()</code>, qui affiche la liste des fichiers et des sous-répertoires du répertoire de travail, ou la fonction <code rend="inline">getwd()</code>, qui renvoie le chemin du répertoire de travail. Vous pouvez changer le répertoire de travail en allant sur l’onglet <hi rend="bold">Divers</hi> du menu de R, puis en cliquant sur <hi rend="bold">Changer de Répertoire de Travail</hi> et en sélectionnant le répertoire de votre choix. Si le fichier que vous voulez charger n’est pas dans le répertoire de travail, R ne pourra pas le trouver.</p>
+                <p>On peut également charger des fichiers CSV dans R, ce qui est la méthode la plus communément utilisée. Un fichier <ref target="https://fr.wikipedia.org/wiki/Comma-separated_values">CSV</ref>, ou « comma-separated values » (valeurs séparées par des virgules), est un fichier contenant des données tabulaires et dans lequel les virgules correspondent aux séparations entre les colonnes. Vous pouvez enregistrer tous les documents Excel au format <code rend="inline">.csv</code> et ensuite les charger dans R. Pour ce faire, il faut donner un nom à votre fichier en utilisant la commande <code rend="inline">&lt;-</code> et l’expression <code rend="inline">read.csv(file="nom-du-fichier.csv", header=TRUE, sep=",")</code> dans la console. <code rend="inline">nom-du-fichier</code> indique à R quel fichier ouvrir et l’argument <code rend="inline">header=TRUE</code> précise que la première ligne est composée des noms des colonnes et non d’observations. <code rend="inline">sep</code> signifie que les valeurs sont séparées par des virgules.</p>
+                <p>Il est important de noter ici que les tableurs configurés en langue française utilisent généralement des points-virgules pour séparer les colonnes et non des virgules. Pourquoi ? Parce qu’en français les virgules servent à séparer les décimales. Si vous utilisez la fonction ci-dessus, vous risquez de ne pas pouvoir charger votre fichier correctement. Il y a deux solutions simples : utiliser la fonction <code rend="inline">read.csv()</code> en indiquant le point-virgule comme séparateur (<code rend="inline">read.csv(file="nom-du-fichier.csv",header=TRUE,sep=";")</code>) ou utiliser la fonction <code rend="inline">read.csv2()</code> de la façon suivante : <code rend="inline">read.csv(file="nom-du-fichier.csv")</code>. Enfin, si votre fichier comporte des nombres avec décimales séparées par des virgules, il faudra remplacer les virgules par des points avant d’ouvrir votre fichier (par exemple en utilisant la fonctionnalité <hi rend="bold">Rechercher et Remplacer</hi>. Sinon, R considèrera les nombres comme du texte.</p>
+                <p>Un fichier CSV peut contenir de très nombreuses données, mais nous allons faire simple pour commencer. Nous allons créer un fichier CSV, avec Excel ou tout autre tableur, en utilisant les données d’Old Bailey utilisées dans la section sur les data frames. On a besoin de trois colonnes : une colonne <hi rend="bold">Date</hi> qui indique les décennies 1710, 1720 et 1730, une colonne <hi rend="bold">ViolationsPaix</hi> qui indique le nombre de violations de la paix (<hi rend="bold">Breaking Peace</hi> dans le tableau de données d'Old Bailey) et une colonne <hi rend="bold">Meurtres</hi> qui indique le nombre de meurtres (<hi rend="bold">Killing</hi>*) correspondant à chaque décennie. </p>
+                <p>Enregistrez le fichier au format CSV (et non CSV2) en lui donnant le nom <code rend="inline">OldBailey.csv</code>. Puis, chargez les données dans R en suivant les explications ci-dessus. Normalement, vous devriez voir ceci :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_40" corresp="code_analyse-donnees-tabulaires-R_40.txt" rend="block"/>
+                </ab>
+                <p>Vous pouvez maintenant accéder aux données dans R et effectuer les calculs de votre choix. Les fichiers CSV peuvent être bien plus complexes que l’exemple fourni ci-dessus, bien entendu, et ils peuvent tous être ouverts dans R.</p>
+                <p>Les fichiers TXT (ou fichiers texte brut) peuvent être importés dans R d’une façon similaire aux fichiers CSV : utilisez la fonction <code rend="inline">read.table()</code>, avec la même syntaxe que pour la fonction <code rend="inline">read.csv</code>.</p>
+            </div>
+            <div type="2">
+                <head>Enregistrer des données dans R</head>
+                <p>Vous savez désormais comment charger des données dans R et vous avez des bases vous permettant de les analyser. Vous pouvez sauvegarder vos données sous un autre format, en utilisant par exemple la fonction <code rend="inline">write.csv()</code> pour créer un fichier CSV.  </p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_41" corresp="code_analyse-donnees-tabulaires-R_41.txt" rend="block"/>
+                </ab>
+                <p>Il est également possible de créer un fichier Excel avec la fonction <code rend="inline">write.xlsx()</code>. Installez le package <code rend="inline">xlsx</code>, chargez-le dans R et créez un fichier Excel avec les données d’Old Bailey :</p>
+                <ab>
+                    <code xml:id="code_analyse-donnees-tabulaires-R_42" corresp="code_analyse-donnees-tabulaires-R_42.txt" rend="block"/>
+                </ab>
+            </div>
+            <div type="2">
+                <head>Conclusion et autres ressources</head>
+                <p>Ce tutoriel vous a présenté les bases de R pour travailler avec des données tabulaires. R est un outil très utile pour la recherche en sciences humaines et sociales, notamment parce qu’il permet de créer des analyses reproductibles et d’analyser des données rapidement, sans mettre en place un système complexe. Maintenant que vous avez quelques bases, vous pouvez explorer les autres fonctions de R pour faire des analyses statistiques, réaliser des graphiques et créer vos propres fonctions.</p>
+                <p>Pour en savoir plus sur R, consultez le <ref target="https://cran.r-project.org/doc/manuals/r-release/R-intro.html">manuel de R</ref> (en anglais).</p>
+                <p>Vous trouverez en ligne de nombreux tutoriels sur R. Nous vous conseillons :</p>
+                <list type="unordered">
+                    <item>
+                        <ref target="http://web.archive.org/web/20191015004305/https://www.nceas.ucsb.edu/files/scicomp/Dloads/RProgramming/BestFirstRTutorial.pdf">R: A self-learn tutorial</ref> (en anglais). Ce tutoriel passe en revue plusieurs fonctions et propose des exercices pour s’entrainer.</item>
+                    <item>
+                        <ref target="https://www.datacamp.com/courses/introduction-a-r">Introduction à R</ref>. Cours proposé par le site Datacamp qui vous permet de vous entrainer en ligne (gratuit, mais il faut s’inscrire pour y accéder). Les exercices interactifs permettent d’identifier vos erreurs et d’apprendre à écrire du code plus efficacement.</item>
+                    <item>
+                        <ref target="https://r.developpez.com/tutoriels/r/debutants/#Lno-I">R pour les débutants</ref>. Écrit par Emmanuel Paradis, il s’agit d’un des premiers manuels francophones d’introduction à R.</item>
+                    <item>L’ouvrage <ref target="https://dh-r.lincolnmullen.com/">Computational Historical Thinking</ref>. Écrit par Lincoln A. Mullen, c’est une ressource précieuse pour les historiennes et historiens qui souhaitent utiliser R pour faire leurs travaux de recherche.  </item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Notes</head>
+                <p>
+                    <ref type="footnotemark" target="#fr_note_1"/> : Box, Jenkins and Reinsel (1976), <emph>Time Series Analysis, Forecasting and Control</emph>. Third Edition. Holden-Day. Series G.
+<ref type="footnotemark" target="#fr_note_2"/> : Henderson and Velleman (1981), <emph>Building multiple regression models interactively</emph>. Biometrics, 37, 391Ð411.</p>
+            </div>
+        </body>
+    </text>
 </TEI>

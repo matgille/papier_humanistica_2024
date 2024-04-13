@@ -1,283 +1,486 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="visualizing-with-bokeh">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Visualizing Data with Bokeh and Pandas</title>
-  <author role="original_author">Charlie Harper</author><editor role="reviewers"><persName>Zoe LeBlanc</persName><persName>Ben Schmidt</persName></editor><editor role="editors"><persName>James Baker</persName><persName>Ian Milligan</persName></editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phen0081</idno><date type="published">07/27/2018</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. This lesson is original.</p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>In this lesson you will learn how to visually explore and present data in Python by using the Bokeh and Pandas libraries.</p></abstract><textClass><keywords><term xml:lang="en">python</term><term xml:lang="en">data-manipulation</term><term xml:lang="en">mapping</term><term xml:lang="en">data-visualization</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="en">
-    <body>
-      <div type="2"><head>Contents</head>
-</div>
-      <div type="2"><head>Overview</head>
-<p>The ability to load raw data, sample it, and then visually explore and present it is a valuable skill across disciplines. In this tutorial, you will learn how to do this in Python by using the Bokeh and Pandas libraries. Specifically, we will work through visualizing and exploring aspects of WWII bombing runs conducted by Allied powers.</p>
-<p>At the end of the lesson you will be able to:</p>
-<list type="unordered">
-<item>Load tabular CSV data</item>
-<item>Perform basic data manipulation, such as aggregating and sub-sampling raw data</item>
-<item>Visualize quantitative, categorical, and geographic data for web display</item>
-<item>Add varying types of interactivity to your visualizations</item>
-</list>
-<p>To reach these goals, we'll work through a variety of visualization examples using THOR, a dataset that describes historical bombing operations.</p>
-<div type="3"><head>The WWII THOR Dataset</head>
-<p>The Theater History of Operations Reports (THOR) lists aerial bombing operations during World War I, World War II, the Korean War, and the Vietnam War undertaken by the United States and Allied Powers. The records were compiled from declassified documents by Lt. Col. Jenns Robertson. THOR is made publicly available through a partnership between the US Department of Defense and <ref target="https://data.world/datamil">data.world</ref>.</p>
-<p>Each row in the THOR dataset contains information on a single mission or bombing run. This information can include the mission date, takeoff and target locations, the target type, aircraft involved, and the types and weights of bombs dropped on the target. The <ref target="https://data.world/datamil/thor-data-dictionary">THOR data dictionary</ref> provides detailed information on the structure of the dataset.</p>
-<p>For this tutorial, we'll use a modified version of the WWII THOR dataset. The original, full-version of the dataset consists of 62 columns of information digitized from the paper forms. To make this dataset more manageable for our purposes, this has been reduced to 19 columns that include core mission information and bombing data. These columns are discussed below when we first load the data. The unabridged dataset is available for download <ref target="https://data.world/datamil/world-war-ii-thor-data">here</ref>.</p>
-<p>The dataset used in this tutorial is contained in <ref target="https://github.com/programminghistorian/ph-submissions/tree/gh-pages/assets/visualizing-with-bokeh/thor_wwii.csv">thor_wwii.csv</ref>. This file is required to complete most of the examples below.</p>
-<p>We'll use Bokeh and Pandas to address some of the following questions:</p>
-<list type="unordered">
-<item>What types and weights of munitions were dropped during World War II (WWII)? What patterns can we discern in the use of different types of munitions?</item>
-<item>How did the types and weights of munitions dropped change over the course of WWII? How do these changes correspond to major military events?</item>
-<item>What targets were munitions dropped on during the war? Were particular types of munitions limited to certain theaters of operations or targets?</item>
-</list>
-</div><div type="3"><head>Other Possible Datasets</head>
-<p>If this dataset doesn't fit your interests or if you'd like more practice after completing this tutorial, here are a few other interesting datasets that you might wish to use with Bokeh and Pandas:</p>
-<list type="unordered">
-<item>
-<p><ref target="https://data.world/history/scottish-witchcraft/">Scottish Witchcraft Trials</ref>: A multi-table set of data on over 4,000 people accused of witchcraft between 1536 and 1736.</p>
-</item>
-<item>
-<p><ref target="https://data.world/history/civil-unrest-event-data">Civil Unrest Events</ref>: A single table cataloging over 60,000 events of civil unrest across the world since the end of World War II.</p>
-</item>
-<item>
-<p><ref target="https://www.slavevoyages.org/voyage/database">Trans-Atlantic Slave Trade Database</ref>: Searchable and customizable tabular data on 36,000 slaving voyages that transported over 10 million slaves from the 16th to 19th centuries.</p>
-</item>
-</list>
-<p>All three datasets contain comparable quantitative, qualitative, and temporal data to those found in the THOR dataset. The Civil Unrest Events and Trans-Atlantic Slave Trade datasets both contain spatial data, though this is lacking from the Scottish Witchcraft Trials data.</p>
-</div></div>
-      <div type="2"><head>Getting Started</head>
-<div type="3"><head>Prerequisites</head>
-<p>This tutorial can be completed using any operating systems. It requires Python 3 and a web browser. You may use any text editor to write your code.</p>
-<p>This tutorial assumes that you have a basic knowledge of the Python language and its associated data structures, particularly lists.</p>
-<p>If you work in Python 2, you will need to create a virtual environment for Python 3, and even if you work in Python 3, creating a virtual environment for this tutorial is good practice.</p>
-</div><div type="3"><head>Creating a Python 3 Virtual Environment</head>
-<p>A Python virutal environment is an isolated environment in which you can install libraries and execute code. Many different virtual evironments can be created to work with different versions of Python and Python libraries. Virtual environments are useful because they ensure you have only the necessary libraries installed and that you do not encounter version conflicts. An additional benefit of virtual environments is that you can pass them to others so that you know your code will execute on another machine.</p>
-<p><ref target="https://conda.io/miniconda.html">Miniconda</ref> is one easy way to create virtual environments that is simple to install across operating systems. You should download Miniconda and follow the instructions for <ref target="https://conda.io/projects/conda/en/stable/user-guide/install/windows.html">Windows</ref>, <ref target="https://conda.io/projects/conda/en/stable/user-guide/install/macos.html">Mac</ref>, or <ref target="https://conda.io/projects/conda/en/stable/user-guide/install/linux.html">Linux</ref> as appropriate for your operating system.</p>
-<p>Once you have downloaded and installed Miniconda for your operating system, you can check that it has installed correctly by opening a command line and typing:</p>
-<ab><code xml:id="code_visualizing-with-bokeh_0" corresp="code_visualizing-with-bokeh_0.txt" lang="language-python" rend="block"/></ab>
-<p>If you see version information similar to the following, then Miniconda has installed correctly.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_1" corresp="code_visualizing-with-bokeh_1.txt" lang="language-python" rend="block"/></ab>
-<p>We'll use Miniconda to create a Python 3 virtual environment named <emph>bokeh-env</emph> for this tutorial. In the command line type the following:</p>
-<ab><code xml:id="code_visualizing-with-bokeh_2" corresp="code_visualizing-with-bokeh_2.txt" lang="language-python" rend="block"/></ab>
-<p>Say 'yes' when you are prompted to install new packages.</p>
-<p>To activate the <emph>bokeh-env</emph> virtual environment, the command differs slightly depending on your operating system.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_3" corresp="code_visualizing-with-bokeh_3.txt" lang="language-python" rend="block"/></ab>
-<p>Your command line should now show that you are in the <emph>bokeh-env</emph> virtual environment.</p>
-<p>When you would like to leave the virtual environment, you can type the command appropriate for your operating system.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_4" corresp="code_visualizing-with-bokeh_4.txt" lang="language-python" rend="block"/></ab>
-</div><div type="3"><head>Installing Packages</head>
-<p>In your activated <emph>bokeh-env</emph> virtual environment, issue the following command to install the python packages for this tutorial.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_5" corresp="code_visualizing-with-bokeh_5.txt" lang="language-python" rend="block"/></ab>
-<p>To get the exact versions used to write this tutorial (note: these may not be the most recent versions of each python package) you can pass the following version numbers to <code rend="inline">pip</code>.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_6" corresp="code_visualizing-with-bokeh_6.txt" lang="language-python" rend="block"/></ab>
-</div><div type="3"><head>Running Code Examples</head>
-<p style="alert alert-info">
-<p>At this point in the lesson, you have a choice of two ways to experiment with "Running Code Examples". You can either proceed in the command line and do the coding by hand, or run the Jupyter notebook provided <ref target="https://github.com/programminghistorian/ph-submissions/tree/gh-pages/assets/visualizing-with-bokeh/visualizing-with-bokeh.ipynb">here</ref>. Beginners who simply want to get a sense of how the code  operates, rather than write it themselves, may find the Jupyter notebook option especially helpful.</p>
-</p>
-<p>It is easiest first to create a single directory and save each code example as a <emph>.py</emph> within it. When you are ready to run the code file, navigate to this directory in your command prompt and make sure your virtual environment is activated. Remember that you can always activate the environment with the following command appropriate for your operating system.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_7" corresp="code_visualizing-with-bokeh_7.txt" lang="language-python" rend="block"/></ab>
-<p>Within the virtual environment, you can run your code by typing:</p>
-<ab><code xml:id="code_visualizing-with-bokeh_8" corresp="code_visualizing-with-bokeh_8.txt" lang="language-python" rend="block"/></ab>
-<p>A Jupyter Notebook containing the code used in this tutorial is also <ref target="https://github.com/programminghistorian/ph-submissions/tree/gh-pages/assets/visualizing-with-bokeh/visualizing-with-bokeh.ipynb">available</ref> in case you prefer to work through the tutorial without installing a virtual environment. You can learn more about Jupyter Notebook <ref target="http://jupyter.org">here</ref>. If you have created a virtual environment using Miniconda, as discussed above, you can install Jupyter Notebook in the environment by typing <code rend="inline">conda install jupyter</code></p>
-</div></div>
-      <div type="2"><head>The Basics of Bokeh</head>
-<div type="3"><head>What is Bokeh?</head>
-<p>Bokeh is a library for creating interactive data visualizations in a web browser. It offers a concise, human-readable syntax, which allows for rapidly presenting data in an aesthetically pleasing manner. If you've worked with visualization in Python before, it's likely that you have used <ref target="https://matplotlib.org">matplotlib</ref>. It's worth briefly mentioning how Bokeh differs from matplotlib, and when one might be preferred to the other.</p>
-<p>Matplotlib has existed since 2002 and has long been a standard of Python data visualization. Bokeh emerged in 2013. This difference in age means that Matplotlib matured long before Bokeh was released; however, in a short period of time, Bokeh has reached a high level of maturity.</p>
-<p>The intended uses of matplotlib and Bokeh are quite different. Matplotlib creates static graphics that are useful for quick and simple visualizations, or for creating publication quality images. Bokeh creates visualizations for display on the web (whether locally or embedded in a webpage) and most importantly, the visualizations are meant to be highly interactive. Matplotlib does not offer either of these features.</p>
-<p>If would you like to visually interact with your data in an exploratory manner or you would like to distribute interactive visual data to a web audience, Bokeh is the library for you! If your main interest is producing finalized visualizations for publication, matplotlib may be better, although Bokeh does offer a way to create static graphics.</p>
-<p>With this differences in mind, as we work through the lesson, I'll emphasize the interactive aspects that make Bokeh useful for exploring and disseminating historical data and that set it apart from other libraries like matplotlib.</p>
-</div><div type="3"><head>Your First Plot</head>
-<p>First, create a new file called <code rend="inline">my_first_plot.py</code> in the same directory as  <code rend="inline">wwii_thor.csv</code> and then open it up in a text editor. We'll be adding lines to this file to run.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_9" corresp="code_visualizing-with-bokeh_9.txt" lang="language-python" rend="block"/></ab>
-<p>To implement and use Bokeh, we first import some basics that we need from the <code rend="inline">bokeh.plotting</code> module.</p>
-<p><code rend="inline">figure</code> is the core object that we will use to create plots. <code rend="inline">figure</code> handles the styling of plots, including title, labels, axes, and grids, and it exposes methods for adding data to the plot. The <code rend="inline">output_file</code> function defines how the visualization will be rendered (namely to an html file) and the <code rend="inline">show</code> function will be invoked when the plot is ready for output. <code rend="inline">show</code> tells Bokeh that all of the data has been added to the plot and it is time to render it.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_10" corresp="code_visualizing-with-bokeh_10.txt" lang="language-python" rend="block"/></ab>
-<p>Bokeh recommends that <code rend="inline">output_file</code>, to which we pass a file name, be called at the start of your script, immediately after imports. An alternative output function to be aware of is <code rend="inline">output_notebook</code> which is used to show plots in-line in a Jupyter Notebook. To learn more about installing and using Jupyter notebooks, see <ref target="https://jupyter.readthedocs.io/en/latest/">Jupyter's documentation</ref>.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_11" corresp="code_visualizing-with-bokeh_11.txt" lang="language-python" rend="block"/></ab>
-<p>Next we'll create some data to plot. Data in Bokeh can take on different forms, but at its simplest, data is just a list of values. We create one list for our x-axis and one for our y-axis.</p>
-<p>With our output format and data fixed, we can instantiate a <code rend="inline">figure</code> and  add the data to it.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_12" corresp="code_visualizing-with-bokeh_12.txt" lang="language-python" rend="block"/></ab>
-<p>{% include alert.html text="<code rend="inline">p</code> is a common variable name for a <code rend="inline">figure</code> object, since a figure is a type of plot." %}</p>
-<p>After instantiating the figure, we call the <code rend="inline">circle</code> , <code rend="inline">line</code>, and <code rend="inline">triangle</code> methods to plot our data. These types of methods are known as a <emph>glyph method</emph>. The term <emph>glyph</emph> in Bokeh refers to the lines, circles, bars, and other shapes that are added to plots to display data.</p>
-<p>If we wanted, we could just keep adding glyphs to the plot! In addition to the <code rend="inline">circle</code>, <code rend="inline">line</code>,   and <code rend="inline">triangle</code> glyphs, there are many others, including:  <code rend="inline">asterisk</code>, <code rend="inline">circle_cross</code>, <code rend="inline">circle_x</code>, <code rend="inline">cross</code>, <code rend="inline">diamond</code>, <code rend="inline">diamond_cross</code>, <code rend="inline">inverted_triangle</code>, <code rend="inline">square</code>, <code rend="inline">square_cross</code>, <code rend="inline">square_x</code>, and <code rend="inline">x</code>.</p>
-<p>When calling a glyph method, at a minimum, we must pass the data we would like to plot, but frequently we might add styling arguments. Here, we set a size, color, and legend name for each glyph.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_13" corresp="code_visualizing-with-bokeh_13.txt" lang="language-python" rend="block"/></ab>
-<p>We will also add our first piece of code that brings some interactivity to the plot. By setting a <code rend="inline">click_policy</code> on our legend, a user can now click on each legend entry (e.g. circle, line, triangle) to show/hide that piece of data! The <code rend="inline">click_policy</code> can also be set to <code rend="inline">mute</code> instead of <code rend="inline">hide</code>. This would mute the color of that data on clicking rather than hide it completely.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_14" corresp="code_visualizing-with-bokeh_14.txt" lang="language-python" rend="block"/></ab>
-<p>Calling <code rend="inline">show</code> and passing the instantiated <code rend="inline">figure</code> will output the results to our html file. Now let's run this code!</p>
-<p>In your command line, make sure you're in the directory where you've saved the file and then run the file with the <code rend="inline">python</code> command.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_15" corresp="code_visualizing-with-bokeh_15.txt" rend="block"/></ab>
-<figure><desc>Plotting a Single Glyph</desc><graphic url="visualizing-with-bokeh-1.png"/></figure>
-<p>A web browser will now appear showing the html file with your visualization. The red circles, blue line, and gold triangles are the result of our glyph method calls. Clicking the legend in the upper right corner will show/hide each glyph type. Note that Bokeh has automatically handled the creation of the grid-lines and tick labels.</p>
-<p>Along the right-hand side, the default toolbar is also displayed. The tools include drag, box zoom, wheel zoom, save, reset, and help. Using these tools, a user can pan along the plot or zoom in on interesting portions of the data. Since this is a stand-alone HTML page, which includes a reference to BokehJS, it can be immediately passed to a co-worker for exploration or posted to the web.</p>
-</div></div>
-      <div type="2"><head>Bokeh and Pandas: Exploring the WWII THOR Dataset</head>
-<p>In the previous example, we manually created two short Python lists for our x and y data. What happens when you have real-world data with tens-of-thousands of rows and dozens of columns stored in an external format? Pandas, a widely-used data science library, is ideally suited to this type of data and integrates seamlessly with Bokeh to create interactive visualizations of data.</p>
-<div type="3"><head>Pandas Overview</head>
-<p>For the purposes of this tutorial, I will only touch on the basic functions of Pandas that are necessary to produce our visualizations. <ref target="https://pandas.pydata.org/pandas-docs/stable/10min.html">10 Minutes to Pandas</ref> and <ref target="https://pandas.pydata.org/pandas-docs/stable/tutorials.html#lessons-for-new-pandas-users">Lessons for New Pandas Users</ref> are excellent introductions that I would recommend for expanding your knowledge beyond the very basics touched on here.</p>
-<p>Pandas has quickly become the <emph>de facto</emph> Python library for data and data science workflows; integration with other major data science and machine learning libraries has only fueled a rise in popularity.<ref type="footnotemark" target="#note_1"/> Pandas provides functionality to quickly and efficiently read, write, and modify datasets for analysis. To accomplish this, Pandas provides data structures that hold different dimensionalities of data. The <code rend="inline">DataFrame</code> holds 2-dimensional data in the manner of a spreadsheet with rows and columns. It's through this object that we'll interact with our WWII THOR dataset. Let's first examine the Pandas <code rend="inline">DataFrame</code> by loading our csv data into one.</p>
-</div><div type="3"><head>Loading Data in Pandas</head>
-<p>To begin with, create a new file called <code rend="inline">loading_data.py</code>.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_16" corresp="code_visualizing-with-bokeh_16.txt" lang="language-python" rend="block"/></ab>
-<p>We start by importing the Pandas library and then calling <code rend="inline">read_csv()</code> and passing a filename to it. Note that the Pandas library is aliased as <emph>pd</emph>. This alias is a convention followed in the <ref target="https://pandas.pydata.org/pandas-docs/stable/">Pandas official documentation</ref> and is widely used by the Pandas community. For this reason, I'll use the <emph>pd</emph> alias throughout the tutorial.</p>
-<p>In this code, <code rend="inline">read_csv</code> creates a <code rend="inline">DataFrame</code> that holds the rows/columns of our csv data. By convention, the variable name <emph>df</emph> is used to represent the loaded dataframe in tutorials and basic code examples. <ref target="https://pandas.pydata.org/pandas-docs/stable/api.html#input-output">Many other methods</ref> exist for reading data formats other than csv in Pandas, such as JSON, SQL tables, Excel files, and HTML.</p>
-<p>When running this code, <code rend="inline">print(df)</code> will output an abridged representation of the loaded data.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_17" corresp="code_visualizing-with-bokeh_17.txt" lang="language-python" rend="block"/></ab>
-<p>This shows that we have 178,281 records of missions with 19 columns per record. To see what the 19 columns are in full, we can access the dataframe's  <code rend="inline">columns</code> object by replacing <code rend="inline">print(df)</code> in the above code with:</p>
-<ab><code xml:id="code_visualizing-with-bokeh_18" corresp="code_visualizing-with-bokeh_18.txt" lang="language-python" rend="block"/></ab>
-<p>The output should look like:</p>
-<ab><code xml:id="code_visualizing-with-bokeh_19" corresp="code_visualizing-with-bokeh_19.txt" lang="language-python" rend="block"/></ab>
-<p>Some of these column names are self explanatory, but it's worth pointing out the following: MSNDATE (mission date), NAF (numbered airforce responsible for mission), AC_ATTACKING (number of aircraft), TONS_HE (high-explosives), TONS_IC (incendiary devices), TONS_FRAG (fragmentation bombs).</p>
-<p>When it comes to accessing data within a <code rend="inline">DataFrame</code>, in this tutorial we use one basic approach: indexing. Here to access a single column we pass a string to our dataframe's indexer: e.g. <code rend="inline">df['MSNDATE']</code>.  To access multiple columns, we pass a list of names to our dataframe's indexer: e.g. <code rend="inline">df[['MSNDATE', 'THEATER']]</code>.</p>
-</div><div type="3"><head>The Bokeh ColumnDataSource</head>
-<p>Now that we've learned how to create a Bokeh plot and how to load tabular data into Pandas, it's time to learn how to link Pandas' <code rend="inline">DataFrame</code> with Bokeh visualizations. The Bokeh object <code rend="inline">ColumnDataSource</code> provides this integration.</p>
-<p>The object's constructor accepts a Pandas <code rend="inline">DataFrame</code> as an argument. After it is created, the <code rend="inline">ColumnDataSource</code> can then be passed to glyph methods via the <code rend="inline">source</code> parameter and other parameters, such as our x and y data, can then reference column names within our source. Let's go through an example of this.</p>
-<p>Using our THOR dataset, we'll create a scatter plot of the number of attacking aircraft versus the tons of munitions dropped. We will use a new file called <code rend="inline">column_datasource.py</code> to do this. We'll also take this opportunity to learn about Bokeh's interactive hover feature.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_20" corresp="code_visualizing-with-bokeh_20.txt" lang="language-python" rend="block"/></ab>
-<p>Here, we import Pandas, the <code rend="inline">figure</code> object and basic functions from <code rend="inline">bokeh.plotting</code>, and the <code rend="inline">ColumnDataSource</code> object from <code rend="inline">bokeh.models</code>.  We're also going to expand our knowledge of interactions in this example by adding a hover feature that is facilitated by the <code rend="inline">HoverTool</code></p>
-<p>We then immediately set our output file following Bokeh's recommended best practices. Finally, we call Pandas <code rend="inline">read_csv</code> method to load our csv into a <code rend="inline">DataFrame</code>.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_21" corresp="code_visualizing-with-bokeh_21.txt" lang="language-python" rend="block"/></ab>
-<p>Since we don't want to plot all 170,000+ rows in our scatterplot (which would require a longer processing time to generate and would create a confusing plot due to the volume of overlapping data), we randomly sample 50 rows using the dataframe's <code rend="inline">sample</code> method.  We then pass this sample to the <code rend="inline">ColumnDataSource</code> constructor and store this in a variable called <code rend="inline">source</code>.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_22" corresp="code_visualizing-with-bokeh_22.txt" lang="language-python" rend="block"/></ab>
-<p>Next, we create our <code rend="inline">figure</code> object and call the <code rend="inline">circle</code> glyph method to plot our data. This is where the <code rend="inline">source</code> variable that holds our <code rend="inline">ColumnDataSource</code> comes into play. It's passed as our <code rend="inline">source</code> argument to the glyph method and the column names holding the number of attacking aircraft (AC_ATTACKING) and tons of munitions dropped (TOTAL_TONS) are passed as our <code rend="inline">x</code> and <code rend="inline">y</code> arguments.</p>
-<p>Interestingly, when we use a <code rend="inline">ColumnDataSource</code> we're not limited to just using column names for <code rend="inline">x</code> and <code rend="inline">y</code> parameters. We can also pass a column name for other parameters such as <code rend="inline">size</code>, <code rend="inline">line_color</code>, or <code rend="inline">fill_color</code>. This allows styling options to be determined by columns in the datasource itself! If you'd like to see this in action, in the code above, change <code rend="inline">size=10</code> to <code rend="inline">size='TONS_HE'</code>. The size of each dot will then reflect the tons of high explosives used.</p>
-<p>{% include alert.html text="Throughout the tutorial, I often pass arguments by name where they could more succinctly be passed by position. This is helpful, in my opinion, for the reader to keep track of what arguments are being passed" %}</p>
-<p>Next we add a title and label our axes.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_23" corresp="code_visualizing-with-bokeh_23.txt" lang="language-python" rend="block"/></ab>
-<p>We can also, at this stage, learn a bit more about the strong interactive, customizable nature of Bokeh plots. In our first Bokeh plot we saw the default Bokeh toolbar, but Bokeh allows us to customize our plot by adding new interactive tools to it.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_24" corresp="code_visualizing-with-bokeh_24.txt" lang="language-python" rend="block"/></ab>
-<p>Bokeh supports <ref target="https://docs.bokeh.org/en/latest/docs/reference/plotting.html">many plotting tools</ref>, but I introduce <code rend="inline">HoverTool</code> here because it's particularly useful for data exploration and interaction. <code rend="inline">HoverTool</code> allows you to set a <code rend="inline">tooltips</code> property which takes a list of <ref target="https://www.w3schools.com/python/python_tuples.asp">tuples</ref>. The first part of the tuple is a display name and the second is a column name from your <code rend="inline">ColumnDataSource</code> prefaced with <code rend="inline">@</code>. Once we've instantiated this tool, we add it to the plot using the <code rend="inline">add_tool</code> method. We'll see how this looks in a moment.</p>
-<p>Finally, we make sure to add the line to show the plot. Now we can run <code rend="inline">column_datasource.py</code> and interact with our data in the browser.</p>
-<figure><desc>Plotting with the ColumnDataSource and More Styling Options</desc><graphic url="visualizing-with-bokeh-2.png"/></figure>
-<p>Note that because we are randomly sampling the data, our plot will look different each time we run the code.</p>
-<p>At the top and along the axes of the plot, we see the labels that we added. There is also a new tool in the toolbar. This is the hover tool that we added. To see it in action, hover over any data point in the scatterplot. A window will pop up showing the columns we set in our <code rend="inline">tooltip</code> property!</p>
-<p>Before moving to the next section of the lesson, try returning to the example above and adding/removing other variables and changing display names.</p>
-</div></div>
-      <div type="2"><head>Categorical Data and Bar Charts: Munitions Dropped by Country</head>
-<p>In the preceding example, we plotted quantitative data. Frequently, though, we want to plot categorical data. Categorical data, in contrast to quantitative, is data that can be divided into groups, but that does not necessarily have a numerical aspect to it. For example, while your height is numerical, your hair color is categorical. From the perspective of our dataset, features like attacking country hold categorical data, while features like the weight of munitions hold quantitative data.</p>
-<p>In this section, we'll learn how to use categorical data as our x-axis values in Bokeh and how to use the <code rend="inline">vbar</code> glyph method to create a vertical bar chart (an <code rend="inline">hbar</code> glyph method functions similarly to create a horizontal bar chart). In addition, we'll learn about preparing categorical data in Pandas by grouping data. Further, we'll add to our knowledge of Bokeh styling and the hover tool.</p>
-<p>To work through this information, we'll create a bar chart that shows the total tons of munitions dropped by each country listed in our csv.</p>
-<p>We start by creating a new file called <code rend="inline">munitions_by_country.py</code> and adding some initial code.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_25" corresp="code_visualizing-with-bokeh_25.txt" lang="language-python" rend="block"/></ab>
-<p>First, we import the Pandas library and the basic elements from Bokeh (i.e. <code rend="inline">figure</code>, <code rend="inline">output_file</code>, <code rend="inline">show</code>, and <code rend="inline">ColumnDataSource</code>). We also make two new imports: <code rend="inline">Spectral5</code> is a pre-made five color pallette, one of Bokeh's many <ref target="https://docs.bokeh.org/en/latest/docs/reference/palettes.html#bokeh-palettes">pre-made color palettes</ref>, and <code rend="inline">factor_cmap</code> is a helper method for mapping colors to bars in a bar-charts.</p>
-<p>After the imports, we set our <code rend="inline">output_file</code>  and load the thor_wwii.csv file into a <code rend="inline">DataFrame</code>.</p>
-<p>We now need to get from the 170,000+ records of individual missions to one record per attacking country with the total munitions dropped.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_26" corresp="code_visualizing-with-bokeh_26.txt" lang="language-python" rend="block"/></ab>
-<p>Pandas lets us do this in a single line of code by using the <code rend="inline">groupby</code> dataframe method. This method accepts a column by which to group the data and one or more aggregating methods that tell Pandas how to group the data together. The output is a new dataframe.</p>
-<p>Let's take this one piece at a time. The <code rend="inline">groupby('COUNTRY_FLYING_MISSION')</code> sets the column that we are grouping on. In other words, this says that we want the resulting dataframe to have one row per unique entry in the column <code rend="inline">COUNTRY_FLYING_MISSION</code>. Since we don't care about aggregating all 19 columns in the dataframe, we choose just the tons of munitions columns with the indexer, <code rend="inline">['TOTAL_TONS', 'TONS_HE', 'TONS_IC', 'TONS_FRAG']</code>. Finally, we use the <code rend="inline">sum</code> method to let Pandas know how to aggregate all of the different rows. Other methods also exist for aggregating, such as <code rend="inline">count</code>, <code rend="inline">mean</code>, <code rend="inline">max</code>, and <code rend="inline">min</code>.</p>
-<p>If you execute <code rend="inline">print(grouped)</code>, you'll see that Pandas has grouped by the five unique countries in our dataset and summed the total tons dropped by each. You can also see the dataset has some problems: South Africa and New Zealand dropped more high explosives than the total tons column. Problems like this are typical of large, manually-created datasets and this is a great reminder why is so important to explore and visualize your data before creating research results.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_27" corresp="code_visualizing-with-bokeh_27.txt" rend="block"/></ab>
-<p>To plot this data, let's convert to kilotons by dividing by 1000.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_28" corresp="code_visualizing-with-bokeh_28.txt" lang="language-python" rend="block"/></ab>
-<p>This is a convenience that we'll continue to use in future examples.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_29" corresp="code_visualizing-with-bokeh_29.txt" lang="language-python" rend="block"/></ab>
-<p>Now, we need to make a <code rend="inline">ColumnDataSource</code> from our grouped data and create a <code rend="inline">figure</code>. Since our x-axis will list the five countries (rather than numerical data) we need to tell the figure how to handle the x-axis.</p>
-<p>To do this, we create a list of countries from our source object, using <code rend="inline">source.data</code> and the column name as key. The list of countries is then passed as the <code rend="inline">x_range</code> to our <code rend="inline">figure</code> constructor. Because this is a list of text data, the figure knows the x-axis is categorical and it also knows what possible values our x range can take (i.e. AUSTRALIA, GREAT BRITAIN, etc.).</p>
-<ab><code xml:id="code_visualizing-with-bokeh_30" corresp="code_visualizing-with-bokeh_30.txt" lang="language-python" rend="block"/></ab>
-<p>Now we plot our data as individually colored bars and add basic labels. To color our bars we use the <code rend="inline">factor_cmap</code> helper function. This creates a special color map that matches an individual color to each category (i.e. what Bokeh calls a <emph>factor</emph>). The color map is then passed as the color argument to our <code rend="inline">vbar</code> glyph method.</p>
-<p>For the data in our glyph method, we're passing a source and again referencing column names. Instead of using a <code rend="inline">y</code> parameter, however, the <code rend="inline">vbar</code> method takes a <code rend="inline">top</code> parameter. A <code rend="inline">bottom</code> parameter can equally be specified, but if left out, its default value is 0.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_31" corresp="code_visualizing-with-bokeh_31.txt" lang="language-python" rend="block"/></ab>
-<p>We add a hover tool again, but now we see that we can use multiple data variables in a single line and add in our own text so the hover popup will list the kilotons of each type of explosive. The <code rend="inline">hover.mode</code> is new. Three modes exist for the hover tool: <code rend="inline">mouse</code>, <code rend="inline">vline</code>, and <code rend="inline">hline</code>. These tell the hover tool when to show the popup. <code rend="inline">mouse</code> is the default value and shows a popup when directly over a glyph. <code rend="inline">vline</code> and <code rend="inline">hline</code> tell the popup to show when a vertical or horizontal line crosses a glyph. With <code rend="inline">vline</code> set here, anytime your mouse passes through an imaginary vertical line extending from each bar, a popup will show.</p>
-<figure><desc>A Bar Chart with Categorical Data and Coloring</desc><graphic url="visualizing-with-bokeh-3.png"/></figure>
-<p>{% include alert.html text="If you have a chance, it's worth exploring Bokeh's <ref target="https://docs.bokeh.org/en/latest/docs/reference/palettes.html#bokeh-palettes">color palettes</ref>. In the above example, try rewriting the code to use something other than <code rend="inline">Spectral5</code>, such as <code rend="inline">Inferno5</code> or <code rend="inline">RdGy5</code>. To take it one step further, you can try your hand at using built-in palettes in any example that uses color." %}</p>
-</div>
-      <div type="2"><head>Stacked Bar Charts and Sub-sampling Data: Types of Munitions Dropped by Country</head>
-<p>Because the previous plot shows that the USA and Great Britain account for the overwhelming majority of bombings, we now focus on these two countries and learn how to make a stacked bar chart that shows the types of munitions each country used.</p>
-<p>We'll start a new file called <code rend="inline">munitions_by_country_stacked.py</code></p>
-<ab><code xml:id="code_visualizing-with-bokeh_32" corresp="code_visualizing-with-bokeh_32.txt" lang="language-python" rend="block"/></ab>
-<p>In addition to our standard imports, this time we use a three-color Spectral palette, one color for each type of explosive (High Explosive, Incendiary, and Fragmentation).</p>
-<ab><code xml:id="code_visualizing-with-bokeh_33" corresp="code_visualizing-with-bokeh_33.txt" lang="language-python" rend="block"/></ab>
-<p>Since the x-axis is again categorical, we'll need to group and aggregate our data. This time, though, we need to exclude any records hat don't have a COUNTRY_FLYING_MISSION with a value of GREAT BRITAIN or USA. To do that, we filter our dataframe.</p>
-<p>For each row in <code rend="inline">df</code>, the <code rend="inline">isin</code> function checks whether COUNTRY_FLYING_MISSION has a value of USA or GREAT BRITAIN. If it does, the corresponding value in the variable <code rend="inline">filter</code> is <code rend="inline">True</code> and if not the value is <code rend="inline">False</code></p>
-<p>When applied to our dataframe via <code rend="inline">df[filter]</code>, a new dataframe is created in which rows with a <code rend="inline">True</code>  value are kept and rows with a <code rend="inline">False</code> value are discarded. After the filter has been applied here, executing <code rend="inline">df.shape</code> shows that 125,526 rows remain of an original 178,281.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_34" corresp="code_visualizing-with-bokeh_34.txt" lang="language-python" rend="block"/></ab>
-<p>Now that we have reduced the dataframe to show only records for the USA and Great Britain, we group our data with <code rend="inline">groupby</code> and aggregate the three columns that hold bomb types with <code rend="inline">sum</code>.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_35" corresp="code_visualizing-with-bokeh_35.txt" lang="language-python" rend="block"/></ab>
-<p>As in the previous example, we create a source object from our grouped data and make sure our figure uses categorical data for the x-axis by setting the <code rend="inline">x_range</code> to the list of countries.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_36" corresp="code_visualizing-with-bokeh_36.txt" lang="language-python" rend="block"/></ab>
-<p>To create the stacked bar chart, we call the <code rend="inline">vbar_stack</code> glyph method. Rather than passing a single column name to a <code rend="inline">y</code> parameter, we instead pass a list of column names as <code rend="inline">stackers</code>. The order of this list determines the order that the columns will be stacked from bottom to top (after you've worked through this example, try switching the column order to see what happens). The <code rend="inline">legend</code> argument supplies text for each stacker and the <code rend="inline">Spectral3</code> palette provides colors for each stacker.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_37" corresp="code_visualizing-with-bokeh_37.txt" lang="language-python" rend="block"/></ab>
-<p>We add basic styling and labeling, and then output the plot.</p>
-<figure><desc>A Stacked Bar Chart with Categorical Data and Coloring</desc><graphic url="visualizing-with-bokeh-4.png"/></figure>
-</div>
-      <div type="2"><head>Time-Series and Annotations: Bombing Operations over Time</head>
-<p>Let's now explore the use of incendiary and fragmentation explosive a little more by seeing if there's any trend in their use over time versus the total munitions dropped. As you have had some time to get used to Bokeh's syntax, let's dive right in with a full code example in a new file named <code rend="inline">my_first_timeseries.py</code>.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_38" corresp="code_visualizing-with-bokeh_38.txt" lang="language-python" rend="block"/></ab>
-<p>Take a minute to seriously look through this code and see what you recognize. Two items should stand out as new.</p>
-<p>First, the statement <code rend="inline">df['MSNDATE'] = pd.to_datetime(df['MSNDATE'], format='%m/%d/%Y')</code> makes sure our MSNDATE column is a datetime. This is important because often data loaded from a csv file will not be properly typed as datetime. Supplying the <code rend="inline">format</code> argument is not required, but doing so significantly speeds up the process.</p>
-<p>Second, we pass the argument <code rend="inline">x_axis_type='datetime'</code> to our figure constructor to tell it that our x data will be datetimes. Otherwise, Bokeh works seamlessly with time data just like any other type of numerical data!</p>
-<p>Looking at the output, though, you might notice a major issue.</p>
-<figure><desc>A Basic Time-Series Plot</desc><graphic url="visualizing-with-bokeh-5.png"/></figure>
-<p>This data is volatile and hard-to-read because it is too fine-grained for our needs. Having daily data over the course of five years is great, but plotting it as such obscures trends in the data. To successfully plot time-series data and look for long-term trends, we need a way to change the time-scale we're looking at so that, for example, we can plot data summarized by weeks, months, or years.</p>
-<p>Thankfully, Pandas offers a quick and easy way to do this. By modifying a single line of code in the above example, we can <emph>resample</emph> our time-series data to any valid unit of time.</p>
-<div type="3"><head>Resampling Time-Series Data</head>
-<p>Resampling time-series data can involve either upsampling (creating more records) or downsampling (creating fewer records). For example, a list of daily temperatures could be upsampled to a list of hourly temperatures or downsampled to a list of weekly temperatures. We'll only be downsampling in this tutorial, but upsampling is very useful when you're trying to match a sporadically-measured dataset with one that's more periodically measured.</p>
-<p>To resample our data, we use a Pandas <code rend="inline">Grouper</code> object, to which we pass the column name holding our datetimes and a code representing the desired resampling frequency. In the case of our data, the statement <code rend="inline">pd.Grouper(key='MSNDATE', freq='M') </code> will be used to resample our MSNDATE column by <emph>M</emph>onth. We could equally resample by <emph>W</emph>eek, <emph>Y</emph>ear, <emph>H</emph>our, and <ref target="http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases">so forth</ref>. These frequency designations can also be prefaced with numbers so that, for example, <code rend="inline">freq='2W'</code> resamples at two week intervals!</p>
-<p>To complete the process of resampling and plotting our data, we pass the above <code rend="inline">Grouper</code> object to our <code rend="inline">groupby</code> function in place of the raw column name. The <code rend="inline">groupby</code> statement from the previous code example should now look like this:</p>
-<ab><code xml:id="code_visualizing-with-bokeh_39" corresp="code_visualizing-with-bokeh_39.txt" lang="language-python" rend="block"/></ab>
-<p>Rerunning the above code sample will produce a much cleaner plot with obvious trends. The plot now shows four points of interest:</p>
-<list type="unordered">
-<item>First, in both the Spring of 1944 and 1945, the scale of Allied bombing operations reached greater intensity.</item>
-<item>Second, there is a smaller spike in the summer of 1945 during the acceleration of bombings against the Japanese after Germany's surrender.</item>
-<item>Third, four spikes in the use of incendiary weapons appear that could further explored.</item>
-<item>Fourth and finally, there are a few small spikes in the use of fragmentation bombs, the use of which then effectively stops after the surrender of Germany.</item>
-</list>
-<figure><desc>A Time-Series Plot with Data Resampled to Months</desc><graphic url="visualizing-with-bokeh-6.png"/></figure>
-</div><div type="3"><head>Annotating Trends in Plots</head>
-<p>Let's look more closely now at the bombings in Europe in 1944 and 1945 to see what trends there are with fragmentation and incendiary munitions. We will also point out some of these trends in our plot with annotations. To do this, we'll filter our dataset so that we work only with bombings in the European Theater of Operations (ETO), resample the data at one-month intervals (<code rend="inline">freq='M'</code>), and then plot the results in the same manner as before.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_40" corresp="code_visualizing-with-bokeh_40.txt" lang="language-python" rend="block"/></ab>
-<figure><desc>A Time-Series Plot of the ETO with Data Resampled to Months</desc><graphic url="visualizing-with-bokeh-7.png"/></figure>
-<p>A few patterns emerge in the ETO data. First we see a very clear escalation of overall bombings leading up to June 6, 1944 and a notable dip during the winter of 1944/1945. Incendiary munitions show three spikes and confirm that the fourth spike seen in the preceding example was directed at the bombing of Japan after Germany's surrender. The pattern of fragmentation bombs is harder to read, but it's now clear that they were only seriously used in the European Theater after D-Day.</p>
-<p>{% include alert.html text="Try your hand at resampling this data using any of <ref target="http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases">Pandas' time frequencies </ref> to see what other trends might emerge. Remember, you can preface these frequencies with numbers as well (e.g. if you were working with historical stock market data, 2Q would give you bi-quarterly data!)" %}</p>
-<p>Since we have established that 6 June 1944 and the winter of 1944/1945 mark changes to the bombing patterns in the ETO, let's highlight these trends using Bokeh's annotation features.</p>
-<p>To do this, we'll create a <code rend="inline">BoxAnnotation</code> and then add these to our <code rend="inline">figure</code> before showing it. First, we need to add an additional import statement to our code.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_41" corresp="code_visualizing-with-bokeh_41.txt" lang="language-python" rend="block"/></ab>
-<p>To create the box, we first need to determine its coordinates. Coordinates for Bokeh annotations can be either absolute (i.e. positioned using screen units), meaning they always stay in one place, or they can be positioned in relation to data. Our annotations will all be positioned using data coordinates.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_42" corresp="code_visualizing-with-bokeh_42.txt" lang="language-python" rend="block"/></ab>
-<p>The left of the box will be 6 June 1944 (D-Day) and for the right of the box we'll choose the first day of the Battle of the Bulge: 16 December 1944. In this case, the dates follow a month-day-year format, but <code rend="inline">to_datetime</code> also works with <ref target="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.to_datetime.html">day-first and year-first formats</ref>.</p>
-<p>We pass these coordinates to the <code rend="inline">BoxAnnotation</code> constructor along with some styling arguments. Then, we add it to the our figure using the <code rend="inline">add_layout()</code> method.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_43" corresp="code_visualizing-with-bokeh_43.txt" lang="language-python" rend="block"/></ab>
-<figure><desc>A Time-Series Plot of the ETO with Annotations Added</desc><graphic url="visualizing-with-bokeh-8.png"/></figure>
-<p>{% include alert.html text="Try to create a similar plot for the Pacific Theater of Operations (PTO). Annotate the invasion of Iwo Jima (February 19, 1945) and Japan's announcement of surrender (August 15, 1945)." %}</p>
-</div></div>
-      <div type="2"><head>Spatial Data: Mapping Target Locations</head>
-<p>In this final part of the lesson we'll look at the spatial components of fragmentation bombs.</p>
-<p>Bokeh provides <ref target="https://docs.bokeh.org/en/latest/docs/reference/tile_providers.html">built-in tile providers</ref> that render base maps of the world. These are contained in the <code rend="inline">bokeh.tile_providers</code> module. For this example, we'll use the CartoDB Tile Service (CARTODBPOSITRON).</p>
-<p>We'll also be using functions imported from the <code rend="inline">pyproj</code> library. Since our coordinates are stored as latitude/longitude, we'll define a custom function to convert them before mapping. Note that although Bokeh is coordinate-system neutral, it uses the Web Mercator projection for mapping, a standard found across web tile providers. The subject of coordinate systems and projections are outside the scope of this tutorial, but the interested reader will find many useful web resources on these topics.</p>
-<p>{% include alert.html text="If your own dataset has place names, but not latitude and longitude, don't worry! You can find ways to easily get coordinates from place names in Programming Historian's <ref target="/lessons/geocoding-qgis">Geocoding Historical Data using QGIS</ref> or <ref target="/lessons/mapping-with-python-leaflet#geocoding-with-python">Web Mapping with Python and Leaflet</ref>." %}</p>
-<ab><code xml:id="code_visualizing-with-bokeh_44" corresp="code_visualizing-with-bokeh_44.txt" lang="language-python" rend="block"/></ab>
-<p>The boilerplate imports and our conversion function are defined. Next, we load our data and apply our conversion function to create new E and N columns that store our Web Mercator easting and northing.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_45" corresp="code_visualizing-with-bokeh_45.txt" lang="language-python" rend="block"/></ab>
-<p>Because a single target can appear in multiple records, we need to group the data by E and N to get unique target locations. Otherwise, we would map the same target every time it appears in a record.</p>
-<p>The <code rend="inline">reset_index</code> function applied after aggregating is new here. By default, when Pandas groups these two columns it will make E and N the index for each row in the new dataframe. Since we just want E and N to remain as normal columns for mapping, we call <code rend="inline">reset_index</code>.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_46" corresp="code_visualizing-with-bokeh_46.txt" lang="language-python" rend="block"/></ab>
-<p>To set bounds for our map, we'll set a minimum and maximum value for our plot's <code rend="inline">x_range</code> and <code rend="inline">y_range</code>. We use the <code rend="inline">Range1D</code> object, which represents bounded 1-dimensional data in Bokeh.</p>
-<ab><code xml:id="code_visualizing-with-bokeh_47" corresp="code_visualizing-with-bokeh_47.txt" lang="language-python" rend="block"/></ab>
-<p>Finally, we call <code rend="inline">add_tile</code> and pass the tile provider we imported. Then, we use glyph methods just like in any other plot. Here, we call <code rend="inline">circle</code> and pass the easting and northing columns as our x and y data.</p>
-<figure><desc>A Map of Target Locations</desc><graphic url="visualizing-with-bokeh-9.png"/></figure>
-<p>Having plotted which targets in Europe and Asia were bombed with fragmentation bombs, we can now start to examine patterns of destruction with greater detail. In the above code, we also summed incendiary bombs. Try to alter the code to create a map of these targets.</p>
-</div>
-      <div type="2"><head>Bokeh as a Visualization Tool</head>
-<p>Bokeh's strength as a visualization tool lies in its ability to show differing types of data in an interactive and web-friendly manner. This tutorial has only scratched the surface of Bokeh's capabilities and the reader is encourage to delve deeper into the library's workings. A great place to start is the <ref target="https://docs.bokeh.org/en/latest/docs/gallery.html">Bokeh gallery</ref>, where you can see a variety of visualizations and decide how you might apply these techniques to your own data. If you're more inclined to dive right into further code examples, Bokeh's <ref target="https://mybinder.org/v2/gh/bokeh/bokeh-notebooks/master?filepath=tutorial%2F00%20-%20Introduction%20and%20Setup.ipynb">online notebook</ref> is an excellent place to start!</p>
-</div>
-      <div type="2"><head>Further Resources</head>
-<list type="unordered">
-<item><ref target="https://docs.bokeh.org/en/latest/docs/user_guide.html">Bokeh User Guide</ref></item>
-<item><ref target="https://docs.bokeh.org/en/latest/docs/gallery.html">Bokeh Gallery</ref></item>
-<item><ref target="https://pandas.pydata.org/pandas-docs/stable/index.html">Pandas Documentation</ref></item>
-<item><ref target="https://www.kdnuggets.com/2017/01/pandas-cheat-sheet.html">Pandas Cheat Sheet</ref></item>
-<item><ref target="https://www.kdnuggets.com/2017/03/bokeh-cheat-sheet.html">Bokeh Cheat Sheet</ref></item>
-</list>
-<p><ref type="footnotemark" target="#note_1"/> : David Robinson, 'Why is Python Growing so Quickly?', <emph>Stack Overflow Blog</emph>, 14 September 2017 <ref target="https://stackoverflow.blog/2017/09/14/python-growing-quickly/">https://stackoverflow.blog/2017/09/14/python-growing-quickly/</ref></p>
-</div>
-    </body>
-  </text>
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Visualizing Data with Bokeh and Pandas</title>
+                <author role="original_author">Charlie Harper</author>
+                <editor role="reviewers">
+                    <persName>Zoe LeBlanc</persName>
+                    <persName>Ben Schmidt</persName>
+                </editor>
+                <editor role="editors">
+                    <persName>James Baker</persName>
+                    <persName>Ian Milligan</persName>
+                </editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0081</idno>
+                <date type="published">07/27/2018</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>In this lesson you will learn how to visually explore and present data in Python by using the Bokeh and Pandas libraries.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">mapping</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2">
+                <head>Contents</head>
+            </div>
+            <div type="2">
+                <head>Overview</head>
+                <p>The ability to load raw data, sample it, and then visually explore and present it is a valuable skill across disciplines. In this tutorial, you will learn how to do this in Python by using the Bokeh and Pandas libraries. Specifically, we will work through visualizing and exploring aspects of WWII bombing runs conducted by Allied powers.</p>
+                <p>At the end of the lesson you will be able to:</p>
+                <list type="unordered">
+                    <item>Load tabular CSV data</item>
+                    <item>Perform basic data manipulation, such as aggregating and sub-sampling raw data</item>
+                    <item>Visualize quantitative, categorical, and geographic data for web display</item>
+                    <item>Add varying types of interactivity to your visualizations</item>
+                </list>
+                <p>To reach these goals, we'll work through a variety of visualization examples using THOR, a dataset that describes historical bombing operations.</p>
+                <div type="3">
+                    <head>The WWII THOR Dataset</head>
+                    <p>The Theater History of Operations Reports (THOR) lists aerial bombing operations during World War I, World War II, the Korean War, and the Vietnam War undertaken by the United States and Allied Powers. The records were compiled from declassified documents by Lt. Col. Jenns Robertson. THOR is made publicly available through a partnership between the US Department of Defense and <ref target="https://data.world/datamil">data.world</ref>.</p>
+                    <p>Each row in the THOR dataset contains information on a single mission or bombing run. This information can include the mission date, takeoff and target locations, the target type, aircraft involved, and the types and weights of bombs dropped on the target. The <ref target="https://data.world/datamil/thor-data-dictionary">THOR data dictionary</ref> provides detailed information on the structure of the dataset.</p>
+                    <p>For this tutorial, we'll use a modified version of the WWII THOR dataset. The original, full-version of the dataset consists of 62 columns of information digitized from the paper forms. To make this dataset more manageable for our purposes, this has been reduced to 19 columns that include core mission information and bombing data. These columns are discussed below when we first load the data. The unabridged dataset is available for download <ref target="https://data.world/datamil/world-war-ii-thor-data">here</ref>.</p>
+                    <p>The dataset used in this tutorial is contained in <ref target="https://github.com/programminghistorian/ph-submissions/tree/gh-pages/assets/visualizing-with-bokeh/thor_wwii.csv">thor_wwii.csv</ref>. This file is required to complete most of the examples below.</p>
+                    <p>We'll use Bokeh and Pandas to address some of the following questions:</p>
+                    <list type="unordered">
+                        <item>What types and weights of munitions were dropped during World War II (WWII)? What patterns can we discern in the use of different types of munitions?</item>
+                        <item>How did the types and weights of munitions dropped change over the course of WWII? How do these changes correspond to major military events?</item>
+                        <item>What targets were munitions dropped on during the war? Were particular types of munitions limited to certain theaters of operations or targets?</item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Other Possible Datasets</head>
+                    <p>If this dataset doesn't fit your interests or if you'd like more practice after completing this tutorial, here are a few other interesting datasets that you might wish to use with Bokeh and Pandas:</p>
+                    <list type="unordered">
+                        <item>
+                            <p>
+                                <ref target="https://data.world/history/scottish-witchcraft/">Scottish Witchcraft Trials</ref>: A multi-table set of data on over 4,000 people accused of witchcraft between 1536 and 1736.</p>
+                        </item>
+                        <item>
+                            <p>
+                                <ref target="https://data.world/history/civil-unrest-event-data">Civil Unrest Events</ref>: A single table cataloging over 60,000 events of civil unrest across the world since the end of World War II.</p>
+                        </item>
+                        <item>
+                            <p>
+                                <ref target="https://www.slavevoyages.org/voyage/database">Trans-Atlantic Slave Trade Database</ref>: Searchable and customizable tabular data on 36,000 slaving voyages that transported over 10 million slaves from the 16th to 19th centuries.</p>
+                        </item>
+                    </list>
+                    <p>All three datasets contain comparable quantitative, qualitative, and temporal data to those found in the THOR dataset. The Civil Unrest Events and Trans-Atlantic Slave Trade datasets both contain spatial data, though this is lacking from the Scottish Witchcraft Trials data.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Getting Started</head>
+                <div type="3">
+                    <head>Prerequisites</head>
+                    <p>This tutorial can be completed using any operating systems. It requires Python 3 and a web browser. You may use any text editor to write your code.</p>
+                    <p>This tutorial assumes that you have a basic knowledge of the Python language and its associated data structures, particularly lists.</p>
+                    <p>If you work in Python 2, you will need to create a virtual environment for Python 3, and even if you work in Python 3, creating a virtual environment for this tutorial is good practice.</p>
+                </div>
+                <div type="3">
+                    <head>Creating a Python 3 Virtual Environment</head>
+                    <p>A Python virutal environment is an isolated environment in which you can install libraries and execute code. Many different virtual evironments can be created to work with different versions of Python and Python libraries. Virtual environments are useful because they ensure you have only the necessary libraries installed and that you do not encounter version conflicts. An additional benefit of virtual environments is that you can pass them to others so that you know your code will execute on another machine.</p>
+                    <p>
+                        <ref target="https://conda.io/miniconda.html">Miniconda</ref> is one easy way to create virtual environments that is simple to install across operating systems. You should download Miniconda and follow the instructions for <ref target="https://conda.io/projects/conda/en/stable/user-guide/install/windows.html">Windows</ref>, <ref target="https://conda.io/projects/conda/en/stable/user-guide/install/macos.html">Mac</ref>, or <ref target="https://conda.io/projects/conda/en/stable/user-guide/install/linux.html">Linux</ref> as appropriate for your operating system.</p>
+                    <p>Once you have downloaded and installed Miniconda for your operating system, you can check that it has installed correctly by opening a command line and typing:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_0" corresp="code_visualizing-with-bokeh_0.txt" rend="block"/>
+                    </ab>
+                    <p>If you see version information similar to the following, then Miniconda has installed correctly.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_1" corresp="code_visualizing-with-bokeh_1.txt" rend="block"/>
+                    </ab>
+                    <p>We'll use Miniconda to create a Python 3 virtual environment named <emph>bokeh-env</emph> for this tutorial. In the command line type the following:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_2" corresp="code_visualizing-with-bokeh_2.txt" rend="block"/>
+                    </ab>
+                    <p>Say 'yes' when you are prompted to install new packages.</p>
+                    <p>To activate the <emph>bokeh-env</emph> virtual environment, the command differs slightly depending on your operating system.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_3" corresp="code_visualizing-with-bokeh_3.txt" rend="block"/>
+                    </ab>
+                    <p>Your command line should now show that you are in the <emph>bokeh-env</emph> virtual environment.</p>
+                    <p>When you would like to leave the virtual environment, you can type the command appropriate for your operating system.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_4" corresp="code_visualizing-with-bokeh_4.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Installing Packages</head>
+                    <p>In your activated <emph>bokeh-env</emph> virtual environment, issue the following command to install the python packages for this tutorial.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_5" corresp="code_visualizing-with-bokeh_5.txt" rend="block"/>
+                    </ab>
+                    <p>To get the exact versions used to write this tutorial (note: these may not be the most recent versions of each python package) you can pass the following version numbers to <code rend="inline">pip</code>.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_6" corresp="code_visualizing-with-bokeh_6.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Running Code Examples</head>
+                    <p rend="alert">At this point in the lesson, you have a choice of two ways to experiment with "Running Code Examples". You can either proceed in the command line and do the coding by hand, or run the Jupyter notebook provided <ref target="https://github.com/programminghistorian/ph-submissions/tree/gh-pages/assets/visualizing-with-bokeh/visualizing-with-bokeh.ipynb">here</ref>. Beginners who simply want to get a sense of how the code  operates, rather than write it themselves, may find the Jupyter notebook option especially helpful.</p>
+                    <p>It is easiest first to create a single directory and save each code example as a <emph>.py</emph> within it. When you are ready to run the code file, navigate to this directory in your command prompt and make sure your virtual environment is activated. Remember that you can always activate the environment with the following command appropriate for your operating system.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_7" corresp="code_visualizing-with-bokeh_7.txt" rend="block"/>
+                    </ab>
+                    <p>Within the virtual environment, you can run your code by typing:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_8" corresp="code_visualizing-with-bokeh_8.txt" rend="block"/>
+                    </ab>
+                    <p>A Jupyter Notebook containing the code used in this tutorial is also <ref target="https://github.com/programminghistorian/ph-submissions/tree/gh-pages/assets/visualizing-with-bokeh/visualizing-with-bokeh.ipynb">available</ref> in case you prefer to work through the tutorial without installing a virtual environment. You can learn more about Jupyter Notebook <ref target="http://jupyter.org">here</ref>. If you have created a virtual environment using Miniconda, as discussed above, you can install Jupyter Notebook in the environment by typing <code rend="inline">conda install jupyter</code>
+                    </p>
+                </div>
+            </div>
+            <div type="2">
+                <head>The Basics of Bokeh</head>
+                <div type="3">
+                    <head>What is Bokeh?</head>
+                    <p>Bokeh is a library for creating interactive data visualizations in a web browser. It offers a concise, human-readable syntax, which allows for rapidly presenting data in an aesthetically pleasing manner. If you've worked with visualization in Python before, it's likely that you have used <ref target="https://matplotlib.org">matplotlib</ref>. It's worth briefly mentioning how Bokeh differs from matplotlib, and when one might be preferred to the other.</p>
+                    <p>Matplotlib has existed since 2002 and has long been a standard of Python data visualization. Bokeh emerged in 2013. This difference in age means that Matplotlib matured long before Bokeh was released; however, in a short period of time, Bokeh has reached a high level of maturity.</p>
+                    <p>The intended uses of matplotlib and Bokeh are quite different. Matplotlib creates static graphics that are useful for quick and simple visualizations, or for creating publication quality images. Bokeh creates visualizations for display on the web (whether locally or embedded in a webpage) and most importantly, the visualizations are meant to be highly interactive. Matplotlib does not offer either of these features.</p>
+                    <p>If would you like to visually interact with your data in an exploratory manner or you would like to distribute interactive visual data to a web audience, Bokeh is the library for you! If your main interest is producing finalized visualizations for publication, matplotlib may be better, although Bokeh does offer a way to create static graphics.</p>
+                    <p>With this differences in mind, as we work through the lesson, I'll emphasize the interactive aspects that make Bokeh useful for exploring and disseminating historical data and that set it apart from other libraries like matplotlib.</p>
+                </div>
+                <div type="3">
+                    <head>Your First Plot</head>
+                    <p>First, create a new file called <code rend="inline">my_first_plot.py</code> in the same directory as  <code rend="inline">wwii_thor.csv</code> and then open it up in a text editor. We'll be adding lines to this file to run.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_9" corresp="code_visualizing-with-bokeh_9.txt" rend="block"/>
+                    </ab>
+                    <p>To implement and use Bokeh, we first import some basics that we need from the <code rend="inline">bokeh.plotting</code> module.</p>
+                    <p>
+                        <code rend="inline">figure</code> is the core object that we will use to create plots. <code rend="inline">figure</code> handles the styling of plots, including title, labels, axes, and grids, and it exposes methods for adding data to the plot. The <code rend="inline">output_file</code> function defines how the visualization will be rendered (namely to an html file) and the <code rend="inline">show</code> function will be invoked when the plot is ready for output. <code rend="inline">show</code> tells Bokeh that all of the data has been added to the plot and it is time to render it.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_10" corresp="code_visualizing-with-bokeh_10.txt" rend="block"/>
+                    </ab>
+                    <p>Bokeh recommends that <code rend="inline">output_file</code>, to which we pass a file name, be called at the start of your script, immediately after imports. An alternative output function to be aware of is <code rend="inline">output_notebook</code> which is used to show plots in-line in a Jupyter Notebook. To learn more about installing and using Jupyter notebooks, see <ref target="https://jupyter.readthedocs.io/en/latest/">Jupyter's documentation</ref>.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_11" corresp="code_visualizing-with-bokeh_11.txt" rend="block"/>
+                    </ab>
+                    <p>Next we'll create some data to plot. Data in Bokeh can take on different forms, but at its simplest, data is just a list of values. We create one list for our x-axis and one for our y-axis.</p>
+                    <p>With our output format and data fixed, we can instantiate a <code rend="inline">figure</code> and  add the data to it.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_12" corresp="code_visualizing-with-bokeh_12.txt" rend="block"/>
+                    </ab>
+                    <p>{% include alert.html text="<code rend="inline">p</code> is a common variable name for a <code rend="inline">figure</code> object, since a figure is a type of plot." %}</p>
+                    <p>After instantiating the figure, we call the <code rend="inline">circle</code> , <code rend="inline">line</code>, and <code rend="inline">triangle</code> methods to plot our data. These types of methods are known as a <emph>glyph method</emph>. The term <emph>glyph</emph> in Bokeh refers to the lines, circles, bars, and other shapes that are added to plots to display data.</p>
+                    <p>If we wanted, we could just keep adding glyphs to the plot! In addition to the <code rend="inline">circle</code>, <code rend="inline">line</code>,   and <code rend="inline">triangle</code> glyphs, there are many others, including:  <code rend="inline">asterisk</code>, <code rend="inline">circle_cross</code>, <code rend="inline">circle_x</code>, <code rend="inline">cross</code>, <code rend="inline">diamond</code>, <code rend="inline">diamond_cross</code>, <code rend="inline">inverted_triangle</code>, <code rend="inline">square</code>, <code rend="inline">square_cross</code>, <code rend="inline">square_x</code>, and <code rend="inline">x</code>.</p>
+                    <p>When calling a glyph method, at a minimum, we must pass the data we would like to plot, but frequently we might add styling arguments. Here, we set a size, color, and legend name for each glyph.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_13" corresp="code_visualizing-with-bokeh_13.txt" rend="block"/>
+                    </ab>
+                    <p>We will also add our first piece of code that brings some interactivity to the plot. By setting a <code rend="inline">click_policy</code> on our legend, a user can now click on each legend entry (e.g. circle, line, triangle) to show/hide that piece of data! The <code rend="inline">click_policy</code> can also be set to <code rend="inline">mute</code> instead of <code rend="inline">hide</code>. This would mute the color of that data on clicking rather than hide it completely.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_14" corresp="code_visualizing-with-bokeh_14.txt" rend="block"/>
+                    </ab>
+                    <p>Calling <code rend="inline">show</code> and passing the instantiated <code rend="inline">figure</code> will output the results to our html file. Now let's run this code!</p>
+                    <p>In your command line, make sure you're in the directory where you've saved the file and then run the file with the <code rend="inline">python</code> command.</p>
+                    <ab>
+                        <code xml:id="code_visualizing-with-bokeh_15" corresp="code_visualizing-with-bokeh_15.txt" rend="block"/>
+                    </ab>
+                    <figure>
+                        <desc>Plotting a Single Glyph</desc>
+                        <graphic url="visualizing-with-bokeh-1.png"/>
+                    </figure>
+                    <p>A web browser will now appear showing the html file with your visualization. The red circles, blue line, and gold triangles are the result of our glyph method calls. Clicking the legend in the upper right corner will show/hide each glyph type. Note that Bokeh has automatically handled the creation of the grid-lines and tick labels.</p>
+                    <p>Along the right-hand side, the default toolbar is also displayed. The tools include drag, box zoom, wheel zoom, save, reset, and help. Using these tools, a user can pan along the plot or zoom in on interesting portions of the data. Since this is a stand-alone HTML page, which includes a reference to BokehJS, it can be immediately passed to a co-worker for exploration or posted to the web.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Bokeh and Pandas: Exploring the WWII THOR Dataset</head>
+                <p>In the previous example, we manually created two short Python lists for our x and y data. What happens when you have real-world data with tens-of-thousands of rows and dozens of columns stored in an external format? Pandas, a widely-used data science library, is ideally suited to this type of data and integrates seamlessly with Bokeh to create interactive visualizations of data.</p>
+                <div type="3">
+                    <head>Pandas Overview</head>
+                    <p>For the purposes of this tutorial, I will only touch on the basic functions of Pandas that are necessary to produce our visualizations. <ref target="https://pandas.pydata.org/pandas-docs/stable/10min.html">10 Minutes to Pandas</ref> and <ref target="https://pandas.pydata.org/pandas-docs/stable/tutorials.html#lessons-for-new-pandas-users">Lessons for New Pandas Users</ref> are excellent introductions that I would recommend for expanding your knowledge beyond the very basics touched on here.</p>
+                    <p>Pandas has quickly become the <emph>de facto</emph> Python library for data and data science workflows; integration with other major data science and machine learning libraries has only fueled a rise in popularity.<ref type="footnotemark" target="#en_note_1"/> Pandas provides functionality to quickly and efficiently read, write, and modify datasets for analysis. To accomplish this, Pandas provides data structures that hold different dimensionalities of data. The <code rend="inline">DataFrame</code> holds 2-dimensional data in the manner of a spreadsheet with rows and columns. It's through this object that we'll interact with our WWII THOR dataset. Let's first examine the Pandas <code rend="inline">DataFrame</code> by loading our csv data into one.</p>
+                </div>
+                <div type="3">
+                    <head>Loading Data in Pandas</head>
+                    <p>To begin with, create a new file called <code rend="inline">loading_data.py</code>.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_16" corresp="code_visualizing-with-bokeh_16.txt" rend="block"/>
+                    </ab>
+                    <p>We start by importing the Pandas library and then calling <code rend="inline">read_csv()</code> and passing a filename to it. Note that the Pandas library is aliased as <emph>pd</emph>. This alias is a convention followed in the <ref target="https://pandas.pydata.org/pandas-docs/stable/">Pandas official documentation</ref> and is widely used by the Pandas community. For this reason, I'll use the <emph>pd</emph> alias throughout the tutorial.</p>
+                    <p>In this code, <code rend="inline">read_csv</code> creates a <code rend="inline">DataFrame</code> that holds the rows/columns of our csv data. By convention, the variable name <emph>df</emph> is used to represent the loaded dataframe in tutorials and basic code examples. <ref target="https://pandas.pydata.org/pandas-docs/stable/api.html#input-output">Many other methods</ref> exist for reading data formats other than csv in Pandas, such as JSON, SQL tables, Excel files, and HTML.</p>
+                    <p>When running this code, <code rend="inline">print(df)</code> will output an abridged representation of the loaded data.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_17" corresp="code_visualizing-with-bokeh_17.txt" rend="block"/>
+                    </ab>
+                    <p>This shows that we have 178,281 records of missions with 19 columns per record. To see what the 19 columns are in full, we can access the dataframe's  <code rend="inline">columns</code> object by replacing <code rend="inline">print(df)</code> in the above code with:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_18" corresp="code_visualizing-with-bokeh_18.txt" rend="block"/>
+                    </ab>
+                    <p>The output should look like:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_19" corresp="code_visualizing-with-bokeh_19.txt" rend="block"/>
+                    </ab>
+                    <p>Some of these column names are self explanatory, but it's worth pointing out the following: MSNDATE (mission date), NAF (numbered airforce responsible for mission), AC_ATTACKING (number of aircraft), TONS_HE (high-explosives), TONS_IC (incendiary devices), TONS_FRAG (fragmentation bombs).</p>
+                    <p>When it comes to accessing data within a <code rend="inline">DataFrame</code>, in this tutorial we use one basic approach: indexing. Here to access a single column we pass a string to our dataframe's indexer: e.g. <code rend="inline">df['MSNDATE']</code>.  To access multiple columns, we pass a list of names to our dataframe's indexer: e.g. <code rend="inline">df[['MSNDATE', 'THEATER']]</code>.</p>
+                </div>
+                <div type="3">
+                    <head>The Bokeh ColumnDataSource</head>
+                    <p>Now that we've learned how to create a Bokeh plot and how to load tabular data into Pandas, it's time to learn how to link Pandas' <code rend="inline">DataFrame</code> with Bokeh visualizations. The Bokeh object <code rend="inline">ColumnDataSource</code> provides this integration.</p>
+                    <p>The object's constructor accepts a Pandas <code rend="inline">DataFrame</code> as an argument. After it is created, the <code rend="inline">ColumnDataSource</code> can then be passed to glyph methods via the <code rend="inline">source</code> parameter and other parameters, such as our x and y data, can then reference column names within our source. Let's go through an example of this.</p>
+                    <p>Using our THOR dataset, we'll create a scatter plot of the number of attacking aircraft versus the tons of munitions dropped. We will use a new file called <code rend="inline">column_datasource.py</code> to do this. We'll also take this opportunity to learn about Bokeh's interactive hover feature.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_20" corresp="code_visualizing-with-bokeh_20.txt" rend="block"/>
+                    </ab>
+                    <p>Here, we import Pandas, the <code rend="inline">figure</code> object and basic functions from <code rend="inline">bokeh.plotting</code>, and the <code rend="inline">ColumnDataSource</code> object from <code rend="inline">bokeh.models</code>.  We're also going to expand our knowledge of interactions in this example by adding a hover feature that is facilitated by the <code rend="inline">HoverTool</code>
+                    </p>
+                    <p>We then immediately set our output file following Bokeh's recommended best practices. Finally, we call Pandas <code rend="inline">read_csv</code> method to load our csv into a <code rend="inline">DataFrame</code>.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_21" corresp="code_visualizing-with-bokeh_21.txt" rend="block"/>
+                    </ab>
+                    <p>Since we don't want to plot all 170,000+ rows in our scatterplot (which would require a longer processing time to generate and would create a confusing plot due to the volume of overlapping data), we randomly sample 50 rows using the dataframe's <code rend="inline">sample</code> method.  We then pass this sample to the <code rend="inline">ColumnDataSource</code> constructor and store this in a variable called <code rend="inline">source</code>.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_22" corresp="code_visualizing-with-bokeh_22.txt" rend="block"/>
+                    </ab>
+                    <p>Next, we create our <code rend="inline">figure</code> object and call the <code rend="inline">circle</code> glyph method to plot our data. This is where the <code rend="inline">source</code> variable that holds our <code rend="inline">ColumnDataSource</code> comes into play. It's passed as our <code rend="inline">source</code> argument to the glyph method and the column names holding the number of attacking aircraft (AC_ATTACKING) and tons of munitions dropped (TOTAL_TONS) are passed as our <code rend="inline">x</code> and <code rend="inline">y</code> arguments.</p>
+                    <p>Interestingly, when we use a <code rend="inline">ColumnDataSource</code> we're not limited to just using column names for <code rend="inline">x</code> and <code rend="inline">y</code> parameters. We can also pass a column name for other parameters such as <code rend="inline">size</code>, <code rend="inline">line_color</code>, or <code rend="inline">fill_color</code>. This allows styling options to be determined by columns in the datasource itself! If you'd like to see this in action, in the code above, change <code rend="inline">size=10</code> to <code rend="inline">size='TONS_HE'</code>. The size of each dot will then reflect the tons of high explosives used.</p>
+                    <p>{% include alert.html text="Throughout the tutorial, I often pass arguments by name where they could more succinctly be passed by position. This is helpful, in my opinion, for the reader to keep track of what arguments are being passed" %}</p>
+                    <p>Next we add a title and label our axes.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_23" corresp="code_visualizing-with-bokeh_23.txt" rend="block"/>
+                    </ab>
+                    <p>We can also, at this stage, learn a bit more about the strong interactive, customizable nature of Bokeh plots. In our first Bokeh plot we saw the default Bokeh toolbar, but Bokeh allows us to customize our plot by adding new interactive tools to it.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_24" corresp="code_visualizing-with-bokeh_24.txt" rend="block"/>
+                    </ab>
+                    <p>Bokeh supports <ref target="https://docs.bokeh.org/en/latest/docs/reference/plotting.html">many plotting tools</ref>, but I introduce <code rend="inline">HoverTool</code> here because it's particularly useful for data exploration and interaction. <code rend="inline">HoverTool</code> allows you to set a <code rend="inline">tooltips</code> property which takes a list of <ref target="https://www.w3schools.com/python/python_tuples.asp">tuples</ref>. The first part of the tuple is a display name and the second is a column name from your <code rend="inline">ColumnDataSource</code> prefaced with <code rend="inline">@</code>. Once we've instantiated this tool, we add it to the plot using the <code rend="inline">add_tool</code> method. We'll see how this looks in a moment.</p>
+                    <p>Finally, we make sure to add the line to show the plot. Now we can run <code rend="inline">column_datasource.py</code> and interact with our data in the browser.</p>
+                    <figure>
+                        <desc>Plotting with the ColumnDataSource and More Styling Options</desc>
+                        <graphic url="visualizing-with-bokeh-2.png"/>
+                    </figure>
+                    <p>Note that because we are randomly sampling the data, our plot will look different each time we run the code.</p>
+                    <p>At the top and along the axes of the plot, we see the labels that we added. There is also a new tool in the toolbar. This is the hover tool that we added. To see it in action, hover over any data point in the scatterplot. A window will pop up showing the columns we set in our <code rend="inline">tooltip</code> property!</p>
+                    <p>Before moving to the next section of the lesson, try returning to the example above and adding/removing other variables and changing display names.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Categorical Data and Bar Charts: Munitions Dropped by Country</head>
+                <p>In the preceding example, we plotted quantitative data. Frequently, though, we want to plot categorical data. Categorical data, in contrast to quantitative, is data that can be divided into groups, but that does not necessarily have a numerical aspect to it. For example, while your height is numerical, your hair color is categorical. From the perspective of our dataset, features like attacking country hold categorical data, while features like the weight of munitions hold quantitative data.</p>
+                <p>In this section, we'll learn how to use categorical data as our x-axis values in Bokeh and how to use the <code rend="inline">vbar</code> glyph method to create a vertical bar chart (an <code rend="inline">hbar</code> glyph method functions similarly to create a horizontal bar chart). In addition, we'll learn about preparing categorical data in Pandas by grouping data. Further, we'll add to our knowledge of Bokeh styling and the hover tool.</p>
+                <p>To work through this information, we'll create a bar chart that shows the total tons of munitions dropped by each country listed in our csv.</p>
+                <p>We start by creating a new file called <code rend="inline">munitions_by_country.py</code> and adding some initial code.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_25" corresp="code_visualizing-with-bokeh_25.txt" rend="block"/>
+                </ab>
+                <p>First, we import the Pandas library and the basic elements from Bokeh (i.e. <code rend="inline">figure</code>, <code rend="inline">output_file</code>, <code rend="inline">show</code>, and <code rend="inline">ColumnDataSource</code>). We also make two new imports: <code rend="inline">Spectral5</code> is a pre-made five color pallette, one of Bokeh's many <ref target="https://docs.bokeh.org/en/latest/docs/reference/palettes.html#bokeh-palettes">pre-made color palettes</ref>, and <code rend="inline">factor_cmap</code> is a helper method for mapping colors to bars in a bar-charts.</p>
+                <p>After the imports, we set our <code rend="inline">output_file</code>  and load the thor_wwii.csv file into a <code rend="inline">DataFrame</code>.</p>
+                <p>We now need to get from the 170,000+ records of individual missions to one record per attacking country with the total munitions dropped.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_26" corresp="code_visualizing-with-bokeh_26.txt" rend="block"/>
+                </ab>
+                <p>Pandas lets us do this in a single line of code by using the <code rend="inline">groupby</code> dataframe method. This method accepts a column by which to group the data and one or more aggregating methods that tell Pandas how to group the data together. The output is a new dataframe.</p>
+                <p>Let's take this one piece at a time. The <code rend="inline">groupby('COUNTRY_FLYING_MISSION')</code> sets the column that we are grouping on. In other words, this says that we want the resulting dataframe to have one row per unique entry in the column <code rend="inline">COUNTRY_FLYING_MISSION</code>. Since we don't care about aggregating all 19 columns in the dataframe, we choose just the tons of munitions columns with the indexer, <code rend="inline">['TOTAL_TONS', 'TONS_HE', 'TONS_IC', 'TONS_FRAG']</code>. Finally, we use the <code rend="inline">sum</code> method to let Pandas know how to aggregate all of the different rows. Other methods also exist for aggregating, such as <code rend="inline">count</code>, <code rend="inline">mean</code>, <code rend="inline">max</code>, and <code rend="inline">min</code>.</p>
+                <p>If you execute <code rend="inline">print(grouped)</code>, you'll see that Pandas has grouped by the five unique countries in our dataset and summed the total tons dropped by each. You can also see the dataset has some problems: South Africa and New Zealand dropped more high explosives than the total tons column. Problems like this are typical of large, manually-created datasets and this is a great reminder why is so important to explore and visualize your data before creating research results.</p>
+                <ab>
+                    <code xml:id="code_visualizing-with-bokeh_27" corresp="code_visualizing-with-bokeh_27.txt" rend="block"/>
+                </ab>
+                <p>To plot this data, let's convert to kilotons by dividing by 1000.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_28" corresp="code_visualizing-with-bokeh_28.txt" rend="block"/>
+                </ab>
+                <p>This is a convenience that we'll continue to use in future examples.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_29" corresp="code_visualizing-with-bokeh_29.txt" rend="block"/>
+                </ab>
+                <p>Now, we need to make a <code rend="inline">ColumnDataSource</code> from our grouped data and create a <code rend="inline">figure</code>. Since our x-axis will list the five countries (rather than numerical data) we need to tell the figure how to handle the x-axis.</p>
+                <p>To do this, we create a list of countries from our source object, using <code rend="inline">source.data</code> and the column name as key. The list of countries is then passed as the <code rend="inline">x_range</code> to our <code rend="inline">figure</code> constructor. Because this is a list of text data, the figure knows the x-axis is categorical and it also knows what possible values our x range can take (i.e. AUSTRALIA, GREAT BRITAIN, etc.).</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_30" corresp="code_visualizing-with-bokeh_30.txt" rend="block"/>
+                </ab>
+                <p>Now we plot our data as individually colored bars and add basic labels. To color our bars we use the <code rend="inline">factor_cmap</code> helper function. This creates a special color map that matches an individual color to each category (i.e. what Bokeh calls a <emph>factor</emph>). The color map is then passed as the color argument to our <code rend="inline">vbar</code> glyph method.</p>
+                <p>For the data in our glyph method, we're passing a source and again referencing column names. Instead of using a <code rend="inline">y</code> parameter, however, the <code rend="inline">vbar</code> method takes a <code rend="inline">top</code> parameter. A <code rend="inline">bottom</code> parameter can equally be specified, but if left out, its default value is 0.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_31" corresp="code_visualizing-with-bokeh_31.txt" rend="block"/>
+                </ab>
+                <p>We add a hover tool again, but now we see that we can use multiple data variables in a single line and add in our own text so the hover popup will list the kilotons of each type of explosive. The <code rend="inline">hover.mode</code> is new. Three modes exist for the hover tool: <code rend="inline">mouse</code>, <code rend="inline">vline</code>, and <code rend="inline">hline</code>. These tell the hover tool when to show the popup. <code rend="inline">mouse</code> is the default value and shows a popup when directly over a glyph. <code rend="inline">vline</code> and <code rend="inline">hline</code> tell the popup to show when a vertical or horizontal line crosses a glyph. With <code rend="inline">vline</code> set here, anytime your mouse passes through an imaginary vertical line extending from each bar, a popup will show.</p>
+                <figure>
+                    <desc>A Bar Chart with Categorical Data and Coloring</desc>
+                    <graphic url="visualizing-with-bokeh-3.png"/>
+                </figure>
+                <p>{% include alert.html text="If you have a chance, it's worth exploring Bokeh's <ref target="https://docs.bokeh.org/en/latest/docs/reference/palettes.html#bokeh-palettes">color palettes</ref>. In the above example, try rewriting the code to use something other than <code rend="inline">Spectral5</code>, such as <code rend="inline">Inferno5</code> or <code rend="inline">RdGy5</code>. To take it one step further, you can try your hand at using built-in palettes in any example that uses color." %}</p>
+            </div>
+            <div type="2">
+                <head>Stacked Bar Charts and Sub-sampling Data: Types of Munitions Dropped by Country</head>
+                <p>Because the previous plot shows that the USA and Great Britain account for the overwhelming majority of bombings, we now focus on these two countries and learn how to make a stacked bar chart that shows the types of munitions each country used.</p>
+                <p>We'll start a new file called <code rend="inline">munitions_by_country_stacked.py</code>
+                </p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_32" corresp="code_visualizing-with-bokeh_32.txt" rend="block"/>
+                </ab>
+                <p>In addition to our standard imports, this time we use a three-color Spectral palette, one color for each type of explosive (High Explosive, Incendiary, and Fragmentation).</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_33" corresp="code_visualizing-with-bokeh_33.txt" rend="block"/>
+                </ab>
+                <p>Since the x-axis is again categorical, we'll need to group and aggregate our data. This time, though, we need to exclude any records hat don't have a COUNTRY_FLYING_MISSION with a value of GREAT BRITAIN or USA. To do that, we filter our dataframe.</p>
+                <p>For each row in <code rend="inline">df</code>, the <code rend="inline">isin</code> function checks whether COUNTRY_FLYING_MISSION has a value of USA or GREAT BRITAIN. If it does, the corresponding value in the variable <code rend="inline">filter</code> is <code rend="inline">True</code> and if not the value is <code rend="inline">False</code>
+                </p>
+                <p>When applied to our dataframe via <code rend="inline">df[filter]</code>, a new dataframe is created in which rows with a <code rend="inline">True</code>  value are kept and rows with a <code rend="inline">False</code> value are discarded. After the filter has been applied here, executing <code rend="inline">df.shape</code> shows that 125,526 rows remain of an original 178,281.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_34" corresp="code_visualizing-with-bokeh_34.txt" rend="block"/>
+                </ab>
+                <p>Now that we have reduced the dataframe to show only records for the USA and Great Britain, we group our data with <code rend="inline">groupby</code> and aggregate the three columns that hold bomb types with <code rend="inline">sum</code>.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_35" corresp="code_visualizing-with-bokeh_35.txt" rend="block"/>
+                </ab>
+                <p>As in the previous example, we create a source object from our grouped data and make sure our figure uses categorical data for the x-axis by setting the <code rend="inline">x_range</code> to the list of countries.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_36" corresp="code_visualizing-with-bokeh_36.txt" rend="block"/>
+                </ab>
+                <p>To create the stacked bar chart, we call the <code rend="inline">vbar_stack</code> glyph method. Rather than passing a single column name to a <code rend="inline">y</code> parameter, we instead pass a list of column names as <code rend="inline">stackers</code>. The order of this list determines the order that the columns will be stacked from bottom to top (after you've worked through this example, try switching the column order to see what happens). The <code rend="inline">legend</code> argument supplies text for each stacker and the <code rend="inline">Spectral3</code> palette provides colors for each stacker.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_37" corresp="code_visualizing-with-bokeh_37.txt" rend="block"/>
+                </ab>
+                <p>We add basic styling and labeling, and then output the plot.</p>
+                <figure>
+                    <desc>A Stacked Bar Chart with Categorical Data and Coloring</desc>
+                    <graphic url="visualizing-with-bokeh-4.png"/>
+                </figure>
+            </div>
+            <div type="2">
+                <head>Time-Series and Annotations: Bombing Operations over Time</head>
+                <p>Let's now explore the use of incendiary and fragmentation explosive a little more by seeing if there's any trend in their use over time versus the total munitions dropped. As you have had some time to get used to Bokeh's syntax, let's dive right in with a full code example in a new file named <code rend="inline">my_first_timeseries.py</code>.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_38" corresp="code_visualizing-with-bokeh_38.txt" rend="block"/>
+                </ab>
+                <p>Take a minute to seriously look through this code and see what you recognize. Two items should stand out as new.</p>
+                <p>First, the statement <code rend="inline">df['MSNDATE'] = pd.to_datetime(df['MSNDATE'], format='%m/%d/%Y')</code> makes sure our MSNDATE column is a datetime. This is important because often data loaded from a csv file will not be properly typed as datetime. Supplying the <code rend="inline">format</code> argument is not required, but doing so significantly speeds up the process.</p>
+                <p>Second, we pass the argument <code rend="inline">x_axis_type='datetime'</code> to our figure constructor to tell it that our x data will be datetimes. Otherwise, Bokeh works seamlessly with time data just like any other type of numerical data!</p>
+                <p>Looking at the output, though, you might notice a major issue.</p>
+                <figure>
+                    <desc>A Basic Time-Series Plot</desc>
+                    <graphic url="visualizing-with-bokeh-5.png"/>
+                </figure>
+                <p>This data is volatile and hard-to-read because it is too fine-grained for our needs. Having daily data over the course of five years is great, but plotting it as such obscures trends in the data. To successfully plot time-series data and look for long-term trends, we need a way to change the time-scale we're looking at so that, for example, we can plot data summarized by weeks, months, or years.</p>
+                <p>Thankfully, Pandas offers a quick and easy way to do this. By modifying a single line of code in the above example, we can <emph>resample</emph> our time-series data to any valid unit of time.</p>
+                <div type="3">
+                    <head>Resampling Time-Series Data</head>
+                    <p>Resampling time-series data can involve either upsampling (creating more records) or downsampling (creating fewer records). For example, a list of daily temperatures could be upsampled to a list of hourly temperatures or downsampled to a list of weekly temperatures. We'll only be downsampling in this tutorial, but upsampling is very useful when you're trying to match a sporadically-measured dataset with one that's more periodically measured.</p>
+                    <p>To resample our data, we use a Pandas <code rend="inline">Grouper</code> object, to which we pass the column name holding our datetimes and a code representing the desired resampling frequency. In the case of our data, the statement <code rend="inline">pd.Grouper(key='MSNDATE', freq='M') </code> will be used to resample our MSNDATE column by <emph>M</emph>onth. We could equally resample by <emph>W</emph>eek, <emph>Y</emph>ear, <emph>H</emph>our, and <ref target="http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases">so forth</ref>. These frequency designations can also be prefaced with numbers so that, for example, <code rend="inline">freq='2W'</code> resamples at two week intervals!</p>
+                    <p>To complete the process of resampling and plotting our data, we pass the above <code rend="inline">Grouper</code> object to our <code rend="inline">groupby</code> function in place of the raw column name. The <code rend="inline">groupby</code> statement from the previous code example should now look like this:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_39" corresp="code_visualizing-with-bokeh_39.txt" rend="block"/>
+                    </ab>
+                    <p>Rerunning the above code sample will produce a much cleaner plot with obvious trends. The plot now shows four points of interest:</p>
+                    <list type="unordered">
+                        <item>First, in both the Spring of 1944 and 1945, the scale of Allied bombing operations reached greater intensity.</item>
+                        <item>Second, there is a smaller spike in the summer of 1945 during the acceleration of bombings against the Japanese after Germany's surrender.</item>
+                        <item>Third, four spikes in the use of incendiary weapons appear that could further explored.</item>
+                        <item>Fourth and finally, there are a few small spikes in the use of fragmentation bombs, the use of which then effectively stops after the surrender of Germany.</item>
+                    </list>
+                    <figure>
+                        <desc>A Time-Series Plot with Data Resampled to Months</desc>
+                        <graphic url="visualizing-with-bokeh-6.png"/>
+                    </figure>
+                </div>
+                <div type="3">
+                    <head>Annotating Trends in Plots</head>
+                    <p>Let's look more closely now at the bombings in Europe in 1944 and 1945 to see what trends there are with fragmentation and incendiary munitions. We will also point out some of these trends in our plot with annotations. To do this, we'll filter our dataset so that we work only with bombings in the European Theater of Operations (ETO), resample the data at one-month intervals (<code rend="inline">freq='M'</code>), and then plot the results in the same manner as before.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_40" corresp="code_visualizing-with-bokeh_40.txt" rend="block"/>
+                    </ab>
+                    <figure>
+                        <desc>A Time-Series Plot of the ETO with Data Resampled to Months</desc>
+                        <graphic url="visualizing-with-bokeh-7.png"/>
+                    </figure>
+                    <p>A few patterns emerge in the ETO data. First we see a very clear escalation of overall bombings leading up to June 6, 1944 and a notable dip during the winter of 1944/1945. Incendiary munitions show three spikes and confirm that the fourth spike seen in the preceding example was directed at the bombing of Japan after Germany's surrender. The pattern of fragmentation bombs is harder to read, but it's now clear that they were only seriously used in the European Theater after D-Day.</p>
+                    <p>{% include alert.html text="Try your hand at resampling this data using any of <ref target="http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases">Pandas' time frequencies </ref> to see what other trends might emerge. Remember, you can preface these frequencies with numbers as well (e.g. if you were working with historical stock market data, 2Q would give you bi-quarterly data!)" %}</p>
+                    <p>Since we have established that 6 June 1944 and the winter of 1944/1945 mark changes to the bombing patterns in the ETO, let's highlight these trends using Bokeh's annotation features.</p>
+                    <p>To do this, we'll create a <code rend="inline">BoxAnnotation</code> and then add these to our <code rend="inline">figure</code> before showing it. First, we need to add an additional import statement to our code.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_41" corresp="code_visualizing-with-bokeh_41.txt" rend="block"/>
+                    </ab>
+                    <p>To create the box, we first need to determine its coordinates. Coordinates for Bokeh annotations can be either absolute (i.e. positioned using screen units), meaning they always stay in one place, or they can be positioned in relation to data. Our annotations will all be positioned using data coordinates.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_42" corresp="code_visualizing-with-bokeh_42.txt" rend="block"/>
+                    </ab>
+                    <p>The left of the box will be 6 June 1944 (D-Day) and for the right of the box we'll choose the first day of the Battle of the Bulge: 16 December 1944. In this case, the dates follow a month-day-year format, but <code rend="inline">to_datetime</code> also works with <ref target="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.to_datetime.html">day-first and year-first formats</ref>.</p>
+                    <p>We pass these coordinates to the <code rend="inline">BoxAnnotation</code> constructor along with some styling arguments. Then, we add it to the our figure using the <code rend="inline">add_layout()</code> method.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_visualizing-with-bokeh_43" corresp="code_visualizing-with-bokeh_43.txt" rend="block"/>
+                    </ab>
+                    <figure>
+                        <desc>A Time-Series Plot of the ETO with Annotations Added</desc>
+                        <graphic url="visualizing-with-bokeh-8.png"/>
+                    </figure>
+                    <p>{% include alert.html text="Try to create a similar plot for the Pacific Theater of Operations (PTO). Annotate the invasion of Iwo Jima (February 19, 1945) and Japan's announcement of surrender (August 15, 1945)." %}</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Spatial Data: Mapping Target Locations</head>
+                <p>In this final part of the lesson we'll look at the spatial components of fragmentation bombs.</p>
+                <p>Bokeh provides <ref target="https://docs.bokeh.org/en/latest/docs/reference/tile_providers.html">built-in tile providers</ref> that render base maps of the world. These are contained in the <code rend="inline">bokeh.tile_providers</code> module. For this example, we'll use the CartoDB Tile Service (CARTODBPOSITRON).</p>
+                <p>We'll also be using functions imported from the <code rend="inline">pyproj</code> library. Since our coordinates are stored as latitude/longitude, we'll define a custom function to convert them before mapping. Note that although Bokeh is coordinate-system neutral, it uses the Web Mercator projection for mapping, a standard found across web tile providers. The subject of coordinate systems and projections are outside the scope of this tutorial, but the interested reader will find many useful web resources on these topics.</p>
+                <p>{% include alert.html text="If your own dataset has place names, but not latitude and longitude, don't worry! You can find ways to easily get coordinates from place names in Programming Historian's <ref target="/lessons/geocoding-qgis">Geocoding Historical Data using QGIS</ref> or <ref target="/lessons/mapping-with-python-leaflet#geocoding-with-python">Web Mapping with Python and Leaflet</ref>." %}</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_44" corresp="code_visualizing-with-bokeh_44.txt" rend="block"/>
+                </ab>
+                <p>The boilerplate imports and our conversion function are defined. Next, we load our data and apply our conversion function to create new E and N columns that store our Web Mercator easting and northing.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_45" corresp="code_visualizing-with-bokeh_45.txt" rend="block"/>
+                </ab>
+                <p>Because a single target can appear in multiple records, we need to group the data by E and N to get unique target locations. Otherwise, we would map the same target every time it appears in a record.</p>
+                <p>The <code rend="inline">reset_index</code> function applied after aggregating is new here. By default, when Pandas groups these two columns it will make E and N the index for each row in the new dataframe. Since we just want E and N to remain as normal columns for mapping, we call <code rend="inline">reset_index</code>.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_46" corresp="code_visualizing-with-bokeh_46.txt" rend="block"/>
+                </ab>
+                <p>To set bounds for our map, we'll set a minimum and maximum value for our plot's <code rend="inline">x_range</code> and <code rend="inline">y_range</code>. We use the <code rend="inline">Range1D</code> object, which represents bounded 1-dimensional data in Bokeh.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_visualizing-with-bokeh_47" corresp="code_visualizing-with-bokeh_47.txt" rend="block"/>
+                </ab>
+                <p>Finally, we call <code rend="inline">add_tile</code> and pass the tile provider we imported. Then, we use glyph methods just like in any other plot. Here, we call <code rend="inline">circle</code> and pass the easting and northing columns as our x and y data.</p>
+                <figure>
+                    <desc>A Map of Target Locations</desc>
+                    <graphic url="visualizing-with-bokeh-9.png"/>
+                </figure>
+                <p>Having plotted which targets in Europe and Asia were bombed with fragmentation bombs, we can now start to examine patterns of destruction with greater detail. In the above code, we also summed incendiary bombs. Try to alter the code to create a map of these targets.</p>
+            </div>
+            <div type="2">
+                <head>Bokeh as a Visualization Tool</head>
+                <p>Bokeh's strength as a visualization tool lies in its ability to show differing types of data in an interactive and web-friendly manner. This tutorial has only scratched the surface of Bokeh's capabilities and the reader is encourage to delve deeper into the library's workings. A great place to start is the <ref target="https://docs.bokeh.org/en/latest/docs/gallery.html">Bokeh gallery</ref>, where you can see a variety of visualizations and decide how you might apply these techniques to your own data. If you're more inclined to dive right into further code examples, Bokeh's <ref target="https://mybinder.org/v2/gh/bokeh/bokeh-notebooks/master?filepath=tutorial%2F00%20-%20Introduction%20and%20Setup.ipynb">online notebook</ref> is an excellent place to start!</p>
+            </div>
+            <div type="2">
+                <head>Further Resources</head>
+                <list type="unordered">
+                    <item>
+                        <ref target="https://docs.bokeh.org/en/latest/docs/user_guide.html">Bokeh User Guide</ref>
+                    </item>
+                    <item>
+                        <ref target="https://docs.bokeh.org/en/latest/docs/gallery.html">Bokeh Gallery</ref>
+                    </item>
+                    <item>
+                        <ref target="https://pandas.pydata.org/pandas-docs/stable/index.html">Pandas Documentation</ref>
+                    </item>
+                    <item>
+                        <ref target="https://www.kdnuggets.com/2017/01/pandas-cheat-sheet.html">Pandas Cheat Sheet</ref>
+                    </item>
+                    <item>
+                        <ref target="https://www.kdnuggets.com/2017/03/bokeh-cheat-sheet.html">Bokeh Cheat Sheet</ref>
+                    </item>
+                </list>
+                <p>
+                    <ref type="footnotemark" target="#en_note_1"/> : David Robinson, 'Why is Python Growing so Quickly?', <emph>Stack Overflow Blog</emph>, 14 September 2017 <ref target="https://stackoverflow.blog/2017/09/14/python-growing-quickly/">https://stackoverflow.blog/2017/09/14/python-growing-quickly/</ref>
+                </p>
+            </div>
+        </body>
+    </text>
 </TEI>

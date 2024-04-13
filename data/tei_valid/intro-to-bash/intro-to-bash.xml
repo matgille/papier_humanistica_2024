@@ -1,0 +1,447 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="intro-to-bash">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Introduction to the Bash Command Line</title>
+                <author role="original_author">
+                    <persName>Ian Milligan</persName>
+                    <persName>James Baker</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>M. H. Beals</persName>
+                    <persName>Allison Hegel</persName>
+                    <persName>Charlotte Tupman</persName>
+                </editor>
+                <editor role="editors">Adam Crymble</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0037</idno>
+                <date type="published">09/20/2014</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original. Available translations are the following: Available translations are the following:<ref type="translations" target="#introduccion-a-bash"/>
+                    <ref type="translations" target="#introduccion-a-bash"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>This lesson will teach you how to enter commands using a command-line interface, rather than through a graphical interface. Command-line interfaces have advantages for computer users who need more precision in their work, such as digital historians. They allow for more detail when running some programs, as you can add modifiers to specify exactly how you want your program to run. Furthermore, they can be easily automated through scripts, which are essentially recipes of text-based commands.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">get-ready</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2">
+                <head>Introduction to the Bash Command Line</head>
+                <div type="3">
+                    <head>Introduction</head>
+                    <p>Many of the lessons at the <emph>Programming Historian</emph> require you to enter commands through a <hi rend="bold">Command-Line Interface</hi>. The usual way that computer users today interact with their system is through a <hi rend="bold">Graphical-User Interface</hi>, or GUI. This means that when you go into a folder, you click on a picture of a file folder; when you run a program, you click on it; and when you browse the web, you use your mouse to interact with various elements on a webpage. Before the rise of GUIs in the late 1980s, however, the primary way to interact with a computer was through a command-line interface.</p>
+                    <figure>
+                        <desc>GUI of Ian Milligan's Computer</desc>
+                        <graphic url="GUI.png"/>
+                    </figure>
+                    <p>Command-line interfaces have advantages for computer users who need more precision in their work -- such as digital historians. They allow for more detail when running some programs, as you can add modifiers to specify <emph>exactly</emph> how you want your program to run. Furthermore, they can be easily automated through <ref target="http://www.tldp.org/LDP/Bash-Beginners-Guide/html/chap_01.html">scripts</ref>, which are essentially recipes of text-based commands.</p>
+                    <p>There are two main command-line interfaces, or 'shells,' that many digital historians use. On OS X or many Linux installations, the shell is known as <code rend="inline">bash</code>, or the 'Bourne-again shell.'  For users on Windows-based systems, the command-line interface is by default <code rend="inline">MS-DOS-based</code>, which uses different commands and <ref target="http://en.wikipedia.org/wiki/Syntax">syntax</ref>, but can often achieve similar tasks. This tutorial provides a basic introduction to the <code rend="inline">bash</code> terminal, and Windows users can follow along by installing popular shells such as <ref target="https://www.cygwin.com/">Cygwin</ref> or Git Bash (see below).</p>
+                    <p>This lesson uses a <hi rend="bold">
+                            <ref target="http://en.wikipedia.org/wiki/Unix_shell">Unix shell</ref>
+                        </hi>, which is a command-line interpreter that provides a user interface for the <ref target="http://en.wikipedia.org/wiki/Unix">Unix</ref> operating system and for Unix-like systems. This lesson will cover a small number of basic commands. By the end of this tutorial you will be able to navigate through your file system and find files, open them, perform basic data manipulation tasks such as combining and copying files, as well as both reading them and making relatively simple edits. These commands constitute the building blocks upon which more complex commands can be constructed to fit your research data or project. Readers wanting a reference guide that goes beyond this lesson are recommended to read Deborah S. Ray and Eric J. Ray, <emph>Unix and Linux: Visual Quickstart Guide</emph>, 4th edition (2009).</p>
+                </div>
+                <div type="3">
+                    <head>Windows Only: Installing Git Bash</head>
+                    <p>For those on OS X, and most Linux installations, you're in luck — you already have a bash shell installed. For those of you on Windows, you'll need to take one extra step and install Git Bash. This can be installed by downloading the most recent 'Full installer' at <ref target="https://git-for-windows.github.io/">this page</ref>. Instructions for installation are available at <ref target="https://web.archive.org/web/20190114082523/https://openhatch.org/missions/windows-setup/install-git-bash">Open Hatch</ref>.</p>
+                </div>
+                <div type="3">
+                    <head>Opening Your Shell</head>
+                    <p>Let's start up the shell. In Windows, run Git Bash from the directory that you installed it in. You will have to run it as an administrator - to do so, right click on the program and select 'Run as Administrator.' In OS X, by default the shell is located in:</p>
+                    <p>
+                        <code rend="inline">Applications -&gt; Utilities -&gt; Terminal</code>
+                    </p>
+                    <figure>
+                        <desc>The Terminal.app program on OS X</desc>
+                        <graphic url="Terminal.png"/>
+                    </figure>
+                    <p>When you run it, you will see this window.</p>
+                    <figure>
+                        <desc>A blank terminal screen on our OS X workstation</desc>
+                        <graphic url="Blank-Terminal.png"/>
+                    </figure>
+                    <p>You might want to change the default visual appearance of the terminal, as eyes can strain at repeatedly looking at black text on a white background. In the default OS X application, you can open the 'Settings' menu in 'Preferences' under Terminal. Click on the 'Settings' tab and change it to a new colour scheme. We personally prefer something with a bit less contrast between background and foreground, as you'll be staring at this a great deal. 'Novel' is a soothing one as is the popular <ref target="http://ethanschoonover.com/solarized">Solarized</ref> suite of colour palettes. For Windows users, a similar effect can be achieved using the Git Bash <code rend="inline">Properties</code> tab. To reach this, right-click anywhere in the top bar and select <code rend="inline">Properties</code>.</p>
+                    <figure>
+                        <desc>The Settings Screen on the OS X Terminal Shell Application</desc>
+                        <graphic url="Settings.png"/>
+                    </figure>
+                    <p>Once you are happy with the interface, let's get started.</p>
+                </div>
+                <div type="3">
+                    <head>Moving Around Your Computer's File System</head>
+                    <p>If, when opening a command window, you are unsure of where you are in a computer's file system, the first step is to find out what directory you are in. Unlike in a graphical system, when in a shell you cannot be in multiple directories at once. When you open up your file explorer on your desktop, it's revealing files that are within a directory. You can find out what directory you are in through the <code rend="inline">pwd</code> command, which stands for "print working directory." Try inputing:</p>
+                    <p>
+                        <code rend="inline">pwd</code>
+                    </p>
+                    <p>and hitting enter. If you're on OS X or Linux, your computer will probably display <code rend="inline">/users/USERNAME</code> with your own user name in place of USERNAME. For example, Ian's path on OS X is <code rend="inline">/users/ianmilligan1/</code>.</p>
+                    <p>Here is where you realize that those on Windows and those on OS X/Linux will have slightly different experiences. On Windows, James is at:</p>
+                    <p>
+                        <code rend="inline">c/users/jbaker</code>
+                    </p>
+                    <p>There are minor differences, but fear not; once you're moving and manipulating files, these platform divergences can fade into the background.</p>
+                    <p>To orient ourselves, let's get a listing of what files are in this directory. Type</p>
+                    <p>
+                        <code rend="inline">ls</code>
+                    </p>
+                    <p>and you will see a list of every file and directory within your current location. Your directory may be cluttered or it may be pristine, but you will at a minimum see some familiar locations. On OS X, for example, you'll see <code rend="inline">Applications</code>, <code rend="inline">Desktop</code>, <code rend="inline">Documents</code>, <code rend="inline">Downloads</code>, <code rend="inline">Library</code>, <code rend="inline">Pictures</code>, etc.</p>
+                    <p>You may want more information than just a list of files. You can do this by specifying various <emph>flags</emph> to go with our basic commands. These are additions to a command that provide the computer with a bit more guidance of what sort of output or manipulation you want. To get a list of these, OS X/Linux users can turn to the built-in help program. OS X/Linux users type</p>
+                    <p>
+                        <code rend="inline">man ls</code>
+                    </p>
+                    <figure>
+                        <desc>The Manual page for the LS command</desc>
+                        <graphic url="man-ls.png"/>
+                    </figure>
+                    <p>Here, you see a listing of the name of the command, the way that you can format this command and what it does. <hi rend="bold">Many of these will not make sense at this stage, but don't worry; over time you will become more familiar with them.</hi> You can explore this page in a variety of ways: the spacebar moves down a page, or you can arrow down and arrow up throughout the document.</p>
+                    <p>To leave the manual page, press</p>
+                    <p>
+                        <code rend="inline">q</code>
+                    </p>
+                    <p>and you will be brought back to the command line where you were before entering the manual page.</p>
+                    <p>Try playing around with the <code rend="inline">man</code> page for the other command you have learned so far, <code rend="inline">pwd</code>.</p>
+                    <p>Windows users can use the <code rend="inline">help</code> command, though this command has fewer features than <code rend="inline">man</code> on OS X/Linux. Enter <code rend="inline">help</code> to see the help available, and <code rend="inline">help pwd</code> for an example of the command's output.</p>
+                    <p>Let's try using a few of those options you saw in the <code rend="inline">man</code> page for ls. Perhaps you only want to see TXT files that are in our home directory. Type</p>
+                    <p>
+                        <code rend="inline">ls *.txt</code>
+                    </p>
+                    <p>which returns a list of text files, if you have any in your home directory (you may not, and that is OK as well). The * command is a <hi rend="bold">wildcard</hi> — it stands for 'anything.' So, in this case, you're indicating that anything that fits the pattern:</p>
+                    <p>[anything.txt]</p>
+                    <p>will be displayed. Try out different combinations. If, for example, you had several files in the format <code rend="inline">1-Canadian.txt</code>, <code rend="inline">2-Canadian.txt</code>, and so forth, the command <code rend="inline">ls *-Canadian.txt</code> would display them all but exclude all other files (those that do not match the pattern).</p>
+                    <p>Say you want more information. In that long <code rend="inline">man</code> page, you saw an option that might be useful:</p>
+                    <quote>
+                        <ab>
+                            <code xml:id="code_intro-to-bash_0" corresp="code_intro-to-bash_0.txt" rend="block"/>
+                        </ab>
+                    </quote>
+                    <p>So, if you type</p>
+                    <p>
+                        <code rend="inline">ls -l</code>
+                    </p>
+                    <p>the computer returns a long list of files that contains information similar to what you'd find in your finder or explorer: the size of the files in bites, the date it was created or last modified, and the file name. However, this can be a bit confusing: you see that a file test.html is '6020' bits large. In commonplace language, you are more used to units of measurement like bytes, kilobytes, megabytes, and gigabytes.</p>
+                    <p>Luckily, there's another flag:</p>
+                    <quote>
+                        <ab>
+                            <code xml:id="code_intro-to-bash_1" corresp="code_intro-to-bash_1.txt" rend="block"/>
+                        </ab>
+                    </quote>
+                    <p>When you want to use two flags, you can just run them together. So, by typing</p>
+                    <p>
+                        <code rend="inline">ls -lh</code>
+                    </p>
+                    <p>you receive output in a human-readable format; you learn that that 6020 bits is also 5.9KB, that another file is 1 megabyte, and so forth.</p>
+                    <p>These options are <emph>very</emph> important. In other lessons within the <emph>Programming Historian</emph>, you'll see them. <ref target="/lessons/applied-archival-downloading-with-wget">Wget</ref>, <ref target="/lessons/topic-modeling-and-mallet">MALLET</ref>, and <ref target="/lessons/sustainable-authorship-in-plain-text-using-pandoc-and-markdown">Pandoc</ref> all use the same syntax. Luckily, you do not need to memorize syntax; instead, keep these lessons handy so you can take a quick peek if you need to tweak something. These lessons can all be done in any order.</p>
+                    <p>You've now spent a great deal of time in your home directory. Let's go somewhere else. You can do that through the <code rend="inline">cd</code> or Change Directory command.</p>
+                    <p>If you type</p>
+                    <p>
+                        <code rend="inline">cd desktop</code>
+                    </p>
+                    <p>you are now on your desktop. This is akin to you 'double-clicking' on the 'desktop' folder within a file explorer. To double check, type <code rend="inline">pwd</code> and you should see something like:</p>
+                    <p>
+                        <code rend="inline">/Users/ianmilligan1/desktop</code>
+                    </p>
+                    <p>Try playing around with those earlier commands: explore your current directory using the <code rend="inline">ls</code> command.</p>
+                    <p>If you want to go back, you can type</p>
+                    <p>
+                        <code rend="inline">cd ..</code>
+                    </p>
+                    <p>This moves us 'up' one directory, putting us back in <code rend="inline">/Users/ianmilligan1/</code>. If you ever get completely lost, the command</p>
+                    <p>
+                        <code rend="inline">cd --</code>
+                    </p>
+                    <p>will bring you right back to the home directory, right where you started.</p>
+                    <p>Try exploring: visit your documents directory, your pictures, folders you might have on your desktop. Get used to moving in and out of directories. Imagine that you are navigating a <ref target="http://en.wikipedia.org/wiki/Tree_structure">tree structure</ref>. If you're on the desktop, you won't be able to <code rend="inline">cd documents</code> as it is a 'child' of your home directory, whereas your Desktop is a 'sibling' of the Documents folder. To get to a sibling, you have to go back to the common parent. To do this, you will have to back up to your home directory (<code rend="inline">cd ..</code>) and then go forward again to <code rend="inline">cd documents</code>.</p>
+                    <p>Being able to navigate your file system using the bash shell is very important for many of the lessons at the <emph>Programming Historian</emph>. As you become more comfortable, you'll soon find yourself skipping directly to the directory that you want. In our case, from anywhere on our system, you could type</p>
+                    <p>
+                        <code rend="inline">cd /users/ianmilligan1/mallet-2.0.7</code>
+                    </p>
+                    <p>or, on Windows, something like</p>
+                    <p>
+                        <code rend="inline">cd c:\mallet-2.0.7\</code>
+                    </p>
+                    <p>and be brought to our MALLET directory for <ref target="/lessons/topic-modeling-and-mallet">topic modeling</ref>.</p>
+                    <p>Finally, try</p>
+                    <p>
+                        <code rend="inline">open .</code>
+                    </p>
+                    <p>in OS X or</p>
+                    <p>
+                        <code rend="inline">explorer .</code>
+                    </p>
+                    <p>in Windows. That command will open up your GUI at the current directory. Make sure to leave a space between <code rend="inline">open</code> or <code rend="inline">explorer</code> and the period.</p>
+                </div>
+                <div type="3">
+                    <head>Interacting with Files</head>
+                    <p>As well as navigating directories, you can interact with files on the command line: you can read them, open them, run them, and even edit them, often without ever having to leave the interface. There is some debate over why one would do this. The primary reason is the seamless experience of working on the command line: you never have to pick up your mouse or touch your track pad, and, although it has a steep learning curve it can eventually become a sole writing environment. Furthermore, many programs require you to use the command line to operate with them. Since you'll be using programs on the command line, it can often be quicker to make small edits without switching into a separate program. For some of these arguments, see Jon Beltran de Heredia's <ref target="http://www.viemu.com/a-why-vi-vim.html">"Why, oh WHY, do those #?@! nutheads use vi?"</ref>.</p>
+                    <p>Here's a few basic ways to interact with files.</p>
+                    <p>First, you can create a new directory so you can engage with text files. We will create it on your desktop, for convenience's sake. You can always move it later. Navigate to your desktop using your shell, and type:</p>
+                    <p>
+                        <code rend="inline">mkdir ProgHist-Text</code>
+                    </p>
+                    <p>This creates a directory named, you guessed it, 'ProgHist-Text.' In general, it's good to avoid putting spaces in your filenames and directories when using the command line (there are workarounds, of course, but this approach is simpler). You can look at your desktop to verify it has worked. Now, move into that directory (remember, that would be <code rend="inline">cd ProgHist-Text</code>).</p>
+                    <p>But wait! There's a trick to make things a bit quicker. Go up one directory (<code rend="inline">cd ..</code> - which will take you back to the Desktop). To navigate to the <code rend="inline">ProgHist-Text</code> directory you could type <code rend="inline">cd ProgHist-Text</code>. Alternatively, you could type <code rend="inline">cd Prog</code> and then hit tab. You will notice that the interface completes the line to <code rend="inline">cd ProgHist-Text</code>. <hi rend="bold">Hitting tab at any time within the shell will prompt it to attempt to auto-complete the line based on the files or sub-directories in the current directory. This is case sensitive, however (i.e. in the previous example, <code rend="inline">cd prog</code> would not auto complete to <code rend="inline">ProgHist-Text</code>. Where two or more files have the same characters, the auto-complete will only fill up to the first point of difference. We would encourage using this method throughout the lesson to see how it behaves.</hi>
+                    </p>
+                    <p>Now you need to find a basic text file to help us with the example. Why don't you use a book that you know is long, such as Leo Tolstoy's epic <emph>War and Peace</emph>. The text file is availiable via <ref target="http://www.gutenberg.org/ebooks/2600">Project Gutenberg</ref>. If you have already installed <ref target="/lessons/applied-archival-downloading-with-wget">wget</ref>, you can just type</p>
+                    <p>
+                        <code rend="inline">wget http://www.gutenberg.org/files/2600/2600-0.txt</code>
+                    </p>
+                    <p>If you do not have wget installed, download the text itself using your browser. Go to the link above, and, in your browser, use the 'Save Page as..' command in your 'file menu.' Save it in your new 'ProgHist-Text directory.' Now, when you type</p>
+                    <p>
+                        <code rend="inline">ls -lh</code>
+                    </p>
+                    <p>you see</p>
+                    <quote>
+                        <quote>
+                            <p>-rw-r--r--+ 1 ianmilligan1  staff   3.1M  1 May 10:03 2600-0.txt</p>
+                        </quote>
+                    </quote>
+                    <p>You can read the text within this file in a few different ways. First, you can tell our computer that you want to read it using the standard program that you use to open text files. By default, this may be TextEdit on OS X or Notepad in Windows. To open a file, just type</p>
+                    <p>
+                        <code rend="inline">open 2600-0.txt</code>
+                    </p>
+                    <p>on OS X, or</p>
+                    <p>
+                        <code rend="inline">explorer 2600-0.txt</code>
+                    </p>
+                    <p>in Windows.</p>
+                    <p>This selects the default program to open that type of file, and opens it.</p>
+                    <p>However, you often want to just work on the command line without leaving it. You can read files within this environment as well. To try this, type:</p>
+                    <p>
+                        <code rend="inline">cat 2600-0.txt</code>
+                    </p>
+                    <p>The terminal window erupts and <emph>War and Peace</emph> cascades by. That's great, in theory, but you can't really make any sense of that amount of text? Instead, you may want to just look at the first or the last bit of the file.</p>
+                    <p>
+                        <code rend="inline">head 2600-0.txt</code>
+                    </p>
+                    <p>Provides a view of the first ten lines, whereas</p>
+                    <p>
+                        <code rend="inline">tail 2600-0.txt</code>
+                    </p>
+                    <p>provides a perspective on the last ten lines. This is a good way to quickly determine the contents of the file. You could add a command to change the amount of lines displayed: <code rend="inline">head -20 2600-0.txt</code>, for example, would show the first twenty lines.</p>
+                    <p>You may also want to change the file name to something more descriptive. You can 'move' it to a new name by typing</p>
+                    <p>
+                        <code rend="inline">mv 2600-0.txt tolstoy.txt</code>
+                    </p>
+                    <p>Afterwards, when you perform a <code rend="inline">ls</code> command, you will see that it is now <code rend="inline">tolstoy.txt</code>. Had you wanted to duplicate it, you could also have run the copy command by typing</p>
+                    <p>
+                        <code rend="inline">cp 2600-0.txt tolstoy.txt</code>
+                    </p>
+                    <p>you will revisit these commands shortly.</p>
+                    <p>Now that you have used several new commands, it's time for another trick. Hit the up arrow on your keyboard. Notice that <code rend="inline">cp 2600-0.txt tolstoy.txt</code> appears before your cursor. You can continue pressing the up arrow to cycle through your previous commands. The down arrow cycles back toward your most recent command.</p>
+                    <p>After having read and renamed several files, you may wish to bring their text together into one file. To combine, or concatenate, two or more files, you can use the <code rend="inline">cat</code> command. First, let's duplicate the Tolstoy file ( <code rend="inline">cp tolstoy.txt tolstoy2.txt</code>). Now that you have two copies of <emph>War and Peace</emph>, let's put them together to make an <hi rend="bold">even longer</hi> book.</p>
+                    <p>To combine, or concatenate, two or more files use the <code rend="inline">cat</code> command. Type</p>
+                    <p>
+                        <code rend="inline">cat tolstoy.txt tolstoy2.txt</code>
+                    </p>
+                    <p>and press enter. This prints, or displays, the combined files within the shell. However, it is too long to read on this window! Luckily, by using the <code rend="inline">&gt;</code> command, you can send the output to a new file, rather than the terminal window. Type</p>
+                    <p>
+                        <code rend="inline">cat tolstoy.txt tolstoy2.txt &gt; tolstoy-twice.txt</code>.</p>
+                    <p>Now, when you type <code rend="inline">ls</code> you'll see <code rend="inline">tolstoy-twice.txt</code> appear in your directory.</p>
+                    <p>When combining more than two files, using a wildcard can help avoid having to write out each filename individually. As you have seen above, <code rend="inline">*</code>, is a place holder for zero or more characters or numbers. So, if you type</p>
+                    <p>
+                        <code rend="inline">cat *.txt &gt; everything-together.txt</code>
+                    </p>
+                    <p>and hit enter, a combination of all the .txt files in the current directory are combined in alphabetical order as <code rend="inline">everything-together.txt</code>. This can be very useful if you need to combine a large number of smaller files within a directory so that you can work with them in a text analysis program. Another wildcard worth remembering is <code rend="inline">?</code> which is a place holder for a single character or number.</p>
+                </div>
+                <div type="3">
+                    <head>Editing Text Files Directly on the Command Line</head>
+                    <p>If you want to read a file in its entirety without leaving the command line, you can fire up <ref target="http://en.wikipedia.org/wiki/Vim_%28text_editor%29">vim</ref>. Vim is a very powerful text editor, which is perfect for using with programs such as <ref target="http://johnmacfarlane.net/pandoc/">Pandoc</ref> to do word processing, or for editing your code without having to switch to another program. Best of all, it comes included with bash on both OS X and Windows. Vim has a fairly steep learning curve, so we will just touch on a few minor points.</p>
+                    <p>Type</p>
+                    <p>
+                        <code rend="inline">vim tolstoy.txt</code>
+                    </p>
+                    <p>You should see vim come to life before you, a command-line based text editor.</p>
+                    <figure>
+                        <desc>Vim</desc>
+                        <graphic url="vim.png"/>
+                    </figure>
+                    <p>If you really want to get into Vim, there is a <ref target="http://vimdoc.sourceforge.net/htmldoc/quickref.html">good Vim guide</ref> available.</p>
+                    <p>Using Vim to read files is relatively simple. You can use the arrow keys to navigate around and could theoretically read <emph>War and Peace</emph> through the command line (one should get an achievement for doing that). Some quick basic navigational commands are as follows:</p>
+                    <p>
+                        <code rend="inline">Ctrl+F</code> (that is, holding down your 'control key' and pressing the letter F) will move you down a page (<code rend="inline">Shift+UpArrow</code> for Windows).</p>
+                    <p>
+                        <code rend="inline">Ctrl+B</code> will move you up a page. (<code rend="inline">Shift+DownArrow</code> for Windows users).</p>
+                    <p>If you want to rapidly move to the end of a line, you can press: <code rend="inline">$</code> and to move to the start of one, <code rend="inline">0</code>. You can also move between sentences by typing <code rend="inline">)</code> (forward) or <code rend="inline">(</code> (backwards). For paragraphs, use <code rend="inline">}</code> and <code rend="inline">{</code>. Since you are doing everything with your keyboard, rather than having to hold your arrow key down to move around a document, this lets you zip quickly back and forth.</p>
+                    <p>Let's scroll to the top and do a minor change, such as adding a <code rend="inline">Reader</code> field in the heading. Move your cursor in between <hi rend="bold">Author:</hi> and <hi rend="bold">Translators:</hi>, like so:</p>
+                    <figure>
+                        <desc>About to Insert a Field</desc>
+                        <graphic url="about-to-insert.png"/>
+                    </figure>
+                    <p>If you just start typing, you'll get an error message or the cursor will begin jumping around. This is because you have to specify that you want to do an edit. Press the letter</p>
+                    <p>
+                        <code rend="inline">a</code>
+                    </p>
+                    <p>At the bottom of the screen, you will see</p>
+                    <p>
+                        <code rend="inline">-- INSERT --</code>
+                    </p>
+                    <p>This means you are in insert mode. You can now type and edit text as if you are in a standard text editor. Press <code rend="inline">enter</code> twice, then <code rend="inline">arrow up</code>, and type</p>
+                    <p>
+                        <code rend="inline">Reader: A Programming Historian</code>
+                    </p>
+                    <p>When you are done, press <code rend="inline">ESC</code> to return to reading mode.</p>
+                    <p>To leave vim or to make saves, you have to enter a series of commands. Press <code rend="inline">:</code> and you'll move to the command input line of Vim. you can enter a variety of commands here. If you want to save the file, type <code rend="inline">w</code> to 'write' the file. If you execute that command, you will see</p>
+                    <quote>
+                        <quote>
+                            <p>"tolstoy.txt" [dos] 65009L, 3291681C written</p>
+                        </quote>
+                    </quote>
+                    <figure>
+                        <desc>After Writing the File, with Our Minor Change</desc>
+                        <graphic url="after-writing.png"/>
+                    </figure>
+                    <p>If you want to quit, type <code rend="inline">:</code> again and then <code rend="inline">q</code>. It will return you to the command line. As with the rest of bash, you could have also combined the two commands. Pressing <code rend="inline">:</code> and then typing <code rend="inline">wq</code> would have written the file and then quit. Or, if you wanted to exit <hi rend="bold">without</hi> saving, <code rend="inline">q!</code> would have quit vim and overriden the default preference to save your changes.</p>
+                    <p>Vim is different than you are likely used to and will require more work and practice to become fluent with it. But if you are tweaking minor things in files, it is a good way to get started. As you become more comfortable, you might even find yourself writing term papers with it, by harnessing the <ref target="/lessons/sustainable-authorship-in-plain-text-using-pandoc-and-markdown">footnoting and formatting power of Pandoc and Markdown</ref>.</p>
+                </div>
+                <div type="3">
+                    <head>Moving, Copying, and Deleting Files</head>
+                    <p>Let's say you are done with this directory, and you would like to move <code rend="inline">tolstoy.txt</code> somewhere else. First, you should create a backup copy. The shell is quite unforgiving with mistakes, and backing up is even more important than with GUIs. If you delete something here, there's no recycling bin to fish it out of. To create a backup, you can type</p>
+                    <p>
+                        <code rend="inline">cp tolstoy.txt tolstoy-backup.txt</code>
+                    </p>
+                    <p>Now when you run a <code rend="inline">ls</code> command you will see five files, two of which are the same: <code rend="inline">tolstoy.txt</code> and <code rend="inline">tolstoy-backup.txt</code>.</p>
+                    <p>Let's move the first of these somewhere else. By way of example, let's create a second directory on your desktop. Move up to your desktop (<code rend="inline">cd ..</code>) and <code rend="inline">mkdir</code> another directory. Let's call it <code rend="inline">proghist-dest</code>.</p>
+                    <p>To copy <code rend="inline">tolstoy.txt</code> you have a few different options. you could run these commands from anywhere in the shell, or you could visit either the origin or destination directories. For this example, let's just run it from here. The basic format of the copy command is <code rend="inline">cp [source] [destination]</code>. That is, you type <code rend="inline">cp</code> first, and then enter the file or files that you want to copy followed by where they should go.</p>
+                    <p>In this case, the command</p>
+                    <p>
+                        <code rend="inline">cp /users/ianmilligan1/desktop/proghist-text/tolstoy.txt /users/ianmilligan1/desktop/proghist-dest/</code>
+                    </p>
+                    <p>will copy Tolstoy from the first directory to the second directory. You will have to insert your own username in place of 'ianmilligan1'. This means you now have three copies of the novel on our computer. The original, the backup and the new copy in the second directly. If you wanted to <hi rend="bold">move</hi> the file, that is, not leave a copy behind, you could run the command again, swapping <code rend="inline">cp</code> for <code rend="inline">mv</code>; let's not do this yet.</p>
+                    <p>You can also copy multiple files with a single command. If you wanted to copy <hi rend="bold">both</hi> the original and the backup file, you could use the wildcard command.</p>
+                    <p>
+                        <code rend="inline">cp /users/ianmilligan1/desktop/proghist-text/*.txt /users/ianmilligan1/desktop/proghist-dest/</code>
+                    </p>
+                    <p>This command copies <hi rend="bold">all</hi> the text files from the origin directory into the destination directory.</p>
+                    <p>Note: If you are in the directory that you either want to move things to or from, you do not have to type out the whole directory structure. Let's do two quick examples. Change your directory to the <code rend="inline">proghist-text</code> directory. From this location, if you wanted to copy these two files to <code rend="inline">proghist-dest</code>, this command would work:</p>
+                    <p>
+                        <code rend="inline">cp *.txt /users/ianmilligan1/desktop/proghist-dest/</code> (on OS X, substitute the directory on Windows)</p>
+                    <p>Alternatively, if you were in the <code rend="inline">proghist-dest</code> directory, this command would work:</p>
+                    <p>
+                        <code rend="inline">cp /users/ianmilligan1/desktop/proghist-text/*.txt ./</code>
+                    </p>
+                    <p>The <code rend="inline">./</code> command refers to the <hi rend="bold">current</hi> directory you're in. <hi rend="bold">This is a really valuable command.</hi>
+                    </p>
+                    <p>Finally, if you want to delete a file, for whatever reason, the command is <code rend="inline">rm</code>, or remove. <hi rend="bold">Be careful with the <code rend="inline">rm</code> command</hi>, as you don't want to delete files that you do not mean to. Unlike deleting from within your GUI, there is <hi rend="bold">no</hi> recycling bin or undo options. For that reason, if you are in doubt, you may want to exercise caution or maintain a regular backup of your data.</p>
+                    <p>Move to <code rend="inline">proghist-text</code> and delete the original file by typing</p>
+                    <p>
+                        <code rend="inline">rm tolstoy.txt</code>
+                    </p>
+                    <p>Check that the file is gone using the <code rend="inline">ls</code> command.</p>
+                    <p>If you wanted to delete an entire directory, you have two options. you can use <code rend="inline">rmdir</code>, the opposite of <code rend="inline">mkdir</code>, to delete an <hi rend="bold">empty</hi> directory. To delete a directory with files, you could use from the desktop:</p>
+                    <p>
+                        <code rend="inline">rm -r proghist-text</code>
+                    </p>
+                </div>
+                <div type="3">
+                    <head>Conclusions</head>
+                    <p>You may want to take a break from the terminal at this point. To do so, enter <code rend="inline">exit</code> and you'll close your session.</p>
+                    <p>There are more commands to try as you get more comfortable with the command line. Some of our other favourites are <code rend="inline">du</code>, which is a way to find out how much memory is being used (<code rend="inline">du -h</code> makes it human readable — as with other commands). For those of you on OS X, <code rend="inline">top</code> provides an overview of what processes are running (<code rend="inline">mem</code> on Windows) and <code rend="inline">touch FILENAME</code> can create a basic text file on both systems</p>
+                    <p>By this point, we hope you have a good, basic understanding of how to move around using the command line, move basic files, and make minor edits here and there. This beginner-level lesson is designed to give you some basic fluency and confidence. In the future, you may want to get involved with scripting.</p>
+                    <p>Have fun! Before you know it, you may find yourself liking the convenience and precision of the command line - for certain applications, at least - far more than the bulkier GUI that your system came with. Your toolkit just got bigger.</p>
+                </div>
+                <table>
+                    <row>
+                        <cell role="label">Command</cell>
+                        <cell role="label">What It Does</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">vim</code>
+                        </cell>
+                        <cell>Opens up the <code rend="inline">vim</code> document editor.</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">rm</code>
+                        </cell>
+                        <cell>Deletes a file</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">cp</code>
+                        </cell>
+                        <cell>Copies a file</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">mv</code>
+                        </cell>
+                        <cell>Moves a file</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">tail *</code>
+                        </cell>
+                        <cell>Displays the last ten lines of <code rend="inline">*</code>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">head *</code>
+                        </cell>
+                        <cell>Displays the first ten lines of <code rend="inline">*</code>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">cat *</code>
+                        </cell>
+                        <cell>
+                            <code rend="inline">cat</code> is a versatile command. It will read a file to you if you substitute a file for <code rend="inline">*</code>, but can also be used to combine files.</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">open</code> or <code rend="inline">explorer</code>
+                        </cell>
+                        <cell>On OS X, <code rend="inline">open</code> followed by a file opens it; in Windows, the command <code rend="inline">explorer</code> followed by a file name does the same thing.</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">mkdir *</code>
+                        </cell>
+                        <cell>Makes a directory named <code rend="inline">*</code>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">cd *</code>
+                        </cell>
+                        <cell>Changes the current directory to <code rend="inline">*</code>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">man *</code>
+                        </cell>
+                        <cell>Lists the manual for the command, substituted for the <code rend="inline">*</code>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">ls</code>
+                        </cell>
+                        <cell>Lists the files in the current directory</cell>
+                    </row>
+                    <row>
+                        <cell>
+                            <code rend="inline">pwd</code>
+                        </cell>
+                        <cell>Prints the 'present working directory,' letting you know where you are.</cell>
+                    </row>
+                </table>
+            </div>
+        </body>
+    </text>
+</TEI>

@@ -1,625 +1,849 @@
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="comprendre-les-expressions-regulieres">
-  <teiHeader>
- <fileDesc>
-  <titleStmt>
-   <title>Comprendre les expressions r&#233;guli&#232;res</title>
-  <author role="original_author">Doug Knox</author><editor role="reviewers"><persName>Dave Shepard</persName><persName>Patrick Burns</persName></editor><author role="translators">Alix Chagu&#233;</author><editor role="translation-reviewers"><persName>Fran&#231;ois Dominic Laram&#233;e</persName><persName>Thomas Soubiran</persName></editor><editor role="editors">Adam Crymble</editor></titleStmt>
-  <publicationStmt>
-   <idno type="doi">10.46430/phfr0006</idno><date type="published">06/22/2013</date><date type="translated">01/15/2020</date><p>Lesson reviewed and published in Programming Historian.</p>
-  </publicationStmt>
-  <sourceDesc>
-  <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#understanding-regular-expressions"/>.</p><p>There are other translations: <ref target=""/></p></sourceDesc>
- </fileDesc>
- <profileDesc><abstract><p>Dans cette le&#231;on, nous allons voir une utilisation avanc&#233;e de la fonction rechercher-remplacer d'un logiciel de traitement de texte dans le but d'exploiter la structure d'un court document historique, qui n'est en essence rien d'autre qu'un tableau en prose.
-</p></abstract><textClass><keywords><term xml:lang="en">data-manipulation</term></keywords></textClass></profileDesc>
-</teiHeader>
-  <text xml:lang="fr">
-    <body>
-      <table>
-<row>
-<cell align="left" role="label"/>
-<cell align="left" role="label"/>
-<cell align="left" role="label"/>
-<cell align="left" role="label"/>
-<cell align="left" role="label"/>
-</row>
-<row>
-<cell align="left">Arizona.</cell>
-<cell align="left">Quarter ended June 30, 1907.</cell>
-<cell align="left">Deaths</cell>
-<cell align="left">tuberculosis</cell>
-<cell align="left">49</cell>
-</row>
-<row>
-<cell align="left">Arizona.</cell>
-<cell align="left">Quarter ended June 30, 1907.</cell>
-<cell align="left">Deaths</cell>
-<cell align="left">smallpox</cell>
-<cell align="left">2</cell>
-</row>
-<row>
-<cell align="left">Arizona.</cell>
-<cell align="left">Quarter ended June 30, 1907.</cell>
-<cell align="left">Deaths</cell>
-<cell align="left">scarlet fever</cell>
-<cell align="left">11</cell>
-</row>
-<row>
-<cell align="left">Arizona.</cell>
-<cell align="left">Quarter ended June 30, 1907.</cell>
-<cell align="left">Deaths</cell>
-<cell align="left">enteric fever</cell>
-<cell align="left">4</cell>
-</row>
-<row>
-<cell align="left">Arizona.</cell>
-<cell align="left">Quarter ended June 30, 1907.</cell>
-<cell align="left">Deaths</cell>
-<cell align="left">diphtheria</cell>
-<cell align="left">1</cell>
-</row>
-</table>
-      <div type="2"><head>Les expressions r&#233;guli&#232;res : pour qui, pour quoi ?</head>
-<p>Peut-&#234;tre n'&#234;tes-vous pas encore s&#251;r(e) de vouloir faire partie des historien(ne)s
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Comprendre les expressions régulières</title>
+                <author role="original_author">Doug Knox</author>
+                <editor role="reviewers">
+                    <persName>Dave Shepard</persName>
+                    <persName>Patrick Burns</persName>
+                </editor>
+                <author role="translators">Alix Chagué</author>
+                <editor role="translation-reviewers">
+                    <persName>François Dominic Laramée</persName>
+                    <persName>Thomas Soubiran</persName>
+                </editor>
+                <editor role="editors">Adam Crymble</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">01/15/2020</date>
+                <idno type="doi">10.46430/phfr0006</idno>
+                <date type="published">06/22/2013</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#understanding-regular-expressions"/>.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Dans cette leçon, nous allons voir une utilisation avancée de la fonction rechercher-remplacer d'un logiciel de traitement de texte dans le but d'exploiter la structure d'un court document historique, qui n'est en essence rien d'autre qu'un tableau en prose.
+</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="fr">
+        <body>
+            <head>Objectifs de la leçon</head>
+            <p>Dans cet exercice, nous utiliserons les fonctionnalités avancées de l'outil "rechercher-remplacer" d'un traitement de texte afin de tirer profit de la structure implicite d'un court document historique, ce dernier étant essentiellement un tableau en forme de prose. Sans pour autant utiliser un langage de programmation, nous allons toutefois mobiliser des techniques de la pensée computationnelle, notamment la recherche par motif. Elle peut être utile à des historien(ne)s, comme à d'autres, qui utilisent des traitements de texte et peut constituer une base pour approfondir la question dans des environnements de développement intégrés (<emph>Integrated Development Environment</emph> - IDE).</p>
+            <p>Nous partirons de quelque chose qui ressemble à ceci:</p>
+            <ab>
+                <code xml:id="code_comprendre-les-expressions-regulieres_0" corresp="code_comprendre-les-expressions-regulieres_0.txt" rend="block"/>
+            </ab>
+            <p>Et nous utiliserons la recherche par motif pour arriver à quelque chose qui
+ressemble à ceci:</p>
+            <table>
+                <row>
+                    <cell role="label"/>
+                    <cell role="label"/>
+                    <cell role="label"/>
+                    <cell role="label"/>
+                    <cell role="label"/>
+                </row>
+                <row>
+                    <cell>Arizona.</cell>
+                    <cell>Quarter ended June 30, 1907.</cell>
+                    <cell>Deaths</cell>
+                    <cell>diphtheria</cell>
+                    <cell>1</cell>
+                </row>
+                <row>
+                    <cell>Arizona.</cell>
+                    <cell>Quarter ended June 30, 1907.</cell>
+                    <cell>Deaths</cell>
+                    <cell>enteric fever</cell>
+                    <cell>4</cell>
+                </row>
+                <row>
+                    <cell>Arizona.</cell>
+                    <cell>Quarter ended June 30, 1907.</cell>
+                    <cell>Deaths</cell>
+                    <cell>scarlet fever</cell>
+                    <cell>11</cell>
+                </row>
+                <row>
+                    <cell>Arizona.</cell>
+                    <cell>Quarter ended June 30, 1907.</cell>
+                    <cell>Deaths</cell>
+                    <cell>smallpox</cell>
+                    <cell>2</cell>
+                </row>
+                <row>
+                    <cell>Arizona.</cell>
+                    <cell>Quarter ended June 30, 1907.</cell>
+                    <cell>Deaths</cell>
+                    <cell>tuberculosis</cell>
+                    <cell>49</cell>
+                </row>
+            </table>
+            <div type="2">
+                <head>Les expressions régulières : pour qui, pour quoi ?</head>
+                <p>Peut-être n'êtes-vous pas encore sûr(e) de vouloir faire partie des historien(ne)s
 <emph>qui programment</emph>, et vous voulez simplement travailler plus efficacement avec
-vos sources. Les historien(ne)s, les biblioth&#233;caires et d'autres sp&#233;cialistes
+vos sources. Les historien(ne)s, les bibliothécaires et d'autres spécialistes
 des sciences humaines et sociales travaillent souvent avec des sources
 textuelles dont la structure est implicite. Il n'est pas non plus rare en
-sciences humaines d'avoir &#224; faire un travail fastidieux avec le texte des notes
-semi-structur&#233;es et des r&#233;f&#233;rences bibliographiques. Dans ce cas, il peut &#234;tre
-utile de conna&#238;tre l'option de recherche par motif.</p>
-<p>Un exemple simple : si vous voulez trouver dans un document une r&#233;f&#233;rence &#224; une
-ann&#233;e pr&#233;cise, disons 1857, il est facile de chercher uniquement cette date.
-Par contre, si on veut trouver toutes les r&#233;f&#233;rences &#224; des ann&#233;es de la
-deuxi&#232;me moiti&#233; du XIXe si&#232;cle, chercher plusieurs dizaines de dates &#224; la suite
-n'est pas pratique du tout. En utilisant les expressions r&#233;guli&#232;res, on peut
-faire appel &#224; un motif concis comme "18[5-9][0-9]" pour trouver efficacement
-n'importe quelle ann&#233;e entre 1850 et 1899.</p>
-<p>Pour cet exercice, nous utilisons LibreOffice Writer et LibreOffice Calc, des
-logiciels de bureautique libres, utilis&#233;s respectivement pour le traitement de
+sciences humaines d'avoir à faire un travail fastidieux avec le texte des notes
+semi-structurées et des références bibliographiques. Dans ce cas, il peut être
+utile de connaître l'option de recherche par motif.</p>
+                <p>Un exemple simple : si vous voulez trouver dans un document une référence à une
+année précise, disons 1857, il est facile de chercher uniquement cette date.
+Par contre, si on veut trouver toutes les références à des années de la
+deuxième moitié du XIXe siècle, chercher plusieurs dizaines de dates à la suite
+n'est pas pratique du tout. En utilisant les expressions régulières, on peut
+faire appel à un motif concis comme "18[5-9][0-9]" pour trouver efficacement
+n'importe quelle année entre 1850 et 1899.</p>
+                <p>Pour cet exercice, nous utilisons LibreOffice Writer et LibreOffice Calc, des
+logiciels de bureautique libres, utilisés respectivement pour le traitement de
 texte et les feuilles de calcul. Les paquets d'installation pour Linux, Mac ou
-Windows peuvent &#234;tre t&#233;l&#233;charg&#233;s depuis <ref target="http://www.libreoffice.org/download">http://www.libreoffice.org/download</ref>.
-D'autre logiciels de traitement de texte et m&#234;me des langages de programmation
-ont des fonctionalit&#233;s similaires de recherche de motifs. Comme sa distribution
-est libre et comme sa syntaxe pour les expressions r&#233;guli&#232;res est proche de ce
+Windows peuvent être téléchargés depuis <ref target="http://www.libreoffice.org/download">http://www.libreoffice.org/download</ref>.
+D'autre logiciels de traitement de texte et même des langages de programmation
+ont des fonctionalités similaires de recherche de motifs. Comme sa distribution
+est libre et comme sa syntaxe pour les expressions régulières est proche de ce
 qu'on trouve dans les environnements de programmation, nous utilisons Libre
-Office plut&#244;t que Microsoft Office. Toutefois, si vous terminez cet exercice et
-trouvez les expressions r&#233;guli&#232;res utiles, il sera facile d'adapter ce que vous
-aurez appris ici &#224; d'autres contextes logiciels.</p>
-<p>Nous commen&#231;ons avec des motifs simples, mais nous allons rapidement arriver &#224;
-des structures plus complexes voire intimidantes. Le but ici est de pr&#233;senter
+Office plutôt que Microsoft Office. Toutefois, si vous terminez cet exercice et
+trouvez les expressions régulières utiles, il sera facile d'adapter ce que vous
+aurez appris ici à d'autres contextes logiciels.</p>
+                <p>Nous commençons avec des motifs simples, mais nous allons rapidement arriver à
+des structures plus complexes voire intimidantes. Le but ici est de présenter
 ce qu'il est utile de mettre en place avec un exemple concret. Nous n'allons
-pas nous attarder sur des exemples bidons servant uniquement &#224; illustrer les
-principes de base. Si vous faites cette le&#231;on rapidement, vous devriez pouvoir
-reproduire les exemples par copier-coller des motifs propos&#233;s, sans
-n&#233;cessairement suivre tous les d&#233;tails. Cela vous donnera une id&#233;e g&#233;n&#233;rale de
-ce qui est possible. Si le r&#233;sultat est prometteur, vous relirez une deuxi&#232;me
-fois pour d&#233;cider quels d&#233;tails sont utiles pour votre travail. Ceci &#233;tant dit
-tout taper soi-m&#234;me est la meilleure fa&#231;on de s'approprier le texte.</p>
-</div>
-      <div type="2"><head>R&#233;cup&#233;rer le texte</head>
-<figure><desc>Figure 1: Capture d'&#233;cran du texte non structur&#233;</desc><graphic url="regex_ia_image.png"/></figure>
-<p>Internet Archive conserve des copies de centaines de rapports de sant&#233; publique
-am&#233;ricains du d&#233;but du XXe si&#232;cle tomb&#233;s dans le domaine public. Ils ont &#233;t&#233;
-num&#233;ris&#233;s via JSTOR et sont rang&#233;s sous le titre "Early Journal Content". Ils
-sont d'une bonne longueur pour notre exercice et sont repr&#233;sentatifs de
-diff&#233;rents types de ressources textuelles utilis&#233;es pour toutes sortes de
+pas nous attarder sur des exemples bidons servant uniquement à illustrer les
+principes de base. Si vous faites cette leçon rapidement, vous devriez pouvoir
+reproduire les exemples par copier-coller des motifs proposés, sans
+nécessairement suivre tous les détails. Cela vous donnera une idée générale de
+ce qui est possible. Si le résultat est prometteur, vous relirez une deuxième
+fois pour décider quels détails sont utiles pour votre travail. Ceci étant dit
+tout taper soi-même est la meilleure façon de s'approprier le texte.</p>
+            </div>
+            <div type="2">
+                <head>Récupérer le texte</head>
+                <figure>
+                    <desc>Figure 1: Capture d'écran du texte non structuré</desc>
+                    <graphic url="regex_ia_image.png"/>
+                </figure>
+                <p>Internet Archive conserve des copies de centaines de rapports de santé publique
+américains du début du XXe siècle tombés dans le domaine public. Ils ont été
+numérisés via JSTOR et sont rangés sous le titre "Early Journal Content". Ils
+sont d'une bonne longueur pour notre exercice et sont représentatifs de
+différents types de ressources textuelles utilisées pour toutes sortes de
 recherche en histoire. Pour notre exercice, nous allons utiliser un rapport de
-cinq pages contenant des statistiques mensuelles sur la morbidit&#233; et la
-mortalit&#233; dans les &#201;tats et les villes des &#201;tats-Unis, publi&#233; en f&#233;vrier 1908.
+cinq pages contenant des statistiques mensuelles sur la morbidité et la
+mortalité dans les États et les villes des États-Unis, publié en février 1908.
 Il est disponible ici : <ref target="http://archive.org/details/jstor-4560629/">http://archive.org/details/jstor-4560629/</ref>.</p>
-<p>Prenez un moment pour parcourir bri&#232;vement les pages du document gr&#226;ce au
+                <p>Prenez un moment pour parcourir brièvement les pages du document grâce au
 <ref target="http://archive.org/stream/jstor-4560629/4560629#page/n0/mode/2up">lien pour lire en ligne</ref>, afin de vous familiariser avec lui. Ce document
-est organis&#233; en paragraphes plut&#244;t qu'en tableaux. Mais on voit bien que sa
-structure sous-jacente peut nous aider &#224; pr&#233;senter les donn&#233;es sous forme de
+est organisé en paragraphes plutôt qu'en tableaux. Mais on voit bien que sa
+structure sous-jacente peut nous aider à présenter les données sous forme de
 tableau. Presque tous les paragraphes du rapport commencent par des
-informations g&#233;ographiques, pr&#233;cisent une p&#233;riode pour les statistiques,
-incluent &#233;ventuellement une estimation de la population, et ensuite, font le
+informations géographiques, précisent une période pour les statistiques,
+incluent éventuellement une estimation de la population, et ensuite, font le
 compte des morts et des cas de maladie non mortelles.</p>
-<p>L'interface de consultation des pages nous montre &#224; quoi ressemblait le
+                <p>L'interface de consultation des pages nous montre à quoi ressemblait le
 document original. Si nous voulons manipuler les chiffres et rendre possible
-les comparaisons et les calculs en utilisant l'information g&#233;ographique, nous
+les comparaisons et les calculs en utilisant l'information géographique, nous
 aurons besoin de travailler sur le document sous forme de texte et de chiffres,
 au lieu de travailler avec l'image. En plus d'offrir plusieurs formats d'images
-&#224; t&#233;l&#233;charger, Internet Archive met &#224; disposition des versions en texte brut
-cr&#233;&#233;es au moyen de logiciels de reconnaissance optique de caract&#232;res (<emph>Optical
-Character Recognition</emph> - OCR). La reconnaissance optique de caract&#232;res est
-souvent imparfaite sur les textes anciens, mais ce qu'elle produit est d&#233;j&#224;
-plus utile que des images. En effet, ce texte peut &#234;tre fouill&#233;, copi&#233; et
-modifi&#233;.</p>
-<p>Passez &#224; l'affichage en <ref target="http://archive.org/stream/jstor-4560629/4560629_djvu.txt">texte int&#233;gral</ref>. Nous partirons de cette base, en
-ignorant la derni&#232;re partie du rapport pr&#233;c&#233;dent. Dans un nouveau document
-LibreOffice, copiez le texte depuis "STATISTICAL REPORTS..." jusqu'&#224; la fin.
-Lorsque vous travaillez avec des donn&#233;es importantes, assurez-vous d'en
-sauvegarder une copie dans un endroit s&#233;par&#233; de votre copie de travail. Cela
+à télécharger, Internet Archive met à disposition des versions en texte brut
+créées au moyen de logiciels de reconnaissance optique de caractères (<emph>Optical
+Character Recognition</emph> - OCR). La reconnaissance optique de caractères est
+souvent imparfaite sur les textes anciens, mais ce qu'elle produit est déjà
+plus utile que des images. En effet, ce texte peut être fouillé, copié et
+modifié.</p>
+                <p>Passez à l'affichage en <ref target="http://archive.org/stream/jstor-4560629/4560629_djvu.txt">texte intégral</ref>. Nous partirons de cette base, en
+ignorant la dernière partie du rapport précédent. Dans un nouveau document
+LibreOffice, copiez le texte depuis "STATISTICAL REPORTS..." jusqu'à la fin.
+Lorsque vous travaillez avec des données importantes, assurez-vous d'en
+sauvegarder une copie dans un endroit séparé de votre copie de travail. Cela
 vous permettra de revenir vers l'original si quelque chose ne se passe pas
-comme pr&#233;vu.</p>
-</div>
-      <div type="2"><head>Usage ordinaire de la fonction Rechercher &amp; remplacer</head>
-<p>Nous pouvons voir quelques erreurs de reconnaissance de caract&#232;res (l&#224; o&#249; le
+comme prévu.</p>
+            </div>
+            <div type="2">
+                <head>Usage ordinaire de la fonction Rechercher &amp; remplacer</head>
+                <p>Nous pouvons voir quelques erreurs de reconnaissance de caractères (là où le
 logiciel de transcription automatique d'Internet Archive a fait des erreurs)
-m&#234;me si globalement, cela semble &#234;tre une bonne transcription. Il y a deux
-endroits o&#249; l'OCR a ins&#233;r&#233; par erreur des guillemets doubles dans ce fichier,
-dans les deux cas en les ajoutant entre la virgule qui s&#233;pare le nom d'un mois
-d'une s&#233;quence de quatre chiffres repr&#233;sentant une ann&#233;e, comme dans :</p>
-<ab><code xml:id="code_comprendre-les-expressions-regulieres_1" corresp="code_comprendre-les-expressions-regulieres_1.txt" rend="block"/></ab>
-<p>Nous pouvons les trouver en faisant une recherche (<code rend="inline">Edition &#8594; Rechercher</code> avec le
+même si globalement, cela semble être une bonne transcription. Il y a deux
+endroits où l'OCR a inséré par erreur des guillemets doubles dans ce fichier,
+dans les deux cas en les ajoutant entre la virgule qui sépare le nom d'un mois
+d'une séquence de quatre chiffres représentant une année, comme dans :</p>
+                <ab>
+                    <code xml:id="code_comprendre-les-expressions-regulieres_1" corresp="code_comprendre-les-expressions-regulieres_1.txt" rend="block"/>
+                </ab>
+                <p>Nous pouvons les trouver en faisant une recherche (<code rend="inline">Edition → Rechercher</code> avec le
 raccourci Ctrl-F ou Cmd-F sur un Mac) portant sur les guillemets doubles. Il
 faut ensuite confirmer que ce sont les deux seules instances de guillemets dans
-le fichier. Dans le cas pr&#233;sent, nous pouvons simplement les supprimer. Plut&#244;t
-que de le faire &#224; la main, essayons d'utiliser la fonction de recherche et de
+le fichier. Dans le cas présent, nous pouvons simplement les supprimer. Plutôt
+que de le faire à la main, essayons d'utiliser la fonction de recherche et de
 remplacement de LibreOffice (<code rend="inline">Ctrl-H</code> ou <code rend="inline">Cmd-Alt-F</code> sur Mac).</p>
-<p><emph>Remplacez</emph> <code rend="inline">"</code> <emph>par rien</emph>.</p>
-<figure><desc>Figure 2: Capture d'&#233;cran de l'option Rechercher &amp; remplacer</desc><graphic url="regex_01_findquote.png"/></figure>
-</div>
-      <div type="2"><head>Trouver une structure pour les lignes</head>
-<p>Nous ne faisons que commencer, mais pour estimer jusqu'o&#249; nous devons aller,
-s&#233;lectionnez tout le texte dans LibreOffice Writer (<code rend="inline">Ctrl-A</code>) et collez-le dans
-LibreOffice Calc (<code rend="inline">Fichier &#8594; Nouveau &#8594; Feuille de calcul</code>). Chaque ligne de
-texte devient une rang&#233;e &#224; une colonne dans la feuille de calcul. Ce que nous
-aimerions, c'est que chaque ligne du tableau repr&#233;sente un enregistrement
-structur&#233; dans une forme coh&#233;rente. Il serait fastidieux de construire un tel
-tableau manuellement. Dans ce qui suit, nous allons r&#233;aliser cette t&#226;che avec
-des expressions r&#233;guli&#232;res dans Writer, mais gardez Calc ouvert &#224;
-l'arri&#232;re-plan : nous y retournerons pour y coller nos futures modifications et
-jauger nos progr&#232;s.</p>
-<p>De retour dans Writer, nous voulons nous d&#233;barrasser des sauts de ligne dont
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">"</code>
+                    <emph>par rien</emph>.</p>
+                <figure>
+                    <desc>Figure 2: Capture d'écran de l'option Rechercher &amp; remplacer</desc>
+                    <graphic url="regex_01_findquote.png"/>
+                </figure>
+            </div>
+            <div type="2">
+                <head>Trouver une structure pour les lignes</head>
+                <p>Nous ne faisons que commencer, mais pour estimer jusqu'où nous devons aller,
+sélectionnez tout le texte dans LibreOffice Writer (<code rend="inline">Ctrl-A</code>) et collez-le dans
+LibreOffice Calc (<code rend="inline">Fichier → Nouveau → Feuille de calcul</code>). Chaque ligne de
+texte devient une rangée à une colonne dans la feuille de calcul. Ce que nous
+aimerions, c'est que chaque ligne du tableau représente un enregistrement
+structuré dans une forme cohérente. Il serait fastidieux de construire un tel
+tableau manuellement. Dans ce qui suit, nous allons réaliser cette tâche avec
+des expressions régulières dans Writer, mais gardez Calc ouvert à
+l'arrière-plan : nous y retournerons pour y coller nos futures modifications et
+jauger nos progrès.</p>
+                <p>De retour dans Writer, nous voulons nous débarrasser des sauts de ligne dont
 nous n'avons pas besoin. Il y a cependant quelques traits d'union en fin de
 ligne que nous devrions nettoyer en premier. Cette fois-ci, nous allons
-commencer &#224; utiliser des expressions r&#233;guli&#232;res. Attention, leurs
-impl&#233;mentations diff&#232;rent dans la mani&#232;re de g&#233;rer les retours &#224; la ligne, bien
+commencer à utiliser des expressions régulières. Attention, leurs
+implémentations diffèrent dans la manière de gérer les retours à la ligne, bien
 plus que dans leur mise en oeuvre.</p>
-<p>Les expressions r&#233;guli&#232;res dans Libre Office ne permettent pas de rechercher
-des motifs s'&#233;talant sur plusieurs lignes. Nous adoptons donc une strat&#233;gie
-indirecte. Nous allons d'abord remplacer les sauts de ligne par un caract&#232;re de
-remplacement - disons <code rend="inline">#</code> - qui n'appara&#238;t pas ailleurs dans notre texte.</p>
-<p>Dans la bo&#238;te de dialogue de l'outil "Rechercher &amp; remplacer", activez "Plus
+                <p>Les expressions régulières dans Libre Office ne permettent pas de rechercher
+des motifs s'étalant sur plusieurs lignes. Nous adoptons donc une stratégie
+indirecte. Nous allons d'abord remplacer les sauts de ligne par un caractère de
+remplacement - disons <code rend="inline">#</code> - qui n'apparaît pas ailleurs dans notre texte.</p>
+                <p>Dans la boîte de dialogue de l'outil "Rechercher &amp; remplacer", activez "Plus
 d'options" ("Autres options" sur Mac) et assurez-vous que l'option
-<code rend="inline">expressions r&#233;guli&#232;res</code> est coch&#233;e. Ceci nous permet d&#233;sormais d'utiliser des
-symboles sp&#233;ciaux pour d&#233;finir des motifs g&#233;n&#233;raux que nous cherchons.</p>
-<p>En utilisant <code rend="inline">Rechercher &amp; remplacer</code>, <emph>remplacez</emph> <code rend="inline">$</code> <emph>par</emph> <code rend="inline">#</code>.</p>
-<figure><desc>Figure 3: L'onglet &#171; Autres options &#187; dans la fen&#234;tre Rechercher &amp; remplacer d'Open Office</desc><graphic url="regex_02_moreoptions.png"/></figure>
-<p>Le symbole du dollar est un symbole sp&#233;cial qui correspond habituellement &#224; la
-fin de chaque ligne afin d'ancrer un motif plus grand. Cependant, m&#234;me s'il
-peut avoir cette fonction dans LibreOffice dans des mod&#232;les plus larges,
-LibreOffice ne nous permettra pas de trouver une portion de texte qui s'&#233;tend
+<code rend="inline">expressions régulières</code> est cochée. Ceci nous permet désormais d'utiliser des
+symboles spéciaux pour définir des motifs généraux que nous cherchons.</p>
+                <p>En utilisant <code rend="inline">Rechercher &amp; remplacer</code>, <emph>remplacez</emph>
+                    <code rend="inline">$</code>
+                    <emph>par</emph>
+                    <code rend="inline">#</code>.</p>
+                <figure>
+                    <desc>Figure 3: L'onglet « Autres options » dans la fenêtre Rechercher &amp; remplacer d'Open Office</desc>
+                    <graphic url="regex_02_moreoptions.png"/>
+                </figure>
+                <p>Le symbole du dollar est un symbole spécial qui correspond habituellement à la
+fin de chaque ligne afin d'ancrer un motif plus grand. Cependant, même s'il
+peut avoir cette fonction dans LibreOffice dans des modèles plus larges,
+LibreOffice ne nous permettra pas de trouver une portion de texte qui s'étend
 de part et d'autre d'un saut de ligne. En revanche, avec LibreOffice nous
-pouvons utiliser le caract&#232;re <code rend="inline">$</code> seul, sans autre motif, afin de trouver les
-sauts de ligne ind&#233;pendamment des autres caract&#232;res et les remplacer.</p>
-<p>Pour r&#233;aliser une op&#233;ration de type "Rechercher &amp; remplacer", vous pouvez
+pouvons utiliser le caractère <code rend="inline">$</code> seul, sans autre motif, afin de trouver les
+sauts de ligne indépendamment des autres caractères et les remplacer.</p>
+                <p>Pour réaliser une opération de type "Rechercher &amp; remplacer", vous pouvez
 commencer par cliquer sur "Rechercher" puis sur "Remplacer" lorsque vous
-constatez que la portion s&#233;lectionn&#233;e correspond &#224; vos attentes. Apr&#232;s l'avoir
-r&#233;p&#233;t&#233; plusieurs fois, vous pouvez cliquer sur "Tout remplacer" pour remplacer
+constatez que la portion sélectionnée correspond à vos attentes. Après l'avoir
+répété plusieurs fois, vous pouvez cliquer sur "Tout remplacer" pour remplacer
 tout le reste en une seule fois. Si vous faites une erreur ou en cas de doute,
-vous pouvez annuler les &#233;tapes r&#233;centes avec <code rend="inline">Editer &#8594; Annuler</code> dans la barre
+vous pouvez annuler les étapes récentes avec <code rend="inline">Editer → Annuler</code> dans la barre
 de menu, ou le raccourci clavier <code rend="inline">Ctrl+Z</code> (<code rend="inline">Cmd+Z</code> sur Mac).</p>
-<p>Dans ce document, le remplacement des fins de ligne entra&#238;ne 249 modifications
-(ce nombre peut varier l&#233;g&#232;rement selon la quantit&#233; de texte que vous avez
-copi&#233;). Cette s&#233;quence de remplacements rendra le texte moins lisible
-temporairement, mais c'est n&#233;cessaire car nous ne pouvons pas transformer une
-s&#233;lection qui s'&#233;tend de part et d'autre d'un saut de ligne. En revanche, nous
-pouvons le faire de part et d'autre d'un caract&#232;re <code rend="inline">#</code>.</p>
-<p>A pr&#233;sent, supprimons les traits d'union. Cela peut d&#233;sormais se faire &#224; l'aide
-d'un remplacement litt&#233;ral, sans utiliser d'expression r&#233;guli&#232;re.</p>
-<p>En utilisant encore "Rechercher &amp; remplacer", <emph>remplacez tous les</emph> <code rend="inline">- #</code>
-(tiret-espace-di&#232;se) <emph>par rien.</emph></p>
-<p>Cela supprimera les traits d'union comme dans "tuber- #culosis" en
+                <p>Dans ce document, le remplacement des fins de ligne entraîne 249 modifications
+(ce nombre peut varier légèrement selon la quantité de texte que vous avez
+copié). Cette séquence de remplacements rendra le texte moins lisible
+temporairement, mais c'est nécessaire car nous ne pouvons pas transformer une
+sélection qui s'étend de part et d'autre d'un saut de ligne. En revanche, nous
+pouvons le faire de part et d'autre d'un caractère <code rend="inline">#</code>.</p>
+                <p>A présent, supprimons les traits d'union. Cela peut désormais se faire à l'aide
+d'un remplacement littéral, sans utiliser d'expression régulière.</p>
+                <p>En utilisant encore "Rechercher &amp; remplacer", <emph>remplacez tous les</emph>
+                    <code rend="inline">- #</code>
+(tiret-espace-dièse) <emph>par rien.</emph>
+                </p>
+                <p>Cela supprimera les traits d'union comme dans "tuber- #culosis" en
 "tuberculosis" en une seule ligne, avec un total de 27 remplacements dans notre
 cas.</p>
-<p>Ensuite, <emph>remplacez tous les</emph> <code rend="inline">##</code> par <code rend="inline">\n</code> (71 occurrences).</p>
-<p>Dans cette &#233;tape, nous prenons ce qui &#233;tait &#224; l'origine des sauts de
-paragraphe, marqu&#233;s par 2 sauts de ligne, suivis d'un di&#232;se doubl&#233; (<code rend="inline">##</code>), et
-nous les transformons &#224; nouveau en sauts de ligne simples. Dans le tableau,
-ils marqueront le d&#233;but d'une nouvelle ligne.</p>
-<p>Pour finir notre travail sur les sauts de lignes, <emph>remplacez tous les <code rend="inline">#</code> par
-<code rend="inline"> </code></emph> (un espace simple). Cela nous d&#233;barrasse de 122 sauts de lignes qui
-n'&#233;taient pas des sauts de paragraphes dans le texte original.</p>
-<p>Ce n'est peut-&#234;tre pas clair au premier abord, mais nous avons transform&#233;
+                <p>Ensuite, <emph>remplacez tous les</emph>
+                    <code rend="inline">##</code> par <code rend="inline">\n</code> (71 occurrences).</p>
+                <p>Dans cette étape, nous prenons ce qui était à l'origine des sauts de
+paragraphe, marqués par 2 sauts de ligne, suivis d'un dièse doublé (<code rend="inline">##</code>), et
+nous les transformons à nouveau en sauts de ligne simples. Dans le tableau,
+ils marqueront le début d'une nouvelle ligne.</p>
+                <p>Pour finir notre travail sur les sauts de lignes, <emph>remplacez tous les <code rend="inline">#</code> par
+<code rend="inline"> </code>
+                    </emph> (un espace simple). Cela nous débarrasse de 122 sauts de lignes qui
+n'étaient pas des sauts de paragraphes dans le texte original.</p>
+                <p>Ce n'est peut-être pas clair au premier abord, mais nous avons transformé
 chaque paragraphe logique en une seule ligne. Dans LibreOffice (et dans les
-&#233;diteurs de texte similaires), vous pouvez activer l'affichage des caract&#232;res
+éditeurs de texte similaires), vous pouvez activer l'affichage des caractères
 non imprimables (en utilisant <code rend="inline">Ctrl-F10</code> sur Windows ou Linux) pour voir les
 lignes et les sauts de paragraphes.</p>
-<figure><desc>Figure 4: Caract&#232;res non imprimables dans LibreOffice</desc><graphic url="regex_03_lines.png"/></figure>
-<p>Une derni&#232;re mani&#232;re de confirmer que nous commen&#231;ons &#224; obtenir une structure
-plus pratique: copions &#224; nouveau tout le texte de Writer et collons-le dans
+                <figure>
+                    <desc>Figure 4: Caractères non imprimables dans LibreOffice</desc>
+                    <graphic url="regex_03_lines.png"/>
+                </figure>
+                <p>Une dernière manière de confirmer que nous commençons à obtenir une structure
+plus pratique: copions à nouveau tout le texte de Writer et collons-le dans
 une nouvelle feuille de calcul. Ceci devrait confirmer que chaque fiche de
-sant&#233; correspond maintenant &#224; une ligne distincte dans le tableau, m&#234;me si nous
-avons encore les en-t&#234;tes de page et les notes de bas de page m&#233;lang&#233;es au
-milieu de tout cela. Nous allons les nettoyer bient&#244;t.</p>
-<figure><desc>Figure 5: La structure am&#233;lior&#233;e, affich&#233;e dans LibreOffice Calc</desc><graphic url="regex_04_calclines.png"/></figure>
-</div>
-      <div type="2"><head>Trouver une structure pour les colonnes</head>
-<p>Les feuilles de calcul organisent l'information en deux dimensions, lignes et
+santé correspond maintenant à une ligne distincte dans le tableau, même si nous
+avons encore les en-têtes de page et les notes de bas de page mélangées au
+milieu de tout cela. Nous allons les nettoyer bientôt.</p>
+                <figure>
+                    <desc>Figure 5: La structure améliorée, affichée dans LibreOffice Calc</desc>
+                    <graphic url="regex_04_calclines.png"/>
+                </figure>
+            </div>
+            <div type="2">
+                <head>Trouver une structure pour les colonnes</head>
+                <p>Les feuilles de calcul organisent l'information en deux dimensions, lignes et
 colonnes. Nous avons vu que les lignes dans Writer correspondent aux lignes
 dans Calc. Comment ajouter des colonnes ?</p>
-<p>Les tableurs peuvent lire et &#233;crire des fichiers de donn&#233;es en format texte
-brut, en suivant l'une ou l'autre de diverses conventions pour repr&#233;senter le
-passage d'une colonne &#224; la suivante. Un format tr&#232;s commun utilise la virgule
-pour s&#233;parer les colonnes, et de tels fichiers sont souvent stock&#233;s avec
-l'extension ".csv" pour "comma-separated values" (valeurs s&#233;par&#233;es par des
+                <p>Les tableurs peuvent lire et écrire des fichiers de données en format texte
+brut, en suivant l'une ou l'autre de diverses conventions pour représenter le
+passage d'une colonne à la suivante. Un format très commun utilise la virgule
+pour séparer les colonnes, et de tels fichiers sont souvent stockés avec
+l'extension ".csv" pour "comma-separated values" (valeurs séparées par des
 virgules). Un autre format courant utilise la tabulation, un type d'espace
-sp&#233;cial, pour s&#233;parer les colonnes. Comme notre texte contient des virgules et
-pour &#233;viter toute confusion, nous utiliserons un caract&#232;re de tabulation pour
-s&#233;parer les colonnes. M&#234;me si l'on peut sauvegarder un fichier de texte brut en
-guise d'interm&#233;diaire, dans cet exercice nous supposerons que nous copions et
-collons directement de Writer &#224; Calc.</p>
-<p>De retour dans Writer, commen&#231;ons &#224; diviser nos donn&#233;es en colonnes en s&#233;parant
-les informations temporelles et g&#233;ographiques des chiffres rapport&#233;s. Presque
+spécial, pour séparer les colonnes. Comme notre texte contient des virgules et
+pour éviter toute confusion, nous utiliserons un caractère de tabulation pour
+séparer les colonnes. Même si l'on peut sauvegarder un fichier de texte brut en
+guise d'intermédiaire, dans cet exercice nous supposerons que nous copions et
+collons directement de Writer à Calc.</p>
+                <p>De retour dans Writer, commençons à diviser nos données en colonnes en séparant
+les informations temporelles et géographiques des chiffres rapportés. Presque
 tous les rapports contiennent les mots <code rend="inline">Total number of deaths</code>. Cherchez cette
-expression et remplacez-la par exactement la m&#234;me phrase, mais avec "\t" au
-d&#233;but de la cha&#238;ne de caract&#232;res (<code rend="inline">\t</code> repr&#233;sentant un caract&#232;re de
+expression et remplacez-la par exactement la même phrase, mais avec "\t" au
+début de la chaîne de caractères (<code rend="inline">\t</code> représentant un caractère de
 tabulation) :</p>
-<p><code rend="inline">\tNombre total de d&#233;c&#232;s</code></p>
-<p>Apr&#232;s avoir fait ce remplacement (53 occurrences), s&#233;lectionnez tout le texte
-et copiez-collez-le &#224; nouveau dans une feuille de calcul vide.</p>
-<p>On dirait que rien n'a chang&#233;, LibreOffice Calc met le texte complet de chaque
+                <p>
+                    <code rend="inline">\tNombre total de décès</code>
+                </p>
+                <p>Après avoir fait ce remplacement (53 occurrences), sélectionnez tout le texte
+et copiez-collez-le à nouveau dans une feuille de calcul vide.</p>
+                <p>On dirait que rien n'a changé, LibreOffice Calc met le texte complet de chaque
 paragraphe dans une seule cellule, tabulations comprises. Nous devons forcer le
-logiciel &#224; interpr&#233;ter le texte pour que Calc nous demande comment traiter les
+logiciel à interpréter le texte pour que Calc nous demande comment traiter les
 tabulations. Essayons encore une fois. Vous pouvez vider la feuille de calcul
-rapidement en s&#233;lectionnant tout (<code rend="inline">Ctrl-A</code>) et en supprimant la s&#233;lection.</p>
-<p>Dans une feuille de calcul vide, s&#233;lectionnez <code rend="inline">Edition &#8594; Collage sp&#233;cial</code> (ou
-faites un clic droit pour y acc&#233;der), puis s&#233;lectionnez "Texte non format&#233;"
-dans les options de la fen&#234;tre qui appara&#238;t. Cela devrait ouvrir une fen&#234;tre
-"Import de texte". Assurez-vous que la case "Tabulation" est coch&#233;e sous
-"Options de s&#233;parateur", puis cliquez sur "OK". (Avant de cliquer sur OK, vous
-pouvez cocher et d&#233;cocher les options "Virgule" ou "Espace" comme s&#233;parateurs
-pour pr&#233;visualiser ce qu'il se passerait ici, m&#234;me si nous ne voulons pas les
-traiter comme s&#233;parateurs dans ce contexte).</p>
-<p>Nous voyons maintenant le d&#233;but prometteur d'une structure de tableau, avec
-les informations g&#233;ographiques et l'intervalle de temps toujours dans la
-colonne A, mais avec le "nombre total de d&#233;c&#232;s" et le texte suivant clairement
-align&#233;s dans une colonne s&#233;par&#233;e.</p>
-<figure><desc>Figure 6 : La nouvelle version des donn&#233;es d&#233;limit&#233;e par les tabulations, affich&#233;e dans LibreOffice Calc</desc><graphic url="regex_05_2col.png"/></figure>
-<p>Si dans certains cas le texte s'&#233;tend dans une troisi&#232;me colonne ou au-del&#224;, il
+rapidement en sélectionnant tout (<code rend="inline">Ctrl-A</code>) et en supprimant la sélection.</p>
+                <p>Dans une feuille de calcul vide, sélectionnez <code rend="inline">Edition → Collage spécial</code> (ou
+faites un clic droit pour y accéder), puis sélectionnez "Texte non formaté"
+dans les options de la fenêtre qui apparaît. Cela devrait ouvrir une fenêtre
+"Import de texte". Assurez-vous que la case "Tabulation" est cochée sous
+"Options de séparateur", puis cliquez sur "OK". (Avant de cliquer sur OK, vous
+pouvez cocher et décocher les options "Virgule" ou "Espace" comme séparateurs
+pour prévisualiser ce qu'il se passerait ici, même si nous ne voulons pas les
+traiter comme séparateurs dans ce contexte).</p>
+                <p>Nous voyons maintenant le début prometteur d'une structure de tableau, avec
+les informations géographiques et l'intervalle de temps toujours dans la
+colonne A, mais avec le "nombre total de décès" et le texte suivant clairement
+alignés dans une colonne séparée.</p>
+                <figure>
+                    <desc>Figure 6 : La nouvelle version des données délimitée par les tabulations, affichée dans LibreOffice Calc</desc>
+                    <graphic url="regex_05_2col.png"/>
+                </figure>
+                <p>Si dans certains cas le texte s'étend dans une troisième colonne ou au-delà, il
 se peut que vous ayez, par inadvertance, mis trop de tabulations. Dans la
-structure que nous avons actuellement, nous ne nous attendons pas &#224; voir deux
-tabulations &#224; la suite. Retournez dans LibreOffice Writer, o&#249; vous pouvez
-v&#233;rifier cela et r&#233;soudre le probl&#232;me en recherchant <code rend="inline">\t\t</code>et en les rempla&#231;ant
-par <code rend="inline">\t</code>, <hi rend="bold">en r&#233;p&#233;tant au besoin</hi> jusqu'&#224; ce qu'il n'y ait plus de
+structure que nous avons actuellement, nous ne nous attendons pas à voir deux
+tabulations à la suite. Retournez dans LibreOffice Writer, où vous pouvez
+vérifier cela et résoudre le problème en recherchant <code rend="inline">\t\t</code>et en les remplaçant
+par <code rend="inline">\t</code>, <hi rend="bold">en répétant au besoin</hi> jusqu'à ce qu'il n'y ait plus de
 double-tabulation.</p>
-<p>Parfois, appliquer plusieurs fois le remplacement d'un motif introduit des
-changements suppl&#233;mentaires qui peuvent &#234;tre ou non intentionnels. D'autres
-fois, r&#233;p&#233;ter le remplacement n'aura aucun effet apr&#232;s la premi&#232;re application.
-Cela vaut la peine de garder cette distinction &#224; l'esprit quand on travaille
-avec des expressions r&#233;guli&#232;res.</p>
-</div>
-      <table>
-<row>
-<cell role="label"/>
-<cell role="label"/>
-</row>
-<row>
-<cell><code rend="inline">$</code></cell>
-<cell>Fin de ligne</cell>
-</row>
-<row>
-<cell><code rend="inline">^</code></cell>
-<cell>D&#233;but de ligne</cell>
-</row>
-<row>
-<cell><code rend="inline">\t</code></cell>
-<cell>Tabulation</cell>
-</row>
-<row>
-<cell><code rend="inline">$1</code></cell>
-<cell>Fait r&#233;f&#233;rence &#224; un groupe s&#233;lection&#233; auparavant (Ceci est la notation utilis&#233;e par LibreOffice ; d'autres notations, telles que \1 peuvent aussi &#234;tre utilis&#233;es</cell>
-</row>
-<row>
-<cell><code rend="inline">()</code></cell>
-<cell>Si le contenu entre parenth&#232;ses correspond, cela d&#233;finit un groupe auquel il sera possible de faire r&#233;f&#233;rence par la suite</cell>
-</row>
-<row>
-<cell><code rend="inline">*</code></cell>
-<cell>Z&#233;ro ou plus</cell>
-</row>
-<row>
-<cell><code rend="inline">.</code></cell>
-<cell>N'importe quel caract&#232;re</cell>
-</row>
-<row>
-<cell><code rend="inline">[0-9]</code></cell>
-<cell>Tous les chiffres</cell>
-</row>
-<row>
-<cell><code rend="inline">[a-z]</code></cell>
-<cell>Toutes les minuscules, dans un intervalle donn&#233;</cell>
-</row>
-<row>
-<cell><code rend="inline">[Ab1]</code></cell>
-<cell>Une classe de caract&#232;res, on s&#233;lectionne alors <code rend="inline">A</code> ou <code rend="inline">b</code> ou <code rend="inline">1</code> dans ce cas-l&#224;</cell>
-</row>
-<row>
-<cell><code rend="inline">A b 1</code></cell>
-<cell>Litt&#233;ral - les lettres, les chiffres et les espaces sont repr&#233;sent&#233;s par eux-m&#234;mes</cell>
-</row>
-</table>
-      <div type="2"><head>Appliquer les expressions r&#233;guli&#232;res</head>
-<p>Commen&#231;ons &#224; en utiliser quelques-unes pour supprimer les en-t&#234;tes de pages
-contenant la date et le num&#233;ro de page. Revenez &#224; votre fen&#234;tre LibreOffice
+                <p>Parfois, appliquer plusieurs fois le remplacement d'un motif introduit des
+changements supplémentaires qui peuvent être ou non intentionnels. D'autres
+fois, répéter le remplacement n'aura aucun effet après la première application.
+Cela vaut la peine de garder cette distinction à l'esprit quand on travaille
+avec des expressions régulières.</p>
+            </div>
+            <head>L'idée générale des expressions régulières</head>
+            <p>Avant de reprendre les manipulations sur le fichier, c'est le moment de faire
+une courte introduction aux expressions régulières. Les expressions régulières
+(ou "regex" pour faire court) sont une façon de définir un motif qui peut
+s'appliquer à une séquence d'éléments. Elles ont ce nom rigolo en raison de
+leurs origines dans le monde de l'informatique et des langages formels
+théoriques et elles sont incorporées à la plupart des langages de
+programmation généraux.</p>
+            <p>Les regex sont souvent accessibles sous une forme ou une autre dans les
+logiciels de traitement de texte avancés, nous procurant ainsi une option
+"rechercher et remplacer" plus puissante que le simple remplacement d'une
+séquence exacte, lettre par lettre. Il existe différentes syntaxes et
+différentes implémentations des expressions régulières. Ce dont on peut
+disposer dans un logiciel de traitement de texte est souvent moins poussé,
+moins robuste et moins conforme à la pratique la plus courante que ce que l'on
+peut trouver dans le contexte d'un langage de programmation. Il y a cependant
+des principes essentiels communs.</p>
+            <table>
+                <row>
+                    <cell role="label"/>
+                    <cell role="label"/>
+                </row>
+                <row>
+                    <cell>
+                        <code rend="inline">A b 1</code>
+                    </cell>
+                    <cell>Littéral - les lettres, les chiffres et les espaces sont représentés par eux-mêmes</cell>
+                </row>
+                <row>
+                    <cell>
+                        <code rend="inline">[Ab1]</code>
+                    </cell>
+                    <cell>Une classe de caractères, on sélectionne alors <code rend="inline">A</code> ou <code rend="inline">b</code> ou <code rend="inline">1</code> dans ce cas-là</cell>
+                </row>
+                <row>
+                    <cell>
+                        <code rend="inline">[a-z]</code>
+                    </cell>
+                    <cell>Toutes les minuscules, dans un intervalle donné</cell>
+                </row>
+                <row>
+                    <cell>
+                        <code rend="inline">[0-9]</code>
+                    </cell>
+                    <cell>Tous les chiffres</cell>
+                </row>
+                <row>
+                    <cell>
+                        <code rend="inline">.</code>
+                    </cell>
+                    <cell>N'importe quel caractère</cell>
+                </row>
+                <row>
+                    <cell>
+                        <code rend="inline">*</code>
+                    </cell>
+                    <cell>Zéro ou plus</cell>
+                </row>
+                <row>
+                    <cell>
+                        <code rend="inline">()</code>
+                    </cell>
+                    <cell>Si le contenu entre parenthèses correspond, cela définit un groupe auquel il sera possible de faire référence par la suite</cell>
+                </row>
+                <row>
+                    <cell>
+                        <code rend="inline">$1</code>
+                    </cell>
+                    <cell>Fait référence à un groupe sélectioné auparavant (Ceci est la notation utilisée par LibreOffice ; d'autres notations, telles que \1 peuvent aussi être utilisées</cell>
+                </row>
+                <row>
+                    <cell>
+                        <code rend="inline">\t</code>
+                    </cell>
+                    <cell>Tabulation</cell>
+                </row>
+                <row>
+                    <cell>
+                        <code rend="inline">^</code>
+                    </cell>
+                    <cell>Début de ligne</cell>
+                </row>
+                <row>
+                    <cell>
+                        <code rend="inline">$</code>
+                    </cell>
+                    <cell>Fin de ligne</cell>
+                </row>
+            </table>
+            <p>Pour une liste plus complète d'expressions régulières dans
+LibreOffice, voir la <ref target="https://help.libreoffice.org/6.3/fr/text/shared/01/02100001.html?DbPAR=SHARED#bm_id3146765">Liste des expressions régulières</ref>.</p>
+            <div type="2">
+                <head>Appliquer les expressions régulières</head>
+                <p>Commençons à en utiliser quelques-unes pour supprimer les en-têtes de pages
+contenant la date et le numéro de page. Revenez à votre fenêtre LibreOffice
 Writer.</p>
-<p><emph>Remplacer :</emph> <code rend="inline">^.*February 21.*1908.*$</code> <emph>par rien</emph> (4 occurrences).</p>
-<p><emph>Remplacer :</emph> <code rend="inline">^.*Received out of regular order..*$</code>  <emph>par rien</emph> (2
+                <p>
+                    <emph>Remplacer :</emph>
+                    <code rend="inline">^.*February 21.*1908.*$</code>
+                    <emph>par rien</emph> (4 occurrences).</p>
+                <p>
+                    <emph>Remplacer :</emph>
+                    <code rend="inline">^.*Received out of regular order..*$</code>
+                    <emph>par rien</emph> (2
 occurrences).</p>
-<p>Ici, <code rend="inline">^</code> (accent circonflexe) correspond au d&#233;but de la ligne. Le <code rend="inline">.</code> (point)
-correspond &#224; n'importe quel caract&#232;re. Le <code rend="inline">*</code> (ast&#233;risque) correspond &#224; toute
-s&#233;quence de z&#233;ro caract&#232;re ou plus. Enfin, <code rend="inline">$</code> (le symbole dollar) correspond &#224; la
-fin de la ligne. En &#233;pelant la date, nous apparierons seulement les lignes o&#249;
-cette s&#233;quence appara&#238;t, lettre par lettre, et en utilisant <code rend="inline">.*</code> aux deux
-extr&#233;mit&#233;s nous apparierons toutes les lignes contenant cette s&#233;quence
-ind&#233;pendamment de ce qui appara&#238;t avant ou apr&#232;s elle sur la ligne. Apr&#232;s avoir
-effectu&#233; ce remplacement, il nous restera quelques lignes vierges.</p>
-<p>Pour supprimer les lignes vides dans LibreOffice, <emph>Remplacez</emph> <code rend="inline">^$</code> <emph>par
+                <p>Ici, <code rend="inline">^</code> (accent circonflexe) correspond au début de la ligne. Le <code rend="inline">.</code> (point)
+correspond à n'importe quel caractère. Le <code rend="inline">*</code> (astérisque) correspond à toute
+séquence de zéro caractère ou plus. Enfin, <code rend="inline">$</code> (le symbole dollar) correspond à la
+fin de la ligne. En épelant la date, nous apparierons seulement les lignes où
+cette séquence apparaît, lettre par lettre, et en utilisant <code rend="inline">.*</code> aux deux
+extrémités nous apparierons toutes les lignes contenant cette séquence
+indépendamment de ce qui apparaît avant ou après elle sur la ligne. Après avoir
+effectué ce remplacement, il nous restera quelques lignes vierges.</p>
+                <p>Pour supprimer les lignes vides dans LibreOffice, <emph>Remplacez</emph>
+                    <code rend="inline">^$</code>
+                    <emph>par
 rien</emph> (5 occurrences).</p>
-<p>Dans d'autres environnements d'expressions r&#233;guli&#232;res, d'autres techniques
-seront n&#233;cessaires pour travailler avec les fins de lignes. Certaines peuvent
-&#234;tre plus pratiques que ce que LibreOffice offre, mais cela suffira pour nos
+                <p>Dans d'autres environnements d'expressions régulières, d'autres techniques
+seront nécessaires pour travailler avec les fins de lignes. Certaines peuvent
+être plus pratiques que ce que LibreOffice offre, mais cela suffira pour nos
 besoins actuels.</p>
-<p>Certains documents mentionnent un &#201;tat, d'autres une ville dont l'&#201;tat est
-implicite, d'autres encore une ville et son &#201;tat ensemble. Le texte n'est pas
-assez structur&#233; pour nous donner une fa&#231;on fiable de distinguer les rapports de
-la Californie et d'Oakland, d'une mani&#232;re qui nous permette de classer
-automatiquement "Californie" dans une colonne "&#201;tat", et "Oakland" dans une
-colonne "ville". Nous devrons &#224; terme faire quelques &#233;ditions &#224; la main, en
-nous appuyant sur nos propres connaissances. Mais les r&#233;f&#233;rences aux p&#233;riodes
-de temps sont tr&#232;s uniformes. Nous pouvons utiliser ces r&#233;f&#233;rences pour cr&#233;er
-des structures qui nous aideront &#224; aligner les segments pour cr&#233;er des colonnes
-coh&#233;rentes.</p>
-<p>Par commodit&#233;, ins&#233;rons dans le texte des marqueurs qui ne seront pas confondus
-avec ce qui s'y trouve d&#233;j&#224;. Nous pouvons facilement distinguer ces marqueurs
+                <p>Certains documents mentionnent un État, d'autres une ville dont l'État est
+implicite, d'autres encore une ville et son État ensemble. Le texte n'est pas
+assez structuré pour nous donner une façon fiable de distinguer les rapports de
+la Californie et d'Oakland, d'une manière qui nous permette de classer
+automatiquement "Californie" dans une colonne "État", et "Oakland" dans une
+colonne "ville". Nous devrons à terme faire quelques éditions à la main, en
+nous appuyant sur nos propres connaissances. Mais les références aux périodes
+de temps sont très uniformes. Nous pouvons utiliser ces références pour créer
+des structures qui nous aideront à aligner les segments pour créer des colonnes
+cohérentes.</p>
+                <p>Par commodité, insérons dans le texte des marqueurs qui ne seront pas confondus
+avec ce qui s'y trouve déjà. Nous pouvons facilement distinguer ces marqueurs
 du texte existant, et les supprimer plus tard quand nous n'en avons plus
-besoin. Cherchons les r&#233;f&#233;rences temporelles et mettons "&lt;t&gt;" au d&#233;but et
-"&lt;/t&gt;" &#224; la fin, avec la mn&#233;monique "t" pour "temps". Nous aurions pu
+besoin. Cherchons les références temporelles et mettons "&lt;t&gt;" au début et
+"&lt;/t&gt;" à la fin, avec la mnémonique "t" pour "temps". Nous aurions pu
 utiliser un marqueur plus explicite, comme "&lt;time&gt;" ou au contraire un
-marqueur non-signifiant comme "asdfJKL ;" (tant que cette suite de caract&#232;re
-n'existe pas d&#233;j&#224; dans notre texte). Dans cet exercice, nous utilisons des
-marqueurs form&#233;s sur le mod&#232;le de "&lt;t&gt;". Si vous connaissez HTML ou XML, nos
-marqueurs ressemblent beaucoup aux balises qui marquent les &#233;l&#233;ments de ces
+marqueur non-signifiant comme "asdfJKL ;" (tant que cette suite de caractère
+n'existe pas déjà dans notre texte). Dans cet exercice, nous utilisons des
+marqueurs formés sur le modèle de "&lt;t&gt;". Si vous connaissez HTML ou XML, nos
+marqueurs ressemblent beaucoup aux balises qui marquent les éléments de ces
 langages. Nous ne sommes pas en train de produire du HTML ou du XML conformes
 en faisant cela, et nous supprimerons ces marqueurs rapidement, mais il y a une
 ressemblance.</p>
-<p><hi rend="bold">Avertissement:</hi> Les expressions r&#233;guli&#232;res sont puissantes, mais elles ont
-leurs limites et, lorsqu'elles sont utilis&#233;es pour modifier du texte auquel
-vous tenez, elles peuvent &#234;tre dangereuses: une erreur et vous pouvez
-rapidement supprimer ou alt&#233;rer de nombreuses informations par inadvertance.
+                <p>
+                    <hi rend="bold">Avertissement:</hi> Les expressions régulières sont puissantes, mais elles ont
+leurs limites et, lorsqu'elles sont utilisées pour modifier du texte auquel
+vous tenez, elles peuvent être dangereuses: une erreur et vous pouvez
+rapidement supprimer ou altérer de nombreuses informations par inadvertance.
 De plus, comme quelques fans du XML pourront vous le dire avec insistance,
-les expressions r&#233;guli&#232;res ne sont pas adapt&#233;es pour l'analyse syntaxique de
-fichiers XML. Apr&#232;s avoir vu &#224; quel point les expressions r&#233;guli&#232;res sont
-utiles pour traiter certains types de motifs, on est tent&#233; de penser, chaque
-fois qu'on voit un motif, qu'un ordinateur devrait &#234;tre capable d'aider, que
-les expressions r&#233;guli&#232;res sont tout ce dont on a besoin. Dans de nombreux cas,
-cela s'av&#233;rera faux. Les expressions r&#233;guli&#232;res ne sont pas ad&#233;quates pour
-traiter les mod&#232;les hi&#233;rarchiquement imbriqu&#233;s qu'on d&#233;crit facilement en
+les expressions régulières ne sont pas adaptées pour l'analyse syntaxique de
+fichiers XML. Après avoir vu à quel point les expressions régulières sont
+utiles pour traiter certains types de motifs, on est tenté de penser, chaque
+fois qu'on voit un motif, qu'un ordinateur devrait être capable d'aider, que
+les expressions régulières sont tout ce dont on a besoin. Dans de nombreux cas,
+cela s'avérera faux. Les expressions régulières ne sont pas adéquates pour
+traiter les modèles hiérarchiquement imbriqués qu'on décrit facilement en
 revanche avec XML.</p>
-<p>Mais ce n'est pas grave. Dans le cadre de ce tutoriel, nous ne pr&#233;tendons pas
+                <p>Mais ce n'est pas grave. Dans le cadre de ce tutoriel, nous ne prétendons pas
 savoir quoi que ce soit sur XML, ni ne nous soucions-nous de la grammaire des
 langages formels. Nous voulons simplement mettre des marqueurs pratiques dans
-un texte pour nous aider &#224; rendre une structure implicite relativement simple
+un texte pour nous aider à rendre une structure implicite relativement simple
 un peu plus explicite. Quand nous en aurons fini, nous retirerons ces marqueurs.
 Il y a une raison pour laquelle de tels marqueurs sont utiles. Si ce qui peut
-&#234;tre fait avec les motifs dans cet exercice vous intrigue, vous voudrez sans
+être fait avec les motifs dans cet exercice vous intrigue, vous voudrez sans
 doute en savoir davantage sur HTML et sur XML, et apprendre ce que leurs
 structures plus explicites permettent de faire.</p>
-</div>
-      <div type="2"><head>D&#233;finir les segments</head>
-<p>Les quelques mod&#232;les suivants deviendront rapidement plus compliqu&#233;s. Si
+            </div>
+            <div type="2">
+                <head>Définir les segments</head>
+                <p>Les quelques modèles suivants deviendront rapidement plus compliqués. Si
 toutefois vous prenez le temps de regarder la documentation pour voir comment
-les symboles d&#233;finissent les motifs, ils deviendront plus clairs.</p>
-<p>Les r&#233;f&#233;rences g&#233;ographiques dans notre texte sont suivies de tirets longs
-(d'une longueur &#233;quivalente &#224; celle de la lettre "m" mais plus long que le
+les symboles définissent les motifs, ils deviendront plus clairs.</p>
+                <p>Les références géographiques dans notre texte sont suivies de tirets longs
+(d'une longueur équivalente à celle de la lettre "m" mais plus long que le
 tiret moyen; sachant que le trait d'union n'est pas un signe de ponctuation et a une
-longueur diff&#233;rente). On peut les remplacer par des tabulations, ce qui va
-nous aider &#224; mettre les &#201;tats et les villes dans des colonnes s&#233;par&#233;es dans
+longueur différente). On peut les remplacer par des tabulations, ce qui va
+nous aider à mettre les États et les villes dans des colonnes séparées dans
 la feuille de calcul.</p>
-<p><emph>Remplacez</emph> <code rend="inline">[ ]?&#8212;[ ]?</code> <emph>par</emph> <code rend="inline">\t</code> (42 occurrences).</p>
-<p>Une mani&#232;re facile d'ins&#233;rer le tiret long dans le motif de recherche est de
-copier-coller un des tirets longs qu'on trouve dans le texte lui-m&#234;me. Les
-crochets ne sont pas vraiment n&#233;cessaires ici, mais ils aident &#224; rendre
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">[ ]?—[ ]?</code>
+                    <emph>par</emph>
+                    <code rend="inline">\t</code> (42 occurrences).</p>
+                <p>Une manière facile d'insérer le tiret long dans le motif de recherche est de
+copier-coller un des tirets longs qu'on trouve dans le texte lui-même. Les
+crochets ne sont pas vraiment nécessaires ici, mais ils aident à rendre
 visible le fait qu'on cherche un espace vide. Cela signifie que notre motif
 acceptera un tiret long avec ou sans espace de part et d'autre.</p>
-<p>Maintenant nous allons chercher des r&#233;f&#233;rences explicites au temps et nous
+                <p>Maintenant nous allons chercher des références explicites au temps et nous
 allons les encadrer de "&lt;t&gt;" et "&lt;/t&gt;". Une fois que nous aurons ces
-marqueurs ils fourniront une base &#224; partir de laquelle construire de nouveaux
+marqueurs ils fourniront une base à partir de laquelle construire de nouveaux
 motifs. Notez que dans le prochain motif, nous devons nous assurer d'appliquer
-le remplacement une fois seulement, sinon, certaines r&#233;f&#233;rences de temps
-risquent d'&#234;tre encadr&#233;es plusieurs fois. Il sera donc plus efficace d'utiliser
-"Tout remplacer" une seule fois pour chaque mod&#232;le encadr&#233;.</p>
-<p><emph>Remplacez</emph> <code rend="inline">(Month of [A-Z][a-z, 0-9]+ 19[0-9][0-9].)</code> <emph>par</emph> <code rend="inline">&lt;t&gt;$1&lt;/t&gt;</code>.</p>
-<figure><desc>Figure 7 : Trouver les informations temporelles en utilisant les expressions r&#233;guli&#232;res</desc><graphic url="regex_06_timemarkup.png"/></figure>
-<p>Ici les parenth&#232;ses permettent de d&#233;finir un groupe au sein du motif de
-recherche. Ce groupe est ensuite appel&#233; dans le motif de remplacement avec
-<code rend="inline">$1</code>. Cela permet de r&#233;p&#233;ter la cible, en ajoutant au passage des caract&#232;res
-suppl&#233;mentaires avant et/ou apr&#232;s.</p>
-<p>Nous avons besoin d'appliquer une approche similaire, cette fois-ci pour les
+le remplacement une fois seulement, sinon, certaines références de temps
+risquent d'être encadrées plusieurs fois. Il sera donc plus efficace d'utiliser
+"Tout remplacer" une seule fois pour chaque modèle encadré.</p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">(Month of [A-Z][a-z, 0-9]+ 19[0-9][0-9].)</code>
+                    <emph>par</emph>
+                    <code rend="inline">&lt;t&gt;$1&lt;/t&gt;</code>.</p>
+                <figure>
+                    <desc>Figure 7 : Trouver les informations temporelles en utilisant les expressions régulières</desc>
+                    <graphic url="regex_06_timemarkup.png"/>
+                </figure>
+                <p>Ici les parenthèses permettent de définir un groupe au sein du motif de
+recherche. Ce groupe est ensuite appelé dans le motif de remplacement avec
+<code rend="inline">$1</code>. Cela permet de répéter la cible, en ajoutant au passage des caractères
+supplémentaires avant et/ou après.</p>
+                <p>Nous avons besoin d'appliquer une approche similaire, cette fois-ci pour les
 rapports trimestriels :</p>
-<p><emph>Remplacer</emph> <code rend="inline">([-A-Za-z ]+ ended [A-Z][a-z, 0-9]+ 19[0-9][0-9].)</code> <emph>par</emph>
-<code rend="inline">&lt;t&gt;$1&lt;/t&gt;</code></p>
-<p>Cette fois, nous en avons termin&#233; le traitement des r&#233;f&#233;rences temporelles.
-Continuons cette strat&#233;gie pour traiter les autres types d'informations que
+                <p>
+                    <emph>Remplacer</emph>
+                    <code rend="inline">([-A-Za-z ]+ ended [A-Z][a-z, 0-9]+ 19[0-9][0-9].)</code>
+                    <emph>par</emph>
+                    <code rend="inline">&lt;t&gt;$1&lt;/t&gt;</code>
+                </p>
+                <p>Cette fois, nous en avons terminé le traitement des références temporelles.
+Continuons cette stratégie pour traiter les autres types d'informations que
 nous avons ici. Nous pouvons utiliser <code rend="inline">&lt;p&gt;</code> pour les estimations de population,
-<code rend="inline">&lt;N&gt;</code> pour les nombres totaux de d&#233;c&#232;s  et <code rend="inline">&lt;c&gt;</code>, pour "<emph>Cases</emph>" (cas) qui
-est utilis&#233; dans le texte pour s&#233;parer les informations sur la mortalit&#233; et
-celles sur la morbidit&#233;. Si vous connaissez un peu HTML ou XML, il vous
-semblera peut-&#234;tre reconna&#238;tre "</p><p>", le marqueur de paragraphe. Ici, nous ne
+<code rend="inline">&lt;N&gt;</code> pour les nombres totaux de décès  et <code rend="inline">&lt;c&gt;</code>, pour "<emph>Cases</emph>" (cas) qui
+est utilisé dans le texte pour séparer les informations sur la mortalité et
+celles sur la morbidité. Si vous connaissez un peu HTML ou XML, il vous
+semblera peut-être reconnaître "</p>
+                <p>", le marqueur de paragraphe. Ici, nous ne
 l'utilisons pas dans ce sens.</p>
-<p>Voici quelques motifs pour &#233;tiqueter chaque type d'information, toujours en
-suivant la m&#234;me strat&#233;gie :</p>
-<p><emph>Remplacez</emph> <code rend="inline">(Estimated population, [0-9,]+.)</code> <emph>par</emph> <code rend="inline">&lt;p&gt;$1&lt;/p&gt;</code> (34
+                <p>Voici quelques motifs pour étiqueter chaque type d'information, toujours en
+suivant la même stratégie :</p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">(Estimated population, [0-9,]+.)</code>
+                    <emph>par</emph>
+                    <code rend="inline">&lt;p&gt;$1&lt;/p&gt;</code> (34
 occurrences).</p>
-<p><emph>Remplacez</emph> <code rend="inline">(Total number of deaths[A-Za-z ,]* [0-9,]+)</code> <emph>par</emph> <code rend="inline">&lt;N&gt;$1&lt;/N&gt;</code>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">(Total number of deaths[A-Za-z ,]* [0-9,]+)</code>
+                    <emph>par</emph>
+                    <code rend="inline">&lt;N&gt;$1&lt;/N&gt;</code>
 (48 occurrences).</p>
-<p><emph>Remplacez</emph> <code rend="inline">(Cases ?:)</code> <emph>par</emph> <code rend="inline">&lt;c&gt;$1&lt;/c&gt;</code> (49 occurrences).</p>
-<p>La partie suivante est un peu plus compliqu&#233;e. Il faudrait que nous puissions
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">(Cases ?:)</code>
+                    <emph>par</emph>
+                    <code rend="inline">&lt;c&gt;$1&lt;/c&gt;</code> (49 occurrences).</p>
+                <p>La partie suivante est un peu plus compliquée. Il faudrait que nous puissions
 identifier les maladies (utilisons <code rend="inline">&lt;d&gt;</code>, pour <emph>disease</emph>) et compter (<code rend="inline">&lt;n&gt;</code>)
-les segments. Comme la langue utilis&#233;e dans ce document est tr&#232;s standardis&#233;e,
-surtout pour les passages qui concernent le d&#233;compte des morts, nous allons
-pouvoir aller assez loin sans avoir &#224; chercher chaque nom de maladie, un par
-un. Tout d'abord, ciblons les paires maladie-d&#233;compte qui sont donn&#233;es apr&#232;s le
+les segments. Comme la langue utilisée dans ce document est très standardisée,
+surtout pour les passages qui concernent le décompte des morts, nous allons
+pouvoir aller assez loin sans avoir à chercher chaque nom de maladie, un par
+un. Tout d'abord, ciblons les paires maladie-décompte qui sont données après le
 mot "including" (y compris):</p>
-<p><emph>Remplacez</emph> <code rend="inline">&lt;/N&gt; including ([A-Za-z ]+) ([0-9]+),</code> <emph>par</emph>
-<code rend="inline">&lt;/N&gt; including &lt;d&gt;$1&lt;/d&gt; &lt;n&gt;$2&lt;/n&gt;</code> (29 occurences).</p>
-<p>Ensuite, on cible de mani&#232;re it&#233;rative les paires maladie-d&#233;compte qui
-apparaissent apr&#232;s nos marqueurs existants :</p>
-<p><emph>Remplacez</emph> <code rend="inline">&gt; ([A-Za-z ]+) ([0-9]+)([.,])</code> <emph>par</emph> <code rend="inline">&gt; &lt;d&gt;$1&lt;/d&gt; &lt;n&gt;$2&lt;/n&gt;</code></p>
-<p>Remarquez que nous nous d&#233;barrassons des virgules apr&#232;s le d&#233;compte du nombre
-de victimes de la maladie en ne faisant pas r&#233;f&#233;rence au troisi&#232;me groupe dans
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">&lt;/N&gt; including ([A-Za-z ]+) ([0-9]+),</code>
+                    <emph>par</emph>
+                    <code rend="inline">&lt;/N&gt; including &lt;d&gt;$1&lt;/d&gt; &lt;n&gt;$2&lt;/n&gt;</code> (29 occurences).</p>
+                <p>Ensuite, on cible de manière itérative les paires maladie-décompte qui
+apparaissent après nos marqueurs existants :</p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">&gt; ([A-Za-z ]+) ([0-9]+)([.,])</code>
+                    <emph>par</emph>
+                    <code rend="inline">&gt; &lt;d&gt;$1&lt;/d&gt; &lt;n&gt;$2&lt;/n&gt;</code>
+                </p>
+                <p>Remarquez que nous nous débarrassons des virgules après le décompte du nombre
+de victimes de la maladie en ne faisant pas référence au troisième groupe dans
 le motif de remplacement.</p>
-<p><hi rend="bold">R&#233;p&#233;tez</hi> ce remplacement autant de fois que n&#233;cessaire, jusqu'&#224; ce qu'il n'y
-ait plus aucun r&#233;sultat correspondant &#224; la recherche. Cela devrait vous prendre
-plusieurs it&#233;rations.</p>
-<p>Notre motif n'a eu aucun effet sur les phrases comme "and 3 from tuberculosis"
+                <p>
+                    <hi rend="bold">Répétez</hi> ce remplacement autant de fois que nécessaire, jusqu'à ce qu'il n'y
+ait plus aucun résultat correspondant à la recherche. Cela devrait vous prendre
+plusieurs itérations.</p>
+                <p>Notre motif n'a eu aucun effet sur les phrases comme "and 3 from tuberculosis"
 ("et 3 de la tuberculose"). Nous pouvons cibler ces phrases et changer l'ordre
-des &#233;lements pour que la maladie apparaisse avant le d&#233;compte :</p>
-<p><emph>Remplacez</emph> <code rend="inline">and ([0-9])+ from ([a-z ]+)</code> <emph>par</emph> <code rend="inline">&lt;d&gt;$2&lt;/d&gt; &lt;n&gt;$1&lt;/n&gt;</code> (32
+des élements pour que la maladie apparaisse avant le décompte :</p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">and ([0-9])+ from ([a-z ]+)</code>
+                    <emph>par</emph>
+                    <code rend="inline">&lt;d&gt;$2&lt;/d&gt; &lt;n&gt;$1&lt;/n&gt;</code> (32
 occurrences).</p>
-<p>Nos marqueurs contiennent d&#233;sormais beaucoup de structures s&#233;mantiques qui nous
-int&#233;ressent. Copions et collons (<code rend="inline">Collage sp&#233;cial</code> -&gt; <code rend="inline">Texte non format&#233;</code>) le texte
-dans LibreOffice Calc afin de voir &#224; quel point nous nous rapprochons de la
-structure d'un tableau. Nous parvenons d&#233;sormais &#224; s&#233;parer les donn&#233;es de
-localisation dans des cellules, mais ces cellules ne sont pas encore align&#233;es
-verticalement. Nous voulons placer toutes les r&#233;f&#233;rences de temps dans la
-troisi&#232;me colonne.</p>
-<figure><desc>Figure 8: Mesurons nos progr&#232;s en utilisant LibreOffice Calc</desc><graphic url="regex_09_calc_3col.png"/></figure>
-<p>Lorsque deux colonnes contiennent des informations de localisation, il n'y a
-pas de probl&#232;me. Par contre, les lignes avec une seule colonne pour la
-localisation ont besoin d'&#234;tre compl&#233;t&#233;es. Pour la plupart, il s'agit de
-villes, donc nous avons besoin de d&#233;placer manuellement le nom de l'&#201;tat dans
-la premi&#232;re colonne. Retournez dans la fen&#234;tre de LibreOffice Writer et :</p>
-<p><emph>Remplacez</emph> <code rend="inline">^([A-Za-z .]+\t&lt;t&gt;)</code> <emph>par</emph> <code rend="inline">\t$1</code> (30 occurrences).</p>
-<p>A pr&#233;sent, r&#233;glez les cas qui ne contiennent aucune information sur la
-localisation car elle est implicitement la m&#234;me que celle de la ligne
-pr&#233;c&#233;dente, mais o&#249; la p&#233;riode de temps est diff&#233;rente.</p>
-<p><emph>Remplacez</emph> <code rend="inline">^&lt;t&gt;</code> <emph>par</emph> <code rend="inline">\t\t&lt;t&gt;</code> (19 occurrences)</p>
-<figure><desc>Figure 9: Affinage approfondi des r&#233;sultats</desc><graphic url="regex_10_loc_columns.png"/></figure>
-<p>Les premi&#232;res colonnes devraient avoir meilleure allure si vous les collez
+                <p>Nos marqueurs contiennent désormais beaucoup de structures sémantiques qui nous
+intéressent. Copions et collons (<code rend="inline">Collage spécial</code> -&gt; <code rend="inline">Texte non formaté</code>) le texte
+dans LibreOffice Calc afin de voir à quel point nous nous rapprochons de la
+structure d'un tableau. Nous parvenons désormais à séparer les données de
+localisation dans des cellules, mais ces cellules ne sont pas encore alignées
+verticalement. Nous voulons placer toutes les références de temps dans la
+troisième colonne.</p>
+                <figure>
+                    <desc>Figure 8: Mesurons nos progrès en utilisant LibreOffice Calc</desc>
+                    <graphic url="regex_09_calc_3col.png"/>
+                </figure>
+                <p>Lorsque deux colonnes contiennent des informations de localisation, il n'y a
+pas de problème. Par contre, les lignes avec une seule colonne pour la
+localisation ont besoin d'être complétées. Pour la plupart, il s'agit de
+villes, donc nous avons besoin de déplacer manuellement le nom de l'État dans
+la première colonne. Retournez dans la fenêtre de LibreOffice Writer et :</p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">^([A-Za-z .]+\t&lt;t&gt;)</code>
+                    <emph>par</emph>
+                    <code rend="inline">\t$1</code> (30 occurrences).</p>
+                <p>A présent, réglez les cas qui ne contiennent aucune information sur la
+localisation car elle est implicitement la même que celle de la ligne
+précédente, mais où la période de temps est différente.</p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">^&lt;t&gt;</code>
+                    <emph>par</emph>
+                    <code rend="inline">\t\t&lt;t&gt;</code> (19 occurrences)</p>
+                <figure>
+                    <desc>Figure 9: Affinage approfondi des résultats</desc>
+                    <graphic url="regex_10_loc_columns.png"/>
+                </figure>
+                <p>Les premières colonnes devraient avoir meilleure allure si vous les collez
 dans Calc. Le texte dans Writer est toujours notre copie de travail, donc si
-vous voulez corriger le nom des &#201;tats, il vous faut le faire dans Writer en
-supprimant des tabulations (<code rend="inline">\t</code>) avant le nom de l'&#201;tat et en introduisant un
-nouveau caract&#232;re de tabulation apr&#232;s. Ou bien vous pouvez attendre que nous en
+vous voulez corriger le nom des États, il vous faut le faire dans Writer en
+supprimant des tabulations (<code rend="inline">\t</code>) avant le nom de l'État et en introduisant un
+nouveau caractère de tabulation après. Ou bien vous pouvez attendre que nous en
 ayons fini avec notre travail dans Writer, pour corriger ces erreurs dans Calc,
-une fois que nous serons pr&#234;ts &#224; en faire notre copie de travail. Mais nous
-n'en sommes pas encore l&#224; !</p>
-<p>Il nous faut d&#233;cider comment g&#233;rer les listes de maladies. Les lignes
-contiennent des listes de longueurs variables. M&#234;me s'il serait facile &#224; ce
-stade d'introduire un caract&#232;re de tabulation pour placer chaque maladie et le
-nombre de victimes ou de malades dans des colonnes diff&#233;rentes, ces colonnes
-ne seraient pas tr&#232;s pratiques. Les maladies et les d&#233;comptes ne seraient pas
-align&#233;s. &#192; la place, nous pouvons plut&#244;t cr&#233;er de nouvelles lignes pour chaque
-maladie. Les rapports distinguent d&#233;comptes des victimes et d&#233;comptes des
-malades, qui sont d&#233;j&#224; s&#233;par&#233;s par "cases:". (Il y a un cas, pour l'Indiana, o&#249;
+une fois que nous serons prêts à en faire notre copie de travail. Mais nous
+n'en sommes pas encore là !</p>
+                <p>Il nous faut décider comment gérer les listes de maladies. Les lignes
+contiennent des listes de longueurs variables. Même s'il serait facile à ce
+stade d'introduire un caractère de tabulation pour placer chaque maladie et le
+nombre de victimes ou de malades dans des colonnes différentes, ces colonnes
+ne seraient pas très pratiques. Les maladies et les décomptes ne seraient pas
+alignés. À la place, nous pouvons plutôt créer de nouvelles lignes pour chaque
+maladie. Les rapports distinguent décomptes des victimes et décomptes des
+malades, qui sont déjà séparés par "cases:". (Il y a un cas, pour l'Indiana, où
 le texte indique cette section avec le terme "Morbidity". Notre motif de
-recherche l'a manqu&#233;. Vous pouvez r&#233;parer le balisage &#224; la main &#224; pr&#233;sent, si
+recherche l'a manqué. Vous pouvez réparer le balisage à la main à présent, si
 vous le souhaitez, ou bien l'ignorer puisqu'il s'agit ici d'un exercice. C'est
-un bon exemple qui montre &#224; quel point les outils d'automatisation ne
-constituent pas le seul et unique moyen d'&#233;diter vos sources et ne vous
-emp&#234;chent pas de les regarder. Ce ne sera pas le seul exemple de ce type).</p>
-<p>Nous pouvons commencer en cr&#233;ant une nouvelle ligne pour la liste des cas
-("cases"), afin que nous puissions les g&#233;rer s&#233;par&#233;ment. De retour dans
+un bon exemple qui montre à quel point les outils d'automatisation ne
+constituent pas le seul et unique moyen d'éditer vos sources et ne vous
+empêchent pas de les regarder. Ce ne sera pas le seul exemple de ce type).</p>
+                <p>Nous pouvons commencer en créant une nouvelle ligne pour la liste des cas
+("cases"), afin que nous puissions les gérer séparément. De retour dans
 LibreOffice Writer :</p>
-<figure><desc>Figure 10: Cr&#233;ation de nouvelles lignes pour les 'cas'</desc><graphic url="regex_11_writer_cases_together_hi.png"/></figure>
-<p><emph>Remplacez</emph> <code rend="inline">^(.*\t)(.*\t)(&lt;t&gt;.*&lt;/t&gt;)(.*)(&lt;c&gt;.*)</code> <emph>par</emph>
-<code rend="inline">$1$2$3$4\n$1$2$3\t$5</code> (47 occurrences).</p>
-<p>Remarquez ici que nous utilisons certains des mod&#232;les de remplacement deux
-fois. Nous ciblons trois groupes jusqu'&#224; la r&#233;f&#233;rence temporelle, puis tout ce
-qui pr&#233;c&#232;de <code rend="inline">&lt;c&gt;</code> dans un quatri&#232;me groupe, et enfin tout ce qui se trouve
-apr&#232;s <code rend="inline">&lt;c&gt;</code> dans un cinqui&#232;me. Dans le mod&#232;le de remplacement, nous remettons
-les groupes 1 &#224; 4 dans l'ordre, puis nous introduisons une nouvelle ligne et
-imprimons &#224; nouveau les groupes 1 &#224; 3, suivis d'une tabulation et du groupe 5.
-Nous avons ainsi d&#233;plac&#233; les listes des cas sur leurs propres lignes, et avons
+                <figure>
+                    <desc>Figure 10: Création de nouvelles lignes pour les 'cas'</desc>
+                    <graphic url="regex_11_writer_cases_together_hi.png"/>
+                </figure>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">^(.*\t)(.*\t)(&lt;t&gt;.*&lt;/t&gt;)(.*)(&lt;c&gt;.*)</code>
+                    <emph>par</emph>
+                    <code rend="inline">$1$2$3$4\n$1$2$3\t$5</code> (47 occurrences).</p>
+                <p>Remarquez ici que nous utilisons certains des modèles de remplacement deux
+fois. Nous ciblons trois groupes jusqu'à la référence temporelle, puis tout ce
+qui précède <code rend="inline">&lt;c&gt;</code> dans un quatrième groupe, et enfin tout ce qui se trouve
+après <code rend="inline">&lt;c&gt;</code> dans un cinquième. Dans le modèle de remplacement, nous remettons
+les groupes 1 à 4 dans l'ordre, puis nous introduisons une nouvelle ligne et
+imprimons à nouveau les groupes 1 à 3, suivis d'une tabulation et du groupe 5.
+Nous avons ainsi déplacé les listes des cas sur leurs propres lignes, et avons
 reproduit mot pour mot les champs lieu et temps.</p>
-<p>Allons plus loin et s&#233;parons chaque cas list&#233; pour le mettre dans sa propre
+                <p>Allons plus loin et séparons chaque cas listé pour le mettre dans sa propre
 ligne :</p>
-<p><emph>Remplacez</emph> <code rend="inline">^(.*\t)(.*\t)(&lt;t&gt;.*&lt;/t&gt;)(.*&lt;c&gt;.*)(&lt;d&gt;.*&lt;/d&gt;) (&lt;n&gt;.*&lt;/n&gt;)</code>
-<emph>par</emph> <code rend="inline">$1$2$3$4\n$1$2$3\tCases\t$5$6</code></p>
-<p>et <hi rend="bold">r&#233;p&#233;tez</hi> autant de fois que n&#233;cessaire jusqu'&#224; ce qu'il n'y ait plus de
-remplacement possible (7 it&#233;rations).</p>
-<p>Maintenant, faisons de m&#234;me pour s&#233;parer les listes de victimes :</p>
-<p><emph>Remplacez</emph> <code rend="inline">^(.*\t)(.*\t)(&lt;t&gt;.*&lt;/t&gt;)(.*&lt;N&gt;.*)(&lt;d&gt;.*&lt;/d&gt;) (&lt;n&gt;.*&lt;/n&gt;)</code>
-<emph>par</emph> <code rend="inline">$1$2$3$4\n$1$2$3\tDeaths\t$5$6</code></p>
-<p>et <hi rend="bold">r&#233;p&#233;tez</hi> autant de fois que n&#233;cessaire jusqu'&#224; ce qu'il n'y ait plus de
-remplacement possible (8 it&#233;rations).</p>
-<p>Cela se rapproche de plus en plus d'une structure tabulaire, comme vous pouvez
-vous en rendre compte si vous collez &#224; nouveau le texte dans Calc &#224; nouveau.
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">^(.*\t)(.*\t)(&lt;t&gt;.*&lt;/t&gt;)(.*&lt;c&gt;.*)(&lt;d&gt;.*&lt;/d&gt;) (&lt;n&gt;.*&lt;/n&gt;)</code>
+                    <emph>par</emph>
+                    <code rend="inline">$1$2$3$4\n$1$2$3\tCases\t$5$6</code>
+                </p>
+                <p>et <hi rend="bold">répétez</hi> autant de fois que nécessaire jusqu'à ce qu'il n'y ait plus de
+remplacement possible (7 itérations).</p>
+                <p>Maintenant, faisons de même pour séparer les listes de victimes :</p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">^(.*\t)(.*\t)(&lt;t&gt;.*&lt;/t&gt;)(.*&lt;N&gt;.*)(&lt;d&gt;.*&lt;/d&gt;) (&lt;n&gt;.*&lt;/n&gt;)</code>
+                    <emph>par</emph>
+                    <code rend="inline">$1$2$3$4\n$1$2$3\tDeaths\t$5$6</code>
+                </p>
+                <p>et <hi rend="bold">répétez</hi> autant de fois que nécessaire jusqu'à ce qu'il n'y ait plus de
+remplacement possible (8 itérations).</p>
+                <p>Cela se rapproche de plus en plus d'une structure tabulaire, comme vous pouvez
+vous en rendre compte si vous collez à nouveau le texte dans Calc à nouveau.
 Encore un peu de patience toutefois: il nous faut nettoyer notre travail avec
-de tr&#232;s simples motifs de remplacement rapides &#224; utiliser. De cette mani&#232;re,
-le gros du travail aura &#233;t&#233; fait.</p>
-<p><emph>Remplacez</emph> <code rend="inline">.*&lt;/c&gt; $</code> <emph>par rien</emph></p>
-<p><emph>Remplacez</emph> <code rend="inline">^$</code> <emph>par rien</emph></p>
-<p><emph>Remplacez</emph> <code rend="inline">&lt;n&gt;</code> <emph>par</emph> <code rend="inline">\t</code></p>
-<p><emph>Remplacez</emph> <code rend="inline">&lt;/n&gt;</code> <emph>par rien</emph></p>
-<p><emph>Remplacez</emph> <code rend="inline">&lt;d&gt;and</code> <emph>par</emph> <code rend="inline">&lt;d&gt;</code></p>
-<p><emph>Remplacez</emph> <code rend="inline">&lt;/?[tdp]&gt;</code> <emph>par rien</emph></p>
-<figure><desc>Figure 11: Vue finale dans LibreOffice Writer</desc><graphic url="regex_17_writer_done.png"/></figure>
-<p>Maintenant, copiez et collez tout cela dans Calc, et vous devriez obtenir un
-tableau relativement bien structur&#233;.</p>
-<figure><desc>Figure 12: Vue finale dans LibreOffice Calc</desc><graphic url="regex_18_calc_done.png"/></figure>
-<p>Si ce n'&#233;tait pas un exercice, mais une source que nous &#233;ditions pour une
-publication ou pour la recherche, il resterait des choses &#224; r&#233;gler. Nous
-n'avons pas trait&#233; les chiffres donn&#233;s pour les estimations de population.
-Notre syst&#232;me de motif n'&#233;tait pas assez sophistiqu&#233; pour tout g&#233;rer. Dans les
+de très simples motifs de remplacement rapides à utiliser. De cette manière,
+le gros du travail aura été fait.</p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">.*&lt;/c&gt; $</code>
+                    <emph>par rien</emph>
+                </p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">^$</code>
+                    <emph>par rien</emph>
+                </p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">&lt;n&gt;</code>
+                    <emph>par</emph>
+                    <code rend="inline">\t</code>
+                </p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">&lt;/n&gt;</code>
+                    <emph>par rien</emph>
+                </p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">&lt;d&gt;and</code>
+                    <emph>par</emph>
+                    <code rend="inline">&lt;d&gt;</code>
+                </p>
+                <p>
+                    <emph>Remplacez</emph>
+                    <code rend="inline">&lt;/?[tdp]&gt;</code>
+                    <emph>par rien</emph>
+                </p>
+                <figure>
+                    <desc>Figure 11: Vue finale dans LibreOffice Writer</desc>
+                    <graphic url="regex_17_writer_done.png"/>
+                </figure>
+                <p>Maintenant, copiez et collez tout cela dans Calc, et vous devriez obtenir un
+tableau relativement bien structuré.</p>
+                <figure>
+                    <desc>Figure 12: Vue finale dans LibreOffice Calc</desc>
+                    <graphic url="regex_18_calc_done.png"/>
+                </figure>
+                <p>Si ce n'était pas un exercice, mais une source que nous éditions pour une
+publication ou pour la recherche, il resterait des choses à régler. Nous
+n'avons pas traité les chiffres donnés pour les estimations de population.
+Notre système de motif n'était pas assez sophistiqué pour tout gérer. Dans les
 lignes qui n'avaient pas de motifs comme "Total number of deaths 292,
-including", nos motifs de recherche qui auraient n&#233;cessit&#233; l'insertion pr&#233;alable d'un marqueur <code rend="inline">&lt;/N&gt;</code> n'ont pas pu fonctionner.</p>
-</div>
-      <div type="2"><head>Quelques pistes suppl&#233;mentaires</head>
-<p>Certains de ces probl&#232;mes pourraient &#234;tre r&#233;solus par des &#233;tapes
-suppl&#233;mentaires de comparaison de motifs, d'autres par une &#233;dition manuelle du
-document entre certaines &#233;tapes de notre travail. D'autres, encore,
-supposeraient qu'on modifie les donn&#233;es en fin de parcours, une fois
+including", nos motifs de recherche qui auraient nécessité l'insertion préalable d'un marqueur <code rend="inline">&lt;/N&gt;</code> n'ont pas pu fonctionner.</p>
+            </div>
+            <div type="2">
+                <head>Quelques pistes supplémentaires</head>
+                <p>Certains de ces problèmes pourraient être résolus par des étapes
+supplémentaires de comparaison de motifs, d'autres par une édition manuelle du
+document entre certaines étapes de notre travail. D'autres, encore,
+supposeraient qu'on modifie les données en fin de parcours, une fois
 qu'elles sont sous une forme tabulaire.</p>
-<p>Nous pourrions aussi envisager d'autres structures pour ce tableau. Par
-exemple, peut-&#234;tre que la mortalit&#233; ou la morbidit&#233; seraient plus faciles &#224;
-compter si elles se trouvaient dans des colonnes diff&#233;rentes. Les logiciels
+                <p>Nous pourrions aussi envisager d'autres structures pour ce tableau. Par
+exemple, peut-être que la mortalité ou la morbidité seraient plus faciles à
+compter si elles se trouvaient dans des colonnes différentes. Les logiciels
 de traitement de texte ne sont pas les meilleurs outils pour utiliser ce genre
 de structure. Les feuilles de calcul, XML et les outils programmatiques qui
-servent &#224; traiter les donn&#233;es sont bien plus susceptibles de correspondre &#224; nos
-besoins. Mais ces m&#234;mes logiciels ont des fonctionnalit&#233;s avanc&#233;es pour
-"rechercher &amp; remplacer" qui sont utiles &#224; conna&#238;tre. Les expressions
-r&#233;guli&#232;res et la recherche avanc&#233;e de motifs sont tr&#232;s utiles pour l'&#233;dition.
-Elles permettent de construire des passerelles entre des s&#233;quences dont la
+servent à traiter les données sont bien plus susceptibles de correspondre à nos
+besoins. Mais ces mêmes logiciels ont des fonctionnalités avancées pour
+"rechercher &amp; remplacer" qui sont utiles à connaître. Les expressions
+régulières et la recherche avancée de motifs sont très utiles pour l'édition.
+Elles permettent de construire des passerelles entre des séquences dont la
 structure est implicite et une structure plus explicite qu'on peut vouloir
-cr&#233;er ou cibler.</p>
-<p>Il y a plus de 400 rapports de sant&#233; publique comme celui-ci, disponibles en
-ligne depuis l'Internet Archive. Si vous voulez vous amuser &#224; toutes les
-tabuler, LibreOffice n'est pas le meilleur outil de d&#233;part. Ce serait mieux
-d'apprendre un peu de Python, de Ruby ou de d&#233;veloppement de scripts pour la
-ligne de commande de votre syst&#232;me d'exploitation. Les &#233;diteurs de texte brut
-orient&#233;s pour la programmation, y compris des classiques comme Emacs et Vi ou
-Vim, supportent tr&#232;s bien les expressions r&#233;guli&#232;res ainsi que d'autres
-techniques de param&#233;trage utiles pour traiter le texte brut de fa&#231;on
-programmatique. Si vous &#234;tes &#224; l'aise pour ouvrir une ligne de commande de type
+créer ou cibler.</p>
+                <p>Il y a plus de 400 rapports de santé publique comme celui-ci, disponibles en
+ligne depuis l'Internet Archive. Si vous voulez vous amuser à toutes les
+tabuler, LibreOffice n'est pas le meilleur outil de départ. Ce serait mieux
+d'apprendre un peu de Python, de Ruby ou de développement de scripts pour la
+ligne de commande de votre système d'exploitation. Les éditeurs de texte brut
+orientés pour la programmation, y compris des classiques comme Emacs et Vi ou
+Vim, supportent très bien les expressions régulières ainsi que d'autres
+techniques de paramétrage utiles pour traiter le texte brut de façon
+programmatique. Si vous êtes à l'aise pour ouvrir une ligne de commande de type
 Unix (sous Mac ou Linux, ou sous Windows avec une machine virtuelle ou
-l'environnement Cygwin), vous pouvez apprendre et tr&#232;s bien utiliser les
-expressions r&#233;guli&#232;res avec des outils comme <code rend="inline">grep</code> pour la recherche et <code rend="inline">sed</code>
-pour le remplacement orient&#233;-ligne (<emph>line-oriented replacing</emph>).</p>
-<p>Les expressions r&#233;guli&#232;res peuvent &#234;tre extr&#234;mement utiles quand on doit
+l'environnement Cygwin), vous pouvez apprendre et très bien utiliser les
+expressions régulières avec des outils comme <code rend="inline">grep</code> pour la recherche et <code rend="inline">sed</code>
+pour le remplacement orienté-ligne (<emph>line-oriented replacing</emph>).</p>
+                <p>Les expressions régulières peuvent être extrêmement utiles quand on doit
 rechercher des motifs dans plusieurs centaines de documents. Les motifs
-employ&#233;s ici reposent sur diff&#233;rents postulats qui pourraient s'av&#233;rer
-erron&#233;s s'ils &#233;taient appliqu&#233;s &#224; des textes plus longs ou &#224; des ensembles de
+employés ici reposent sur différents postulats qui pourraient s'avérer
+erronés s'ils étaient appliqués à des textes plus longs ou à des ensembles de
 textes plus longs. Cependant, avec un langage de programmation, nous pourrions
-enregistrer ce que nous faisons sous la forme d'un petit script, l'am&#233;liorer et
-le r&#233;ex&#233;cuter autant de fois que n&#233;cessaire pour atteindre nos objectifs.</p>
-</div>
-      <div type="2"><head>Pour en apprendre plus</head>
-<p>La page Wikipedia sur les <ref target="https://fr.wikipedia.org/wiki/Expression_r%C3%A9guli%C3%A8re">expressions r&#233;guli&#232;res</ref> est un endroit utile pour
-trouver un bref historique des expressions r&#233;guli&#232;res et de leur lien avec la
-th&#233;orie des langages formels. Vous y trouverez aussi un r&#233;sum&#233; des variations
+enregistrer ce que nous faisons sous la forme d'un petit script, l'améliorer et
+le réexécuter autant de fois que nécessaire pour atteindre nos objectifs.</p>
+            </div>
+            <div type="2">
+                <head>Pour en apprendre plus</head>
+                <p>La page Wikipedia sur les <ref target="https://fr.wikipedia.org/wiki/Expression_r%C3%A9guli%C3%A8re">expressions régulières</ref> est un endroit utile pour
+trouver un bref historique des expressions régulières et de leur lien avec la
+théorie des langages formels. Vous y trouverez aussi un résumé des variations
 syntaxiques et des efforts de standardisation formelle.</p>
-<p>Quel que soit l'outil que vous utilisez, sa documentation est importante pour
+                <p>Quel que soit l'outil que vous utilisez, sa documentation est importante pour
 les cas pratiques, en particulier pour le travail dans des environnements de
-traitement de texte o&#249; les impl&#233;mentations d'expressions r&#233;guli&#232;res peuvent
-&#234;tre particuli&#232;rement idiosyncrasiques. Il existe de nombreuses ressources
-disponibles pour apprendre comment utiliser les expressions r&#233;guli&#232;res dans un
-contexte de programmation. La meilleure solution pour vous peut d&#233;pendre du
+traitement de texte où les implémentations d'expressions régulières peuvent
+être particulièrement idiosyncrasiques. Il existe de nombreuses ressources
+disponibles pour apprendre comment utiliser les expressions régulières dans un
+contexte de programmation. La meilleure solution pour vous peut dépendre du
 langage de programmation qui vous est le plus familier ou avec lequel il est le
 plus pratique de commencer.</p>
-<p>Il existe de nombreux &#233;diteurs d'expressions r&#233;guli&#232;res en ligne gratuitement.
-<ref target="http://rubular.com/">Rubular</ref>, construit &#224; partir de Ruby, dispose d'une interface tr&#232;s utile
-qui vous permet de tester les expressions r&#233;guli&#232;res sur des &#233;chantillons de
-texte. Il vous montre dynamiquement les motifs cibl&#233;s ou les groupes. David
-Birnbaum, directeur du d&#233;partement des langues et litt&#233;ratures slaves de
-Pittsburgh, a quant &#224; lui de bons cas de figures sur la mani&#232;re de travailler avec des
-<ref target="http://dh.obdurodon.org/regex.html">expressions r&#233;guli&#232;res et des outils pour XML</ref>, dans le but de baliser des
+                <p>Il existe de nombreux éditeurs d'expressions régulières en ligne gratuitement.
+<ref target="http://rubular.com/">Rubular</ref>, construit à partir de Ruby, dispose d'une interface très utile
+qui vous permet de tester les expressions régulières sur des échantillons de
+texte. Il vous montre dynamiquement les motifs ciblés ou les groupes. David
+Birnbaum, directeur du département des langues et littératures slaves de
+Pittsburgh, a quant à lui de bons cas de figures sur la manière de travailler avec des
+<ref target="http://dh.obdurodon.org/regex.html">expressions régulières et des outils pour XML</ref>, dans le but de baliser des
 fichiers de texte brut pour en faire des fichiers XML.</p>
-</div>
-    </body>
-  </text>
+            </div>
+        </body>
+    </text>
 </TEI>

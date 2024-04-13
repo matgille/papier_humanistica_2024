@@ -1,0 +1,377 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="creacion-de-aplicacion-shiny">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Creación de aplicaciones web interactivas con R y Shiny</title>
+                <author role="original_author">Yann Ryan</author>
+                <editor role="reviewers">
+                    <persName>Amanda Regan</persName>
+                    <persName>Nicole Lemire Garlic</persName>
+                </editor>
+                <author role="translators">Jennifer Isasi</author>
+                <editor role="translation-reviewers">
+                    <persName>Angélica Avilés Bosques</persName>
+                    <persName>Isabelle Gribomont</persName>
+                    <persName>Riva Quiroga</persName>
+                </editor>
+                <editor role="editors">
+                    <persName>Tiago Sousa Garcia</persName>
+                    <persName>Alex Wermer-Colan</persName>
+                </editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">04/26/2023</date>
+                <idno type="doi">10.46430/phes0062</idno>
+                <date type="published">10/19/2022</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#shiny-leaflet-newspaper-map-tutorial"/>.</p>
+                <p>There are other translations: <ref target="#aplicacao-web-interativa-r-shiny-leaflet"/>
+                </p>
+                <p>There are other translations: <ref target="#aplicacao-web-interativa-r-shiny-leaflet"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Esta lección demuestra cómo crear un mapa web interactivo usando R y Shiny. En la lección, diseñarás e implementarás una aplicación simple, que consiste en un control deslizante que permite a los usuarios seleccionar un rango de fechas y mostrar un conjunto de puntos correspondientes en un mapa interactivo.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">mapping</term>
+                    <term xml:lang="en">website</term>
+                    <term xml:lang="en">r</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="es">
+        <body>
+            <div type="2">
+                <head>Introducción</head>
+                <p>Esta lección te muestra cómo crear una aplicación web interactiva básica con Shiny. Shiny es un paquete (un conjunto de funciones) para el lenguaje de programación R. Su propósito es facilitar el desarrollo de aplicaciones web que permiten a los usuarios interactuar con el código de R en un navegador y mediante elementos de la interfaz de usuario (UI) como controles deslizantes, menús desplegables, etc. En esta lección diseñarás e implementarás una aplicación sencilla que contiene un control deslizante que permite al usuario seleccionar un rango de fechas para mostrar un conjunto de puntos correspondientes en un mapa interactivo. </p>
+            </div>
+            <div type="2">
+                <head>Objetivos de la lección</head>
+                <p>En esta lección vas a aprender: </p>
+                <list type="unordered">
+                    <item>Cómo crear una aplicación básica interactiva en Shiny.</item>
+                    <item>Los diseños clave y los principios de diseño de la interfaz de usuario de Shiny.</item>
+                    <item>El concepto y la práctica de "programación reactiva" tal y como es implementada en aplicaciones Shiny. Específicamente, aprenderás cómo puedes usar Shiny para "escuchar" ciertos datos entrantes y cómo se conectan con datos salientes para que se muestren en tu aplicación.</item>
+                </list>
+                <div type="3">
+                    <head>Interfaces gráficas de usuario y las Humanidades Digitales</head>
+                    <p>Las <ref target="https://perma.cc/U4Z4-SP73">interfaces gráficas de usuario (GUI)</ref> y los elementos interactivos pueden ayudar a que ciertos tipos de trabajos académicos basados en datos sean más accesibles o legibles. Por ejemplo, los historiadores que trabajan con datos a gran escala pueden querer demostrar el cambio en una variable a lo largo del tiempo. Un mapa interactivo con una línea de tiempo regulable es, en algunos casos, más fácil de leer y permite mostrar una mayor cantidad de información que una serie de mapas estáticos. Adicionalmente, permitirle al usuario elegir los parámetros de la visualización puede ayudar a evitar algunos de los sesgos que a menudo se encuentran en las visualizaciones de datos que utilizan series temporales (por ejemplo, dibujar arbitrariamente un mapa por décadas).</p>
+                    <p>Muchos proyectos de investigación tienen elementos interactivos como parte de sus resultados. Algunos ejemplos son <ref target="https://www.cartografiadigital.cl/map">
+                            <emph>Cartografía de la Literatura Digital Latinoamericana</emph>
+                        </ref> o <ref target="https://xpmethod.columbia.edu/torn-apart/volume/2/">
+                            <emph>Torn Apart/Separados</emph>
+                        </ref>, y como ejemplo de un proyecto que utiliza Shiny, <ref target="https://utrecht-university.shinyapps.io/GeoNewsMiner">GeoNewsMiner</ref> muestra la geolocalización de lugares mencionados en un grupo de periódicos. Las aplicaciones interactivas pueden ser herramientas útiles también en los archivos. Por ejemplo, los investigadores de los Archivos Nacionales del Reino Unido han creado una aplicación que evalúa el nivel de riesgo en una colección digital, utilizando Shiny y a través de una serie de preguntas respondidas por un usuario.</p>
+                    <p>Otro caso de uso típico para las aplicaciones interactivas es obtener una forma sencilla de explorar tu propio conjunto de datos sin tener la intención de que la aplicación esté disponible de forma pública. Podrías simplemente usarla para encontrar patrones interesantes o como punto de partida para futuras investigaciones. De esta manera, la interactividad puede ser particularmente útil para ayudarte a explorar y encontrar patrones dentro de conjuntos de datos a gran escala. </p>
+                </div>
+                <div type="3">
+                    <head>Opciones para crear una GUI</head>
+                    <p>Hay varias opciones a la hora de abordar el desarrollo de visualizaciones interactivas similares a los ejemplos anteriores. Una es aprender una herramienta especializada y diseñada para manipular páginas web en respuesta a entradas de datos, como la <ref target="https://perma.cc/BG9S-KPJE">biblioteca Javascript D3</ref>. Una segunda opción es utilizar alguna de las herramientas web ya existentes, algunas generales como <ref target="https://perma.cc/M6Y9-9ZCP">Tableau</ref> o <ref target="https://perma.cc/TAA2-W7WA">Rawgraphs</ref>, o algunas con un propósito más específico como <ref target="https://perma.cc/2W5A-PBJU">Palladio</ref> o <ref target="https://perma.cc/SS9Z-6DAG">Gephi</ref>. Un tercer acercamiento podría ser usar <ref target="https://perma.cc/9MNM-G5WQ">cuadernos Jupyter</ref> que permiten compartir código interactivo e, incluso, con algunos <ref target="https://perma.cc/ESA5-9MEJ">paquetes adicionales</ref>, crear una interfaz de usuario. </p>
+                    <p>Esta lección presenta una cuarta opción: crear aplicaciones interactivas usando una GUI con un paquete para un lenguaje de programación de propósito general, como <ref target="https://perma.cc/LXR5-BYC9">Bokeh</ref> o <ref target="https://perma.cc/J7T9-EHTJ">Dash</ref> para Python o, en esta lección, <ref target="https://perma.cc/CK9W-VRKN">Shiny</ref> para R. Tanto Python como R son lenguajes de programación versátiles, muy utilizados y de código abierto, con comunidades activas y una amplia gama de paquetes creados por estas. Hay muchas circunstancias en las que tiene sentido utilizarlas como base para aplicaciones interactivas. Básicamente, estos paquetes actúan como interfaces interactivas del lenguaje de programación con las que se pueden crear controles deslizantes, selectores y otros elementos que pueden ser usados dinámicamente para cambiar partes del código. En la mayoría de los casos, no requieren conocimientos técnicos por parte de los usuarios. Como están diseñados para funcionar en un navegador, funcionan en cualquier plataforma y son fáciles de compartir.</p>
+                </div>
+                <div type="3">
+                    <head>Shiny y la programación reactiva</head>
+                    <p>Shiny está basado en el concepto de la <ref target="https://perma.cc/2XNF-W56K">reactividad</ref>. Normalmente, al programar, establecemos un valor específico para una variable, por ejemplo, <code rend="inline">x = 5</code>. En la <emph>programación reactiva</emph>, el valor de la variable depende de una entrada cambiante, generalmente establecida por quienes interactúan con la aplicación (desde un control deslizante o una lista desplegable, por ejemplo). El código "escucha" los cambios en estas variables reactivas y, cada vez que estas cambian, actualiza los resultados salientes de forma automática. </p>
+                    <p>Sin embargo, esta actualización solo ocurre dentro de <hi rend="bold">entornos reactivos</hi>. Shiny tiene tres contextos reactivos importantes: funciones de <code rend="inline">render*</code>, usadas para crear objetos de R y mostrarlos en la aplicación, <code rend="inline">observe({})</code>, y <code rend="inline">reactive({})</code>. En este tutorial vas a utilizar la reactividad para crear un <emph>data frame</emph> resumido con títulos de periódicos y sus fechas, el cual se actualiza dinámicamente basándose en los datos escogidos por quienes usen la aplicación. Para tu aplicación usarás una función de <code rend="inline">render*</code> para mostrar un mapa que se adapta a los cambios del <emph>data frame</emph> reactivo y se actualiza con ellos. </p>
+                </div>
+                <div type="3">
+                    <head>Ventajas y desventajas de utilizar Shiny</head>
+                    <p>La ventaja de este método es que crear aplicaciones Shiny es <emph>relativamente</emph> fácil si ya sabes programar con R porque, además, Shiny puede aprovechar toda la gama de sus paquetes y características. En algunas circunstancias esto puede ser mejor que aprender un nuevo lenguaje desde cero. Si tienes experiencia usando R y un poco de conocimiento sobre Shiny, puedes crear aplicaciones muy complejas y útiles, desde <ref target="https://perma.cc/LHP6-6LRT">mapas interactivos</ref> al <ref target="https://perma.cc/25G9-2T8R">análisis de redes</ref>, a <ref target="https://perma.cc/NR2G-F4F7">modelos de aprendizaje automático</ref> o paneles completos con mucha funcionalidad. Si puedes programar algo en R, probablemente también puedes hacerlo interactivo con Shiny. El proceso de crear una interfaz de usuario de Shiny es muy flexible y fácil de personalizar, por lo cual es sencillo crear una aplicación en un formato que podría ser integrado en el sitio web de un proyecto utilizando <emph>iframes</emph>. Aunque tiene su interfaz en inglés, puedes consultar el proyecto <emph>
+                            <ref target="https://www.mappingthegayguides.org/map/">Mapping the Gay Guides</ref>
+                        </emph> como un ejemplo de esto.</p>
+                    <p>Pero también hay ciertas desventajas que hay que tener en cuenta. Para aquellas personas que no tienen la intención de usar un lenguaje como R en otros aspectos de su trabajo, aprenderlo solo para crear aplicaciones Shiny puede ser una exageración. Shiny es de código abierto y de uso gratuito, y la forma más fácil de publicar una aplicación terminada en la web es usando un servicio llamado shinyapps.io. Este es un producto comercial con una opción gratuita pero que brinda un número limitado de horas de uso (25h), tras lo cual hay que pagar una tarifa mensual. Puedes ejecutar Shiny en tu propio servidor (o a través de algo como <ref target="https://perma.cc/DEA2-HCC7">Amazon Web Services</ref>), pero es un proceso bastante complicado y requiere un conocimiento bastante avanzado de configuración de servidores web. Debes tener esto en cuenta si está pensando en usar Shiny para una aplicación pública, especialmente si crees que podría tener mucho tráfico y un uso intensivo. Como alternativa, se puede replicar parte de la funcionalidad de Shiny en una página HTML simple usando el paquete de R <ref target="https://rstudio.github.io/crosstalk/index.html">crosstalk</ref>.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Contexto histórico y datos</head>
+                <p>La Hemeroteca Digital de la Biblioteca Nacional de España alberga publicaciones periódicas de la prensa histórica española desde su inicio hasta mediados del XX, digitalizadas según su presupuesto desde 2007 y limitada siempre por la legislación de propiedad intelectual vigente. Con una clara intención didáctica y representativa de cada época, se puede consultar prensa de todo tipo, desde la científica o religiosa hasta la satírica o deportiva, tanto de corta como de larga tirada<ref type="footnotemark" target="#note_1"/>. Aunque podemos consultar esta colección de forma individual y, después, página por página, aquí nos interesa explorar el conjunto de datos de los documentos de la hemeroteca digital. Para ello vamos a descargar únicamente el listado de títulos disponible en la base de datos del Gobierno de España<ref type="footnotemark" target="#note_2"/>.</p>
+                <p>Estos metadatos estructurados son el recurso que utilizarás en esta lección. Para quienes estudian historia, rastrear los metadatos de esta colección puede ser una forma para entender el crecimiento y el cambio en la prensa a lo largo del tiempo y en diferentes regiones. Además, puede ayudarnos a comprender más sobre la colección de la Biblioteca Nacional de España en sí, incluidos sus silencios, sesgos, estrategias de digitalización y puntos ciegos. Los datos podrían incluso indicar algo sobre los cambios demográficos y la industrialización de España, así como los desarrollos en las tecnologías de la comunicación (los trenes y luego los telégrafos hicieron posible tener prensas regionales y locales, por ejemplo).</p>
+                <p>La industria de los periódicos (y, por lo tanto, la colección) pasó de un pequeño número de títulos publicados en Madrid a principios del siglo XVII, concretamente iniciando con la <emph>Gaceta de Madrid</emph> en 1661 a una floreciente prensa provincial semanal y diaria en el XVIII, y luego a una gran prensa local en los siglos XIX y XX. Durante gran parte del siglo XVIII, se agregó un impuesto a cada copia de un periódico, haciéndolos caros y solo disponibles para la élite. En el siglo siguiente esto fue derogado y la prensa comenzó —aunque lentamente— a reflejar con mayor amplitud las aspiraciones y la diversidad del país y sus diversas regiones. La aplicación que crearás en este tutorial, un mapa interactivo de títulos publicados, controlado por un control deslizante de tiempo seleccionado por el usuario, es una forma útil de visualizar estos cambios.</p>
+                <p>Debemos añadir que en el listado de títulos de esta colección están incluidos algunos diarios extranjeros que contienen, de una forma u otra, información referente a España. Por ejemplo, encontramos el alemán <ref target="https://perma.cc/XKQ7-7MJK">
+                        <emph>Darmstädter Zeitung</emph>
+                    </ref> publicado desde el cinco de mayo hasta el dos de junio de 1872  o el <ref target="https://perma.cc/S5B5-FSRN">
+                        <emph>Almanaque sud-americano</emph>
+                    </ref>. Aunque quedan guardados en el documento, aquí no los vamos a mostrar en la visualización, que enfocaremos en la Península Ibérica<ref type="footnotemark" target="#note_3"/>. </p>
+                <div type="3">
+                    <head>Descargar los datos</head>
+                    <p>Para este tutorial,  descargarás dos archivos: primero, una lista a nivel de los títulos periódicos presentes en la Hemeroteca Digital de la Biblioteca Nacional de España (a la que nos referiremos como la 'lista de títulos') y segundo, un conjunto de datos de poblaciones de España y sus coordenadas que<ref target="https://www.businessintelligence.info/varios/longitud-latitud-pueblos-espana.html"> encontramos online </ref>(al que nos referiremos como la 'lista de coordenadas') y que hemos convertido en un archivo separado por comas y editado ligeramente para hacer coincidir los lugares que se encuentran en la lista de títulos con las ubicaciones en un mapa.</p>
+                    <list type="ordered">
+                        <item>Descarga el <ref target="/assets/creacion-de-aplicacion-shiny/bne_hemeroteca-digital.csv">listado de títulos desde el repositorio de Github</ref> para esta lección. El <ref target="https://perma.cc/JT88-ZXPD">archivo original</ref> está disponible en la base de datos del Ministerio de Asuntos Económicos y Transformación Digital de España. Para nuestro propósito, y como indicamos más abajo, tuvimos que realizar algunos cambios. </item>
+                        <item>Las <ref target="/assets/creacion-de-aplicacion-shiny/listado-longitud-latitud-municipios-espana.csv">coordenadas</ref> también está disponibles en el repositorio de la lección. </item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Entender los datos</head>
+                    <p>Puesto que en los datos proporcionados por la BNE la información original sobre la fecha (<code rend="inline">comprende</code>) no sigue un formato normalizado (común a todos los documentos), hemos creado dos nuevas columnas con inicio y final de la fecha de publicación. Por ejemplo, en el original algunas casillas indican el rango de fechas con preposiciones ("del" y "al" o "a") y en otras, en cambio, tienen un guión o una coma. Aquí añadimos el primer año en la columna <code rend="inline">año_inicio</code> y el final en <code rend="inline">año_final</code>.  </p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_0" corresp="code_creacion-de-aplicacion-shiny_0.txt" rend="block"/>
+                    </ab>
+                    <p>En los casos en los que aparecían tres años, hemos tomado la decisión de utilizar el primero y el último, suponiendo que hubo una pausa intermedia en la publicación pero siempre siendo el último año la fecha final. En las publicaciones en las que hubo una pausa pero siguen publicándose hoy en día, se ha decidido duplicar su entrada (con el mismo ISSN, Título y Ámbito geográfico) para poder notar su reaparición (ejemplo: <code rend="inline">De 2002 a 2009. 2014- </code>).  En caso de aparecer solo un año, se utiliza como fecha única de principio y fin. Y en aquellas publicaciones sin fecha final, hemos puesto 2023 como año final. </p>
+                    <p>También hemos tenido que adaptar el ámbito geográfico dado por los datos de BNE, en su mayoría la capital de provincia, a la ciudad concreta en que se imprimió la publicación. Mucha de esta información estaba disponible entre paréntesis o en los propios títulos de los periódicos. Sin embargo, también se han comprobado algunas localidades mediante una búsqueda en la web de la hemeroteca digital. Esto ofrece mayor granularidad a nuestra visualización. Hemos añadido una columna con el nombre de la comunidad autónoma a la que pertenece cada ciudad para permitir más opciones hacia el final de la lección. </p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Configurar el entorno R y creación de una aplicación Shiny</head>
+                <p>Para demostrarte como funciona Shiny, en este tutorial usarás un conjunto de datos con títulos de periódicos, sus lugares y fechas de publicación para crear una aplicación interactiva sencilla. En total, hay cinco pasos de codificación que deberás llevar a cabo: </p>
+                <list type="ordered">
+                    <item>Cargar los dos conjuntos de datos necesarios</item>
+                    <item>Crear una interfaz de usuario (UI)</item>
+                    <item>Crear un conjunto de datos "reactivo" de lugares, conteo de sus apariciones y sus coordenadas geográficas</item>
+                    <item>Transformar aquella en un set de datos geográfico especial llamado en R un <emph>simple features object</emph> (objeto de características simples)</item>
+                    <item>Crear un mapa interactivo con otro paquete de R llamado <ref target="https://perma.cc/RW6M-ZCG2">Leaflet</ref>
+                    </item>
+                </list>
+                <p>Antes de hacer todo esto tienes que configurar un entorno adecuado y crear una nueva aplicación de Shiny. </p>
+                <div type="3">
+                    <head>Instalar R y RStudio</head>
+                    <p>Debes tener la última versión de R y RStudio en tu computadora para completar la lección. R tiene un entorno de desarrollo integrado (IDE por sus siglas en inglés) llamado RStudio y que proporciona muchas características que hacen que la codificación sea más conveniente. Usaremos RStudio a lo largo de la lección.</p>
+                    <p>Otras lecciones de <emph>Programming Historian</emph> te enseñan <ref target="/es/lecciones/datos-tabulares-en-r">a trabajar con R</ref> y <ref target="/es/lecciones/administracion-de-datos-en-r">con <emph>tidyverse</emph>
+                        </ref>. Si no tienes mucho conocimiento sobre R, su instalación y la administración de datos, te aconsejamos que completes primero dichas lecciones antes de completar esta lección. </p>
+                </div>
+                <div type="3">
+                    <head>Crear un nuevo proyecto en RStudio</head>
+                    <p>Una vez que tienes R y RStudios instalados, abre el segundo y crea un nuevo proyecto para trabajar en tu aplicación. Para ello, abre la ventana <code rend="inline">Create a Project</code> desde el menú (File -&gt; New Project). Selecciona <code rend="inline">New Directory</code>(directorio nuevo) y después <code rend="inline">New Project</code> (proyecto nuevo). Da un nombre al directorio de tu proyecto, haz click en <code rend="inline">Use renv with the project</code> (usar <code rend="inline">renv</code> con tu proyecto) y pulsa en <code rend="inline">Create Project</code>(crear proyecto).</p>
+                    <p>Antes de continuar, instala los tres paquetes necesarios para completar el tutorial si es que todavía no los tienes. Ejecuta los siguientes comandos: </p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_1" corresp="code_creacion-de-aplicacion-shiny_1.txt" lang="language-r" rend="block"/>
+                    </ab>
+                    <p>Dependiendo de la configuración de tu sistema, el cuarto paquete, <code rend="inline">sf</code>, puede que requiera pasos adicionales antes de instalarlo. Los usuarios de Windows deberían poder instalarlo directamente usando el comando <code rend="inline">install.packages('sf')</code> pero los usuarios de Mac y Linux tienen que instalar la librería externa <code rend="inline">gdal</code> con <ref target="https://brew.sh/es/">Homebrew</ref> para que <code rend="inline">sf</code> funcione dentro de R. En Mac, instala <code rend="inline">gdal</code> a través de la Terminal con los siguientes comandos: </p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_2" corresp="code_creacion-de-aplicacion-shiny_2.txt" rend="block"/>
+                    </ab>
+                    <p>Las instrucciones más recientes, con más detalles, se pueden encontrar en <ref target="https://github.com/r-spatial/sf">la página del paquete en Github</ref> (solo disponible en inglés). Consulta las instrucciones debajo del encabezado "Instalación" en el archivo ReadMe.</p>
+                </div>
+                <div type="3">
+                    <head>Crear una aplicación Shiny vacía</head>
+                    <p>Una aplicación de Shiny consiste en un <emph>script</emph> con un nombre especial, <code rend="inline">app.R</code>, que comunica a RStudio que se trata de una aplicación y que debe abrirla en una ventana del navegador al ejecutarla. En esta primera sección, vas a crear una aplicación que cargará los paquetes y conjuntos de datos necesarios, y mostrará el mensaje "Hola mundo". Para ello, lleva a cabo los siguientes pasos: </p>
+                    <p>1. Configura una carpeta para la aplicación</p>
+                    <p>Es una buena práctica colocar todos los archivos necesarios para la aplicación en una misma carpeta, dentro del proyecto de RStudio. Haz esto creando una nueva carpeta llamada "aplicación de periódicos" dentro de la carpeta del proyecto RStudio que has creado. Guarda los archivos que has descargado más arriba en esa nueva carpeta. </p>
+                    <p>2. Crea el archivo app.R</p>
+                    <p>Haz click en File -&gt; New file -&gt; R Script. Usa el menú o <code rend="inline">command/ctrl + s</code> para guardar el archivo. Navega a la nueva carpeta que acabas de crear y guarda el archivo ahí, con <code rend="inline">app.R</code> como nombre del archivo. Ahora deberías tener los siguientes archivos en la carpeta "aplicación de periódicos" que acabas de crear: </p>
+                    <figure>
+                        <desc>Figura 1: Captura de pantalla del panel de archivos R.</desc>
+                        <graphic url="es-tr-creacion-de-aplicacion-shiny-1.png"/>
+                    </figure>
+                    <p>3. Carga los paquetes relevantes</p>
+                    <p style="alert alert-warning">
+Es importante tener en cuenta que, a diferencia de en otras lecciones, el código que estás a punto de ejecutar no funcionará si se ejecuta línea por línea, sino solo cuando todo el script <code rend="inline">app.R</code> se ejecuta desde RStudio.
+</p>
+                    <p>Lo primero que necesita hacer la aplicación es preparar y cargar los datos mediante el <emph>script</emph>
+                        <code rend="inline">app.R</code>, pero fuera de la interfaz de usuario y elementos del servidor que crearás más adelante. Primero, activa todas las librerías que vas a usar con el siguiente código: </p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_3" corresp="code_creacion-de-aplicacion-shiny_3.txt" lang="language-r" rend="block"/>
+                    </ab>
+                    <p>4. Carga los conjuntos de datos</p>
+                    <p>Ahora, la aplicación debería cargar los archivos con la lista de títulos y las coordenadas en dos <emph>data frames</emph> que vamos a llamar <code rend="inline">lista_de_titulos</code> y <code rend="inline">lista_de_coordenadas</code> respectivamente. Añade la siguiente línea al código de la <code rend="inline">app.R</code>, que debería aparecer en la parte de arriba a la izquierda de RStudio. Nota que al ser el directorio de trabajo diferente del directorio de la aplicación, estos comandos solo funcionarán cuando ejecutes la app en sí misma. </p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_4" corresp="code_creacion-de-aplicacion-shiny_4.txt" lang="language-r" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Añade los elementos necesarios de Shiny</head>
+                    <p>Para transformar lo anterior en una aplicación Shiny, el <emph>script</emph>
+                        <code rend="inline">app.R</code> necesita tres elementos que crearás a continuación, en este orden:  </p>
+                    <list type="ordered">
+                        <item>Una <hi rend="bold">interfaz de usuario</hi> (UI), donde se guardará la apariencia de la aplicación. </item>
+                        <item>Un <hi rend="bold">servidor</hi> (server), que contendrá el código. </item>
+                        <item>El comando o línea de código para ejecutar la aplicación en sí misma. </item>
+                    </list>
+                    <p>A continuación, crearás cada uno de estos elementos de uno en uno.</p>
+                    <p>1. Crea un elemento UI vacío</p>
+                    <p>La interfaz de usuario es un elemento que contendrá varios comandos especiales Shiny que definirán la apariencia de la aplicación. Examinaremos las opciones específicas más abajo pero, en general, se empieza especificando un tipo de página dentro de la cual se anidan varios componentes de la UI; después, se añade un tipo de plano y, dentro de éste, los elementos específicos al plano; y finalmente, dentro de estos, los varios componentes de la aplicación.</p>
+                    <p>El tipo que vas a usar se llama <code rend="inline">fluidPage()</code>, una página que contiene un plano fluído de lineas que, a su vez, tienen columnas y que se auto-redimensiona para adaptarse a la ventana del navegador. </p>
+                    <p>El primer paso es crear todos los elementos básicos para una aplicación, antes de rellenarlos con los componentes necesarios. Para empezar, crea un elemento UI vacío con la variable <code rend="inline">interfaz_usuario</code> en el elemento <code rend="inline">fluidPage()</code>. Para saber si la aplicación está funcionando cuando la ejecutes por primera vez, añade un simple mensaje de "Hola mundo" en el elemento UI. Añade el siguiente código en <code rend="inline">app.R</code>: </p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_5" corresp="code_creacion-de-aplicacion-shiny_5.txt" lang="language-r" rend="block"/>
+                    </ab>
+                    <p>2. Crea un servidor (server)</p>
+                    <p>El servidor es creado como una función de R con dos argumentos, <code rend="inline">input</code> (entrada) y <code rend="inline">output</code> (salida) - no necesitas saber lo que hace cada uno por ahora<ref type="footnotemark" target="#note_4"/>. En R una función se crea con el comando <code rend="inline">function{}</code>, especificando los argumentos entre paréntesis y el código de la función dentro de las llaves <code rend="inline">{}</code>.<br/>
+Especifica la parte del servidor con este código: </p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_6" corresp="code_creacion-de-aplicacion-shiny_6.txt" lang="language-r" rend="block"/>
+                    </ab>
+                    <p>3. Añade la línea para ejecutar la aplicación.</p>
+                    <p>Finalmente, añade el comando que hará ejecutar la aplicación. Este es otra línea específica de Shiny, <code rend="inline">shinyApp()</code>, que lleva la UI y los objetos del servidor que acabas de crear como argumentos.
+<code rend="inline">shinyApp(ui, server)</code>
+                    </p>
+                    <p>El archivo <code rend="inline">app.R</code> ahora debería, por tanto, contener las siguientes líneas: </p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_7" corresp="code_creacion-de-aplicacion-shiny_7.txt" lang="language-r" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3">
+                    <head>Prueba la aplicación</head>
+                    <p>Una vez que hayas creado estos objetos, guarda de nuevo el archivo <code rend="inline">app.R</code>. Ahora RStudio lo reconocerá como una aplicación Shiny y los iconos en la barra superior del panel cambiarán, con un botón que dice <code rend="inline">Run App</code> o ejecutar aplicación (Figura 2). Si haces click en él, ejecutará la aplicación en una nueva ventana con el navegador propio de RStudio. </p>
+                    <figure>
+                        <desc>Figura 2: Captura de pantalla mostrando el panel de control con el botón para ejecutar la aplicación, Run App, marcado en rojo.</desc>
+                        <graphic url="es-tr-creacion-de-aplicacion-shiny-2.png"/>
+                    </figure>
+                    <p>Deberías ver una página web casi en blanco con la frase "Hola mundo" en la parte superior izquierda. También notarás que mientras la aplicación esté siendo ejecutada, no puedes ejecutar ninguna línea de código en RStudio: la consola aparece como ocupado (<emph>busy</emph>). Para parar la aplicación, simplemente cierra el navegador. También puedes usar la opción de <code rend="inline">open in browser</code> para que la aplicación se abra en tu navegador por defecto. </p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Configurar la aplicación</head>
+                <div type="3">
+                    <head>Diseño de la interfaz de usuario</head>
+                    <p>La interfaz de usuario (UI) de Shiny utiliza el formato <ref target="https://getbootstrap.esdocu.com">Bootstrap</ref>. La UI está basada en un sistema cuadricular formado por filas y columnas. Para este ejemplo, vamos a utilizar el diseño conocido como <code rend="inline">sidebarLayout</code>, que consta de un título, una barra lateral a la izquierda de la página para las entradas del usuario y un panel principal para mostrar los resultados. El siguiente diagrama o esquema te ayudará a visualizar el diseño: </p>
+                    <figure>
+                        <desc>Figura 3: Diagrama o esquema que muestra la estructura del diseño de la aplicación.</desc>
+                        <graphic url="es-tr-creacion-de-aplicacion-shiny-3.png"/>
+                    </figure>
+                    <p>El próximo paso es rellenar el elemento <code rend="inline">ui</code> (interfaz de usuario) con los componentes necesarios para representar dicho diseño. Primero, usa el elemento <code rend="inline">titlePanel()</code> (panel de título) para dar un título a tu aplicación y añade la barra lateral. Borra el mensaje de "Hola mundo" dentro del objeto <code rend="inline">fluidPage()</code> (página) y reemplázalo por lo siguiente: </p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_8" corresp="code_creacion-de-aplicacion-shiny_8.txt" lang="language-r" rend="block"/>
+                    </ab>
+                    <p>A continuación, completa el diseño con partes específicas de la página web, en concreto, con los componentes llamados <code rend="inline">sidebarPanel()</code> (panel de la barra) y <code rend="inline">mainPanel()</code> (panel principal) dentro del elemento <code rend="inline">sidebarLayout()</code> (diseño lateral).</p>
+                    <p>El elemento de la interfaz de usuario debería contener este código: </p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_9" corresp="code_creacion-de-aplicacion-shiny_9.txt" lang="language-r" rend="block"/>
+                    </ab>
+                    <p>Notarás que estos comandos anidados corresponden al diseño del diagrama de la Figura 3.</p>
+                </div>
+                <div type="3">
+                    <head>Añade un 'Widget': El control del deslizador</head>
+                    <p>En Shiny, los usuarios actualizan los valores en la visualización con varios controles interactivos y customizables llamados 'widgets'. Puedes consultar el listado completo de esta opción en <ref target="https://perma.cc/GW78-FQEJ">la galería de widgets de Shiny</ref> (disponible en inglés). </p>
+                    <p>El que vas a usar aquí se llama <code rend="inline">sliderInput()</code> y mostrará una barra deslizante interactiva con una gran cantidad de opciones, como los valores mínimo, máximo y de inicio. También puedes establecer el paso y el formato de los números (escriba <code rend="inline">?sliderInput</code> en la consola para obtener una lista completa de opciones y explicaciones, en inglés). Aquí vas a crear uno con un año mínimo de 1678 (el punto de datos más antiguo en la lista de títulos) y un máximo de 2023 (el más reciente). </p>
+                    <p>El valor inicial (predeterminado) puede ser un solo número o un vector de dos números. Si utilizas este último, el control deslizante será de doble, con un primer y segundo valor. Esto es lo que queremos usar, para que los usuarios puedan especificar un rango de años.</p>
+                    <p>El siguiente código creará un control deslizante con dos extremos deslizables, configurado de forma predeterminada en 1800 y 1850:</p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_10" corresp="code_creacion-de-aplicacion-shiny_10.txt" lang="language-r" rend="block"/>
+                    </ab>
+                    <p>Inserta este código entre los paréntesis del comando <code rend="inline">sidebarPanel = sidebarPanel( )</code>. Si te pierdes o algo no está del todo claro, echa un vistazo al código completo al final de esta lección.</p>
+                    <p>En este punto, ejecuta la aplicación para ver cómo se ve el control deslizante. Deberías ver un panel gris a la izquierda (el panel de la barra lateral) con el control deslizante. Si pasas el cursor sobre el control, notarás que puedes arrastrar cada extremo (para seleccionar un tamaño de rango) y también puedes arrastrar el medio (que moverá todo el control deslizante sobre una ventana del tamaño de rango seleccionado).</p>
+                    <figure>
+                        <desc>Figura 4: GIF animado demostrando la funcionalidad del control deslizante.</desc>
+                        <graphic url="es-tr-creacion-de-aplicacion-shiny-4.gif"/>
+                    </figure>
+                </div>
+                <div type="3">
+                    <head>Colocar el leafletOutput en el elemento mainPanel</head>
+                    <p>En Shiny, debes decirle a la UI que debe mostrar el <emph>output</emph> creado en el código del servidor (algún tipo de elemento de R como una tabla de datos o un gráfico o algo tan sencillo como una línea de texto).  Esto se hace creando un elemento UI de la familia de <code rend="inline">*Output</code>. Cada elemento de R que puedes mostrar en Shiny tiene su propio comando <code rend="inline">*Output</code>: aquí, vamos a usar el <code rend="inline">leafletOutput()</code> que le dice a la UI que cree un mapa Leaflet. <code rend="inline">leafletOutput</code> requiere un argumento: la identificación (ID) del <emph>output</emph>. Esta etiqueta se usará para hacer coincidir el elemento de la interfaz de usuario con el objeto de mapa real que vas a crear en el código del servidor más adelante. Establece esta etiqueta como 'mapa' e inserta el siguiente código entre paréntesis del <code rend="inline">mainPanel()</code>:</p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_11" corresp="code_creacion-de-aplicacion-shiny_11.txt" lang="language-r" rend="block"/>
+                    </ab>
+                </div>
+            </div>
+            <div type="2">
+                <head>Crear la lógica del servidor</head>
+                <p>A continuación, tienes que escribir la lógica para crear el objeto a mostrar en la UI. Esto se hace en dos partes. Primero, crearás un elemento reactivo que, como se explicó más arriba, es un objeto especial que interpretará los cambios pedidos por el usuario para reajustar la visualización. En segundo lugar, crearás la visualización que contenga el propio mapa interactivo. </p>
+                <div type="3">
+                    <head>Crear el elemento reactivo con el mapa Leaflet</head>
+                    <p>Primero, crea el elemento reactivo. En este caso, vamos a usar un conjunto de datos geográficos especial que se llama <emph>objeto de características simples</emph> (<emph>simple features object</emph>). Este provee una representación de un objeto en el mundo real mediante uno o varios puntos que pueden o no estar conectados por segmentos en línea recta para formar líneas y polígonos. </p>
+                    <p>Cada vez que los usuarios cambien las variables en el control deslizante de alguna manera (para ampliar o reducir el rango de fechas), la aplicación ejecutará una serie de comandos: </p>
+                    <list type="unordered">
+                        <item>Filtra la lista de títulos según las fechas seleccionadas</item>
+                        <item>Cuenta el número de veces que cada lugar aparece en ese rango de fechas</item>
+                        <item>Une los lugares con sus coordenadas </item>
+                        <item>Convierte el resultado a un objeto de características simples</item>
+                    </list>
+                    <p>Para crear un objeto llamado <code rend="inline">mapa_df</code>, añade el siguiente código dentro de las llaves del componente del servidor:</p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_12" corresp="code_creacion-de-aplicacion-shiny_12.txt" lang="language-r" rend="block"/>
+                    </ab>
+                    <p>Este código hace lo siguiente: </p>
+                    <list type="ordered">
+                        <item>Filtra el conjunto de datos de periódicos con el comando de filtrado <code rend="inline">filter()</code>, con los valores del widget <code rend="inline">sliderInput</code>. Se accede a estos valores usando el <code rend="inline">input$&lt;NombreEtiqueta&gt;</code> que en este caso es <code rend="inline">input$años</code>, aunque hay algo más a notar. ¿Te acuerdas de que estableciste el valor de <code rend="inline">sliderInput</code> en un vector de dos valores, de modo que se pueda seleccionar un rango? Los dos números de este rango se almacenan en <code rend="inline">input$años[1]</code> e <code rend="inline">input$años[2]</code>. Estos son los valores a los que necesitas acceder para filtrar los datos. La función de filtro (<emph>filter</emph>) devuelve filas en un <emph>data frame</emph> (<code rend="inline">df</code>) en el que un conjunto específico de condiciones son verdaderas: en este caso, donde la columna <code rend="inline">año_inicio</code> es mayor que el primer año e inferior que el segundo. </item>
+                        <item>La función <code rend="inline">count()</code> produce un <emph>data frame</emph> de cada ciudad y un recuento de cuántas veces aparece cada una, en el conjunto de datos ya filtrado entre dos rangos de fechas. Especificamos el nombre de la nueva columna para el recuento con el argumento <code rend="inline">name = 'titulo'</code>. </item>
+                        <item>Utiliza <code rend="inline">left_join()</code> para unir el conjunto de coordenadas con el <emph>data frame</emph> que contiene el recuento de las ciudades, especificando que el elemento común entre ambos es la columna llamada <code rend="inline">poblacion</code> (En general, <emph>join</emph> es un tipo de función que hace coincidir o que une dos dataframes diferentes en función a un elemento común).</item>
+                        <item>Podría haber una pequeña cantidad de títulos de publicaciones sin coordenadas, lo cual podría causar un error al crear el objeto geográfico. Para evitar que estos rompan la aplicación, puedes quitarlos con el código <code rend="inline">filter(!is.na(lng) &amp; !is.na(lat))</code>. </item>
+                        <item>Finalmente, convierte todo en un objeto de características simples, usando la función <code rend="inline">st_as_sf()</code>. En ella, especifica el nombre de las columnas que contienen las coordenadas y establece un sistema de referencias de las mismas con <code rend="inline">st_set_crs()</code>
+                            <ref type="footnotemark" target="#note_5"/>.</item>
+                    </list>
+                    <p>Shiny puede acceder a este <emph>data frame</emph> de características simples en cualquier contexto reactivo con la función <code rend="inline">mapa_df()</code> y puede ser utilizado por múltiples salidas a la vez: por ejemplo, podrías crear una aplicación que muestre un mapa y un gráfico de barras, cada uno usando el mismo objeto reactivo.</p>
+                </div>
+                <div type="3">
+                    <head>Crea un mapa Leaflet</head>
+                    <p>Lo último que hay que hacer es crear el mapa en sí mismo con la biblioteca <code rend="inline">leaflet</code>, la cual crea mapas interactivos con zoom y funciona particularmente bien con Shiny. Agrega el siguiente código dentro del elemento <code rend="inline">server()</code>, justo debajo del elemento reactivo <code rend="inline">mapa_df</code>:</p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_13" corresp="code_creacion-de-aplicacion-shiny_13.txt" lang="language-r" rend="block"/>
+                    </ab>
+                    <p>Hay varias cosas complejas dentro de esa pieza de código así que es importante revisarlas en detalle. En Shiny, se crea reactividad conectando entradas (<emph>inputs</emph>) con salidas (<emph>outputs</emph>). </p>
+                    <p>
+                        <hi rend="bold">Input</hi>, en este contexto, son las variables que el usuario puede ir cambiando. ¿Recuerdas el <code rend="inline">sliderInput()</code> que creaste en la interfaz de usuario anterior, con la etiqueta "años"? Ya hemos visto que Shiny almacena dicho valor en la variable <code rend="inline">input$años</code>.
+<hi rend="bold">Output</hi>, aquí, son la información que le indica a Shiny qué mostrar en la interfaz de usuario y se crean en el servidor con la variable <code rend="inline">output$*</code>. Esta información debe coincidir con un elemento <code rend="inline">*Output</code> en la UI. En esta, creaste un <emph>output</emph>
+                        <code rend="inline">leaflet</code> con la etiqueta mapa usando el código <code rend="inline">leafletOutput(outputId = 'mapa')</code>. Esto debería coincidir con una salida o <emph>output</emph> llamada <code rend="inline">output$mapa</code> en el servidor. </p>
+                    <p>A su vez, esta variable <code rend="inline">output$mapa</code> tiene que estar conectada con una función <code rend="inline">render*</code> que le indica a Shiny qué tipo de objeto tiene que representar en la UI. El que necesitamos se llama <code rend="inline">renderLeaflet</code>, con la que indicamos a la UI que el mapa debe salir de la librería <code rend="inline">leaflet</code>. El objeto <code rend="inline">renderLeaflet</code> tiene tanto paréntesis como llaves, como los objetos reactivos de más arriba. </p>
+                    <p>El mapa Leaflet en sí mismo se crea ahí. Primero, añade la función <code rend="inline">leaflet()</code>. Luego, añade las imágenes predeterminadas (con zoom) con la función <code rend="inline">addTiles()</code> (añadir teselado). Para finalizar, escoge la posición y nivel de zoom por defecto a la Península Ibérica con el comando <code rend="inline">setView(lng =-3.700346, lat = 40.41669, zoom = 5.2)</code> utilizando las coordenadas de Madrid ciudad como centro. </p>
+                </div>
+                <div type="3">
+                    <head>Muestra los puntos con el dataframe reactivo</head>
+                    <p>Haz una pausa aquí y vuelve a ejecutar la aplicación. Si todo va bien, deberías ver un mapa interactivo de la Península Ibérica a la derecha del control deslizante. Puedes hacer zoom y moverte sobre él y poco más. Ahora necesitas añadir los puntos que representan el recuento de títulos por cada lugar y según el rango de fechas escogido. </p>
+                    <figure>
+                        <desc>Figura 5: Captura de pantalla del mapa Leaflet en la aplicación y su widget interactivo.</desc>
+                        <graphic url="es-tr-creacion-de-aplicacion-shiny-5.png"/>
+                    </figure>
+                    <p>Para eso, usa el comando <code rend="inline">addCircleMarkers()</code> (añadir marcadores circulares), que añade una capa gráfica de círculos al mapa <code rend="inline">leaflet</code> tomando las coordenadas del objeto con datos geográficos. Con un <emph>pipe</emph>
+                        <code rend="inline">%&gt;%</code>, añade la siguiente línea después de la función anterior con un <code rend="inline">addCircleMarkers()</code>(mira el código final si no sabes dónde va esto): </p>
+                    <ab>
+                        <code xml:id="code_creacion-de-aplicacion-shiny_14" corresp="code_creacion-de-aplicacion-shiny_14.txt" lang="language-r" rend="block"/>
+                    </ab>
+                    <p>Lo más importante: en vez de una fuente de datos fija, dicha línea especifica que <code rend="inline">addCircleMarkers</code> debe usar el <emph>data frame</emph> reactivo que hemos creado antes, con el argumento <code rend="inline">data = mapa_df()</code>. Nota que a diferencia de variables regulares en R, esta tiene dos paréntesis al final, indicando que se trata de una variable reactiva especial. Cada vez que la aplicación nota un cambio en este objeto reactivo, redibuja el mapa con los datos nuevos. </p>
+                    <p>En este punto también puedes configurar el radio de los círculos para que se corresponda con la columna que contiene el recuento de títulos de cada ciudad. Para ello usa <code rend="inline">radio = ~sqrt(titulo)</code>. Usamos la raíz cuadrada (<code rend="inline">sqrt</code>) porque eso hace que el área de los círculos se adapte proporcionalmente al conteo. </p>
+                </div>
+                <div type="3">
+                    <head>Prueba la aplicación</head>
+                    <p>Ya puedes volver a ejecutar la aplicación. Ahora, debería haber círculos de varios tamaños repartidos por el mapa. Intenta mover o arrastrar los controles deslizantes para ajustar el rango de años que quieres explorar: El mapa debería de actualizarse con cada cambio. ¡Felicidades, has creado tu primera aplicación Shiny!</p>
+                    <figure>
+                        <desc>Figura 6: GIF animado mostrando cómo el mapa Leaflet se actualiza al cambiar los valores del control.</desc>
+                        <graphic url="es-tr-creacion-de-aplicacion-shiny-6.gif"/>
+                    </figure>
+                </div>
+            </div>
+            <div type="2">
+                <head>Mejorar la aplicación</head>
+                <p>Para aprender más sobre Shiny y Leaflet y, a la vez, hacer tu aplicación más informativa o incluso útil, puedes integrar algunas de las siguientes características: </p>
+                <p>Primero, por ejemplo, puedes añadir una forma de filtrar los datos del mapa. Usando otro widget llamado <code rend="inline">selectInput</code>, puedes hacer que tus usuarios vean datos de una o varias de las comunidades autónomas en la lista de títulos añadiendo el filtro al <code rend="inline">sidebarPanel</code> en la UI y en el servidor: </p>
+                <ab>
+                    <code xml:id="code_creacion-de-aplicacion-shiny_15" corresp="code_creacion-de-aplicacion-shiny_15.txt" lang="language-r" rend="block"/>
+                </ab>
+                <p>Para que esta opción funcione, debes dejar un valor por defecto en <code rend="inline">selected = </code>; aquí dejamos "País Vasco" pero puedes elegir otra comunidad. </p>
+                <p>Luego, en el código del servidor como tal, debes añadir también una indicación del filtrado por comunidades autónomas en su filtro o <code rend="inline">filter</code>: </p>
+                <ab>
+                    <code xml:id="code_creacion-de-aplicacion-shiny_16" corresp="code_creacion-de-aplicacion-shiny_16.txt" lang="language-r" rend="block"/>
+                </ab>
+                <p>Se pueden  incluir más tipos de opciones interactivas en el <code rend="inline">sliderInput</code>, separando los comandos con comas. Lee sobre ellos, si sabes inglés, con <code rend="inline">?selectInput</code> en la consola.  </p>
+                <p>Por otro lado, también puedes añadir algunos elementos al mapa Leaflet en el propio addCircleMarkers<code rend="inline">. Por ejemplo, si quieres que aparezcan etiquetas con los nombres de las poblaciones en el mapa, puedes usar el comando </code>label = poblacion`: </p>
+                <ab>
+                    <code xml:id="code_creacion-de-aplicacion-shiny_17" corresp="code_creacion-de-aplicacion-shiny_17.txt" lang="language-r" rend="block"/>
+                </ab>
+                <p>Puedes encontrar todas las opciones de estos elementos ejecutando <code rend="inline">?addCircleMarkers</code> en la consola.</p>
+                <p>Notarás que cada vez que mueves el control deslizante, la aplicación restablece la visualización del mapa, lo cual no es muy cómodo. Esto se puede evitar usando otra función llamada <code rend="inline">leafletProxy</code>. En esencia, crea un mapa Leaflet vacío como arriba (sin los marcadores circulares). Después, en otro contexto reactivo, <code rend="inline">observe</code>, añadirás el código para redibujar las partes cambiantes del mapa usando <code rend="inline">leafletProxy</code>. Si sabes inglés puedes leer las instrucciones para ello en <ref target="https://perma.cc/CZ84-CW9F">la documentación de Leaflet</ref>. </p>
+            </div>
+            <div type="2">
+                <head>Conclusión</head>
+                <p>Las visualizaciones interactivas pueden ayudar a aportar nuevos conocimientos a los datos históricos. En este tutorial, usamos algunos paquetes R potentes, como <code rend="inline">tidyverse</code> y <code rend="inline">leaflet</code> en un entorno interactivo, en lugar de tener que preparar todos los datos por adelantado. Aprendimos cómo y por qué podríamos usar la programación reactiva, puesto que esta nos permite crear código R dinámico donde las opciones elegidas por los usuarios sustituyen a variables fijas.</p>
+                <p>Este enfoque se puede adaptar fácilmente para formatos de datos y modos de análisis diferentes. La barrera de entrada relativamente baja facilita la creación de aplicaciones rápidas que pueden hacer que trabajar con datos a gran escala sea menos complicado. Las aplicaciones Shiny también son una forma útil de compartir los beneficios de la programación en R con una audiencia no técnica o miembros del equipo de un proyecto. Es relativamente fácil crear una aplicación que permita a un usuario visualizar su propio análisis de datos con R, sin tener que codificar o usar la línea de comandos.</p>
+            </div>
+            <div type="2">
+                <head>Código final (sin añadidos)</head>
+                <ab>
+                    <code xml:id="code_creacion-de-aplicacion-shiny_18" corresp="code_creacion-de-aplicacion-shiny_18.txt" lang="language-r" rend="block"/>
+                </ab>
+            </div>
+            <div type="2">
+                <head>Código final (con añadidos)</head>
+                <ab>
+                    <code xml:id="code_creacion-de-aplicacion-shiny_19" corresp="code_creacion-de-aplicacion-shiny_19.txt" lang="language-r" rend="block"/>
+                </ab>
+            </div>
+            <div type="2">
+                <head>Notas</head>
+                <p>
+                    <ref type="footnotemark" target="#note_1"/> : Para más información y contenidos relacionados, visita <ref target="https://www.bne.es/es/catalogos/hemeroteca-digital">la página web de la Hemeroteca Digital.</ref>
+                    <ref type="footnotemark" target="#note_2"/> : Estos <ref target="https://perma.cc/JT88-ZXPD">datos</ref>, que luego modificamos, están disponibles bajo licencia CCO (gratuito y editable) por parte del Ministerio de Cultura y Deporte.<br/>
+                    <ref type="footnotemark" target="#note_3"/> : Podrían añadirse las coordenadas de dichas poblaciones extranjeras en el mismo CSV para visualizar el panorama completo de publicaciones referidas o en relación a España disponibles en la Hemeroteca Digital de la BNE.
+<ref type="footnotemark" target="#note_4"/> : El objeto del servidor es en realidad una lista de R con todos los objetos de entrada o <emph>inputs</emph> guardados en el primer elemento, llamado <code rend="inline">input</code> y todos los objetos resultantes u  <emph>outputs</emph> en el segundo elemento, llamado <code rend="inline">output</code>.
+<ref type="footnotemark" target="#note_5"/> : Debido a que hay varias formas de transformar un globo terráqueo en una representación 2D, la visualización correcta de datos geográficos requiere establecer un sistema de referencia de coordenadas. 4326 es uno de uso común para datos geográficos en todo el mundo.</p>
+            </div>
+        </body>
+    </text>
+</TEI>

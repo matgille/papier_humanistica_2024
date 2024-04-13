@@ -6,7 +6,7 @@ import json
 
 
 
-tei_ns = "https://tei-c.org/ns/1-0/"
+tei_ns = "http://www.tei-c.org/ns/1.0"
 ns_decl = {"tei": tei_ns}
 
 def main(directory):
@@ -14,7 +14,7 @@ def main(directory):
         filename = file.split("/")[-1]
         directory_name = directory.split('/')[-1]
         tree = ET.parse(file)
-        print(file)
+        print(f"Treating {file}")
         for division in tree.xpath("//tei:div", namespaces=ns_decl):
             print("New div")
             try:
@@ -63,16 +63,22 @@ def main(directory):
             
             # try:
             try:
-                os.mkdir(f"../../data/to_tei/struct_aligned/{directory_name}")
+                os.mkdir(f"../../data/tei_aligned/{directory_name}")
             except FileExistsError:
                 pass
+            except FileNotFoundError:
+                os.mkdir(f"../../data/tei_aligned/")
+                os.mkdir(f"../../data/tei_aligned/{directory_name}")
             
-            with open(f"../../data/to_tei/struct_aligned/{directory_name}/{filename}", "w") as structured_div:
+            with open(f"../../data/tei_aligned/{directory_name}/{filename}", "w") as structured_div:
+                print(f"Saving to ../../data/tei_aligned/{directory_name}/{filename}")
                 structured_div.write(ET.tostring(tree, pretty_print=True, encoding="utf-8").decode('utf8'))
 
 
 if __name__ == '__main__':
     with open("logs/lessons_to_align.json", "r") as lessons:
         lessons_to_align = json.load(lessons)
+    print(lessons_to_align)
     for directory in lessons_to_align:
+        print(directory)
         main(directory)

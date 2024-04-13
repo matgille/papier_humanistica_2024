@@ -1,0 +1,928 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="introduction-a-heurist">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Introduction à Heurist</title>
+                <author role="original_author">Vincent Paillusson</author>
+                <editor role="reviewers">
+                    <persName>Manon Durier</persName>
+                    <persName>Morgane Pica</persName>
+                    <persName>Viera Rebolledo-Dhuin</persName>
+                </editor>
+                <author role="translators"/>
+                <editor role="editors">
+                    <persName>Antoine Henry</persName>
+                    <persName>Sofia Papastamkou</persName>
+                </editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phfr0021</idno>
+                <date type="published">04/01/2022</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Ce tutoriel présente l'utilisation d'Heurist, un logiciel de gestion de base de données dédié aux sciences humaines et sociales. En s'appuyant sur un jeu de données de sites de fouilles archéologiques, il illustre le fonctionnement d'Heurist et ses fonctionnalités.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">mapping</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="fr">
+        <body>
+            <div type="2">
+                <head>Objectifs du cours</head>
+                <p>Ce cours est une introduction à l’utilisation d'<ref target="https://perma.cc/5U92-NLF5">Heurist</ref>, logiciel <emph>open source</emph> développé par l’université de Sydney afin de permettre aux chercheurs et chercheuses en sciences humaines et sociales (SHS) de gérer leurs données acquises sur le terrain.</p>
+            </div>
+            <div type="2">
+                <head>Présentation de Heurist</head>
+                <p>Heurist est un système de gestion de base de données (<ref target="https://perma.cc/66GX-YNHL">SGBD</ref>). Élaboré en 2005 par le professeur <ref target="https://perma.cc/6MFS-557H">Ian Johnson</ref>
+                    <ref type="footnotemark" target="#note_Remerciements"/> en collaboration avec des dizaines de projets de recherche en sciences humaines, il vise à redonner à la communauté de recherche le contrôle sur ses données plutôt que de le déléguer aux personnes en charge des développements informatiques<ref type="footnotemark" target="#note_5"/>. Si Heurist peut être utilisé pour gérer tous types de données, il a été pensé pour résoudre des problématiques liées aux recherches en SHS. Il intègre donc nativement la gestion et la visualisation de données spatiales et temporelles ainsi que des éléments permettant de décrire de façon fine des lieux ou des personnes. Ses fonctionnalités sont nombreuses, elles comprennent entre autres :</p>
+                <list type="ordered">
+                    <item>La modélisation</item>
+                    <item>L'import</item>
+                    <item>La visualisation</item>
+                    <item>La publication</item>
+                    <item>L'export dans un format ouvert</item>
+                    <item>Le travail collaboratif</item>
+                    <item>L'analyse</item>
+                </list>
+                <figure>
+                    <desc>Fig. 1. Cycle de recherche Heurist.</desc>
+                    <graphic url="introduction-a-heurist-1.png"/>
+                </figure>
+                <p>En outre, Heurist offre un dispositif parfaitement compatible avec les objectifs de la science ouverte<ref type="footnotemark" target="#note_FAIR"/>
+                    <ref type="footnotemark" target="#note_5StarOpenData"/> :</p>
+                <list type="unordered">
+                    <item>En donnant la possibilité de décrire les données à travers des ontologies et des standards (<ref target="https://perma.cc/F5FK-K7BB">DCMI-TERMS</ref>, <ref target="https://perma.cc/TQG8-P2FJ">BIBO</ref>, <ref target="https://perma.cc/U23V-XJ9H">BIO</ref>, <ref target="https://perma.cc/C8F7-TQK8">FOAF</ref>, <ref target="https://perma.cc/X8R6-NR8P">DOAP</ref>, <ref target="https://perma.cc/FNV9-J8GJ">RDF</ref>, <ref target="https://perma.cc/B7DD-LXM4">SKOS</ref>)</item>
+                    <item>En exportant des données sous des formats ouverts (<ref target="https://perma.cc/K6MA-CGKS">CSV</ref>, <ref target="https://perma.cc/5TF6-NJJW">XML</ref>, <ref target="https://perma.cc/XE3P-ESXJ">JSON</ref>, <ref target="https://perma.cc/4KFW-B2E7">GEOJSON</ref>, <ref target="https://perma.cc/8MCS-GMQV">KML</ref>) et réexploitables par de nombreux autres logiciels et protocoles (<ref target="https://perma.cc/M7GL-7AJH">GEPHI</ref>, <ref target="https://perma.cc/3VM9-L9EW">IIIF</ref>, <ref target="https://perma.cc/N756-2V2A">MySQL</ref>)</item>
+                    <item>En liant les vocabulaires sur Heurist à des référentiels exposés sur le web à l'aide d'identifiants <ref target="https://perma.cc/DN39-B92S">URI</ref>
+                    </item>
+                    <item>En rendant accessibles et interopérables les données sur le web via la publication d'un site web ou la génération de <emph>feeds</emph> ou <ref target="https://perma.cc/5L75-B3P4">flux web</ref>
+                    </item>
+                    <item>En permettant la récupération de données exportées depuis d'autres systèmes de gestion de base de données (par exemple MySQL, FileMaker ou Access) en s'appuyant sur des formats ouverts (CSV, XML)</item>
+                </list>
+            </div>
+            <div type="2">
+                <head>Quelques éléments techniques</head>
+                <p>Heurist est un logiciel <emph>open source</emph>, il se base sur une infrastructure serveur de type <ref target="https://perma.cc/ET9N-K9E3">LAMP</ref> très utilisée dans le développement web. Les chercheurs et chercheuses peuvent y avoir accès moyennant la création d'un compte sur <ref target="https://perma.cc/3EBM-AEHU">un serveur hébergeant Heurist</ref>. Dans le cadre de cette leçon, nous utiliserons une instance hébergée par la <ref target="https://perma.cc/M6X8-5BPV">TGIR Huma-Num</ref> qui <ref target="https://heurist.huma-num.fr">met à disposition Heurist</ref> pour la communauté francophone de recherche en SHS.</p>
+                <p>Pour les personnes souhaitant tester le logiciel hors ligne, il est également possible d'héberger Heurist localement sur un ordinateur. Les informations pour son installation sont disponibles en anglais <ref target="https://heuristnetwork.org/installation/">sur le site officiel d'Heurist</ref>.</p>
+                <p>Heurist s'appuie sur une conception <ref target="https://perma.cc/5MJU-FV2G">relationnelle</ref> des données, mais simplifie certains aspects de cette modélisation afin de faciliter son utilisation. Nous abordons brièvement quelques concepts clés du modèle relationnel dans la partie <ref target="#modelisation">« Modélisation des données »</ref>.</p>
+            </div>
+            <div type="2">
+                <head>Organisation de la leçon</head>
+                <p>Dans cette leçon, nous partirons d'un jeu de données brut, discuterons sa modélisation et répercuterons cette modélisation dans Heurist afin d'importer les données pour enfin les publier en ligne.</p>
+                <p style="alert alert-warning">
+   Cette leçon et les captures d'écran qu'elle contient ont été réalisées en avril 2021 sur la version 6 d'Heurist (notée « h6 »). Heurist évoluant constamment, ses fonctionnalités et son interface sont amenées à se modifier au fil du temps à travers de nombreuses sous-versions (par exemple « h6.2.26 » en janvier 2022). Dans la plupart des cas, cela ne devrait pas gêner la compréhension des indications qui suivent, la logique fonctionnelle restant la même au sein de la version 6 du logiciel. Pour toutes questions ou interrogations, il est possible de consulter la documentation en ligne (en anglais) sur le site officiel d'<ref target="https://heuristnetwork.org/tutorials/">Heurist</ref> dans la rubrique <i>Learn</i> ou encore de demander de l'aide auprès d'autres usagers d'Heurist via la liste francophone <ref target="https://perma.cc/K398-B6WT">d'utilisateurs et utilisatrices Heurist</ref>.
+</p>
+            </div>
+            <div type="2">
+                <head>Données utilisées pour le cours</head>
+                <p>Nous utiliserons tout au long du cours le jeu de données de <ref target="https://www.data.gouv.fr/fr/datasets/localisation-des-sites-de-fouille-archeologiques-de-l-inrap-576210/">« Localisation des sites de fouille archéologiques de l'INRAP »</ref>, libre de droits et recensant 625 sites de fouilles en France.</p>
+                <p>Comme son nom l'indique, ce jeu de données localise des sites de fouilles archéologiques de l'<ref target="https://perma.cc/DA3Q-HQ3J">Institut national de recherches archéologiques préventives (INRAP)</ref> et est enrichi d'informations de localisation précises comme :</p>
+                <list type="unordered">
+                    <item>Les coordonnées géographiques du site de fouilles</item>
+                    <item>Un nom de site</item>
+                    <item>
+Des informations de localisation utilisant le découpage administratif français<list type="unordered">
+                            <item>Région</item>
+                            <item>Département</item>
+                            <item>Commune</item>
+                        </list>
+                    </item>
+                    <item>Des données temporelles concernant l'intervention archéologique</item>
+                    <item>Des thèmes et des périodes historiques relatifs à ce qui a été découvert sur le site</item>
+                </list>
+                <p>Il s'agit d'un tableau de données CSV (format ouvert) dont les colonnes sont séparées par des points-virgules. Il peut être lu et édité avec un simple éditeur de texte ou un tableur.</p>
+                <p>Ces données, bien que relativement limitées et peu complexes, nous permettront d'utiliser les fonctionnalités de visualisation cartographique et chronologique de Heurist. Comme nous le verrons plus loin, Heurist porte bien son nom, car il permet, par la visualisation et une exploration différente de ses données (notamment via des fonctionnalités de visualisation cartographiques et de graphes), de découvrir et de corriger très rapidement des erreurs ou encore d'approfondir une analyse. Ces données peuvent par la suite être exportées vers d'autres logiciels spécialisés comme par exemple <ref target="https://perma.cc/H5MT-UW8S">QGIS</ref>
+                    <ref type="footnotemark" target="#note_QGIS"/> et Gephi. De surcroît, il facilite également la recherche et la navigation dans les données à travers de nombreux filtres configurables à des fins de recherche individuelle, de travail collaboratif ou encore de diffusion à destination d'un plus large public.</p>
+                <p>Pour les besoins de l'exercice et l'intégration correcte des données, certaines opérations de consolidation et de transformation ont été effectuées à l'aide de l'outil <ref target="/fr/lecons/nettoyer-ses-donnees-avec-openrefine">OpenRefine</ref> pour :</p>
+                <list type="unordered">
+                    <item>La création de nouvelles colonnes <hi rend="bold">Coordonnées décimales lat/long</hi> et la conversion des coordonnées géospatiales, notées initialement en <ref target="https://perma.cc/6K8T-T37G">Lambert 93</ref>, en notation décimale latitude/longitude afin de permettre leur intégration dans Heurist et de les référencer précisément, indépendamment de la période concernée ou des évolutions toponymiques</item>
+                    <item>L'ajout d’une colonne <hi rend="bold">Id</hi> pour identifier de façon non ambiguë une intervention archéologique</item>
+                    <item>Le renommage de la colonne <hi rend="bold">Nom de site</hi> en <hi rend="bold">Nom d’intervention</hi> après avoir observé que les informations qu'elle contenait pouvaient concerner des éléments autres que ceux du site proprement dit, comme par exemple la date de l'intervention</item>
+                    <item>
+La désambiguïsation des noms de site afin d’identifier un lieu d’intervention de façon unique en procédant à :<list type="unordered">
+                            <item>La création d'une nouvelle colonne <hi rend="bold">Nom de site</hi> à partir de la colonne <hi rend="bold">Nom d'intervention</hi>
+                            </item>
+                            <item>L'extraction d'informations, comme l'année d'intervention, relatives à l'intervention plutôt qu'au site</item>
+                            <item>L'homogénéisation orthographique des noms de lieux possédant les mêmes coordonnées géographiques</item>
+                        </list>
+                    </item>
+                </list>
+                <p>L'ensemble des données que nous utiliserons pour cette leçon sont à télécharger <ref target="https://github.com/vpaillusson/tuto-heurist/raw/master/donnees_inrap.zip">sur le répertoire GitHub de l'auteur</ref> ainsi que sur le <ref target="https://github.com/programminghistorian/jekyll/tree/gh-pages/assets/introduction-a-heurist">dépôt</ref> du <emph>Programming Historian</emph>. Vous y trouverez quatre fichiers :</p>
+                <list type="unordered">
+                    <item>
+                        <code rend="inline">donnees_inrap_ph.csv</code>
+                    </item>
+                    <item>
+                        <code rend="inline">periodes.csv</code>
+                    </item>
+                    <item>
+                        <code rend="inline">themes.csv</code>
+                    </item>
+                    <item>
+                        <code rend="inline">type_intervention.csv</code>
+                    </item>
+                </list>
+                <p>Ces fichiers CSV contiennent les informations descriptives d'une intervention incorporant les modifications nécessaires à une intégration dans Heurist, ainsi que la liste des termes décrivant les périodes, les thèmes et les types d'intervention tels qu’ils ont été définis dans le fichier source de l'INRAP.</p>
+            </div>
+            <div type="2">
+                <head>Modélisation des données</head>
+                <p>Heurist s'appuie sur une conception relationnelle des données, il est ainsi important de rappeler certains éléments théoriques afin de comprendre son fonctionnement. Nous ne ferons pas un cours sur la modélisation relationnelle des données<ref type="footnotemark" target="#note_coursMerise"/>, retenons néanmoins que celle-ci permet de garantir :</p>
+                <list type="unordered">
+                    <item>
+                        <p>L'unicité de chaque enregistrement : un site archéologique ne sera renseigné qu'une seule fois dans la base de données. La création d'un doublon provoquera une erreur.</p>
+                    </item>
+                    <item>
+                        <p>La non-redondance des données saisies : si un site fait l'objet de plusieurs interventions archéologiques, il ne sera pas nécessaire de saisir à chaque fois les données le concernant. De même, en cas de correction concernant ce site, il suffira de la réaliser une seule fois pour la voir répercutée sur toute la base.</p>
+                    </item>
+                </list>
+                <figure>
+                    <desc>Fig. 2. Modélisation de l'unicité.</desc>
+                    <graphic url="introduction-a-heurist-2.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>Une organisation structurée des connaissances : <ref target="#vocabulaires2">vocabulaires contrôlés</ref> ou d'<ref target="https://perma.cc/AJL5-H5MK">ontologies</ref>. Cela permet une cohérence dans la manière de décrire les objets au sein d'une même base de données ou d'un collectif de travail.</item>
+                </list>
+                <figure>
+                    <desc>Fig. 3. Types d'enregistrement proposés par Heurist pour toutes nouvelles bases de données.</desc>
+                    <graphic url="introduction-a-heurist-3.png"/>
+                </figure>
+                <div type="3">
+                    <head>Entités et champs</head>
+                    <p>Ouvrez le fichier <code rend="inline">donnees_inrap_ph.csv</code> avec le tableur de votre choix (par exemple OpenOffice Calc ou MS Excel). Ce tableau reprend les noms de colonnes du fichier CSV source de l'INRAP avec quelques colonnes supplémentaires nécessaires à l'import dans Heurist.</p>
+                    <p>Les colonnes de ce tableau peuvent être regroupées en deux types d'objets distincts :</p>
+                    <figure>
+                        <desc>Fig. 4. Tableau INRAP</desc>
+                        <graphic url="introduction-a-heurist-4.png"/>
+                    </figure>
+                    <list type="ordered">
+                        <item>
+                            <p>Localisation</p>
+                            <list type="unordered">
+                                <item>Nom du site</item>
+                                <item>Coordonnées Lambert 93 X</item>
+                                <item>Coordonnées Lambert 93 Y</item>
+                                <item>Coordonnées décimales longitude</item>
+                                <item>Coordonnées décimales latitude</item>
+                                <item>Région</item>
+                                <item>Département</item>
+                                <item>Commune</item>
+                            </list>
+                        </item>
+                        <item>
+                            <p>Intervention</p>
+                            <list type="unordered">
+                                <item>Id</item>
+                                <item>Nom d'intervention</item>
+                                <item>Date de début</item>
+                                <item>Date de fin</item>
+                                <item>Type d’intervention</item>
+                                <item>Thèmes</item>
+                                <item>Périodes</item>
+                            </list>
+                        </item>
+                    </list>
+                    <p>Nous appellerons ces objets des « entités ». Dans Heurist, elles portent le nom de « types d'enregistrement » (<emph>record types</emph>). Les colonnes qui composent ces types d'enregistrement y sont appelées « champs » (<emph>fields</emph>).</p>
+                    <figure>
+                        <desc>Fig. 5. Modélisation des entités et de leurs champs descriptifs.</desc>
+                        <graphic url="introduction-a-heurist-5.png"/>
+                    </figure>
+                    <p>Dans notre exemple, <hi rend="bold">Intervention</hi> serait donc un type d'enregistrement, soit une entité, tandis qu'une intervention précise, par exemple celle d'Id INRAP0002, sera une instance de cette entité et sera appelée un « enregistrement » (<emph>record</emph>) dans Heurist.</p>
+                    <figure>
+                        <desc>Fig. 6. Modélisation des instances d'une entité.</desc>
+                        <graphic url="introduction-a-heurist-6.png"/>
+                    </figure>
+                    <p>Parmi ses attributs, chaque entité dispose d'un identifiant unique permettant d'y faire référence de façon non ambiguë. Cet identifiant peut être un simple nombre incrémenté pour chaque occurrence de l'entité ou être construit de façon plus élaborée en fonction des besoins et du volume d'occurrences.
+Dans le cadre de nos données, l'attribut <hi rend="bold">Id</hi> identifie une intervention de façon non ambiguë et <hi rend="bold">Nom de site</hi> fait référence à une et une seule localisation. En pratique, nous pouvons donc générer un identifiant de deux façons : soit en le construisant de façon arbitraire pour la cohérence de notre modèle conceptuel (champ <hi rend="bold">Id</hi>) soit en sélectionnant un attribut qui porte déjà ce rôle dans notre base de données (champ <hi rend="bold">Nom de site</hi>). </p>
+                </div>
+                <div type="3">
+                    <head>Les relations</head>
+                    <p>Les entités ne sont pas des objets isolés dans notre base de données. Au contraire, elles sont reliées entre elles afin de décrire des événements ou des objets complexes. Par exemple, étant donné que nous souhaitons conserver le lien entre un lieu et une opération archéologique spécifique, une intervention archéologique sera liée à une localisation. Nous verrons plus loin comment Heurist gère ce type de relations en pratique.</p>
+                </div>
+                <div type="3">
+                    <head>Champs multivalués et cardinalité</head>
+                    <p>Les cellules des colonnes <hi rend="bold">Thèmes</hi> et <hi rend="bold">Périodes</hi> de notre fichier <code rend="inline">donnees_inrap_ph.csv</code>, peuvent comporter plusieurs thèmes ou périodes séparés par le symbole « # ». Pour permettre l'interrogation de celles-ci de façon fine, nous devons les séparer tout en maintenant leur relation respective avec l'opération archéologique qu'elles décrivent. Cela veut donc dire que l'intervention d'Id INRAP0002 sera reliée aux thèmes « Antiquité » et « Protohistoire » et non au thème « #Antiquité#protohistoire ».</p>
+                    <figure>
+                        <desc>Fig. 7. Modélisation des champs multivalués.</desc>
+                        <graphic url="introduction-a-heurist-7.png"/>
+                    </figure>
+                    <p>Il faut indiquer quelque part dans notre modèle qu'une intervention peut avoir plusieurs thèmes: c'est la <ref target="https://perma.cc/M5RH-2B9U">cardinalité</ref>, qui permet de préciser si l'entité décrite peut être reliée à d'autres entités ou encore si des informations descriptives du même type peuvent être répétées. En outre, elle détermine le caractère obligatoire ou optionnel de cette relation. Essentiellement, elle répond aux questions du type :</p>
+                    <list type="unordered">
+                        <item>Une intervention est-elle obligatoirement liée à un thème ? (information descriptive)</item>
+                        <item>Une intervention est-elle liée à plusieurs thèmes ? (information descriptive)</item>
+                        <item>Une intervention est-elle obligatoirement liée à un site ? (relation à une autre entité)</item>
+                        <item>une intervention est-elle liée à plusieurs sites ? (relation à une autre entité)</item>
+                    </list>
+                    <p>Nous ne détaillerons pas ici la formalisation de la notation de ces cardinalités, mais en pratique dans Heurist cela sera défini pour un champ donné par les paramètres <emph>Repeatability</emph> et <emph>Requirement</emph> (fig. 8) :</p>
+                    <figure>
+                        <desc>Fig. 8. Champs multivalués dans Heurist.</desc>
+                        <graphic url="introduction-a-heurist-8.png"/>
+                    </figure>
+                </div>
+                <div type="3">
+                    <head>Vocabulaires contrôlés</head>
+                    <p>Nous venons de rencontrer le cas des thèmes ou périodes qui pouvaient décrire une même intervention. De même, <hi rend="bold">Type d'intervention</hi> fait référence à un vocabulaire, même si celui-ci compte uniquement deux termes.</p>
+                    <p>
+                        <ref target="#vocabulaires1">cohérence des données</ref>.
+Fonctionnellement, les <ref target="https://perma.cc/4ESL-P4UZ">vocabulaires contrôlés</ref> s'opposent à une saisie textuelle libre. Concrètement, il s'agit de lister, de catégoriser et de hiérarchiser des concepts, en nombre fini, afin d'éviter certains biais courants lors des saisies textuelles libres tels que :</p>
+                    <list type="unordered">
+                        <item>L'incohérence orthographique (M ≠ m, Moyen-Âge ≠ Moyen Âge)</item>
+                        <item>La synonymie (habitats ≈ édifices ≈ architecture)</item>
+                        <item>L'inclusion (pratiques funéraires ⊆ cultes)</item>
+                    </list>
+                    <p>L'utilisation de vocabulaires contrôlés permet ainsi d'optimiser les requêtes et l'analyse sur des données : d'une part, elle réduit le nombre de termes descriptifs, en supprimant les synonymies et en corrigeant les incohérences orthographiques, d'autre part, elle organise hiérarchiquement les concepts, une requête pouvant par exemple se limiter à une branche hiérarchique au sein d'un même vocabulaire contrôlé.</p>
+                    <p>C'est aussi une façon de se mettre d'accord, au sein d'un collectif de travail, sur une certaine description du monde comme le font les <ref target="https://perma.cc/5X7R-NLQ9">thésaurus</ref> ou les ontologies. Par ailleurs, dans une optique de science ouverte, utiliser des vocabulaires partagés par une communauté scientifique plus large, surtout lorsqu'ils sont normalisés, est également un gage d'interopérabilité et de compréhension mutuelle.</p>
+                    <p>Afin de gérer ces listes de termes, Heurist utilise des « vocabulaires » (<emph>vocabularies</emph>). Chaque vocabulaire (<emph>vocabulary</emph>) contient des « termes » (<emph>terms</emph>). Heurist intègre nativement un certain nombre de vocabulaires, dont certains sont issus de standards du web de données et pourront être très utiles à la communauté de recherche en SHS.</p>
+                    <figure>
+                        <desc>Fig. 9. Vocabulaires contrôlés.</desc>
+                        <graphic url="introduction-a-heurist-9.png"/>
+                    </figure>
+                    <p>Heurist propose également un système de modèles préétablis de types d'enregistrement via l'onglet <emph>Browse templates</emph> du mode <emph>Design</emph>, organisés thématiquement, et que n'importe qui peut utiliser dans sa propre base. C'est aussi une source d'inspiration très intéressante, car, en plus des modèles proposés par Heurist, il est possible de consulter et d'importer des modèles de bases de données d'autres personnes utilisant le logiciel.</p>
+                    <p>En complément d'Heurist, des outils comme <ref target="https://perma.cc/FUJ6-32UV">Opentheso</ref>, soutenus notamment par le Consortium MASA, ou encore <ref target="https://perma.cc/M9QB-QF9D">Loterre</ref>, de l'<ref target="https://perma.cc/696R-4NDW">Institut de l'information scientifique et technique du Centre national de la recherche scientifique (Inist CNRS)</ref>, peuvent être très utiles pour organiser ou consulter des thésaurus scientifiques multilingues et multihiérarchiques compatibles conformes aux standards du web des données ouvertes.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Créer une base de données sur Heurist</head>
+                <p>Une fois ces quelques informations théoriques rappelées, nous pouvons passer à leur mise en pratique dans Heurist.</p>
+                <div type="3">
+                    <head>Création d'un compte utilisateur</head>
+                    <p>Rendez-vous sur l'instance d'<ref target="https://heurist.huma-num.fr/">Heurist hébergée sur Huma-Num</ref> puis suivez les instructions pour créer un compte ainsi qu'une base de données.</p>
+                    <p>Une fois connectés à cette nouvelle base, vous êtes redirigés vers l'interface de Heurist.</p>
+                    <figure>
+                        <desc>Fig. 10. Page d'accueil de Heurist.</desc>
+                        <graphic url="introduction-a-heurist-10.png"/>
+                    </figure>
+                    <p>La colonne de navigation à gauche est organisée par groupes fonctionnels :</p>
+                    <list type="unordered">
+                        <item>
+                            <emph>Explore</emph> donne accès à la navigation dans les données, c'est la fonction clef de l'exploitation d'une base Heurist</item>
+                        <item>
+                            <emph>Design</emph> permet la modélisation des données</item>
+                        <item>
+                            <emph>Populate</emph> donne la possibilité d'ajouter de nouveaux enregistrements</item>
+                        <item>
+                            <emph>Publish</emph> permet de gérer la publication de vos données en ligne via un site web ou une page dédiée</item>
+                        <item>
+                            <emph>Admin</emph> offre la possibilité de gérer vos bases de données ainsi que les utilisateurs et utilisatrices</item>
+                    </list>
+                    <p>Une rubrique d'aide est accessible pour chaque mode via le « ? » entouré d'un cercle.</p>
+                </div>
+                <div type="3">
+                    <head>Création de notre modèle de données</head>
+                    <list type="ordered">
+                        <item>Cliquez sur <emph>Design</emph>
+                        </item>
+                        <item>Puis sur <emph>Record types</emph>
+                        </item>
+                        <item>Par défaut, le premier groupe de types d'enregistrement est sélectionné</item>
+                        <item>Chaque type d'enregistrement est résumé sur une ligne dans la fenêtre de visualisation de droite</item>
+                    </list>
+                    <figure>
+                        <desc>Fig. 11. Record types.</desc>
+                        <graphic url="introduction-a-heurist-11.png"/>
+                    </figure>
+                    <div type="4">
+                        <head>Création de l'entité de localisation</head>
+                        <p>Comme nous l'avons vu précédemment, nous avons :</p>
+                        <list type="unordered">
+                            <item>
+Deux entités principales<list type="unordered">
+                                    <item>Localisation</item>
+                                    <item>Intervention</item>
+                                </list>
+                            </item>
+                            <item>
+Trois vocabulaires<list type="unordered">
+                                    <item>Thèmes</item>
+                                    <item>Périodes</item>
+                                    <item>Type d'intervention</item>
+                                </list>
+                            </item>
+                        </list>
+                        <p>Afin de mieux organiser les données, ajoutez un nouveau groupe de types d'enregistrement en cliquant sur <emph>Add</emph> et nommez-le « INRAP ».</p>
+                        <p>Les champs dont nous avons besoin pour l'entité localisation sont les suivants :</p>
+                        <list type="unordered">
+                            <item>
+Localisation<list type="unordered">
+                                    <item>Nom du site (champ texte)</item>
+                                    <item>Coordonnées Lambert 93 X (champ texte)</item>
+                                    <item>Coordonnées Lambert 93 Y (champ texte)</item>
+                                    <item>Coordonnées décimales longitude (champ lat/long)</item>
+                                    <item>Coordonnées décimales latitude (champ lat/long)</item>
+                                    <item>Région (champ texte)</item>
+                                    <item>Département (champ texte)</item>
+                                    <item>Commune (champ texte)</item>
+                                </list>
+                            </item>
+                        </list>
+                        <p style="alert alert-warning">
+    Même si nous avons converti les coordonnées géographiques en notation décimale afin de les intégrer dans Heurist, nous conservons les données Lambert 93 sous forme de champ texte afin de garder trace de ces données initiales.
+</p>
+                        <p>Ajoutez un type d'enregistrement pour définir l'entité de localisation.</p>
+                        <list type="ordered">
+                            <item>Cliquez sur <emph>Add</emph>
+                            </item>
+                            <item>Dans la fenêtre vous prévenant que vous pouvez importer des <emph>record types</emph> existants, cliquez sur <emph>Continue</emph>
+                            </item>
+                        </list>
+                        <figure>
+                            <desc>Fig. 12. Ajout d'un *record type*.</desc>
+                            <graphic url="introduction-a-heurist-12.png"/>
+                        </figure>
+                        <p>Remplissez les informations concernant le type d'enregistrement de localisation auquel vous donnerez le nom de <hi rend="bold">Site</hi>.</p>
+                        <figure>
+                            <desc>Fig. 13. Entité de localisation.</desc>
+                            <graphic url="introduction-a-heurist-13.png"/>
+                        </figure>
+                        <p>Il vous est ensuite demandé de choisir le champ par défaut de ce type d'enregistrement. Laissez le choix par défaut et continuez.</p>
+                        <p>Dans Heurist, chaque champ est décrit à l’aide des informations suivantes :</p>
+                        <list type="unordered">
+                            <item>Un nom</item>
+                            <item>
+Un type de données<list type="unordered">
+                                    <item>Texte libre</item>
+                                    <item>Liste de vocabulaires</item>
+                                    <item>Information géospatiale</item>
+                                    <item>Zone de texte</item>
+                                </list>
+                            </item>
+                            <item>Une taille (<emph>field width</emph>), soit une limite dans le nombre de caractères du formulaire de saisie</item>
+                            <item>
+Un statut<list type="unordered">
+                                    <item>Caché (grisé)</item>
+                                    <item>Optionnel</item>
+                                    <item>Obligatoire (génère une erreur si l'information n'est pas remplie)</item>
+                                    <item>Recommandé</item>
+                                </list>
+                            </item>
+                            <item>Une répétabilité, une seule ou plusieurs occurrences de ce champ (par exemple il peut y avoir plusieurs thèmes ou périodes pour une même intervention)</item>
+                        </list>
+                        <p>Renommez le champ <hi rend="bold">Name/title</hi> par défaut en <hi rend="bold">Nom du site</hi>. Conservez les autres paramètres avec leur nom par défaut (<emph>required</emph>, <emph>single</emph>, <emph>field width</emph>).</p>
+                        <figure>
+                            <desc>Fig. 14. Champ nom du site.</desc>
+                            <graphic url="introduction-a-heurist-14.png"/>
+                        </figure>
+                        <p>Il y a cinq autres champs textuels dans notre type d'enregistrement.
+Nous allons en créer un ensemble et vous pourrez créer les autres vous-mêmes en suivant la même procédure.</p>
+                        <p>Cliquez sur <emph>Insert field</emph>.</p>
+                        <p>Remplissez les éléments obligatoires en rouge :</p>
+                        <list type="unordered">
+                            <item>
+                                <emph>Field name</emph>
+                            </item>
+                            <item>
+                                <emph>Help text</emph>
+                            </item>
+                            <item>
+                                <emph>Data type</emph>
+                            </item>
+                        </list>
+                        <p>Sélectionnez le <hi rend="bold">type de données</hi> (<emph>data type</emph>) suivant : <emph>Text (single line)</emph>, car dans notre cas il correspond aux champs textuels attendus.</p>
+                        <figure>
+                            <desc>Fig. 15. Champ Lambert 93 X.</desc>
+                            <graphic url="introduction-a-heurist-15.png"/>
+                        </figure>
+                        <p>Gardez les autres valeurs par défaut et sauvegardez.</p>
+                        <p>Répétez la même opération pour les champs :</p>
+                        <list type="unordered">
+                            <item>Coordonnées Lambert 93 Y</item>
+                            <item>Région</item>
+                            <item>Département</item>
+                            <item>Commune</item>
+                        </list>
+                        <p>Cela vous donne l'organisation suivante :</p>
+                        <figure>
+                            <desc>Fig. 16. Champ textuel.</desc>
+                            <graphic url="introduction-a-heurist-16.png"/>
+                        </figure>
+                        <p>Il ne reste que les informations géoréférencées. La démarche sera la même, seul le type de données sera différent. Le type géospatial de Heurist prend des données en format lat/long, un seul champ permettra donc d'intégrer les deux valeurs latitude et longitude de notre fichier CSV :</p>
+                        <figure>
+                            <desc>Fig. 17. Champ géoréférencé.</desc>
+                            <graphic url="introduction-a-heurist-17.png"/>
+                        </figure>
+                        <p>Ajoutez le champ suivant avec le type de données suivant : <hi rend="bold">Coordonnées décimales</hi>.</p>
+                        <p>La création de l'ensemble des champs du type d'enregistrement <hi rend="bold">Site</hi> est ainsi terminée.</p>
+                        <figure>
+                            <desc>Fig. 18. Ensemble des champs du type d'enregistrement Site.</desc>
+                            <graphic url="introduction-a-heurist-18.png"/>
+                        </figure>
+                    </div>
+                    <div type="4">
+                        <head>Création des vocabulaires</head>
+                        <list type="ordered">
+                            <item>Cliquez sur <emph>Vocabularies</emph>
+                            </item>
+                            <item>La deuxième colonne en partant de la gauche liste les catégories ou groupes de vocabulaires et se trouve par défaut sur la catégorie <emph>User-defined</emph>
+                            </item>
+                            <item>
+La colonne suivante liste les vocabulaires de ce groupe, ici deux vocabulaires<list type="unordered">
+                                    <item>
+                                        <emph>Country</emph>
+                                    </item>
+                                    <item>
+                                        <emph>Place type</emph>
+                                    </item>
+                                </list>
+                            </item>
+                            <item>Enfin, la partie la plus à droite liste l'ensemble des termes de ce vocabulaire</item>
+                        </list>
+                        <figure>
+                            <desc>Fig. 19. Vocabulaires.</desc>
+                            <graphic url="introduction-a-heurist-19.png"/>
+                        </figure>
+                        <p>Le groupe <emph>User-defined</emph> convient bien, vous allez donc créer les trois vocabulaires dans celui-ci en cliquant sur <emph>Add</emph>.</p>
+                        <figure>
+                            <desc>Fig. 20. Ajouter un vocabulaire.</desc>
+                            <graphic url="introduction-a-heurist-20.png"/>
+                        </figure>
+                        <list type="ordered">
+                            <item>Renseignez le label <hi rend="bold">Thèmes</hi> ainsi qu'une courte description</item>
+                            <item>Il est également possible d'ajouter une URI relative à un terme de vocabulaire ou d'une ontologie, ce n'est pas nécessaire dans le cas présent</item>
+                            <item>Sauvegardez</item>
+                        </list>
+                        <p>Une fois le vocabulaire créé, plusieurs fonctionnalités sont disponibles :</p>
+                        <list type="ordered">
+                            <item>Ajouter un terme de vocabulaire manuellement</item>
+                            <item>Ajouter une liste de termes par référence à un autre vocabulaire</item>
+                            <item>Exporter les termes</item>
+                            <item>Importer les termes</item>
+                        </list>
+                        <figure>
+                            <desc>Fig. 21. Éditer un vocabulaire.</desc>
+                            <graphic url="introduction-a-heurist-21.png"/>
+                        </figure>
+                        <p>Pour ne pas avoir à saisir manuellement les termes de vocabulaire, vous allez utiliser la fonctionnalité d'import proposée par Heurist afin d'intégrer les contenus des fichiers <code rend="inline">periodes.csv</code>, <code rend="inline">themes.csv</code> et <code rend="inline">type_intervention.csv</code> téléchargés en début de leçon.</p>
+                        <p>Cliquez sur <emph>Import</emph>.</p>
+                        <list type="ordered">
+                            <item>Copiez et collez la liste des thèmes du fichier <code rend="inline">themes.csv</code> du dossier zip que vous venez de télécharger dans la fenêtre prévue à cet effet en étape 1</item>
+                            <item>Cochez la case <emph>Labels in line 1</emph> puis cliquez sur <emph>Analyse</emph>
+                            </item>
+                            <item>Vérifiez que la liste importée ne présente pas d’erreur</item>
+                            <item>Vérifiez que <emph>Term (label)</emph> est bien rempli avec le nom du vocabulaire (ici <hi rend="bold">Thèmes</hi>) et cliquez sur <emph>Import</emph>
+                            </item>
+                        </list>
+                        <figure>
+                            <desc>Fig. 22. Import des thèmes INRAP dans Heurist.</desc>
+                            <graphic url="introduction-a-heurist-22.png"/>
+                        </figure>
+                        <p>Suivez exactement la même opération que précédemment avec le vocabulaire <hi rend="bold">Périodes</hi> en utilisant le fichier <code rend="inline">periodes.csv</code>.</p>
+                        <p>Pour <hi rend="bold">Type d'intervention</hi>, la liste ne contenant que deux termes (« Diagnostic » et « Fouille »), vous pouvez soit réitérer la même opération, soit les insérer manuellement un par un en cliquant sur <emph>Add</emph> dans le vocabulaire <hi rend="bold">Type d'intervention</hi> que vous aurez créé.</p>
+                        <figure>
+                            <desc>Fig. 23. Liste des vocabulaires.</desc>
+                            <graphic url="introduction-a-heurist-23.png"/>
+                        </figure>
+                    </div>
+                    <div type="4">
+                        <head>Création de l'entité Intervention</head>
+                        <list type="ordered">
+                            <item>Retournez sur <emph>Record Type &gt; INRAP</emph>
+                            </item>
+                            <item>Pour ajouter un type d'enregistrement, cliquez sur <emph>Add</emph> comme précédemment avec le type d'enregistrement <hi rend="bold">Site</hi>
+                            </item>
+                        </list>
+                        <p>Sélectionnez les champs par défaut pour notre entité : <emph>Name/title</emph>, <emph>Start date</emph>, <emph>End date</emph>.</p>
+                        <figure>
+                            <desc>Fig. 24. Création de l'entité Intervention.</desc>
+                            <graphic url="introduction-a-heurist-24.png"/>
+                        </figure>
+                        <p>Pour rappel, nous avons besoin des champs suivants :</p>
+                        <list type="unordered">
+                            <item>
+Intervention<list type="unordered">
+                                    <item>Identifiant d'intervention</item>
+                                    <item>Nom d'intervention</item>
+                                    <item>Date de début</item>
+                                    <item>Date de fin</item>
+                                    <item>Type d’intervention (se réfère au vocabulaire du même nom)</item>
+                                    <item>Thèmes (se réfère au vocabulaire du même nom)</item>
+                                    <item>Périodes (se réfère au vocabulaire du même nom)</item>
+                                    <item>Localisation (se réfère à l'entité du même nom)</item>
+                                </list>
+                            </item>
+                        </list>
+                        <p>Renommez les champs comme suit :</p>
+                        <list type="unordered">
+                            <item>
+                                <emph>Name/title</emph> devient <hi rend="bold">Identifiant d'intervention</hi>
+                            </item>
+                            <item>
+                                <emph>Start date</emph> devient <hi rend="bold">Date de début</hi>
+                            </item>
+                            <item>
+                                <emph>End date</emph> devient <hi rend="bold">Date de fin</hi>
+                            </item>
+                        </list>
+                        <p>Vous allez ajouter les trois champs de vocabulaires contrôlés.</p>
+                        <list type="ordered">
+                            <item>Cliquez sur <emph>Insert</emph>
+                            </item>
+                            <item>Renseignez le label du champ ainsi que sa description et sélectionnez le type de champ</item>
+                            <item>Par défaut, <emph>Dropdown (Terms)</emph> est sélectionné. Cliquez sur <emph>Use this field type</emph>.</item>
+                        </list>
+                        <figure>
+                            <desc>Fig. 25. Ajout d'un champ de vocabulaire.</desc>
+                            <graphic url="introduction-a-heurist-25.png"/>
+                        </figure>
+                        <p>Enfin, sélectionnez le vocabulaire <hi rend="bold">Thèmes</hi>, rendez le répétable (<emph>repeatable</emph>) et sauvegardez.</p>
+                        <figure>
+                            <desc>Fig. 26. Ajout du champ Thèmes.</desc>
+                            <graphic url="introduction-a-heurist-26.png"/>
+                        </figure>
+                        <p>Effectuez la même opération pour <hi rend="bold">Périodes</hi> et <hi rend="bold">Type d'intervention</hi> à la seule différence que <hi rend="bold">Type d'intervention</hi> ne sera pas répétable.</p>
+                        <p>Ajoutez maintenant la référence à <hi rend="bold">Site</hi> en sélectionnant le <emph>data type</emph> suivant :  <emph>Record pointer</emph>.</p>
+                        <figure>
+                            <desc>Fig. 27. Ajout du champ Site.</desc>
+                            <graphic url="introduction-a-heurist-27.png"/>
+                        </figure>
+                        <p>Pour finaliser la création de ce champ, sélectionnez le type d'enregistrement que nous souhaitons référencer, soit le type d'enregistrement <hi rend="bold">Site</hi> dans le groupe de types d'enregistrement <hi rend="bold">INRAP</hi>.</p>
+                        <figure>
+                            <desc>Fig. 28. Sélection de l'entité Site.</desc>
+                            <graphic url="introduction-a-heurist-28.png"/>
+                        </figure>
+                        <p>Pour terminer, ajoutez le champ <hi rend="bold">Nom de l'intervention</hi> qui sera de type <emph>text single line</emph> en suivant la même procédure que pour les champs textuels du type d'enregistrement <hi rend="bold">Site</hi>.</p>
+                        <p>Vous obtenez un type d'enregistrement <hi rend="bold">Intervention</hi> composée des champs définis plus haut ou précédemment mentionnés.</p>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Importer des données dans Heurist</head>
+                <p>Le modèle Heurist est terminé, vous allez pouvoir l'alimenter avec les données INRAP à votre disposition.</p>
+                <div type="3">
+                    <head>Import des données de localisation</head>
+                    <p>Pour ce faire, nous allons changer de mode, à partir du menu principal en haut à gauche de l'interface de notre base, et passer dans l'onglet <emph>Populate</emph>.</p>
+                    <p>Comme son nom l'indique, ce mode regroupe les fonctionnalités permettant d'alimenter le modèle que nous avons élaboré dans la partie <emph>Design</emph>.</p>
+                    <p>À partir de <emph>Populate</emph>, il est possible soit d'ajouter un enregistrement individuel, soit d'effectuer des imports de données en lots via des fichiers structurés au format CSV (ou encore HML qui correspond au format XML d'Heurist). La possibilité est également offerte d'effectuer une synchronisation avec une collection <ref target="https://perma.cc/E6YB-NEY6">Zotero</ref> pour importer des données bibliographiques le cas échéant.</p>
+                    <p>Dans notre cas, le fichier source étant un fichier CSV, cliquez sur <emph>Delimited text/CSV</emph> puis sur <emph>Upload new file (CSV/TSV)</emph> et chargez le fichier <code rend="inline">donnees_inrap_ph.csv</code> téléchargé en début de leçon.</p>
+                    <figure>
+                        <desc>Fig. 29. Import CSV.</desc>
+                        <graphic url="introduction-a-heurist-29.png"/>
+                    </figure>
+                    <list type="ordered">
+                        <item>
+                            <p>Conservez les quatre premiers paramètres par défaut et modifiez <emph>Multivalue separator</emph> en « # » via la liste déroulante afin de séparer les occurrences multiples de périodes et de thèmes tels qu'ils sont représentés dans notre fichier CSV</p>
+                        </item>
+                        <item>
+                            <p>Cliquez sur <emph>Analyse data</emph> pour afficher une visualisation des données, vérifiez que ces données sont correctement interprétées et cliquez sur <emph>Continue</emph> (cf. Fig. 30)</p>
+                        </item>
+                        <item>
+                            <p>Dans <emph>Select record type</emph>, choisissez <hi rend="bold">Site</hi> et cliquez sur <emph>OK</emph>.</p>
+                        </item>
+                    </list>
+                    <figure>
+                        <desc>Fig. 30. Analyse du fichier CSV.</desc>
+                        <graphic url="introduction-a-heurist-30.png"/>
+                    </figure>
+                    <p>Une fois les données analysées et chargées dans Heurist, la première étape consiste à vérifier si des enregistrements de type <hi rend="bold">Site</hi> existent déjà dans le système. Heurist effectue une recherche via un ou des champs que vous pouvez sélectionner lors de la procédure d'import (par exemple un champ de type identifiant n'amenant pas d'ambiguïté). Si Heurist trouve des valeurs dans sa base correspondant à celles présentes dans le fichier CSV, il les met à jour si nécessaire ou bien les crée s'il ne trouve rien.</p>
+                    <p>Pour ce faire, à partir de la boîte de dialogue qui apparaît lorsque Heurist effectue cette opération :</p>
+                    <list type="ordered">
+                        <item>Cochez la case <hi rend="bold">Nom du site</hi> dans la colonne de gauche correspondant aux données du fichier CSV et sélectionnez <hi rend="bold">Nom du site</hi> dans la colonne correspondant au type d'enregistrement <hi rend="bold">Site</hi> dans Heurist</item>
+                        <item>Cliquez sur <emph>Match against existing records</emph>
+                        </item>
+                    </list>
+                    <figure>
+                        <desc>Fig. 31. Correspondance avec des enregistrements existants.</desc>
+                        <graphic url="introduction-a-heurist-31.png"/>
+                    </figure>
+                    <p>La deuxième étape consiste à indiquer à Heurist quelle colonne du tableau va renseigner quel champ dans le type d'enregistrement <hi rend="bold">Site</hi>. Il suffit donc de cocher les cases des colonnes à importer et de renseigner dans la colonne de droite les champs auxquels elles correspondent :</p>
+                    <list type="ordered">
+                        <item>Cochez les champs du fichier CSV à importer et sélectionnez en face les champs qu'ils doivent alimenter</item>
+                        <item>Vous pouvez visualiser et naviguer dans les enregistrements qui vont être créés dans la colonne de droite</item>
+                        <item>Cliquez sur <emph>Prepare</emph> puis <emph>Start insert</emph>
+                        </item>
+                    </list>
+                    <figure>
+                        <desc>Fig. 32. Insertion des données CSV.</desc>
+                        <graphic url="introduction-a-heurist-32.png"/>
+                    </figure>
+                    <p>L'ensemble des entrées ont été créées et une fenêtre de résumé vous indique les opérations effectuées :</p>
+                    <figure>
+                        <desc>Fig. 33. Résumé des opérations effectuées.</desc>
+                        <graphic url="introduction-a-heurist-33.png"/>
+                    </figure>
+                </div>
+                <div type="3">
+                    <head>Import des données relatives aux interventions sur site</head>
+                    <p>Après avoir chargé nos données de localisation, il nous reste à importer les interventions. Pour ce faire, cliquez sur <emph>Back to start</emph> pour retourner au chargement du fichier CSV.</p>
+                    <figure>
+                        <desc>Fig. 34. Retour au chargement du fichier.</desc>
+                        <graphic url="introduction-a-heurist-34.png"/>
+                    </figure>
+                    <p>Pour finir ce projet, nous devons charger le reste des données liées aux interventions. Nous allons effectuer les mêmes opérations de chargement du fichier que précédemment.</p>
+                    <p>Arrivés à <emph>Select record type</emph>, choisissez cette fois-ci <hi rend="bold">Intervention</hi>, cochez la case <hi rend="bold">Site</hi> pour gérer les dépendances entre les enregistrements puis validez.</p>
+                    <figure>
+                        <desc>Fig. 35. Sélection de l'entité Intervention pour import.</desc>
+                        <graphic url="introduction-a-heurist-35.png"/>
+                    </figure>
+                    <p>Comme à chaque import, Heurist vérifie d'abord si des enregistrements existent déjà. Sachant qu'une <hi rend="bold">Intervention</hi> est liée à un <hi rend="bold">Site</hi>, Heurist vérifie en premier si les sites qui sont dans le fichier CSV sont déjà présents dans la base de données. Il faut donc faire correspondre le champ <hi rend="bold">Nom du site</hi> du fichier CSV avec le champ <hi rend="bold">Nom du site</hi> du type d'enregistrement <hi rend="bold">Site</hi> dans Heurist.</p>
+                    <figure>
+                        <desc>Fig. 36. Correspondance avec des sites déjà présents dans la base de données.</desc>
+                        <graphic url="introduction-a-heurist-36.png"/>
+                    </figure>
+                    <p>Heurist vérifie les éléments et, chose relativement classique, le fichier source n'étant pas parfait, trouve des doublons dans les noms de site et propose de nous aider à lever les ambiguïtés. En l'occurrence, il s'agit de la même chaîne de caractères, mais avec une majuscule à l'initiale pour un site et sans majuscule pour l'autre. Cliquez sur <emph>Resolve ambiguous matches</emph> puis vérifiez les enregistrements déjà intégrés dans la base de données pour enfin aligner les enregistrements avec les données trouvées dans le fichier CSV.</p>
+                    <figure>
+                        <desc>Fig. 37. Résolution des ambiguïtés.</desc>
+                        <graphic url="introduction-a-heurist-37.png"/>
+                    </figure>
+                    <p>Une fois les doublons résolus, nous effectuons la même opération pour les données de l'entité <hi rend="bold">Intervention</hi>. Prenez soin de renseigner, comme nous venons de le faire pour l'import des données de localisation, les champs d’<hi rend="bold">Intervention</hi> que vous souhaitez remplir via votre fichier CSV, avant de valider la préparation et de finir l’import. À la fin de l'opération, vous devez obtenir une fenêtre vous indiquant l’insertion de 625 nouveaux enregistrements.</p>
+                    <figure>
+                        <desc>Fig. 38. Import des données d'Intervention.</desc>
+                        <graphic url="introduction-a-heurist-38.png"/>
+                    </figure>
+                </div>
+            </div>
+            <div type="2">
+                <head>Explorer et modifier les données</head>
+                <div type="3">
+                    <head>Explorer les données de localisation</head>
+                    <p>Nous avons bien importé nos données. Quittons à présent <emph>Populate</emph> et revenons au menu principal pour nous rendre cette fois à l'onglet <emph>Explore</emph> qui présente un panel de fonctionnalités permettant d'explorer et de filtrer les données chargées dans la base Heurist.</p>
+                    <p>Pour afficher les sites que vous venez d'importer, cliquez sur l'onglet <emph>Explore</emph> dans la colonne de gauche, placez votre curseur sur <emph>Entities</emph> puis sélectionnez <hi rend="bold">Site</hi>.</p>
+                    <p>Les sites sont listés par leur identifiant Heurist (H-ID), ce qui donne un label du type <emph>Record 1250</emph>.
+Nous allons voir comment modifier ce label peu intelligible plus loin dans la leçon.</p>
+                    <p>En cliquant sur un enregistrement, les données le concernant apparaissent dans le volet de visualisation de droite, y compris la relation avec une intervention archéologique. Par défaut, le mode <emph>Record View</emph> est sélectionné. Il affiche l'ensemble des informations d'un enregistrement et donne accès à son édition.</p>
+                    <figure>
+                        <desc>Fig. 39. Afficher le détail d'un enregistrement.</desc>
+                        <graphic url="introduction-a-heurist-39.png"/>
+                    </figure>
+                    <p>D'autres options de visualisation sont disponibles :</p>
+                    <list type="unordered">
+                        <item>
+                            <p>
+                                <emph>Map-Timeline</emph> permet une visualisation spatiale et temporelle des données</p>
+                        </item>
+                        <item>
+                            <p>
+                                <emph>List view</emph> permet de lister les enregistrements sous forme de tableau et de les exporter sous forme de tableurs ou en format PDF</p>
+                        </item>
+                        <item>
+                            <p>
+                                <emph>Custom reports</emph> (pour utilisateurs et utilisatrices plus avancés) permet de gérer la mise en page des résultats d'une requête à l'aide de <ref target="https://perma.cc/B84C-U5VL">
+                                    <emph>templates</emph>
+                                </ref> gérés par le moteur <ref target="https://perma.cc/V4Y6-ZV8P">PHP</ref>
+                                <ref target="https://perma.cc/NFN5-M949">Smarty</ref>
+                                <ref type="footnotemark" target="#note_Smarty"/>, la page ainsi générée peut ensuite être mise en ligne</p>
+                        </item>
+                        <item>
+                            <p>
+                                <emph>Export</emph> permet l'export de l'ensemble des résultats de la requête en cours sous différents formats pouvant être réutilisés par d'autres logiciels (CSV, GEPHI, XML, JSON, GEOJSON, KML, IIIF)</p>
+                        </item>
+                    </list>
+                    <figure>
+                        <desc>Fig. 40. Formats d'export.</desc>
+                        <graphic url="introduction-a-heurist-40.png"/>
+                    </figure>
+                    <list type="unordered">
+                        <item>
+                            <p>
+                                <emph>Network diagram</emph> affiche un diagramme montrant les liens entre les enregistrements</p>
+                        </item>
+                        <item>
+                            <p>
+                                <emph>Crosstabs</emph> permet d'effectuer des requêtes croisées sur les données</p>
+                        </item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Modifier les données</head>
+                    <p>Cliquez sur l’onglet <emph>Map-Timeline</emph> pour visualiser l’ensemble des sites géolocalisés sous forme de carte. Ce faisant, vous pouvez observer que certaines données semblent manifestement erronées. En effet, bien que tous les sites de notre jeu de données se situent en France, la visualisation en révèle un au Mali et deux autres près des côtes africaines. Le rôle de la visualisation des données spatiales à des fins correctives est ici évident. Voyons maintenant comment corriger ce type d'erreur. En cliquant sur le drapeau d'un site sur la carte, vous pouvez afficher, à l'aide d'une fenêtre secondaire (<emph>popup</emph>), l'ensemble des informations concernant cette enregistrement. Ici, cliquez sur le site situé au Mali. Le nom du site apparaît dans une nouvelle fenêtre et l'enregistrement correspondant est automatiquement sélectionné. Ainsi, vous pouvez voir que le site dont il est question est celui de Boulazac situé en Dordogne. Directement, depuis cette fenêtre, passez en mode édition, en cliquant sur l’icône du crayon, pour corriger les informations liées à cet enregistrement.</p>
+                    <figure>
+                        <desc>Fig. 41. Édition des coordonnées du site de Boulazac.</desc>
+                        <graphic url="introduction-a-heurist-41.png"/>
+                    </figure>
+                    <p>Pour modifier ou entrer une donnée GPS, Heurist propose deux solutions :</p>
+                    <list type="ordered">
+                        <item>Rechercher dans la base de données d'<ref target="https://www.openstreetmap.fr/">OpenStreetMap</ref> un nom de lieu et lui attribuer un marqueur de point permettant de définir ses coordonnées</item>
+                        <item>Insérer les coordonnées, qui auront été récupérées par le moyen de votre choix, directement</item>
+                    </list>
+                    <p>
+                        <hi rend="bold">Option 1</hi>
+                    </p>
+                    <list type="ordered">
+                        <item>Cliquez sur le champ de saisie de <hi rend="bold">Coordonnées GPS</hi>
+                        </item>
+                        <item>Dans la fenêtre qui s'ouvre, effectuez une recherche sur Boulazac dans la base d'OpenStreetMap (cf. Fig. 42)</item>
+                        <item>Le site est trouvé sur OpenStreetMap, il faut y adjoindre un marqueur pour enregistrer les coordonnées du point dans Heurist</item>
+                        <item>Cliquez sur le marqueur et déplacez-le jusque sur le pointeur du site trouvé via le moteur de recherche, puis sauvegardez (cf. Fig. 43)</item>
+                    </list>
+                    <figure>
+                        <desc>Fig. 42. Recherche des coordonnées GPS de Boulazac.</desc>
+                        <graphic url="introduction-a-heurist-42.png"/>
+                    </figure>
+                    <figure>
+                        <desc>Fig. 43. Validation des coordonnées GPS à l'aide du marqueur.</desc>
+                        <graphic url="introduction-a-heurist-43.png"/>
+                    </figure>
+                    <p>
+                        <hi rend="bold">Option 2</hi>
+                    </p>
+                    <list type="ordered">
+                        <item>Cliquez sur le champ de saisie de <hi rend="bold">Coordonnées GPS</hi>
+                        </item>
+                        <item>Puis sur <emph>Add Geometry</emph> dans la colonne de droite de la carte</item>
+                        <item>Insérez les coordonnées dans le format indiqué, par exemple ici pour un simple point la syntaxe est 0.7679869062166365 45.178199165946225, puis sauvegardez les modifications</item>
+                    </list>
+                    <figure>
+                        <desc>Fig. 44. Renseigner les coordonnées manuellement.</desc>
+                        <graphic url="introduction-a-heurist-44.png"/>
+                    </figure>
+                    <p>Afin de vérifier que les modifications des coordonnées GPS ont bien été prises en compte, nous allons utiliser l'assistant de filtre. Dans notre cas, nous utilisons le nom de la commune :</p>
+                    <list type="ordered">
+                        <item>Ajoutez un filtre</item>
+                        <item>Dans la fenêtre de paramètres qui s’ouvre, saisissez les informations nécessaires pour trouver notre enregistrement</item>
+                        <item>Filtrez</item>
+                    </list>
+                    <figure>
+                        <desc>Fig. 45. Rechercher un enregistrement en filtrant les données.</desc>
+                        <graphic url="introduction-a-heurist-45.png"/>
+                    </figure>
+                    <p>Un seul élément est trouvé et vous pouvez observer que la modification du lieu a bien été effectuée.</p>
+                    <figure>
+                        <desc>Fig. 46. Vérification de l’enregistrement de la modification cartographique.</desc>
+                        <graphic url="introduction-a-heurist-46.png"/>
+                    </figure>
+                </div>
+                <div type="3">
+                    <head>Modifier l'étiquette des enregistrements</head>
+                    <p>Nous avons trouvé Boulazac, mais son étiquette (<emph>title mask</emph>) dans la liste des enregistrements est peu intelligible. Nous pouvons l'éditer depuis n'importe quel enregistrement. Dans la fenêtre d'édition d'un site, cliquez sur <emph>Edit title mask</emph>.</p>
+                    <figure>
+                        <desc>Fig. 47. Modification de l'étiquette d'un type d'enregistrement.</desc>
+                        <graphic url="introduction-a-heurist-47.png"/>
+                    </figure>
+                    <list type="ordered">
+                        <item>Sélectionnez le ou les champs que vous souhaitez afficher dans la colonne de gauche</item>
+                        <item>Cliquez sur <emph>Insert field</emph> et agencez-les comme vous le souhaitez dans le champ texte</item>
+                        <item>Sélectionnez des enregistrements et testez l'étiquette ainsi générée</item>
+                        <item>Sauvegardez les modifications</item>
+                    </list>
+                    <figure>
+                        <desc>Fig. 48. Édition de l'étiquette.</desc>
+                        <graphic url="introduction-a-heurist-48.png"/>
+                    </figure>
+                    <p>Rafraîchissez de nouveau la page (<emph>CTRL+R</emph> ou <emph>F5</emph>) et visualisez les modifications apportées.</p>
+                    <p>Vous savez donc maintenant comment consulter vos données, les modifier et visualiser à la volée les corrections ou ajouts effectués.</p>
+                </div>
+                <div type="3">
+                    <head>Utilisation des filtres</head>
+                    <p>Toujours en mode <emph>Explore</emph>, si le dernier filtre inséré est encore actif, utilisez le filtre par entité dans la colonne de gauche pour n'afficher que les entités de type <hi rend="bold">Intervention</hi>.</p>
+                    <figure>
+                        <desc>Fig. 49. Lister les interventions.</desc>
+                        <graphic url="introduction-a-heurist-49.png"/>
+                    </figure>
+                    <p>Comme avec les données de localisation, nous pouvons visualiser les informations de chaque intervention dans la fenêtre de visualisation via l'onglet <emph>Record view</emph>. Nous observons que les valeurs des champs multivalués comme <hi rend="bold">Thèmes</hi> et <hi rend="bold">Périodes</hi> sont correctement séparées, le nom du site apparaît bien comme un élément lié et, en cliquant dessus, une fenêtre secondaire affiche les données le concernant.</p>
+                    <figure>
+                        <desc>Fig. 50. Visualiser le détail d'une intervention.</desc>
+                        <graphic url="introduction-a-heurist-50.png"/>
+                    </figure>
+                    <p>En revanche, si vous tentez de visualiser les informations géographiques liées à une intervention via le mode <emph>Map-Timeline</emph>, cela ne fonctionne pas. Seules les informations temporelles de chaque intervention apparaissent. En effet, actuellement la requête de filtre demande uniquement d'afficher les interventions et de récupérer les données qui y sont directement attachées. En revanche, il n'a pas encore été demandé à Heurist de récupérer le détail des informations géographiques liées à chaque intervention. Pour enrichir notre requête, nous allons créer un filtre spécifique :</p>
+                    <list type="ordered">
+                        <item>Cliquez sur <emph>Save filter</emph>
+                        </item>
+                        <item>Renseignez le nom et le type d'enregistrement filtré par défaut (cf. Fig. 51)</item>
+                        <item>Éditez la règle qui permet de remonter les informations de localisation via la relation de <emph>Record pointer</emph> entre <hi rend="bold">Intervention</hi> et <hi rend="bold">Site</hi>, puis sauvegardez la règle et le filtre.</item>
+                    </list>
+                    <figure>
+                        <desc>Fig. 51. Création d'un filtre avancé.</desc>
+                        <graphic url="introduction-a-heurist-51.png"/>
+                    </figure>
+                    <figure>
+                        <desc>Fig. 52. Afficher les informations du *record pointer* Site.</desc>
+                        <graphic url="introduction-a-heurist-52.png"/>
+                    </figure>
+                    <p>Lorsque vous sélectionnez le filtre que vous venez de créer dans la rubrique <emph>Saved filters &gt; My filters</emph>, vous pouvez maintenant visualiser directement les données spatiales attachées aux interventions.</p>
+                    <figure>
+                        <desc>Fig. 53. Visualisation des informations spatiales.</desc>
+                        <graphic url="introduction-a-heurist-53.png"/>
+                    </figure>
+                </div>
+            </div>
+            <div type="2">
+                <head>Mettre en ligne les données gérées dans Heurist</head>
+                <p>Les opérations de modélisation, de visualisation et de modification offrent les outils pour gérer ses données de recherche. Elles œuvrent également à préparer le partage des données dans le cadre de travaux collaboratifs ou encore à les publier auprès d’un public plus large.</p>
+                <p>Heurist propose plusieurs fonctionnalités de mise en ligne :</p>
+                <list type="unordered">
+                    <item>L'intégration d'un filtre de visualisation à facettes dans une page web hébergée sur un autre site comme Wordpress, Drupal, etc. (option qui est présentée dans cette leçon)</item>
+                    <item>La création d'une page web directement dans Heurist</item>
+                    <item>La génération d'un site web complet avec gestion du contenu des pages et personnalisation de l'affichage</item>
+                </list>
+                <p>Ces solutions s'appuient sur la création préalable d'un filtre, que nous venons de découvrir, ou d'une recherche à facettes.</p>
+                <div type="3">
+                    <head>Création d'un filtre de recherche à facettes</head>
+                    <p>Un filtre de recherche à facettes est une interface permettant d'afficher les résultats d'une première recherche ou requête, et de les filtrer, en temps réel, à l'aide de filtres qui peuvent prendre la forme de champs textuels, de listes de sélection ou encore de cases à cocher.</p>
+                    <list type="ordered">
+                        <item>Sélectionnez l'éditeur de filtre à facettes dans les fonctionnalités du mode <emph>Explore</emph>
+                        </item>
+                        <item>Dans la fenêtre de paramètres du filtre, remplissez les champs pour indiquer que le filtre porte sur l'entité <hi rend="bold">Intervention</hi> et que l’affichage des champs doit se faire sous forme de ligne (cf. Fig. 54)</item>
+                        <item>Comme pour le filtre de recherche, éditez la règle qui permet de remonter aux informations de localisation via la relation de <emph>record pointer</emph> entre <hi rend="bold">Intervention</hi> et <hi rend="bold">Site</hi>, puis sauvegardez la règle et validez</item>
+                        <item>Sélectionnez les champs sur lesquels vous souhaitez pouvoir effectuer des requêtes. Nous pouvons ici sélectionner les attributs de l’entité <hi rend="bold">Intervention</hi>, mais également ceux de l’entité <hi rend="bold">Site</hi>, du fait des données liées (cf. Fig. 55).</item>
+                    </list>
+                    <figure>
+                        <desc>Fig. 54. Création d’un filtre de recherche à facettes.</desc>
+                        <graphic url="introduction-a-heurist-54.png"/>
+                    </figure>
+                    <figure>
+                        <desc>Fig. 55. Construction du filtre de recherche à facettes.</desc>
+                        <graphic url="introduction-a-heurist-55.png"/>
+                    </figure>
+                    <p>Une fois les critères de filtre validés, une nouvelle fenêtre permet de personnaliser la manière de présenter les champs de recherche à facettes. Plusieurs possibilités sont offertes selon l’utilisation souhaitée, et ce, pour chaque champ/critère retenu :</p>
+                    <list type="unordered">
+                        <item>
+                            <emph>List</emph> présente une liste de l'ensemble des valeurs possibles d'un champ avec leur nombre d'occurrences</item>
+                        <item>
+                            <emph>Wrapped</emph> présente l'ensemble des valeurs d'un champ sous une forme plus concise</item>
+                        <item>
+                            <emph>Search</emph> permet la recherche par simple saisie textuelle</item>
+                        <item>
+                            <emph>Slider</emph> permet la navigation temporelle à l'aide de curseurs</item>
+                        <item>
+                            <emph>Dropdown</emph> propose une liste sous forme de liste déroulante</item>
+                    </list>
+                    <p>Par défaut, tous les champs textuels proposent une recherche par saisie textuelle. Lorsque le nombre de termes le permet, il est possible de proposer une liste ou une présentation plus concise. Modifiez les étiquettes pour les champs liés aux sites, conservez l'affichage par défaut pour chaque champ et validez.</p>
+                    <figure>
+                        <desc>Fig. 56. Modes d'affichage des filtres de champs.</desc>
+                        <graphic url="introduction-a-heurist-56.png"/>
+                    </figure>
+                    <p>Pour visualiser le résultat de notre filtre :</p>
+                    <list type="ordered">
+                        <item>Rendez-vous sur les filtres sauvegardés (<emph>saved filters</emph>) dans <emph>Explore</emph> ou bien dans <emph>Saved filters</emph> au bout de la barre de filtre</item>
+                        <item>Puis sélectionnez le filtre à facettes que nous venons de créer</item>
+                    </list>
+                    <figure>
+                        <desc>Fig. 57. Sélection du filtre à facettes précédemment créé.</desc>
+                        <graphic url="introduction-a-heurist-57.png"/>
+                    </figure>
+                    <figure>
+                        <desc>Fig. 58. Visualisation de la recherche à facettes.</desc>
+                        <graphic url="introduction-a-heurist-58.png"/>
+                    </figure>
+                    <p>Cette recherche à facettes peut être intégrée sur une page dans un autre site web. Cela se fait par des éléments HTML appelés <emph>iframe</emph>. Pour intégrer notre page web dans une page d'un autre site, tel qu'un article de blog Wordpress, il suffit de copier le code qui est affiché en cliquant sur <emph>Embed</emph> dans la liste des options du filtre de recherche à facettes, et de le coller dans l'éditeur de texte du site web.</p>
+                    <figure>
+                        <desc>Fig. 59. Intégration du filtre à facettes dans une page web.</desc>
+                        <graphic url="introduction-a-heurist-59.png"/>
+                    </figure>
+                    <p style="alert alert-warning">
+  Pour des questions de sécurité, certains systèmes de gestion de contenu (CMS) ou administrateurs de sites web bloquent la possibilité d'intégrer ces balises <i>iframe</i> ou restreignent leur utilisation. Rapprochez-vous de la personne administrant le site (webmestre) pour avoir plus d'informations.
+</p>
+                </div>
+                <div type="3">
+                    <head>Gérer les droits d'accès à vos ressources Heurist</head>
+                    <p>Par défaut, les données d'un enregistrement ne peuvent être modifiées que par le ou la propriétaire de la base et ne sont visibles que par les personnes connectées à Heurist.</p>
+                    <p>Pour modifier ces droits et rendre vos données accessibles publiquement, repassez en mode <emph>Explore</emph> et, dans la barre d’options figurant au-dessus de la liste des enregistrements, sélectionnez <emph>Ownership/Visibility</emph> dans le menu de gestion de partage.</p>
+                    <p>Définissez le périmètre de votre choix (ici, nous sélectionnons l'ensemble des enregistrements présents), les utilisateurs et utilisatrices ou les groupes ayant l'autorisation de modifier les données, et enfin, les personnes pouvant visualiser les données. Validez pour appliquer les modifications.</p>
+                    <p>Vous pouvez voir que les modifications ont bien été pris en compte en observant le changement de couleur du chiffre à gauche de chaque enregistrement.</p>
+                    <p>En déplaçant le curseur de la souris sur le chiffre ou sur le symbole barré juste à côté, vous obtenez des informations sur la visibilité et les droits d'édition de chaque enregistrement.</p>
+                </div>
+            </div>
+            <div type="2">
+                <head>Conclusion</head>
+                <p>Heurist est un outil en constante évolution depuis 2005, fonctionnellement très riche à destination de la communauté de recherche. Si son accès n'est pas réservé aux spécialistes en informatique, cette richesse fonctionnelle peut rendre son utilisation délicate pour des novices. Nous espérons que ce tutoriel permettra à un plus grand nombre d'utiliser ce logiciel pour répondre à leurs besoins.</p>
+                <p>L'utilisation avancée de certaines fonctionnalités peut toutefois nécessiter de l'aide extérieure. La rubrique <emph>Help</emph> est dédiée à cet usage.</p>
+                <p>Le site web <ref target="https://perma.cc/XVM4-Z7H2">heuristnetwork</ref> dispose également d'une page <ref target="https://perma.cc/E86L-ZGYU">
+                        <emph>Contact</emph>
+                    </ref> et d'une rubrique <ref target="https://heuristnetwork.org/tutorials/">
+                        <emph>Learn</emph>
+                    </ref> permettant de compléter le contenu du présent cours.</p>
+            </div>
+            <div type="2">
+                <head>Ressources utiles</head>
+                <div type="3">
+                    <head>Sur l'utilisation d'Heurist</head>
+                    <list type="unordered">
+                        <item>Heurist, « Help System », consulté le 1er avril 2022, <ref target="https://heuristplus.sydney.edu.au/heurist/?db=Heurist_Help_System&amp;website&amp;id=39&amp;pageid=622">https://heuristplus.sydney.edu.au/heurist/?db=Heurist_Help_System&amp;website&amp;id=39&amp;pageid=622</ref>. Cette ressource (en anglais) est régulièrement augmentée et à consulter sans modération.</item>
+                        <item>Ian Johnson, « Concevoir et collaborer sur des bases de données sans réinventer la roue », 22 janvier 2021, Université de Haute-Alsace (plateforme vidéos), consulté le 1er avril 2022 <ref target="https://perma.cc/8YDX-NUED">https://e-diffusion.uha.fr/video/3668-j1-ian-johnson-conference-inaugurale/</ref>.</item>
+                        <item>Universalistes par RENATER, « Heurist Utilisateurs », liste de diffusion, page consultée le 1er avril 2022, <ref target="https://perma.cc/K398-B6WT">https://groupes.renater.fr/sympa/info/heurist-utilisateurs</ref>.</item>
+                        <item>Un autre tutoriel sur Heurist rédigé par Régis Witz, ingénieur d'études à la <ref target="https://perma.cc/4Q7E-KMQY">Maison Interuniverstaire des Sciences de l’Homme – Alsace (MISHA)</ref> : Régis Witz, « Créer sa base de données avec Heurist », (2021), <ref target="https://doi.org/10.5281/zenodo.6243955">https://doi.org/10.5281/zenodo.6243955</ref>.</item>
+                    </list>
+                </div>
+                <div type="3">
+                    <head>Sur la gestion des données de la recherche</head>
+                    <list type="unordered">
+                        <item>James Baker, <ref target="/fr/lecons/preserver-ses-donnees-de-recherche">« Préserver ses données de recherche »</ref>, traduction par Anne-Sophie Bessero-Lagarde, <emph>Programming Historian en français 2</emph> (2020) <ref target="https://doi.org/10.46430/phfr0009">https://doi.org/10.46430/phfr0009</ref>.</item>
+                        <item>Urfist Méditerranée, « Format Ouvert ou Fermé », <emph>DoRANum</emph>, 21 février 2017 (mis á jour le 9 octobre 2020), consulté le 1er avril 2022, <ref target="https://perma.cc/AGP7-HC2R">https://doranum.fr/stockage-archivage/quiz-format-ouvert-ou-ferme/</ref>.</item>
+                        <item>Centre Informatique National de l’Enseignement Supérieur (CINES), « FACILE - Service de validation de formats », consulté le 1er avril 2022, <ref target="https://perma.cc/U29L-FV6H">https://facile.cines.fr/</ref>.</item>
+                    </list>
+                </div>
+            </div>
+            <div type="2">
+                <head>Notes</head>
+                <p>
+                    <note xml:id="note_Remerciements"> Que je remercie tout particulièrement pour la relecture, les conseils et les corrections apportés à la présente leçon.</note>
+                    <ref type="footnotemark" target="#note_5"/> : À ce sujet, lire l'article : Paris Time Machine, « Heurist, une base de données généraliste pour les sciences humaines et sociales », sans date, consulté le 1 avril 2022, <ref target="https://perma.cc/M57X-CQZ2">https://paris-timemachine.huma-num.fr/heurist-une-base-de-donnees-generique-pour-les-sciences-humaines-et-sociales/</ref>.
+<note xml:id="note_coursMerise"> Pour en savoir plus : Idris Neumann, « Initiation à la conception de bases de données relationnelles avec MERISE », 28 février 2012 (mis á jour le 15 juin 2019), consulté le 1er avril 2022, <ref target="https://perma.cc/8YGP-L2GV">https://ineumann.developpez.com/tutoriels/merise/initiation-merise/</ref>.</note>
+                    <note xml:id="note_QGIS"> Pour aller plus loin avec QGIS, voir la leçon qui lui est dédiée sur <emph>Programming Historian</emph> en anglais : Justin Colson, <ref target="/en/lessons/geocoding-qgis">« Geocoding Historical Data using QGIS »</ref>, <emph>Programming Historian 6</emph> (2017), <ref target="https://doi.org/10.46430/phen0066">https://doi.org/10.46430/phen0066</ref>.</note>
+                    <note xml:id="note_FAIR"> Voir les principes des données FAIR : « Fair data », Wikipédia, mis á jour le 19 septembre 2021, consulté le 1er avril 2022, <ref target="https://perma.cc/6HBY-PUXB">https://fr.wikipedia.org/wiki/Fair_data</ref>.</note>
+                    <note xml:id="note_5StarOpenData"> Pour en savoir plus : World Wide Web Consortium (W3C), « 5 Star Linked Data », mis á jour le 15 mars 2013, consulté le 1er avril 2022, <ref target="https://perma.cc/Q9LV-H7Q6">https://www.w3.org/2011/gld/wiki/5_Star_Linked_Data</ref>.</note>
+                    <note xml:id="note_Smarty"> Pour aller plus loin, voir : Éric Pommereau, « Initiation aux templates en PHP avec Smarty », 2008, consulté le 1er avril 2022, <ref target="https://perma.cc/MZ6W-ZDEV">https://eric-pommereau.developpez.com/tutoriels/initiation-smarty/?page=introduction</ref>.</note>
+                </p>
+            </div>
+        </body>
+    </text>
+</TEI>
