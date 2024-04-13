@@ -788,10 +788,11 @@ if __name__ == '__main__':
     regexp = rf"/home/mgl/Bureau/Travail/PH/jekyll/(es|fr|en|pt)/l[^/]*/[^/]*\.md"
     lessons = [f for f in glob.glob(f"/home/mgl/Bureau/Travail/PH/jekyll/*/l*/{target_lesson}.md") if
                re.search(regexp, f)]
-    print(len(lessons))
+    # Those two lessons break the script because of tei elements they have.
     lessons = [lesson for lesson in lessons if lesson != "/home/mgl/Bureau/Travail/PH/jekyll/es/lecciones/introduccion-a-tei-1.md"]
-    lessons = [lesson for lesson in lessons if lesson != "/home/mgl/Bureau/Travail/PH/jekyll/pt/licoes/introducao-codificacao-textos-tei-1.md"]
-    print(len(lessons))
+    lessons = [lesson for lesson in lessons if lesson != "/home/mgl/Bureau/Travail/PH/jekyll/pt/licoes/introducao" \
+                                                         "-codificacao-textos-tei-1.md"] 
+    
     # Removing log file
     try:
         os.remove("logs/log.txt")
