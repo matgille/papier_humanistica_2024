@@ -1,13 +1,11 @@
 import tqdm
 from gliner import GLiNER
-import glob
 import sys
 model = GLiNER.from_pretrained("urchade/gliner_base")
 
-labels = ["technical term"]
+labels = ["technical term", "methodological"]
 # f"/home/mgl/Bureau/Travail/PH/jekyll/{lang}/*/*.md"
 files = sys.argv[1:]
-concat_lessons = ""
 entities = []
 print(files)
 for file in tqdm.tqdm(files):
