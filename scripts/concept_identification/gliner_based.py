@@ -6,7 +6,7 @@ model = GLiNER.from_pretrained("urchade/gliner_base")
 
 labels = ["technical term"]
 # f"/home/mgl/Bureau/Travail/PH/jekyll/{lang}/*/*.md"
-files = glob.glob(sys.argv[1:])
+files = sys.argv[1:]
 concat_lessons = ""
 entities = []
 print(files)
