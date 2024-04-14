@@ -9,6 +9,7 @@ labels = ["technical term"]
 files = glob.glob(sys.argv[1])
 concat_lessons = ""
 entities = []
+print(files)
 for file in tqdm.tqdm(files):
     with open(file, "r") as indiv_file:
         lesson = indiv_file.read()
