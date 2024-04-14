@@ -1,0 +1,346 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="extrair-paginas-ilustradas-com-python" xml:base="extrair-paginas-ilustradas-com-python/extrair-paginas-ilustradas-com-python.xml">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Extrair Páginas Ilustradas de Bibliotecas Digitais com Python</title>
+                <author role="original_author">Stephen Krewson</author>
+                <editor role="reviewers">
+                    <persName>Catherine DeRose</persName>
+                    <persName>Taylor Arnold</persName>
+                </editor>
+                <author role="translators">João Domingues Pereira</author>
+                <editor role="translation-reviewers">
+                    <persName>Felipe Lamarca</persName>
+                    <persName>Salete Farias</persName>
+                </editor>
+                <editor role="editors">Anandi Silva Knuppel</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">05/03/2023</date>
+                <idno type="doi">10.46430/phpt0040</idno>
+                <date type="published">01/14/2019</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#extracting-illustrated-pages"/>.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>A aprendizagem de máquina e as extensões de API do HathiTrust e do Internet Archive estão a tornar mais fácil a extração de regiões de página com interesse visual de volumes digitalizados. Esta lição mostra como extrair eficientemente essas regiões e, ao fazê-lo, como fomentar novas questões sobre a pesquisa visual.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">api</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <div type="2" n="1">
+                <head>Visão Geral</head>
+                <p>E se só quisesse ver as imagens num livro? Este é um pensamento que já ocorreu tanto a jovens crianças como a pesquisadores adultos. Se soubesse que o livro está disponível através duma biblioteca digital, seria útil fazer o <emph>download</emph> somente das páginas com imagens e ignorar o resto.</p>
+                <p>Aqui estão as miniaturas de página dum volume do HathiTrust com o identificador exclusivo <code rend="inline">osu.32435078698222</code>. Após o processo descrito nesta lição, apenas as páginas com imagens (31 no total) foram baixadas como JPEGs para uma pasta.</p>
+                <figure>
+                    <desc>Visualização dum volume para o qual só as páginas com imagens foram baixadas.</desc>
+                    <figDesc>Imagem com a apresentação das páginas de um livro que contêm imagens</figDesc>
+                    <graphic url="file-explorer-example.png"/>
+                </figure>
+                <p>Para ver quantas páginas <emph>não ilustradas</emph> foram filtradas, compare com o <ref target="https://babel.hathitrust.org/cgi/pt?id=osu.32435078698222%3Bview=thumb%3Bseq=1">conjunto total de miniaturas</ref> para todas as 148 páginas nesta edição revisada de 1845 do livro infantil <emph>bestseller</emph> de Samuel Griswold Goodrich, <emph>The Tales of Peter Parley About America</emph> (1827).</p>
+                <figure>
+                    <desc>Visualização das miniaturas do HathiTrust para todas as páginas.</desc>
+                    <figDesc>Imagem com a visualização de todas as miniaturas das páginas de um livro</figDesc>
+                    <graphic url="parley-full-thumbnails.png"/>
+                </figure>
+                <p>Esta lição mostra como completar estas etapas de filtragem e de <emph>download</emph> para volumes de texto em domínio público detidos pelo HathiTrust (HT) e pelo Internet Archive (IA), duas das maiores bibliotecas digitais no mundo. Será do interesse de qualquer um que deseje criar coleções de imagens com o fim de aprender sobre a História da Ilustração e o <emph>layout</emph> (<emph>mise en page</emph>) dos livros. As abordagens visuais à bibliografia digital estão a tornar-se populares, seguindo os esforços pioneiros do <ref target="https://perma.cc/3QYS-XNSF">EBBA</ref> e do <ref target="https://perma.cc/SH49-K56K">Aida</ref>. Projetos recentemente concluídos ou financiados exploram maneiras de <ref target="https://web.archive.org/web/20190526050917/http://culturalanalytics.org/2018/12/detecting-footnotes-in-32-million-pages-of-ecco/">identificar notas de rodapé</ref> e de <ref target="https://perma.cc/QB4J-55GU">rastrear notas de margem de página</ref>, para dar só dois <ref target="https://perma.cc/9RC2-PJBL">exemplos</ref>.</p>
+                <p>A minha própria pesquisa tenta responder a questões empíricas sobre alterações na frequência e modo de ilustração em textos médicos e educacionais do século dezanove. Isto envolve agregar múltiplas imagens por livro e tentar estimar que processo de impressão foi usado para fazer tais imagens. Um caso de uso mais direcionado para a extração de páginas ilustradas pode ser a catalogação de ilustrações ao longo de <ref target="https://perma.cc/2FCU-YW6D">diferentes edições</ref> do mesmo livro. Trabalhos futuros poderão investigar com sucesso as características visuais e o <emph>significado</emph> das imagens extraídas: a sua cor, o seu tamanho, o seu tema, o seu género, o número de figuras e assim por diante.</p>
+                <p>Como obter informação <emph>localizada</emph> sobre regiões visuais de interesse está para além do âmbito desta lição, visto que o processo envolve uma quantidade significativa de aprendizagem de máquina. No entanto, a classificação sim/não de páginas com (ou sem) imagens é um primeiro passo prático para reduzir o enorme volume de <emph>todas</emph> as páginas para cada livro numa coleção visada, tornando viável a localização de ilustrações. Para dar um ponto de referência, os textos médicos do século dezanove contêm (em média) ilustrações em 1-3% das suas páginas. Se estiver a tentar estudar a ilustração no interior dum <emph>corpus</emph> duma biblioteca digital sobre o qual não tem qualquer informação preexistente, é, consequentemente, razoável assumir que 90+% das páginas nesse <emph>corpus</emph> NÃO estarão ilustradas.</p>
+                <p>O HT e o IA permitem que a questão com imagens/sem imagens seja respondida indiretamente através da análise dos dados gerados pelo <emph>software</emph>
+                    <emph>optical character recognition</emph> (OCR) ou reconhecimento ótico de caracteres, em português (o OCR é aplicado após um volume físico ser digitalizado com o objetivo de gerar uma transcrição do texto muitas vezes desordenada). Aproveitar o resultado do <emph>output</emph> do OCR para encontrar páginas ilustradas foi proposto primeiramente por Kalev Leetaru numa <ref target="https://perma.cc/3J79-4QA6">colaboração de 2014</ref> com o Internet Archive e o Flickr. Esta lição transfere a abordagem de Leetaru para o HathiTrust e tira proveito de bibliotecas de processamento de XML mais rápidas no Python, bem como da gama recentemente ampliada de formatos de ficheiro de imagem do IA.</p>
+                <p>Uma vez que o HT e o IA expõem a sua informação derivada do OCR de maneiras ligeiramente diferentes, eu irei adiar a apresentação dos detalhes das "características visuais" de cada biblioteca para as suas secções respetivas.</p>
+            </div>
+            <div type="2" n="2">
+                <head>Objetivos</head>
+                <p>No final da lição, o leitor será capaz de:</p>
+                <list type="unordered">
+                    <item>Configurar a versão "mínima" da distribuição Anaconda do Python (Miniconda) e criar um ambiente;</item>
+                    <item>Salvar e iterar sobre uma lista de IDs de volumes do HT ou do IA gerados por uma pesquisa;</item>
+                    <item>Acessar aos <emph>application programming interfaces</emph> (APIs) ou interfaces de programação de aplicações, em português, de dados do HT e do IA através das bibliotecas do Python;</item>
+                    <item>Encontrar características visuais ao nível da página;</item>
+                    <item>Fazer o <emph>download</emph> dos JPEGs de páginas programaticamente.</item>
+                </list>
+                <p>O grande objetivo é fortalecer as competências de coleta e exploração de dados ao criar um <emph>corpus</emph> de ilustração histórica. Combinar dados de imagem com os metadados dum volume permite a formulação de questões de pesquisa promissoras sobre a mudança visual ao longo do tempo.</p>
+            </div>
+            <div type="2" n="3">
+                <head>Requisitos</head>
+                <p>Os requisitos de <emph>software</emph> desta lição são mínimos: o acesso a uma máquina executando um sistema operacional padrão e um navegador de internet. O Miniconda está disponível em duas versões de 32 e de 64 <emph>bits</emph> para Windows, macOS e Linux. O Python 3 é a versão estável atual da linguagem e será suportado indefinidamente<ref type="footnotemark" target="#pt_note_1"/>.</p>
+                <p>Este tutorial assume um conhecimento básico da linha de comando e da linguagem de programação Python. O leitor deve compreender as convenções para comentários e comandos num tutorial baseado num <emph>shell</emph>. Eu recomendo a <ref target="/en/lessons/intro-to-bash">
+                        <emph>Introduction to the Bash Command Line</emph>
+                    </ref>, de Ian Milligan e James Baker, para aprender ou para rever as suas competências com a linha de comando.</p>
+            </div>
+            <div type="2" n="4">
+                <head>Configuração</head>
+                <div type="3" n="4.1">
+                    <head>Dependências</head>
+                    <p>Os leitores mais experientes podem querer simplesmente instalar as dependências e executar os <emph>notebooks</emph> nos seus ambientes de escolha. Mais informações sobre a minha própria configuração do Miniconda (e algumas diferenças entre o Windows e o *nix) são providenciadas.</p>
+                    <quote>
+                        <p>
+                            <hi rend="bold">Nota de tradução</hi>: Para instalar as dependências, altere o seu diretório de trabalho para a pasta onde se encontra instalado o Python executando o comando <code rend="inline">cd</code> e, depois, digite o comando <code rend="inline">pip install</code> ou <code rend="inline">pip3 install</code> acompanhado pelas seguintes linhas:</p>
+                    </quote>
+                    <list type="unordered">
+                        <item>
+                            <code rend="inline">hathitrust-api</code> ou <code rend="inline">hathitrust_api</code> (<ref target="https://github.com/rlmv/hathitrust-api">Documentos de Instalação</ref>);</item>
+                        <item>
+                            <code rend="inline">internetarchive</code> (<ref target="https://archive.org/services/docs/api/internetarchive/">Documentos de Instalação</ref>);</item>
+                        <item>
+                            <code rend="inline">jupyter</code> (<ref target="https://jupyter.org/install">Documentos de Instalação</ref>);</item>
+                        <item>
+                            <code rend="inline">requests</code> (<ref target="https://requests.readthedocs.io/en/latest/user/install/#install">Documentos de Instalação</ref>) [o criador recomenda a instalação do<code rend="inline">pipenv</code>; para a instalação do <code rend="inline">pip</code>, veja <ref target="https://pypi.org/project/requests2/">PyPI</ref>].</item>
+                    </list>
+                </div>
+                <div type="3" n="4.2">
+                    <head>Ficheiros da Lição</head>
+                    <p>Faça o <emph>download</emph> desta <ref target="/assets/extracting-illustrated-pages/lesson-files.zip">pasta comprimida</ref> que contém dois <emph>Jupyter notebooks</emph>, um para cada uma das bibliotecas digitais. A pasta também contém um ficheiro de metadados JSON de amostra descrevendo uma coleção do HathiTrust. Descomprima e confirme que os seguintes ficheiros estão presentes: <code rend="inline">554050894-1535834127.json</code>, <code rend="inline">hathitrust.ipynb</code> e <code rend="inline">internetarchive.ipynb</code>.</p>
+                    <p style="alert alert-warning">
+Todos os comandos subsequentes assumem que o seu diretório de trabalho atual é a pasta que contém os ficheiros da lição.
+</p>
+                    <div type="4" n="4.2.1">
+                        <head>Destino do <emph>Download</emph>
+                        </head>
+                        <p>Aqui está o diretório predefinido que será criado assim que todas as células em ambos os <emph>notebooks</emph> tiverem sido executadas (como providenciado). Depois de obter uma lista de quais páginas num volume contêm imagens, as funções de <emph>download</emph> do HT e do IA solicitam essas páginas como JPEGs (nomeadas pelo número de página) e arquivam-nas em subdiretórios (nomeados pelo ID do item). É claro que o leitor pode usar diferentes listas de volumes ou mudar o destino <code rend="inline">out_dir</code> para algo que não <code rend="inline">items</code>.</p>
+                        <ab>
+                            <code xml:id="code_extrair-paginas-ilustradas-com-python_0" corresp="code_extrair-paginas-ilustradas-com-python_0.txt" rend="block"/>
+                        </ab>
+                        <p>As funções de <emph>download</emph> são lentas; se executar os <emph>notebooks</emph> novamente, com o diretório <code rend="inline">items</code> similar ao que se apresenta em cima, qualquer item que já tenha a sua própria subpasta será ignorado.</p>
+                    </div>
+                </div>
+                <div type="3" n="4.3">
+                    <head>Anaconda (Opcional)</head>
+                    <p>A Anaconda é a principal distribuição científica do Python. O seu gerenciador de pacotes <code rend="inline">conda</code> permite-lhe instalar bibliotecas como a <code rend="inline">numpy</code> e a <code rend="inline">tensorflow</code> com facilidade. A versão "Miniconda" não é acompanhada por quaisquer pacotes supérfluos pré-instalados, o que incentiva o leitor a manter o seu ambiente de base limpo e a instalar apenas o que necessita para um projeto dentro dum ambiente nomeado.</p>
+                    <p>Faça o <emph>download</emph> e instale o <ref target="https://conda.io/miniconda.html">Miniconda</ref>. Escolha a versão estável mais recente do Python 3. Se tudo correr bem, o leitor conseguirá executar <code rend="inline">which conda</code> (no Linux/macOS) ou <code rend="inline">where conda</code> (no Windows) no seu <emph>shell</emph> e ver a localização do programa executável no <emph>output</emph>.</p>
+                    <p>A Anaconda tem uma <ref target="http://web.archive.org/web/20190115051900/https://conda.io/docs/_downloads/conda-cheatsheet.pdf">
+                            <emph>cheat sheet</emph>
+                        </ref> ou folha de dicas, em português, útil para comandos de uso frequente.</p>
+                    <div type="4" n="4.3.1">
+                        <head>Criar um Ambiente</head>
+                        <p>Os ambientes, entre outras coisas, ajudam a controlar a complexidade associada ao uso de múltiplos gerenciadores de pacotes em conjunto. Nem todas as bibliotecas do Python podem ser instaladas através do <code rend="inline">conda</code>. Em alguns casos, nós recorreremos ao gestor de pacote padrão do Python, o <code rend="inline">pip</code> (ou alterações planejadas, como o <code rend="inline">pipenv</code>). No entanto, quando o fizermos, nós usaremos uma versão do <code rend="inline">pip</code> instalada através do <code rend="inline">conda</code>. Isto mantém todos os pacotes que nós precisamos para o projeto no mesmo espaço virtual.</p>
+                        <ab>
+                            <code lang="language-bash" xml:id="code_extrair-paginas-ilustradas-com-python_1" corresp="code_extrair-paginas-ilustradas-com-python_1.txt" rend="block"/>
+                        </ab>
+                        <p>Agora nós criamos um ambiente nomeado, configuramo-lo para usar Python 3, e ativamo-lo.</p>
+                        <ab>
+                            <code lang="language-bash" xml:id="code_extrair-paginas-ilustradas-com-python_2" corresp="code_extrair-paginas-ilustradas-com-python_2.txt" rend="block"/>
+                        </ab>
+                        <ab>
+                            <code lang="language-bash" xml:id="code_extrair-paginas-ilustradas-com-python_3" corresp="code_extrair-paginas-ilustradas-com-python_3.txt" rend="block"/>
+                        </ab>
+                        <p>Para sair dum ambiente, execute <code rend="inline">source deactivate</code> no Linux/macOS ou <code rend="inline">deactivate</code> no Windows. Mas certifique-se que permanece no ambiente <code rend="inline">extract-pages</code> durante o decorrer da lição!</p>
+                    </div>
+                    <div type="4" n="4.3.2">
+                        <head>Instalar os Pacotes do Conda</head>
+                        <p>Nós podemos usar o <code rend="inline">conda</code> para instalar os nossos primeiros pacotes. Todos os outros pacotes necessários (gzip, JSON, os, sys e time) fazem parte da <ref target="https://docs.python.org/3/library/">biblioteca padrão do Python</ref>. Note como nós precisamos de especificar um canal em alguns casos. O leitor pode pesquisar por pacotes no <ref target="https://anaconda.org/">Anaconda Cloud</ref>.</p>
+                        <ab>
+                            <code lang="language-bash" xml:id="code_extrair-paginas-ilustradas-com-python_4" corresp="code_extrair-paginas-ilustradas-com-python_4.txt" rend="block"/>
+                        </ab>
+                        <p>O Jupyter tem muitas dependências (outros pacotes dos quais depende), por isso esta etapa pode exigir alguns minutos. Recorde-se que quando o <code rend="inline">conda</code> lhe pergunta se deseja continuar com a instalação por via da questão <code rend="inline">Proceed ([y]/n)?</code>, o leitor deve digitar um <code rend="inline">y</code> ou um <code rend="inline">yes</code> e, depois, pressionar <emph>Enter</emph> para aceitar a instalação do pacote.</p>
+                        <p style="alert alert-warning">
+Nos bastidores, o <code rend="inline">conda</code> está a trabalhar para certificar-se que todos os pacotes e dependências necessários serão instalados numa maneira compatível.
+</p>
+                    </div>
+                    <div type="4" n="4.3.3">
+                        <head>Instalar Pacotes do Pip</head>
+                        <p>Se estiver a usar um ambiente <code rend="inline">conda</code>, é melhor usar a versão local do <code rend="inline">pip</code>. Confirme que os seguintes comandos dão como resultado do <emph>output</emph> um programa cujo caminho absoluto contém algo como <code rend="inline">/Miniconda/envs/extract-pages/Scripts/pip</code>.</p>
+                        <ab>
+                            <code lang="language-bash" xml:id="code_extrair-paginas-ilustradas-com-python_5" corresp="code_extrair-paginas-ilustradas-com-python_5.txt" rend="block"/>
+                        </ab>
+                        <ab>
+                            <code lang="language-bash" xml:id="code_extrair-paginas-ilustradas-com-python_6" corresp="code_extrair-paginas-ilustradas-com-python_6.txt" rend="block"/>
+                        </ab>
+                        <p>Se vir duas versões do <code rend="inline">pip</code> no <emph>output</emph> em cima, certifique-se de digitar o caminho absoluto para a versão do ambiente <emph>local</emph> ao instalar as bibliotecas <emph>wrapper</emph> da API.</p>
+                        <ab>
+                            <code lang="language-bash" xml:id="code_extrair-paginas-ilustradas-com-python_7" corresp="code_extrair-paginas-ilustradas-com-python_7.txt" rend="block"/>
+                        </ab>
+                        <ab>
+                            <code lang="language-bash" xml:id="code_extrair-paginas-ilustradas-com-python_8" corresp="code_extrair-paginas-ilustradas-com-python_8.txt" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+                <div type="3" n="4.4">
+                    <head>
+                        <emph>Jupyter Notebooks</emph>
+                    </head>
+                    <p>O <ref target="/en/lessons/text-mining-with-extracted-features#start-a-notebook">
+                            <emph>Text Mining in Python Through the HTRC Feature Reader</emph>
+                        </ref>, de Peter Organisciak e Boris Capitanu, explica os benefícios dos <emph>notebooks</emph> para o desenvolvimento e a exploração de dados. Também contém informação útil sobre como executar eficazmente as células. Visto que nós instalámos a versão minimalista da Anaconda, nós precisamos de iniciar o Jupyter a partir da linha de comandos. No seu <emph>shell</emph> (a partir do interior da pasta contendo os ficheiros da lição) execute <code rend="inline">jupyter notebook</code>.</p>
+                    <p>Isto executará o servidor do <emph>notebook</emph> no seu <emph>shell</emph> e iniciará o seu navegador de internet predefinido com a página inicial do Jupyter<ref type="footnotemark" target="#pt_note_2"/>. A página inicial mostra todos os ficheiros no diretório de trabalho atual.</p>
+                    <figure>
+                        <desc>A página inicial do Jupyter mostrando os ficheiros da lição.</desc>
+                        <figDesc>Imagem com a apresentação da estrutura de ficheiros da página inicial do Jupyter</figDesc>
+                        <graphic url="jupyter-home.png"/>
+                    </figure>
+                    <p style="alert alert-warning">
+No seu shell, certifique-se que usou o comando <code rend="inline">cd</code> para ir até ao diretório descomprimido <code rend="inline">lesson-files</code>.
+</p>
+                    <p>Clique nos <emph>notebooks</emph>
+                        <code rend="inline">hathitrust.ipynb</code> e <code rend="inline">internetarchive.ipynb</code> para abri-los em novas abas do navegador de internet. A partir daqui, nós não precisamos de executar qualquer comando no <emph>shell</emph>. Os <emph>notebooks</emph> permitem-nos executar o código Python e ter acesso total ao sistema de pastas do computador. Quando o leitor tiver terminado, pode parar o servidor do <emph>notebook</emph> carregando em "<emph>Quit</emph>" na página inicial do Jupyter ou executando <code rend="inline">ctrl+c</code> no <emph>shell</emph>.</p>
+                </div>
+            </div>
+            <div type="2" n="5">
+                <head>HathiTrust</head>
+                <div type="3" n="5.1">
+                    <head>Acesso à API</head>
+                    <p>O leitor precisa efetuar um registro no HathiTrust antes de usar o API de dados. Dirija-se ao <ref target="https://babel.hathitrust.org/cgi/kgs/request">portal de registro</ref> e preencha o seu nome, a sua organização e o seu e-mail para requerer chaves de acesso. O leitor deverá receber uma resposta no e-mail dentro de cerca dum minuto (<hi rend="bold">nota de tradução</hi>: verifique também a caixa de <emph>spam</emph>). Clique no link, que o trará a uma página temporária com ambas as chaves exibidas.</p>
+                    <p>No <emph>notebook</emph>
+                        <code rend="inline">hathitrust.ipynb</code>, examine a primeira célula (mostrada em baixo). Preencha as suas chaves da API como indicado. Depois, execute a célula clicando em "<emph>Run</emph>" na barra de navegação do <emph>notebook</emph>.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_extrair-paginas-ilustradas-com-python_9" corresp="code_extrair-paginas-ilustradas-com-python_9.txt" rend="block"/>
+                    </ab>
+                    <p style="alert alert-warning">
+Cuidado! Não exponha as suas chaves de acesso através dum repositório público no GitHub (ou outro <emph>host</emph> de controle de versões). Elas serão pesquisáveis por qualquer outra pessoa. Uma boa prática para um projeto Python é a de armazenar as suas chaves de acesso como variáveis de ambiente ou salvá-las num ficheiro que não é <emph>versionado</emph>.
+</p>
+                </div>
+                <div type="3" n="5.2">
+                    <head>Criar uma Lista de Volumes</head>
+                    <p>O HT permite a qualquer um fazer uma coleção de itens—o leitor nem sequer tem que estar na sua conta! No entanto, o leitor deveria registrar uma conta se quiser salvar a sua lista de volumes. Siga as <ref target="https://babel.hathitrust.org/cgi/mb?colltype=updated">instruções</ref> para fazer algumas pesquisas no texto completo e para, depois, adicionar resultados escolhidos a uma coleção. Atualmente, o HathiTrust não tem uma API de pesquisa pública para adquirir volumes programaticamente; o leitor precisa de pesquisar através da sua <emph>interface</emph> da internet.</p>
+                    <p>Ao atualizar uma coleção, o HT mantém o rastro dos metadados associados para cada item nela. Eu incluí nos ficheiros da lição os metadados para uma lição de amostra no formato JSON. Se quisesse usar o ficheiro da sua própria coleção do HT, o leitor navegaria até à página das suas coleções e colocaria o cursor do <emph>mouse</emph> sobre o link dos metadados à esquerda para revelar a opção para fazer o <emph>download</emph> como JSON, como observado na seguinte captura de tela.</p>
+                    <figure>
+                        <desc>Captura de tela de como fazer o *download* dos metadados de coleções no formato JSON.</desc>
+                        <figDesc>Imagem de uma página web do site HathiTrust com instruções para download de metadados de ficheiros JSON</figDesc>
+                        <graphic url="download-ht-json.png"/>
+                    </figure>
+                    <p>Assim que o leitor tiver feito o <emph>download</emph> do ficheiro JSON, basta movê-lo para o diretório onde colocou os <emph>Jupyter notebooks</emph>. Substitua o nome do ficheiro JSON no <emph>notebook</emph> do HT com o nome do ficheiro da sua coleção.</p>
+                    <p>O <emph>notebook</emph> mostra como usar <emph>list comprehension</emph> para obter todas as <emph>strings</emph>
+                        <code rend="inline">htitem_id</code> dentro do objeto <code rend="inline">gathers</code> que contem todas as informações da coleção.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_extrair-paginas-ilustradas-com-python_10" corresp="code_extrair-paginas-ilustradas-com-python_10.txt" rend="block"/>
+                    </ab>
+                    <p style="alert alert-warning">
+Os tutoriais normalmente mostram-lhe como processar um item de exemplo (muitas vezes de tamanho ou complexidade trivial). Isto é pedagogicamente conveniente, mas significa que o leitor está menos equipado para aplicar esse código a múltiplos itens—de longe o caso de uso mais comum. Nos <emph>notebooks</emph>, o leitor verá como encapsular transformações aplicadas a um item em <emph>funções</emph> que podem ser usadas num <emph>loop</emph> sobre uma coleção de itens.
+</p>
+                </div>
+                <div type="3" n="5.3">
+                    <head>Característica Visual: IMAGE_ON_PAGE</head>
+                    <p>Dada uma lista de volumes, nós queremos explorar que características visuais eles têm ao nível da página. A <ref target="https://perma.cc/Y6UU-G9HZ">documentação mais recente</ref> (2015) para o API de dados descreve um objeto metadados chamado <code rend="inline">htd:pfeat</code> nas páginas 9-10. <code rend="inline">htd:pfeat</code> é a abreviação para "HathiTrust Data API: Page Features".</p>
+                    <quote>
+                        <list type="unordered">
+                            <item>
+                                <code rend="inline">htd:pfeat</code>­ - the page feature key (if available):<list type="unordered">
+                                    <item>CHAPTER_START</item>
+                                    <item>COPYRIGHT</item>
+                                    <item>FIRST_CONTENT_CHAPTER_START</item>
+                                    <item>FRONT_COVER</item>
+                                    <item>INDEX</item>
+                                    <item>REFERENCES</item>
+                                    <item>TABLE_OF_CONTENTS</item>
+                                    <item>TITLE</item>
+                                </list>
+                            </item>
+                        </list>
+                    </quote>
+                    <p>O que o <emph>wrapper</emph>
+                        <code rend="inline">hathitrust-api</code> faz é disponibilizar os metadados completos para um volume do HT como um objeto Python. Dado o identificador dum volume, nós podemos pedir os seus metadados e, depois, fazer o <emph>drill down</emph> através da <emph>sequência</emph> de páginas até à informação ao nível da página. A <emph>lista</emph>
+                        <code rend="inline">htd:pfeat</code> está associada com cada página num volume e, em teoria, contém todas as características que se aplicam a essa página. Na prática, existem mais algumas <emph>tags</emph> de características do que as oito listadas em cima. Aquela com a qual nós iremos trabalhar chama-se <code rend="inline">IMAGE_ON_PAGE</code> e é mais abstratamente visual que <emph>tags</emph> estruturais como <code rend="inline">CHAPTER_START</code>.</p>
+                    <p>Tom Burton-West, um bibliotecário pesquisador na biblioteca da <emph>University of Michigan</emph>, trabalha em estreita colaboração com o HathiTrust e o HTRC, o Centro de Pesquisa do HathiTrust. O Tom disse-me por e-mail que o HathiTrust recebe a informação <code rend="inline">htd:pfeat</code> via o Google, com o qual trabalham proximamente desde a fundação do HT, em 2008. Um contacto no Google deu permissão ao Tom para partilhar o seguinte:</p>
+                    <quote>
+                        <p>Estas <emph>tags</emph> são derivadas duma combinação de Heurística, de aprendizagem de máquina e de anotação humana.</p>
+                    </quote>
+                    <p>Um exemplo heurístico pode ser o facto do primeiro elemento na sequência de páginas do volume ser quase sempre a <code rend="inline">FRONT_COVER</code>. A aprendizagem de máquina pode ser usada para treinar modelos a discriminar, digamos, entre dados de imagem que são mais típicos das linhas de prosa numa escrita ocidental ou das linhas numa gravura. A anotação humana é a atribuição manual de etiquetas a imagens. A habilidade de ver as ilustrações dum volume nos bancos de dados do EEBO e do ECCO é um exemplo de anotação humana.</p>
+                    <p>O uso da "aprendizagem de máquina" pelo Google parece um pouco misterioso. Até o Google publicitar os seus métodos, é impossível saber todos os detalhes. No entanto, é provável que as <emph>tags</emph>
+                        <code rend="inline">IMAGE_ON_PAGE</code> tenham sido propostas pela primeira vez após a deteção de blocos de "Imagens" nos ficheiros de <emph>output</emph> do OCR (um processo discutido em baixo, na secção do Internet Archive). Mais filtragem pode, então, ser aplicada.</p>
+                </div>
+                <div type="3" n="5.4">
+                    <head>Passo a Passo Para o Código</head>
+                    <div type="4" n="5.4.1">
+                        <head>Encontrar as imagens</head>
+                        <p>Nós vimos como criar uma lista de volumes e observámos que a API de dados pode ser usada para obter objetos metadados contendo características experimentais ao nível da página. A função essencial no <emph>notebook</emph> do HT tem a assinatura digital <code rend="inline">ht_picture_download(item_id, out_dir=None)</code>. Dado um identificador exclusivo e um diretório de destino opcional, esta função irá, em primeiro lugar, obter os metadados do volume a partir da API e convertê-los num formato JSON. Depois, percorre a sequência de páginas e verifica se a <emph>tag</emph>
+                            <code rend="inline">IMAGE_ON_PAGE</code> está na lista <code rend="inline">htd:pfeat</code> (se a mesma existir).</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_extrair-paginas-ilustradas-com-python_11" corresp="code_extrair-paginas-ilustradas-com-python_11.txt" rend="block"/>
+                        </ab>
+                        <p>Note que nós precisamos de fazer o <emph>drill down</emph> por vários níveis até ao objeto do nível de topo para obter o objeto <code rend="inline">htd:seq</code>, sobre o qual nós podemos iterar.</p>
+                        <p>As duas exceções que eu quero evitar são o <code rend="inline">KeyError</code>, que ocorre quando a página não tem qualquer característica ao nível da página a si associada, e o <code rend="inline">TypeError</code>, que ocorre quando o campo <code rend="inline">pseq</code> para a página é, por alguma razão, não numérico e, portanto, não pode ser destinado a um <code rend="inline">int</code>. Se algo correr mal com uma página, nós simplesmente executamos <code rend="inline">continue</code> para passar à próxima. O plano é obter todos os dados bons que conseguirmos. Não é limpar inconsistências ou falhas nos metadados do item.</p>
+                    </div>
+                    <div type="4" n="5.4.2">
+                        <head>Fazer o <emph>Download</emph> das Imagens</head>
+                        <p>Assim que <code rend="inline">img_pages</code> contém a lista completa de páginas com a <emph>tag</emph>
+                            <code rend="inline">IMAGE_ON_PAGE</code>, nós podemos fazer o download dessas páginas. Note que, se nenhum <code rend="inline">out_dir</code> for fornecido a <code rend="inline">ht_picture_download()</code>, então a função simplesmente retorna a lista <code rend="inline">img_pages</code> e NÃO faz o <emph>download</emph> do quer que seja.</p>
+                        <p>A chamada da API <code rend="inline">getpageimage()</code> retorna um JPEG por predefinição. Nós simplesmente colocamos os bytes do JPEG num ficheiro na forma normal. Dentro da subpasta do volume (ela própria dentro do <code rend="inline">out_dir</code>), as páginas serão nomeadas <code rend="inline">1.jpg</code> para a página 1 e assim sucessivamente.</p>
+                        <p>Uma coisa a considerar é a nossa taxa de uso da API. Nós não queremos abusar do nosso acesso ao fazer centenas de pedidos por minuto. Para estar a salvo, especialmente se pretendermos executar grandes trabalhos, nós esperamos dois segundos antes de fazer cada pedido de página. Isto pode ser frustrante a curto prazo, mas ajuda a evitar o sufocamento ou a suspenção da API.</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_extrair-paginas-ilustradas-com-python_12" corresp="code_extrair-paginas-ilustradas-com-python_12.txt" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+            </div>
+            <div type="2" n="6">
+                <head>Internet Archive</head>
+                <div type="3" n="6.1">
+                    <head>Acesso à API</head>
+                    <p>Nós conectamos à biblioteca API do Python usando uma conta no Archive.org com e-mail e palavra-chave ao invés das chaves de acesso do API. Isto é discutido no <ref target="https://archive.org/services/docs/api/internetarchive/quickstart.html">Guia Quickstart</ref>. Se não tiver uma conta, <ref target="https://archive.org/account/login.createaccount.php">registre-se</ref> para obter o seu "Virtual Library Card".</p>
+                    <p>Na primeira célula do <emph>notebook</emph>
+                        <code rend="inline">internetarchive.ipynb</code>, introduza as suas credenciais como indicado. Execute a célula para autenticar-se perante a API.</p>
+                    <quote>
+                        <p>
+                            <hi rend="bold">Nota de tradução</hi>: O comando <code rend="inline">ia.configure(ia_email, ia_password)</code> é atualmente desnecessário e pode gerar um erro extenso, em cuja mensagem final consta: <code rend="inline">InvalidURL: Invalid URL 'https:///services/xauthn/': No host supplied</code>. Sugerimos que o mesmo não seja executado no ficheiro IPYNB.</p>
+                    </quote>
+                </div>
+                <div type="3" n="6.2">
+                    <head>Criar uma Lista de Volumes</head>
+                    <p>A biblioteca IA do Python permite-lhe submeter <emph>query strings</emph> e receber uma lista de pares chave-valor correspondentes na qual a palavra "<emph>identifier</emph>", ou identificador, em português, é a chave e o verdadeiro identificador é o valor. A sintaxe para uma <emph>query</emph> é explicada na <ref target="https://archive.org/advancedsearch.php">página de Advanced Search</ref> para o IA. O leitor pode especificar parâmetros ao usar uma palavra-chave como "<emph>date</emph>" ou "<emph>mediatype</emph>" seguida de dois pontos e o valor que quer atribuir a esse parâmetro. Por exemplo, eu só quero resultados que são <emph>textos</emph> (em oposição a vídeos, <emph>etc.</emph>). Certifique-se que os parâmetros e as opções que está a tentar usar são suportadas pela funcionalidade de pesquisa do IA. Caso contrário, pode perder ou obter resultados estranhos e não saber porquê.</p>
+                    <p>No <emph>notebook</emph>, eu gero uma lista de IDs do IA com o seguinte código:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_extrair-paginas-ilustradas-com-python_13" corresp="code_extrair-paginas-ilustradas-com-python_13.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3" n="6.3">
+                    <head>Característica Visual: Blocos de Imagens</head>
+                    <p>O Internet Archive não apresenta quaisquer características ao nível da página. Ao invés, disponibiliza um certo número de ficheiros brutos do processo de digitalização aos utilizadores. O mais importante destes para os nossos propósitos é o ficheiro XML Abbyy. Abbyy é uma empresa russa cujo <emph>software</emph> FineReader domina o mercado do OCR.</p>
+                    <p>Todas as versões recentes do FineReader produzem um <ref target="https://perma.cc/83EK-LXP2">documento XML</ref> que associa diferentes "blocos" com cada página no documento digitalizado. O tipo de bloco mais comum é <code rend="inline">Text</code> mas também existem blocos <code rend="inline">Picture</code> ou "Imagem", em português. Aqui está um bloco de exemplo tirado dum ficheiro de XML Abbyy do IA. Os cantos superior esquerdo ("t" e "l") e inferior direito ("b" e "r") são suficientes para identificar a região de bloco retangular.</p>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_extrair-paginas-ilustradas-com-python_14" corresp="code_extrair-paginas-ilustradas-com-python_14.txt" rend="block"/>
+                    </ab>
+                    <p>O equivalente no IA a ver as <emph>tags</emph>
+                        <code rend="inline">IMAGE_ON_PAGE</code> no HT é a análise do ficheiro XML Abbyy e a iteração sobre cada página. Se existir pelo menos um bloco <code rend="inline">Picture</code> nessa página, a página é sinalizada como possivelmente contendo uma imagem.</p>
+                    <p>Enquanto a característica <code rend="inline">IMAGE_ON_PAGE</code> do HT não contém informação sobre a <emph>localização</emph> dessa imagem, os blocos <code rend="inline">Picture</code> no ficheiro XML estão associados a uma região retangular na página. No entanto, porque o FineReader se especializa no reconhecimento de letras de conjuntos de caracteres ocidentais, é muito menos preciso a identificar regiões de imagem. O projeto de Leetaru (veja <emph>Visão Geral</emph>) usou as coordenadas da região para cortar imagens, mas nesta lição nós iremos simplesmente fazer o <emph>download</emph> da página inteira.</p>
+                    <p>Parte da diversão intelectual desta lição é usar um <emph>dataset</emph> (<emph>tags</emph> de bloco do OCR) por vezes confuso para um propósito largamente não intencional: identificar imagens e não palavras. A certa altura, tornar-se-á computacionalmente viável executar modelos de aprendizagem aprofundada em todas as páginas ilustradas nuas num volume e escolher o(s) tipo(s) de imagem(/ns) desejada(s). Mas, como a maior parte das páginas na maioria dos volumes não são ilustradas, esta é uma tarefa dispendiosa. Por agora, faz mais sentido aproveitar os dados existentes que nós detemos do processo de ingestão do OCR.</p>
+                    <p>Para mais informações sobre como o próprio OCR funciona e interage com o processo de digitalização, por favor, veja a lição do <emph>PH</emph> de Mila Oiva, <ref target="/en/lessons/retired/OCR-with-Tesseract-and-ScanTailor">OCR With Tesseract and ScanTailor</ref> (atenção que esta lição já não é actualizada). Erros podem surgir por causa de distorções, artefactos e muitos outros problemas. Estes erros acabam por afetar a fiabilidade e a precisão dos blocos "Picture". Em muitos casos, o Abbyy estimará que páginas em branco ou descoloridas são, na realidade, imagens. Estas <emph>tags</emph> de bloco incorretas, ainda que indesejadas, podem ser combatidas com o uso de redes neurais convolucionais retreinadas. Pense nas páginas com imagens cujo download foi feito nesta lição como um primeiro passo num processo mais longo para obter um <emph>dataset</emph> limpo e útil de ilustrações históricas.</p>
+                </div>
+                <div type="3" n="6.4">
+                    <head>Passo a Passo do Código</head>
+                    <div type="4" n="6.4.1">
+                        <head>Encontrar as Imagens</head>
+                        <p>Tal como com o HT, a função principal para o IA é <code rend="inline">ia_picture_download(item_id, out_dir=None)</code>.</p>
+                        <p>Visto que envolve o I/O dum ficheiro, o processo para obter a lista <code rend="inline">img_pages</code> é mais complicado do que o do HT. Usando a utilidade <code rend="inline">ia</code> (que é instalada com a biblioteca) da linha de comando, o leitor pode obter uma ideia dos ficheiros de metadados disponíveis para um volume. Com muitas poucas exceções, um ficheiro com o formato "Abbyy GZ" deveria estar disponível para volumes com o tipo de <emph>media</emph>
+                            <code rend="inline">text</code> no Internet Archive.</p>
+                        <p>Estes ficheiros, mesmo quando comprimidos, podem facilmente ter centenas de megabytes de tamanho! Se existir um ficheiro Abbyy para o volume, nós obtemos o seu nome e depois fazemos o <emph>download</emph>. A chamada <code rend="inline">ia.download()</code> usa alguns parâmetros úteis para ignorar a solicitação se o ficheiro já existe e, se não, para fazer o seu <emph>download</emph> sem criar um diretório aninhado. Para salvar espaço, nós eliminamos o ficheiro Abbyy depois de o analisar.</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_extrair-paginas-ilustradas-com-python_15" corresp="code_extrair-paginas-ilustradas-com-python_15.txt" rend="block"/>
+                        </ab>
+                        <p>Assim que nós tivermos o ficheiro, nós precisamos de analisar o XML usando a biblioteca padrão do Python. Nós tomamos vantagem do facto de que nós podemos abrir o ficheiro comprimido diretamente com a biblioteca <code rend="inline">gzip</code>. Os ficheiros Abbyy são indexadas a partir do zero, por isso a primeira página na sequência digitalizada tem o índice de 0. No entanto, nós temos que filtrar 0 porque não pode ser exigido do IA. A exclusão do índice 0 por parte do IA não está documentada em qualquer lugar; em vez disso, eu descobri através de tentativa e erro. Se o leitor ver uma mensagem de erro de explicação difícil, tente rastrear a origem e não tenha medo em pedir ajuda, seja a alguém com experiência relevante, seja a alguém da própria organização.</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_extrair-paginas-ilustradas-com-python_16" corresp="code_extrair-paginas-ilustradas-com-python_16.txt" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4" n="6.4.2">
+                        <head>Fazer o <emph>Download</emph> das Imagens</head>
+                        <p>O <emph>wrapper</emph> do IA incorporado no Python não providencia uma função de download de páginas únicas—apenas em massa. Isto significa que nós usaremos a RESTful API do IA para obter páginas específicas. Primeiro, nós construímos um URL para cada página de que nós precisamos. Depois, nós usamos a biblioteca <code rend="inline">requests</code> para enviar uma solicitação <code rend="inline">GET</code> de HTTP e, se tudo correr bem (<emph>i.e.</emph> o código 200 é enviado na resposta), nós escrevemos o conteúdo da resposta num ficheiro JPEG.</p>
+                        <p>O IA tem estado a trabalhar numa <ref target="https://perma.cc/F6HJ-YGM7">versão <emph>alpha</emph>
+                            </ref> duma API para o corte e redimensionamento de imagens que obedeça às exigências do International Image Interoperability Framework (<ref target="https://perma.cc/7ABF-GGJM">IIIF</ref>). O IIIF representa uma profunda melhoria face ao antigo método para <emph>downloads</emph> de páginas únicas que requeriam a realização do <emph>download</emph> de ficheiros JP2, um formato de ficheiro largamente não suportado. Agora, é extremamente simples obter um só JPEG duma página:</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_extrair-paginas-ilustradas-com-python_17" corresp="code_extrair-paginas-ilustradas-com-python_17.txt" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+            </div>
+            <div type="2" n="7">
+                <head>Próximos Passos</head>
+                <p>Assim que o leitor tiver entendido as principais funções e o código de <emph>unpacking</emph> dos dados nos <emph>notebooks</emph>, sinta-se livre para executar as células em sequência ou carregar em "<emph>Run All</emph>" e ver as páginas ilustradas a entrar nas pastas. O leitor é encorajado a adaptar estes <emph>scripts</emph> e funções para as suas próprias questões de pesquisa.</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_1"/> : <hi rend="bold">Nota de tradução</hi>: Aconselhamos o leitor a adicionar o Python ao PATH, processo que pode ser feito na ocasião da sua instalação. Isto irá suavizar a incorporação das dependências (veja <emph>Dependências</emph>).</p>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_2"/> : <hi rend="bold">Nota de tradução</hi>: Inicialmente, aparece uma página de transição, a qual deverá remeter rapidamente para o Jupyter. Caso tal não aconteça, basta seguir as instruções nesta página.</p>
+            </div>
+        </body>
+    </text>
+</TEI>

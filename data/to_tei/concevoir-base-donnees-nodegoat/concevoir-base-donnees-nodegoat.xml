@@ -1,0 +1,544 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="concevoir-base-donnees-nodegoat">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Des sources aux données, concevoir une base de données en sciences humaines et sociales avec nodegoat</title>
+                <author role="original_author">Agustín Cosovschi</author>
+                <editor role="reviewers">
+                    <persName>Octave Julien</persName>
+                    <persName>Solenn Huitric</persName>
+                </editor>
+                <editor role="editors">Sofia Papastamkou</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phfr0029</idno>
+                <date type="published">02/29/2024</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Cette leçon permet de prendre en main le logiciel nodegoat pour construire une base de données relationnelle dans le cadre d'une recherche en sciences humaines.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="fr">
+        <body>
+            <div type="2">
+                <head>Introduction : penser en termes de données, un défi conceptuel</head>
+                <p>Au moment de faire ses premiers pas dans le monde des humanités numériques, le chercheur ou la chercheuse en sciences humaines se confronte à plusieurs défis. Ce sont souvent des défis techniques : l’emploi des outils numériques n’est pas toujours évident et la maitrise d’une méthode, d’un logiciel ou encore plus d’un langage de programmation exige souvent une pratique longue et parfois ardue. Il existe néanmoins un autre type de défi, différent mais tout aussi complexe que les défis techniques : savoir conceptualiser sa recherche en termes de « données ».</p>
+                <p>Mais alors, de quoi parle-t-on quand on parle de « données » ? De manière générale, nous pouvons définir les <ref target="https://perma.cc/3CKY-42UF">données</ref> (en anglais, « data ») comme des informations structurées en unités discrètes et se prêtant au traitement automatique. La nature et la structure de ces informations doivent permettre d’arriver toujours aux mêmes résultats en répétant avec elles les mêmes opérations. </p>
+                <p>Mettre en données l’objet d’une recherche implique un certain travail de traduction : il faut traduire nos informations depuis leur forme de base à une forme structurée. La donnée, contrairement à ce qu’on peut croire, n’est pas du tout « donnée » : elle n’est pas disponible dans la réalité, elle n’attend pas qu’on la cueille – elle est, au contraire, le produit d’un travail d’interprétation et de transformation. Afin de produire ses données, le chercheur ou la chercheuse doit lire ses sources en suivant une problématique définie, en extraire les informations pertinentes et les consigner de manière structurée. <ref type="footnotemark" target="#fr_note_1"/>
+                </p>
+                <p>Celles et ceux qui font de la recherche en sciences humaines rencontrent souvent des problèmes à ce stade, car la notion même de « donnée » n’est pas limpide. En histoire, en anthropologie ou en littérature, nous pouvons réfléchir aux phénomènes que nous étudions en termes flexibles, ouverts et souvent incertains. Nous avons l’habitude de réfléchir à la subjectivité du chercheur et de donner une place centrale à la contingence. Nous savons analyser les phénomènes politiques, sociaux et culturels en tant qu’objets complexes, difficiles à réduire à un « ensemble de données ». Comme le dit Miriam Posner <ref target="https://perma.cc/BBC5-MBEC">dans un billet de blog</ref> à ce sujet (ma traduction) :</p>
+                <quote>
+                    <p>Nous, les chercheurs et chercheuses en sciences humaines, entretenons un rapport avec nos preuves tout à fait différent de celui qu’ont les autres scientifiques, même ceux des sciences sociales. Nous connaissons les choses d’une manière différente que le peuvent les chercheurs et chercheuses d’autres disciplines. Nous pouvons savoir que quelque chose est vrai sans être en mesure de présenter un ensemble de données, comme on l’entend traditionnellement.<ref type="footnotemark" target="#fr_note_2"/>
+                    </p>
+                </quote>
+                <p>Ainsi, pour les chercheurs et chercheuses en sciences humaines, cela peut sembler contre-intuitif de lire leurs sources, leurs documents ou leurs notes ethnographiques pour en tirer des informations destinées à être insérées dans des catégories fixes, discrètes, structurées dans un tableur. Cela peut même sembler simpliste et superficiel : comment pourrait-on traduire en termes de « données » une tradition politique ; la dimension affective d’une pratique culturelle locale ; les enjeux conceptuels de la philosophie moderne, ou la psychologie d’un personnage littéraire ?</p>
+                <p>Pourtant, penser notre recherche en termes de données n’amène pas forcément à une simplification ou un aplatissement de notre objet d’étude, comme le montre la <ref target="https://perma.cc/9VKT-Y2JJ">nouvelle vague de travaux en histoire quantitative</ref>, qui semble faire un retour en force. Ces travaux nous montrent qu’il est possible d’adopter une démarche méthodologique qui fait appel aux données, tout en réservant une place à la complexité et à la subjectivité. Comme le rappelle Johanna Drucker, spécialiste en design graphique, les données recueillies ne sont jamais indépendantes de l’opération de recueil dont elles résultent : au contraire, un travail d’interprétation s’effectue toujours pour capter, saisir et découper ces données de la réalité. Autrement dit, « all data is capta » (toute donnée est captée).<ref type="footnotemark" target="#fr_note_3"/>
+                </p>
+                <p>Pour sa part, l’historien Manfred Thaller insiste sur le fait que les données peuvent représenter la réalité, mais sont insuffisantes si elles n’émanent pas d’un travail d’interprétation. Il propose un schéma hiérarchique qui distingue « données », « information » et « savoir ». Les données sont des symboles qui peuvent être rangés dans un système de représentation ; il en résulte de l’information lorsqu’elles sont interprétées dans un contexte défini. Le savoir, lui, est le produit d’informations qui génèrent une prise de décision ou une action.<ref type="footnotemark" target="#fr_note_4"/>
+                </p>
+                <p>En reconnaissant la complexité mais aussi la nature structurée des données, concevoir notre recherche en termes de données nous offre des avantages importants.</p>
+                <p>D’abord, enregistrer nos informations en forme de données nous permet de les traiter ensuite par des méthodes numériques automatiques, et de les prêter à des analyses quantitatives. Cela s’avère utile lorsque notre recherche nous demande de manipuler une grande quantité d’information, ou lorsqu’on peut directement prélever des séries de données depuis nos sources (inventaires, données démographiques, etc.). </p>
+                <p>De plus, le processus même de traduire nos informations en données exige que nous définissions de manière claire et nette les éléments de notre investigation, nos hypothèses et nos questions de recherche. Ceci nous apporte donc un avantage conceptuel. Autrement dit, on devient obligé de formaliser les objets de notre recherche, les relations qui les relient mutuellement, ainsi que la nature et les conséquences de leurs interactions.</p>
+                <p>Enfin, enregistrer des informations dans une base de données nous permet de les partager facilement avec le reste de la communauté scientifique.</p>
+                <p>Dans cette leçon, nous discuterons des difficultés auxquelles on est susceptible de se confronter au moment de concevoir une base de données dans le cadre d’une recherche en sciences humaines, en tant que débutant dans le domaine du numérique. Nous allons donc :</p>
+                <list type="unordered">
+                    <item>
+                        <ref target="#de-la-saisie-%C3%A0-la-mod%C3%A9lisation-des-donn%C3%A9es">aborder les notions et les dispositifs techniques nécessaires pour concevoir un modèle de données</ref>
+                    </item>
+                    <item>
+                        <ref target="#construire-une-base-de-donn%C3%A9es-avec-nodegoat">faire les premiers pas dans la construction d’une base de données en se servant de l’environnement en ligne <emph>nodegoat</emph>
+                        </ref>
+                    </item>
+                </list>
+                <p>Ainsi, nous espérons pouvoir faire comprendre les avantages d’une méthode de travail dont la logique n’est pas toujours évidente pour ceux et celles qui ont reçu une formation en sciences humaines.</p>
+            </div>
+            <div type="2">
+                <head>De la saisie à la modélisation des données</head>
+                <p>Comme nous l’avons mentionné, plus nous inspectons nos sources, plus notre recherche produit une quantité conséquente d’informations ; dans ce cas, il est souvent préférable de cataloguer ces informations de manière organisée et structurée. Par exemple, imaginons que nous menions une recherche historique sur un ensemble de livres : un projet hypothétique portant sur les ouvrages produits par les écrivains dissidents des régimes communistes d’Europe de l’Est. </p>
+                <div type="3">
+                    <head>Saisie simple de données tabulaires</head>
+                    <p>Si nous le voulions, nous pourrions enregistrer des informations sur ces livres de manière intuitive, en utilisant les fonctionnalités offertes par un <ref target="https://perma.cc/LHV7-ZE3Y">tableur</ref>, comme ceci :</p>
+                    <p>
+                        <hi rend="bold">Tableau Basique</hi>
+                    </p>
+                    <table>
+                        <row>
+                            <cell role="label">Titre</cell>
+                            <cell role="label">Ville de parution</cell>
+                            <cell role="label">Auteur</cell>
+                        </row>
+                        <row>
+                            <cell>L’Archipel du Gulag</cell>
+                            <cell>Paris</cell>
+                            <cell>Alexandre  Soljenitsyne</cell>
+                        </row>
+                        <row>
+                            <cell>Vie et destin</cell>
+                            <cell>Genève</cell>
+                            <cell>Vassili Grossman</cell>
+                        </row>
+                        <row>
+                            <cell>The New Class</cell>
+                            <cell>New York</cell>
+                            <cell>Milovan Djilas</cell>
+                        </row>
+                        <row>
+                            <cell>The Captive Mind</cell>
+                            <cell>Paris</cell>
+                            <cell>Czesław Miłosz</cell>
+                        </row>
+                        <row>
+                            <cell>La machine et les rouages</cell>
+                            <cell>Paris</cell>
+                            <cell>Michel Heller</cell>
+                        </row>
+                        <row>
+                            <cell>The Intellectuals on the Road to Class Power</cell>
+                            <cell>Brighton</cell>
+                            <cell>Geoge Konrad, Ivan Szelenyi</cell>
+                        </row>
+                    </table>
+                    <p>Ce tableau à trois colonnes constitue une première saisie qui nous permet de visualiser nos informations très simplement. Nous commençons à construire déjà, de manière plutôt élémentaire, ce qui pourrait ensuite devenir un <ref target="https://perma.cc/6ERU-8H2W">« jeu de données »</ref> (en anglais, « dataset »). Chaque ligne dans le tableau représente un « cas », ou « enregistrement », et chaque colonne représente une « caractéristique », ou « attribut » de ces cas . Ici, ce sont le titre, la ville d’édition et l’auteur de chaque ouvrage.</p>
+                    <p>Pour l’instant, cet outil nous suffit car nous n’y conservons qu’une quantité peu conséquente d’information. Mais imaginons que, au fur et à mesure que nous approfondissons notre enquête, nous questionnions de plus en plus les ouvrages et les auteurs. Ainsi, nous multiplierions les informations enregistrées. Nous pourrions, par exemple, élargir le tableau comme suit :</p>
+                    <p>
+                        <hi rend="bold">Tableau Élargi</hi>
+                    </p>
+                    <table>
+                        <row>
+                            <cell role="label">Titre</cell>
+                            <cell role="label">Ville de parution</cell>
+                            <cell role="label">Langue de la première édition</cell>
+                            <cell role="label">Date de parution</cell>
+                            <cell role="label">Maison d’édition</cell>
+                            <cell role="label">Date de fondation de la maison d’édition</cell>
+                            <cell role="label">Auteur</cell>
+                            <cell role="label">Nationalité de l’auteur</cell>
+                            <cell role="label">Ville de naissance de l’auteur</cell>
+                            <cell role="label">Date de naissance de l’auteur</cell>
+                        </row>
+                        <row>
+                            <cell>L’Archipel du Gulag</cell>
+                            <cell>Paris</cell>
+                            <cell>Français</cell>
+                            <cell>1973</cell>
+                            <cell>Le Seuil</cell>
+                            <cell>1930</cell>
+                            <cell>Alexandre  Soljenitsyne</cell>
+                            <cell>Russe</cell>
+                            <cell>Kislovodsk</cell>
+                            <cell>1918</cell>
+                        </row>
+                        <row>
+                            <cell>Vie et destin</cell>
+                            <cell>Genève</cell>
+                            <cell>Français</cell>
+                            <cell>1980</cell>
+                            <cell>L’âge d’homme</cell>
+                            <cell>1955</cell>
+                            <cell>Vassili Grossman</cell>
+                            <cell>Russe</cell>
+                            <cell>Berdytchiv</cell>
+                            <cell>1905</cell>
+                        </row>
+                        <row>
+                            <cell>The New Class</cell>
+                            <cell>New York</cell>
+                            <cell>Anglais</cell>
+                            <cell>1957</cell>
+                            <cell>Praeger</cell>
+                            <cell>1950</cell>
+                            <cell>Milovan Djilas</cell>
+                            <cell>Monténégrine</cell>
+                            <cell>Podbišće</cell>
+                            <cell>1911</cell>
+                        </row>
+                        <row>
+                            <cell>The Captive Mind</cell>
+                            <cell>Paris</cell>
+                            <cell>Anglais</cell>
+                            <cell>1953</cell>
+                            <cell>Instytut Literacki</cell>
+                            <cell>1946</cell>
+                            <cell>Czesław Miłosz</cell>
+                            <cell>Polonaise</cell>
+                            <cell>Szetejnie</cell>
+                            <cell>1911</cell>
+                        </row>
+                        <row>
+                            <cell>La machine et les rouages</cell>
+                            <cell>Paris</cell>
+                            <cell>Français</cell>
+                            <cell>1985</cell>
+                            <cell>Calmann-Lévy</cell>
+                            <cell>1920</cell>
+                            <cell>Michel Heller</cell>
+                            <cell>Russe</cell>
+                            <cell>Moguilev</cell>
+                            <cell>1922</cell>
+                        </row>
+                        <row>
+                            <cell>The Intellectuals on the Road to Class Power</cell>
+                            <cell>Brighton</cell>
+                            <cell>Anglais</cell>
+                            <cell>1979</cell>
+                            <cell>Harvester Press</cell>
+                            <cell>?</cell>
+                            <cell>George Konrad, Ivan Szelenyi</cell>
+                            <cell>Hongrois, Hongrois</cell>
+                            <cell>Berettyóújfalu, Budapest</cell>
+                            <cell>1933, 1938</cell>
+                        </row>
+                    </table>
+                    <p>Grâce à ce nouveau tableau, nous pouvons maintenant croiser plus d’informations et ainsi approfondir l’analyse. Cela nous permet d’interroger les relations entre les caractéristiques des livres, celles des maisons d’édition et celles des auteurs. Nous pourrions, par exemple, formuler et vérifier l’hypothèse que les auteurs russes publient plus souvent en français, ou nous demander éventuellement si certaines maisons d’édition préfèrent les auteurs d’un certain âge, ou d’une certaine nationalité.</p>
+                    <p>Cependant, plus nous multiplions les cas analysés et les questions posées, plus l’information se multiplie. Ce tableau devient alors bien moins pratique. Dans certains cas, l’information elle-même est compliquée. L’ouvrage <emph>The Intellectuals on the Road to Class Power</emph>, par exemple, a plus d’un auteur. La maison d’édition Harvester Press n’a pas de date de fondation (car les informations sur cette petite maison d’édition anglaise sont plutôt limitées) – un exemple classique de l’incertitude qui caractérise la recherche en sciences humaines. Il devient donc de plus en plus difficile de lire, croiser et interpréter toutes ces informations. </p>
+                    <p>Quand cela arrive, il est souvent plus utile de commencer à réfléchir aux « relations » qui relient les différents objets de notre recherche et de construire une table qui les représente - une <ref target="https://perma.cc/9PBN-JFK6">table de données</ref> - avant de les rassembler dans une <ref target="https://perma.cc/MZ9C-QBEV">base de données</ref>.</p>
+                </div>
+                <head>Du tableur à la base de données: les principes de modélisation</head>
+                <p>Qu’est-ce qu’une « base de données » ? De manière générale, il s’agit d’un contenant qui organise des informations selon une certaine structure. Plus spécifiquement, comme le dit Georges Gardarin, une base de données est « un ensemble de données modélisant les objets d’une partie du monde réel et servant de support à une application informatique ».<ref type="footnotemark" target="#fr_note_5"/> Les données dans une base de données doivent pouvoir être « interrogeables » : nous devons pouvoir retrouver toutes les données qui satisfont un certain critère (ici, par exemple, tous les auteurs de nationalité russe ou tous les ouvrages parus en français). C’est cette interrogeabilité qui fait de la base de données un outil puissant d’exploration et d’analyse de nos informations.</p>
+                <p>Dans cette leçon, nous nous concentrerons sur un type particulier et assez fréquent de base de données : la <ref target="https://perma.cc/TE8D-GD2A">base de données relationnelle</ref>. La structure d’une base de données relationnelle (« base de donnée » par la suite) est un ensemble de tables, reliées de façon à ce que l’on puisse circuler des unes aux autres. La base de données contient notamment deux types d’éléments : les objets et les relations entre ces objets. Chaque objet représente une réalité complexe. Il comporte de nombreuses caractéristiques (ou les « attributs », dans les colonnes) qui s’expriment dans des cas particuliers (les « enregistrements », sur les lignes). Avant de pouvoir construire cette base de données, nous devons donc d’abord définir les objets, les attributs qu’ils contiennent et la façon dont ils sont connectés les uns aux autres. Cela nous oblige à passer par ce que l’on appelle un <ref target="https://perma.cc/MSH7-FYWV">modèle de données</ref>.</p>
+                <p>Dans notre exemple, nous avons identifié trois objets qui nous intéressent : les ouvrages, les maisons d’édition et les auteurs. Comment sont-ils reliés ? La réponse dépendra surtout de notre problématique de recherche. Dans le cas proposé ici, si notre attention porte sur la problématique du « livre en tant qu’objet de circulation », nous pouvons par exemple imaginer un graphique élémentaire reliant ouvrage, auteur et maison d’édition de cette façon :</p>
+                <figure>
+                    <desc>Figure 1. Schéma logique représentant les relations entre ouvrages, maisons d’édition et auteurs.</desc>
+                    <figDesc>Schéma logique constitué de trois cercles qui représentent ouvrage, maison d’édition et auteur. Deux flèches partent des ouvrages : une pointe vers les maisons d’éditions, et une autre vers les auteurs</figDesc>
+                    <graphic url="fr-or-concevoir-base-donnees-nodegoat-01.png"/>
+                </figure>
+                <p>Ce schéma correspond plus ou moins à un « modèle conceptuel de données »<ref type="footnotemark" target="#fr_note_5"/> représentant les entités qui nous intéressent et les relations qui les relient. Ici, chaque ouvrage est ainsi lié à un certain auteur qui l’a écrit et à une certaine maison d’édition qui l’a publié.</p>
+                <p>Nous devons ensuite nous demander, comme nous l’avons déjà évoqué :</p>
+                <list type="unordered">
+                    <item>quelle information contient chaque objet ?</item>
+                    <item>de quels éléments est-il est composé ?</item>
+                    <item>comment exactement ces objets sont-ils reliés entre eux ?</item>
+                </list>
+                <p>Nos réponses dépendront de leurs attributs respectifs. En suivant le tableau crée plus haut pour cataloguer les informations de notre recherche hypothétique, nous pouvons définir nos objets comme contenant les attributs suivants et comme étant connectés ainsi :</p>
+                <figure>
+                    <desc>Figure 2. Modèle de données montrant les objets, leurs attributs et leurs relations.</desc>
+                    <figDesc>Modèle de données avec les trois objets, leurs attributs et les relations qui se tissent entre les objets à travers des attributs.</figDesc>
+                    <graphic url="fr-or-concevoir-base-donnees-nodegoat-02.png"/>
+                </figure>
+                <p>Ceci correspond maintenant à ce que l’on appelle généralement un « modèle logique de données », qui nous permet de définir plus clairement nos objets et leurs relations et, ainsi, d’implémenter le modèle conceptuel. Sur la base de ce schéma, nous pouvons maintenant créer des tables pour enregistrer les caractéristiques de chaque objet séparément :</p>
+                <p>
+                    <hi rend="bold">Table 1 : ouvrage</hi>
+                </p>
+                <table>
+                    <row>
+                        <cell role="label">Titre</cell>
+                        <cell role="label">Langue de la première édition</cell>
+                        <cell role="label">Date de parution</cell>
+                        <cell role="label">Maison d’édition</cell>
+                        <cell role="label">Auteur</cell>
+                    </row>
+                    <row>
+                        <cell>L’Archipel du Gulag</cell>
+                        <cell>Français</cell>
+                        <cell>1973</cell>
+                        <cell>Le Seuil</cell>
+                        <cell>Alexandre  Soljenitsyne</cell>
+                    </row>
+                    <row>
+                        <cell>Vie et destin</cell>
+                        <cell>Français</cell>
+                        <cell>1980</cell>
+                        <cell>L’âge d’homme</cell>
+                        <cell>Vassili Grossman</cell>
+                    </row>
+                    <row>
+                        <cell>The New Class</cell>
+                        <cell>Anglais</cell>
+                        <cell>1957</cell>
+                        <cell>Praeger</cell>
+                        <cell>Milovan Djilas</cell>
+                    </row>
+                    <row>
+                        <cell>The Captive Mind</cell>
+                        <cell>Anglais</cell>
+                        <cell>1953</cell>
+                        <cell>Instytut Literacki</cell>
+                        <cell>Czesław Miłosz</cell>
+                    </row>
+                    <row>
+                        <cell>La machine et les rouages</cell>
+                        <cell>Français</cell>
+                        <cell>1985</cell>
+                        <cell>Calmann-Lévy</cell>
+                        <cell>Michel Heller</cell>
+                    </row>
+                    <row>
+                        <cell>The Intellectuals on the Road to Class Power</cell>
+                        <cell>Anglais</cell>
+                        <cell>1979</cell>
+                        <cell>Harvester Press</cell>
+                        <cell>Geoge Konrad, Ivan Szelenyi</cell>
+                    </row>
+                </table>
+                <p>
+                    <hi rend="bold">Table 2 : auteur</hi>
+                </p>
+                <table>
+                    <row>
+                        <cell role="label">Prénom</cell>
+                        <cell role="label">Nom</cell>
+                        <cell role="label">Nationalité</cell>
+                        <cell role="label">Ville de naissance</cell>
+                        <cell role="label">Date de naissance</cell>
+                    </row>
+                    <row>
+                        <cell>Alexandre</cell>
+                        <cell>Soljenitsyne</cell>
+                        <cell>Russe</cell>
+                        <cell>Kislovodsk</cell>
+                        <cell>1918</cell>
+                    </row>
+                    <row>
+                        <cell>Vassili</cell>
+                        <cell>Grossman</cell>
+                        <cell>Russe</cell>
+                        <cell>Berdytchiv</cell>
+                        <cell>1905</cell>
+                    </row>
+                    <row>
+                        <cell>Milovan</cell>
+                        <cell>Djilas</cell>
+                        <cell>Monténégrine</cell>
+                        <cell>Podbišće</cell>
+                        <cell>1911</cell>
+                    </row>
+                    <row>
+                        <cell>Czesław</cell>
+                        <cell>Miłosz</cell>
+                        <cell>Polonaise</cell>
+                        <cell>Szetejnie</cell>
+                        <cell>1911</cell>
+                    </row>
+                    <row>
+                        <cell>Michel</cell>
+                        <cell>Heller</cell>
+                        <cell>Russe</cell>
+                        <cell>Moguilev</cell>
+                        <cell>1922</cell>
+                    </row>
+                    <row>
+                        <cell>Geoge</cell>
+                        <cell>Konrad</cell>
+                        <cell>Hongrois</cell>
+                        <cell>Berettyóújfalu</cell>
+                        <cell>1933</cell>
+                    </row>
+                    <row>
+                        <cell>Ivan</cell>
+                        <cell>Szelenyi</cell>
+                        <cell>Hongrois</cell>
+                        <cell>Budapest</cell>
+                        <cell>1938</cell>
+                    </row>
+                </table>
+                <p>
+                    <hi rend="bold">Table 3 : maisons d’édition</hi>
+                </p>
+                <table>
+                    <row>
+                        <cell role="label">Nom</cell>
+                        <cell role="label">Ville</cell>
+                        <cell role="label">Date de fondation</cell>
+                    </row>
+                    <row>
+                        <cell>Le Seuil</cell>
+                        <cell>Paris</cell>
+                        <cell>1930</cell>
+                    </row>
+                    <row>
+                        <cell>L’âge de l’homme</cell>
+                        <cell>Genève</cell>
+                        <cell>1955</cell>
+                    </row>
+                    <row>
+                        <cell>Praeger</cell>
+                        <cell>New York</cell>
+                        <cell>1950</cell>
+                    </row>
+                    <row>
+                        <cell>Instytut Literacki</cell>
+                        <cell>Paris</cell>
+                        <cell>1946</cell>
+                    </row>
+                    <row>
+                        <cell>Calmann-Lévy</cell>
+                        <cell>Paris</cell>
+                        <cell>1920</cell>
+                    </row>
+                    <row>
+                        <cell>Harvester Press</cell>
+                        <cell>Brighton</cell>
+                        <cell>?</cell>
+                    </row>
+                </table>
+                <p>Nous avons maintenant organisé ces informations en trois tables qui représentent notre jeu de données. Afin de pouvoir naviguer entre ces tables, en suivant les relations que nous avons établies dans le schéma du modèle de données, il faut maintenant les relier. Pour ce faire, on définit les possibilités et les restrictions qui se manifestent dans leurs relations - nous appelons cela la <ref target="https://perma.cc/M4M5-DCES">cardinalité</ref>
+                    <ref type="footnotemark" target="#fr_note_6"/>.</p>
+                <p>Quand on construit une base de données relationnelle, on doit toujours s’interroger sur les relations qui existent entre les tables : chaque élément d’une table se rapporte-t-il exclusivement à un élément individuel d’une autre table, ou entretient-il des relations multiples et croisées ? Dans le cas exemple des relations entre auteurs et ouvrages : chaque ouvrage a-t-il seulement un auteur (cardinalité 1,1) ? Ou peut-il en avoir deux ou plus, comme <emph>The Intellectuals on the Road to Class Power</emph> (cardinalité 1,N) ? À l’inverse, chaque auteur d’un livre avec plusieurs auteurs ne pourrait-il pas être l’auteur de plusieurs ouvrages (cardinalité N,N) ? Ces questions se posent certainement au moment de constituer notre base de données<ref type="footnotemark" target="#fr_note_7"/>. Les réponses dépendront de notre jeu de données. Dans <ref target="#cr%C3%A9er-et-param%C3%A9trer-une-base-dans-nodegoat">la partie suivante</ref>, nous verrons comment mettre tout ceci en pratique.</p>
+            </div>
+            <div type="2">
+                <head>Construire une base de données avec nodegoat</head>
+                <p>La construction d’une base de données relationnelle se fait à l’aide de logiciels spécialisés, les <ref target="https://perma.cc/D3J4-DSBT">systèmes de gestion de base de données (SGBD)</ref>, qui permettent d’interroger et de manipuler les données selon les principes du langage de requête <ref target="https://perma.cc/B7CF-8YE3">SQL</ref>. Il existe une multitude de SGBD, sous licence libre ou propriétaires (comme Microsoft Access). Il faut noter que ces logiciels peuvent vite devenir difficiles à manier. C’est pourquoi nous allons nous servir ici du logiciel en ligne <ref target="https://perma.cc/LHM9-5VXP">nodegoat</ref>, spécifiquement conçu pour faciliter ce processus pour les chercheurs et chercheuses en sciences humaines. Comme nous allons le constater, il permet de concevoir un modèle de données de manière flexible ; de gérer et conserver des données en ligne ; d’introduire des informations historiques ayant un certain degré d’incertitude ; d’exporter et importer ces données de manière simple et, enfin, de produire des visualisations telles que cartes ou réseaux.<ref type="footnotemark" target="#fr_note_7"/>
+                </p>
+                <div type="3">
+                    <head>Démarrer avec nodegoat</head>
+                    <p>nodegoat est un logiciel en ligne qui permet aux utilisateurs et aux utilisatrices de modéliser, de construire et de partager leur base de données, de façon relativement intuitive. Cette leçon a été conçue en se servant de la version 7.3 de nodegoat, mais nous avons vérifié qu’elle marche tout aussi bien avec la version 8.2 (version en vigueur au moment de la publication de cette leçon). Notez bien que ni l’interface, ni la documentation du logiciel ne sont disponibles en français. Il faut par conséquent avoir une connaissance élémentaire de la langue anglaise afin d’utiliser nodegoat. Avant de commencer, il faut demander l’ouverture d’un compte pour utiliser (gratuitement) nodegoat en ligne. Attention, nodegoat peut prendre jusqu’à 48 heures pour vous accorder votre compte.</p>
+                    <p>nodegoat est un logiciel libre et il est aussi possible de <ref target="https://perma.cc/5PLH-YJQG">l’installer localement</ref>, mais cela exige néanmoins des compétences informatiques poussées. Dans les deux cas (installation locale ou application en ligne), l’utilisation de fonctionnalités plus avancées, notamment pour travailler sur plusieurs projets ou de manière collaborative, requiert de souscrire à l’un des abonnements payants proposés par la société qui le développe. </p>
+                    <p>Les instructions qui suivent visent à guider les lectrices et les lecteurs dans la création d’une base de données sur nodegoat, selon les principes expliqués <ref target="#la-logique-de-notre-recherche--entre-le-mod%C3%A8le-de-donn%C3%A9es-et-la-base-de-donn%C3%A9es">dans la première partie de la leçon</ref>. L’approche que prend le logiciel ressemble fortement à celle qu’on a décrite plus haut pour conceptualiser notre recherche : essentiellement, elle traite les personnes, les groupes et les choses comme des objets, connectés par des relations diverses.<ref type="footnotemark" target="#fr_note_8"/> nodegoat offre aussi des outils d’analyse relationnelle et de production de visualisations telles que cartes ou réseaux. Surtout, le logiciel accepte de consigner des informations incertaines ou ambigües, courantes en sciences humaines. Par exemple, il peut suggérer d’utiliser un intervalle de temps si on ne dispose pas de dates exactes, ou de dessiner un polygone si on ne dispose pas de coordonnées géographiques exactes. </p>
+                    <p>Certes, l’objet de cette leçon n’est pas l’utilisation de nodegoat en soi - vous pouvez tout à fait utiliser <ref target="/fr/lecons/introduction-a-heurist">d’autres logiciels de gestion de bases de données spécifiquement conçus pour la recherche en sciences humaines et sociales</ref>. Malgré tout, en combinant tous ces outils dans un même environnement, nodegoat facilite considérablement l’exercice de concevoir sa recherche en données. Son avantage majeur pour nous, dans cette leçon, est qu’il facilite particulièrement la définition et l’exécution du modèle que nous avons décrit de façon abstraite ci-dessus. </p>
+                </div>
+                <div type="3">
+                    <head>Mettre en place son projet dans nodegoat</head>
+                    <p>En se connectant à nodegoat pour la première fois, nous nous trouvons face à notre <hi rend="bold">Domain</hi> (espace de travail), vide pour l’instant, où l’on voit trois onglets : <hi rend="bold">Data</hi> (données), <hi rend="bold">Management</hi> (gestion) et <hi rend="bold">Model</hi> (modèle). Dans <hi rend="bold">Model</hi>, nous allons construire notre modèle de données selon la logique expliquée dans la section précédente. Dans <hi rend="bold">Management</hi>, nous définirons les paramètres pour mettre en œuvre ce modèle. Enfin, dans <hi rend="bold">Data</hi>, nous cataloguerons nos données selon la structure définie par le modèle, et nous examinerons ces données.</p>
+                    <figure>
+                        <desc>Figure 3. Le domaine de nodegoat encore vide.</desc>
+                        <figDesc>Fonds vide avec les trois onglets</figDesc>
+                        <graphic url="fr-or-concevoir-base-donnees-nodegoat-03.png"/>
+                    </figure>
+                    <div type="4">
+                        <head>Définir les objets de la base de données</head>
+                        <p>Nous allons d’abord créer notre projet, puis définir notre modèle de données et construire notre base. En cliquant sur l’onglet <hi rend="bold">Management</hi>, créons notre projet (via <emph>Add project</emph>) et attribuons-lui un titre en utilisant la barre (<hi rend="bold">Name</hi>) qui s’affiche : « Ouvrages de l’Est ». </p>
+                        <p>Nous allons ensuite naviguer vers l’onglet <hi rend="bold">Model</hi> afin de définir notre modèle de données. Commençons par ajouter un « object type » (type d’objet) en cliquant sur <emph>Add Object Type</emph>. Dans notre modèle, nous avons déjà défini nos trois types d’objets  : l’ouvrage, l’auteur, et la maison d’édition. </p>
+                        <figure>
+                            <desc>Figure 4. L’onglet 'Model' et l’option qui nous permet de commencer à définir notre modèle de données.</desc>
+                            <figDesc>Le volet Model et l’option Add Object Type qui nous permet de commencer à définir notre modèle de données</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-04.png"/>
+                        </figure>
+                        <p>Sous <hi rend="bold">Name</hi>, nous pouvons établir le nom du premier type d’objet de notre jeu de données (« Ouvrage ») et, sous <hi rend="bold">Descriptions</hi>, définir ses attributs. Les attributs du type <hi rend="bold">Ouvrage</hi> sont le titre, la date de parution ou la langue de la première édition. Il faut bien préciser le type de valeur que prend chaque attribut : <hi rend="bold">String</hi> (chaine de caractères) pour les valeurs textuelles comme le titre de l’ouvrage ; <hi rend="bold">Date</hi> pour des formats spécifiques comme la date de parution, ou <ref target="https://perma.cc/K42P-7YB7">autre</ref> en fonction de la nature du jeu de données.</p>
+                        <p>Ici, attention : étant donné que nous incluons le titre de l’ouvrage comme attribut dans <hi rend="bold">Descriptions</hi>, il faut désactiver l’option <hi rend="bold">Fixed Field</hi> (qui fixe le nom du type d’objet selon la valeur donnée à <hi rend="bold">Name</hi>) et cocher à la place la case <hi rend="bold">Name</hi> sous notre premier attribut <hi rend="bold">Titre</hi>. Le nom des objets du type <hi rend="bold">Ouvrage</hi> dans la base de données prendra alors la valeur donnée à l’attribut <hi rend="bold">Titre</hi>.</p>
+                        <figure>
+                            <desc>Figure 5. Définition d’un premier type d’objet pour à travers l’option 'Add Object Type'.</desc>
+                            <figDesc>Le volet Ouvrages et les cases de trois attributs (titres, langue, date de parution)</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-05.png"/>
+                        </figure>
+                        <p>Créons de la même façon les deux autres types d’objets de notre modèle, à savoir l’auteur et la maison d’édition. Sous <hi rend="bold">Name</hi>, nous déterminons le nom du type d’objet (<hi rend="bold">Auteur</hi>, puis <hi rend="bold">Maison d’Edition</hi>) et sous <hi rend="bold">Descriptions</hi>, ses attributs. Pour ces deux types aussi, nous choisirons de désactiver l’option <hi rend="bold">Fixed Field</hi> et nous cocherons plutôt la case <hi rend="bold">Name</hi> sous l’attribut qui donnera le nom de l’élément. Dans le cas de l’auteur, nous pouvons cocher cette option sous <hi rend="bold">Prénom</hi> et <hi rend="bold">Nom</hi>, attributs séparés dans notre exemple.  Ainsi, nous verrons dans l’aperçu de notre base de données que le nom de chaque auteur sera formé de la combinaison de ces deux valeurs. </p>
+                        <p>Pour l’ouvrage, en revanche, nous ne définirons que l’attribut <hi rend="bold">Titre</hi> comme <hi rend="bold">Name</hi>. Si nous souhaitons éviter que la base de données affiche le titre d’un ouvrage deux fois (en tant que nom de l’objet, et en tant que nom de son attribut <hi rend="bold">Titre</hi>), nous pouvons désactiver l’option <hi rend="bold">Overview</hi> (à côté de <hi rend="bold">Fixed Field</hi>). Notre base de données ne donnera ainsi pas de nom à l’objet autre que les valeurs sous lesquelles nous avons coché <hi rend="bold">Name</hi> (ici, donc, le <hi rend="bold">Titre</hi>).</p>
+                        <figure>
+                            <desc>Figure 6. Choix des attributs 'Prénom' et 'Nom' comme valeurs bases du nom de l’objet.</desc>
+                            <figDesc>Les cases des attributs Prénom et Nom, avec l’option Name activée.</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-06.png"/>
+                        </figure>
+                        <figure>
+                            <desc>Figure 7. L'option 'Overview' desactivée.</desc>
+                            <figDesc>L'option in Overview désactivée</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-07.png"/>
+                        </figure>
+                        <p>Nous allons maintenant choisir quels types d’objets nous voulons utiliser dans ce projet. Cette distinction est importante, car il est tout à fait possible d’enregistrer une variété de types d’objets dans notre base de données, sans tous les utiliser, ou sans les explorer de la même manière, selon le projet. Naviguons donc vers l’onglet <hi rend="bold">Management</hi> (gestion), et cliquons sur l’option <hi rend="bold">Edit</hi>, qui s’affiche à droite du nom du projet.  </p>
+                        <figure>
+                            <desc>Figure 8. Volet 'Management' permettant de gérer le projet et de choisir quels objets seront utilisés.</desc>
+                            <figDesc>Le volet Management, avec les objets que nous avons créés</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-08.png"/>
+                        </figure>
+                        <p>nodegoat offre en plus deux types d’objets pré-enregistrés, que nous pouvons ici choisir d’utiliser ou non: « City » (ville) et « Geometry » (géométrie). <hi rend="bold">Geometry</hi> est utile pour représenter des régions, pays ou autres unités politiques du passé ou du présent. Les données géospatiales de ces deux types d’objets (périmètre, coordonnées géographiques, etc.) proviennent de bases de données géographiques externes telles que <ref target="https://perma.cc/9SVS-8MGJ">GeoNames</ref>, qui sont reliées à nodegoat. Il s’agit ainsi de deux types d’objets très utiles et prêts à l’emploi, dont chaque utilisateur et utilisatrice peut se servir pour sa recherche et, inversement, contribuer à enrichir. Dans le cadre de notre projet, nous allons nous servir du type d’objet <hi rend="bold">City</hi>, qui contient des informations utiles sur les villes. Le logiciel vient donc de nous aider à améliorer notre modèle de données, en ajoutant un type d’objet à nos trois premiers, ainsi qu’un nombre d’attributs que nous n’avions pas pensé à comprendre initialement, ou dont nous n’aurions pas pu disposer autrement (par exemple, le pays auquel appartient une ville).    </p>
+                    </div>
+                    <div type="4">
+                        <head>Paramétrer la base de données</head>
+                        <p>Il nous reste encore une étape fondamentale à réaliser : établir les relations entre nos objets. Jusqu’ici, nous n’avons fourni que des informations attachées à un seul type d’objet à la fois. Pourtant, l’élément crucial que nous offre cette base de données relationnelle est, justement, de pouvoir relier nos objets entre eux. Pour rappel, nous avons commencé à construire notre modèle en créant des types d’objets que nous avons par la suite activés dans l’onglet <hi rend="bold">Management</hi> (gestion). À présent, il nous faut revenir dans l’onglet <hi rend="bold">Model</hi> pour connecter chaque type d’objet aux autres. Ce seront les attributs de nos objets qui, comme l’a prescrit notre modèle de données, fonctionneront comme « connecteurs ». </p>
+                        <p>Commençons avec le type d’objet <hi rend="bold">Ouvrage</hi>. Via le bouton <emph>Edit</emph>, nous accédons à l’onglet <hi rend="bold">Object Types</hi> puis aux attributs (<hi rend="bold">Descriptions</hi>). Deux nous intéressent particulièrement : <hi rend="bold">Auteur</hi> et <hi rend="bold">Maison d’édition</hi>. L’attribut <hi rend="bold">Auteur</hi> relie le type d’objet <hi rend="bold">Ouvrage</hi> au type <hi rend="bold">Auteur</hi> ; l’attribut <hi rend="bold">Maison d’édition</hi> relie le type d’objet <hi rend="bold">Ouvrage</hi> au type <hi rend="bold">Maison d’Edition</hi>. Dans le menu déroulant à droite du nom des attributs <hi rend="bold">Auteur</hi> et <hi rend="bold">Maison d’Edition</hi>, activons l’option <hi rend="bold">Reference: Object Type</hi>. Ce faisant, un nouveau menu déroulant apparait, affichant une liste des types d’objets de notre modèle. Nous choisissons respectivement <hi rend="bold">Auteur</hi> et <hi rend="bold">Maison d’Edition</hi>. Le type d’objet <hi rend="bold">Ouvrage</hi> est, comme défini dans notre modèle conceptuel, maintenant relié aux types d’objets <hi rend="bold">Auteur</hi> et <hi rend="bold">Maison d’Edition</hi>, à travers ses attributs <hi rend="bold">Auteur</hi> et <hi rend="bold">Maison d’Edition</hi>. Les deux types d’objets <hi rend="bold">Auteur</hi> et <hi rend="bold">Maison d’Edition</hi> deviennent ainsi sources d’informations qui pouront être intégrées dans le type <hi rend="bold">Ouvrage</hi>. Nous avons donc concrétisé les liens définis de manière abstraite dans notre modèle.</p>
+                        <figure>
+                            <desc>Figure 9. Action pour connecter les objets à travers certains attributs via l'option 'Reference: Object Type'.</desc>
+                            <figDesc>Case de l'attribut 'Auteur' avec l'option Reference: Object Type et avec un séparateur</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-09.png"/>
+                        </figure>
+                        <p>| Nous devons ici cocher la case <hi rend="bold">Multiple</hi> sous l’attribut <hi rend="bold">Auteur</hi>, afin d’indiquer que certains ouvrages peuvent avoir plus d’un auteur, comme dans le cas de <emph>The Intellectuals on the Road to Class Power</emph>. Il faut aussi sélectionner le symbole que nodegoat utilisera pour séparer les auteurs multiples dans une même case. Les « separators » (séparateurs) les plus fréquemment utilisés sont <code rend="inline">,</code> ou <code rend="inline">;</code> ou encore <code rend="inline">|</code>, mais attention : vérifiez bien le séparateur de données choisi en format tabulaire au moment de l’export du CSV. S’ils sont les mêmes, cela risque de dérégler la structure des données au moment de l’export. |</p>
+                        <p>Enfin, lors de la définition de nos objets et de leurs structures, nous pouvons être confrontés à des informations historiques incertaines. L’exemple de l’ouvrage <emph>The Intellectuals on the Road to Class Power</emph> illustre bien ce cas, car nous ne connaissons pas la date exacte de fondation de la maison d’édition Harvester Press. Comment faire dans un cas comme celui-ci ? Si notre recherche indique que les publications de cet éditeur commencent dans les années 1970, nous pouvons formuler l’hypothèse que ses débuts d’activité doivent se trouver quelque part entre l’année 1970 et l’année 1979, date de parution de notre ouvrage. nodegoat permet de cataloguer une information temporelle en forme d’intervalle de temps (ce que l’on appelle <hi rend="bold">Chronology</hi>), utile dans ce genre de cas. </p>
+                        <p>Pour cela, revenons à l’onglet <hi rend="bold">Model</hi> afin d’examiner le type d’objet <hi rend="bold">Maison d’Edition</hi>. En toute probabilité, nous avions défini l’attribut <hi rend="bold">Date de fondation</hi> de la même manière que la date de naissance d’un auteur : dans l’onglet <hi rend="bold">Objects</hi>, sur la liste des <hi rend="bold">Descriptions</hi> et en choissisant le type de donnée <hi rend="bold">Date</hi>.</p>
+                        <figure>
+                            <desc>Figure 10. L'attribut 'Date de fondation'.</desc>
+                            <figDesc>L'Attribut Date de fondation</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-10.png"/>
+                        </figure>
+                        <p>Afin de pouvoir consigner plutôt une date en forme d’intervalle de temps, nous devons en revanche nous servir de l’onglet <hi rend="bold">Sub-Object</hi> (sous-objet). Ici, nous allons créer un sous-objet appelé <hi rend="bold">Date de fondation</hi> et cocher les options <hi rend="bold">Date</hi> et <hi rend="bold">Chronology</hi>.</p>
+                        <figure>
+                            <desc>Figure 11. Création d’un sub-objet 'Chronology' pour le type 'Maisons d’Edition'.</desc>
+                            <figDesc>Sous-onglet avec l’objet Chronology</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-11.png"/>
+                        </figure>
+                        <p>Désormais, le type d'objet <hi rend="bold">Maison d’Edition</hi> comporte un attribut différent d’<hi rend="bold">Auteur</hi> et d’<hi rend="bold">Ouvrage</hi>, qui permet d’introduire des informations temporelles en tant qu’intervalles de temps. Avant de continuer, il faudra supprimer l’attribut <hi rend="bold">Date de fondation</hi> dans l’onglet <hi rend="bold">Objects</hi>, car nous venons de le remplacer par le sous-objet chronologique.</p>
+                    </div>
+                    <div type="4">
+                        <head>Explorer et exploiter la base de données</head>
+                        <p>Notre modèle, ses types d’objets et leurs relations sont maintenant définies. Si nous revenons sur l’onglet <hi rend="bold">Management</hi> et cliquons sur le nom du projet, nodegoat nous montre une visualisation du modèle qui, comme vous le remarquerez, ressemble beaucoup à notre modèle original :</p>
+                        <figure>
+                            <desc>Figure 12. Visualisation de notre modèle de données sur nodegoat.</desc>
+                            <figDesc>modèle de données connectant quatre tableurs, respectivement Auteurs, Maisons d’édition, Ouvrages et Villes</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-12.png"/>
+                        </figure>
+                        <p>Nous allons enfin pouvoir renseigner manuellement notre base de données avec les valeurs que nous collecterons au fur et à mesure de notre recherche. Cela se fait depuis l’onglet <hi rend="bold">Data</hi> (données) avec l’option <emph>Add</emph> (ajouter), que l’on voit sur l’onglet de chaque type d’objet.</p>
+                        <p>Notons que l’attribut <hi rend="bold">Date de fondation</hi> du type d’objet <hi rend="bold">Maison d’Edition</hi> ne s’affiche pas avec les autres attributs, mais en tant qu’élément des <hi rend="bold">Sub-Objects</hi>, et dont la date est définie comme <hi rend="bold">Chronology</hi>. Le logiciel nous permet ici de renseigner les détails de la chronologie à travers un choix entre trois options : 1) « Point » pour indiquer une date exacte; 2) « Statement » (déclaration) pour indiquer une période après ou avant une certaine date (année, mois ou jour) ; 3) « Between Statements » (entre déclarations) pour indiquer une période comprise entre deux dates (comme dans notre exemple, entre 1970 et 1979).</p>
+                        <figure>
+                            <desc>Figure 13. Création d’une chronologie pour Harvester Press.</desc>
+                            <figDesc>Onglet pour créer une chronologie</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-13.png"/>
+                        </figure>
+                        <figure>
+                            <desc>Figure 14. Exemple de chronologie définie comme période « entre déclarations ».</desc>
+                            <figDesc>Onglet avec deux cases pour dates, pour créer une période entre les deux</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-14.png"/>
+                        </figure>
+                        <p>Une fois que nous aurons enregistré tous les ouvrages, auteurs et maisons d’édition, l’interface de consultation de la base de données ressemblera aux images ci-dessous. Il suffira alors de cliquer sur chaque élément pour accéder aux informations le concernant :</p>
+                        <figure>
+                            <desc>Figure 15. Aperçu des ouvrages dans notre base de données.</desc>
+                            <figDesc>Table portant sur les ouvrages avec les informations en cinq colonnes</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-15.png"/>
+                        </figure>
+                        <figure>
+                            <desc>Figure 16. Aperçu des auteurs dans notre base de données.</desc>
+                            <figDesc>Table portant sur les auteurs avec les informations en six colonnes</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-16.png"/>
+                        </figure>
+                        <p>Nous pouvons aussi importer l’ensemble de nos données après la fin du dépouillement de nos sources, à l’aide de fichiers CSV, plutôt que les enregistrer manuellement au fur et à mesure.</p>
+                        <p>Indépendamment de l’option choisie, une fois notre base de données constituée et peuplée, nous pouvons utiliser les outils de visualisation proposés par le logiciel pour explorer davantage nos objets et leurs relations. Voici, par exemple, une carte fournie par nodegoat pour visualiser les lieux de naissance des auteurs (points bleus) :</p>
+                        <figure>
+                            <desc>Figure 17. Visualisation géographique des villes de naissance de nos auteurs sur nodegoat.</desc>
+                            <figDesc>Carte d'Europe avec des points sur les villes de naissance des auteurs en Europe de l'Est</figDesc>
+                            <graphic url="fr-or-concevoir-base-donnees-nodegoat-17.png"/>
+                        </figure>
+                        <p>Somme toute, nodegoat nous permet de définir notre modèle de données et de constituer une base de données de manière relativement simple. Il propose des possibilités multiples pour consigner des informations géographiques et temporelles en prenant en compte l’incertitude qui accompagne souvent le type d’information que nous recueillons en sciences humaines. Par ailleurs, les outils de visualisation permettent d’apprécier l’évolution de notre recherche et d’identifier certaines tendances. Enfin, cet environnement de recherche permet de stocker et de gérer nos données en ligne, tout en offrant la possibilité de les sauvegarder ou de les exporter pour les exploiter à l’aide d’autres outils.</p>
+                    </div>
+                </div>
+            </div>
+            <div type="2">
+                <head>Conclusion</head>
+                <p>Cette leçon a pour but d’encourager les chercheurs et les chercheuses en sciences humaines à concevoir leur recherche en termes de données, en les initiant à la conception et la réalisation d’une base de données, souvent difficiles pour les néophytes. Nous avons essayé ici de donner certains éléments introductifs en nous servant du logiciel en ligne nodegoat qui est particulièrement adapté aux besoins de celles et ceux qui débutent dans la gestion numérique des données. </p>
+                <p>Certes, nodegoat comporte aussi certaines limitations : l’accès individuel gratuit est limité à la réalisation d’un seul projet hébergé sur le site du logiciel. Si l’objectif est de gérer plusieurs projets, d’avoir plusieurs comptes ou d’héberger le projet sur un serveur propre, il devient nécessaire de basculer sur un abonnement payant. Celui-ci demande souvent un soutien financier et/ou technique de la part d’une institution de recherche ou d’enseignement. </p>
+                <p>Pour approfondir votre utilisation de nodegoat et explorer tout son potentiel, nous vous invitons à explorer les <ref target="https://perma.cc/6QEL-F7YZ">Guides</ref> préparés par l’équipe de LAB1100, qui expliquent en détail le fonctionnement du logiciel. Sur le site de nodegoat, vous pouvez aussi explorer <ref target="https://perma.cc/3LKU-ZPYK">d’autres exemples de modèles de données proposés par les créateurs</ref>, ainsi que des exemples de recherches historiques mobilisant des bases de données. </p>
+            </div>
+            <div type="2">
+                <head>Notes</head>
+                <p>
+                    <ref type="footnotemark" target="#fr_note_1"/> : Lemercier Claire et Claire Zalc, <emph>Méthodes quantitatives pour l’historien</emph>, Paris, Repères/La Découverte, 2008. DOI : <ref target="https://doi.org/10.3917/dec.lemer.2008.01">https://doi.org/10.3917/dec.lemer.2008.01</ref>
+                </p>
+                <p>
+                    <ref type="footnotemark" target="#fr_note_2"/> : Posner, Miriam, (2015), "Humanities Data: A Necessary Contradiction", <emph>Miriam Posner’s Blog</emph>
+                    <ref target="https://perma.cc/BBC5-MBEC">https://miriamposner.com/blog/humanities-data-a-necessary-contradiction/</ref>
+                </p>
+                <p>
+                    <ref type="footnotemark" target="#fr_note_3"/> : Drucker, Johanna (2011), "Humanities Approaches to Graphical Display", <emph>Digital Humanities Quarterly</emph> 5, n. 1.</p>
+                <p>
+                    <ref type="footnotemark" target="#fr_note_4"/> : Thaller, Manfred (2018), "On Information in Historical Sources", <emph>A Digital Ivory Tower</emph>, <ref target="https://ivorytower.hypotheses.org/56">https://ivorytower.hypotheses.org/56</ref>
+                </p>
+                <p>
+                    <ref type="footnotemark" target="#fr_note_5"/> : Gardarin, Georges (2003), <emph>Bases de données</emph>, Paris : Eyrolles. Le livre est librement accessible depuis <ref target="https://perma.cc/MBC9-EKZZ">le site web de l’auteur</ref>. </p>
+                <p>
+                    <ref type="footnotemark" target="#fr_note_6"/> : Voir cette notice de Wikipédia pour plus d’éléments sur la notion de « cardinalité » : « Modèle relationnel », <ref target="https://perma.cc/KSA4-Y4WL">https://fr.wikipedia.org/wiki/Mod%C3%A8le_relationnel#Relation_1:N</ref>. Voir aussi Gardarin, ouvrage cité, 412-413.</p>
+                <p>
+                    <ref type="footnotemark" target="#fr_note_7"/> : Bree, P. van, Kessels, G., (2013). nodegoat: a web-based data management, network analysis &amp; visualisation environment, <ref target="http://nodegoat.net">http://nodegoat.net</ref> from <ref target="https://perma.cc/LAT9-M6UW">LAB1100</ref>
+                </p>
+                <p>
+                    <ref type="footnotemark" target="#fr_note_8"/> : Les créateurs de nodegoat décrivent l’approche relationnelle du logiciel comme « orienté-objet ». Ce concept étant le plus souvent utilisé pour décrire un paradigme de programmation informatique, nous préférons éviter l’emploi de ce terme afin d’éviter des confusions.</p>
+            </div>
+        </body>
+    </text>
+</TEI>

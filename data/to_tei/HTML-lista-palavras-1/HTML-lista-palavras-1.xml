@@ -70,7 +70,7 @@
                 </ab>
                 <p>Estamos interessados apenas na transcrição em si e não nos metadados extras contidos nas tags. No entanto, irá notar que o final dos metadados corresponde ao início da transcrição. Isso torna a localização dos metadados uma marcação potencialmente útil para isolar o texto transcrito.</p>
                 <p>À primeira vista, percebemos que a transcrição do julgamento em si começa com uma tag HTML: <code rend="inline">&lt;p&gt;</code>, que significa 'parágrafo'. Essa é coincidentemente a primeira tag de parágrafo no documento. Podemos usar isso para encontrar o ponto de partida do nosso texto transcrito. Temos sorte nesse caso porque essa tag é uma maneira confiável de encontrar o início do texto transcrito no julgamento (caso deseje, dê uma olhada em alguns outros julgamentos para verificar).</p>
-                <p>O texto do julgamento termina na linha 82 com outra tag HTML: <code rend="inline">&lt;br/&gt;</code>, que significa uma quebra de linha. Essa é a última quebra de linha no documento. Essas duas tags (tag de primeiro parágrafo e última quebra de linha), portanto, nos oferecem uma forma de isolar o texto desejado. Sites bem formatados quase sempre terão uma forma única de sinalizar o fim de um conteúdo. Você frequentemente só precisa verificar de forma atenta.</p>
+                <p>O texto do julgamento termina na linha 82 com outra tag HTML: ``, que significa uma quebra de linha. Essa é a última quebra de linha no documento. Essas duas tags (tag de primeiro parágrafo e última quebra de linha), portanto, nos oferecem uma forma de isolar o texto desejado. Sites bem formatados quase sempre terão uma forma única de sinalizar o fim de um conteúdo. Você frequentemente só precisa verificar de forma atenta.</p>
                 <p>A próxima tarefa é remover toda a marcação HTML que permanece mesclada ao conteúdo. Como sabe que tags HTML são sempre encontradas em pares correspondentes de parênteses angulares, é provavelmente uma aposta segura o fato de que, se remover tudo o que estiver entre parênteses angulares, todo o HTML será removido e restará somente a transcrição. Note que estamos assumindo que a transcrição não possuirá os símbolos matemáticos de "menor que" ou "maior que". Se Bowsey fosse um matemático, essa suposição não seria tão segura.</p>
                 <p>A seguir, descreve-se o algoritmo em palavras.</p>
                 <p>Para isolar o conteúdo:</p>
@@ -78,9 +78,8 @@
                     <item>Fazer o download do texto transcrito</item>
                     <item>Buscar no HTML e guardar a localização da primeira tag <code rend="inline">&lt;p&gt;</code>
                     </item>
-                    <item>Buscar no HTML e guardar a localização da última tag <code rend="inline">&lt;br/&gt;</code>
-                    </item>
-                    <item>Armazenar tudo que vier após a tag <code rend="inline">&lt;p&gt;</code> e antes da tag <code rend="inline">&lt;br/&gt;</code> numa string: <emph>pageContents</emph>
+                    <item>Buscar no HTML e guardar a localização da última tag ``</item>
+                    <item>Armazenar tudo que vier após a tag <code rend="inline">&lt;p&gt;</code> e antes da tag `` numa string: <emph>pageContents</emph>
                     </item>
                 </list>
                 <p>Neste ponto, temos o texto da transcrição do julgamento, além da marcação HTML. Em seguida:</p>
@@ -98,14 +97,13 @@
             </div>
             <div type="2">
                 <head>Isolar o Conteúdo Desejado</head>
-                <p>Os próximos passos utilizam os comandos de Python introduzidos na lição <ref target="/pt/licoes/manipular-strings-python">Manipular strings com Python</ref> para implementar a primeira metade do algoritmo: remover todo o conteúdo antes da tag <code rend="inline">&lt;p&gt;</code> e depois da tag <code rend="inline">&lt;br/&gt;</code>. Para recapitular, o algoritmo era o seguinte:</p>
+                <p>Os próximos passos utilizam os comandos de Python introduzidos na lição <ref target="/pt/licoes/manipular-strings-python">Manipular strings com Python</ref> para implementar a primeira metade do algoritmo: remover todo o conteúdo antes da tag <code rend="inline">&lt;p&gt;</code> e depois da tag ``. Para recapitular, o algoritmo era o seguinte:</p>
                 <list type="unordered">
                     <item>Fazer o download do texto transcrito</item>
                     <item>Buscar no HTML e guardar a localização da primeira tag <code rend="inline">&lt;p&gt;</code>
                     </item>
-                    <item>Buscar no HTML e guardar a localização da última tag <code rend="inline">&lt;br/&gt;</code>
-                    </item>
-                    <item>Armazenar tudo que vier após a tag <code rend="inline">&lt;p&gt;</code> e antes da tag <code rend="inline">&lt;br/&gt;</code> numa string: <emph>pageContents</emph>
+                    <item>Buscar no HTML e guardar a localização da última tag ``</item>
+                    <item>Armazenar tudo que vier após a tag <code rend="inline">&lt;p&gt;</code> e antes da tag `` numa string: <emph>pageContents</emph>
                     </item>
                 </list>
                 <p>Para fazer isso, você utilizará o método de string 'find', o método .rfind() (que encontra a última correspondência de algo) e criará uma nova substring contendo apenas o conteúdo desejado entre essas posições de índice.</p>
@@ -118,7 +116,7 @@
                 <ab>
                     <code lang="language-python" xml:id="code_HTML-lista-palavras-1_2" corresp="code_HTML-lista-palavras-1_2.txt" rend="block"/>
                 </ab>
-                <p>Quando executar o <code rend="inline">trial-content.py</code>, ele acessará a página web da transcrição do julgamento de Bowsey e depois verificará o módulo <code rend="inline">obo.py</code> para buscar a função <emph>stripTags</emph>. Ele utilizará essa função para extrair tudo após a primeira tag <code rend="inline">&lt;p&gt;</code> e antes da última tag <code rend="inline">&lt;br/&gt;</code>. Com alguma sorte, esse deve ser o conteúdo textual da transcrição de Bowsey, além de alguma marcação HTML. Não se preocupe se a sua tela de Saída de Comando terminar em uma linha preta grossa. A tela de saída do Komodo Edit possui um número máximo de caracteres para exibição, após o qual os caracteres começarão a literalmente escrever uns sobre os outros na tela, dando a aparência de uma linha preta. Não se preocupe: o texto está lá, ainda que não consiga vê-lo; pode cortá-lo e colá-lo em um ficheiro de texto para verificar.</p>
+                <p>Quando executar o <code rend="inline">trial-content.py</code>, ele acessará a página web da transcrição do julgamento de Bowsey e depois verificará o módulo <code rend="inline">obo.py</code> para buscar a função <emph>stripTags</emph>. Ele utilizará essa função para extrair tudo após a primeira tag <code rend="inline">&lt;p&gt;</code> e antes da última tag ``. Com alguma sorte, esse deve ser o conteúdo textual da transcrição de Bowsey, além de alguma marcação HTML. Não se preocupe se a sua tela de Saída de Comando terminar em uma linha preta grossa. A tela de saída do Komodo Edit possui um número máximo de caracteres para exibição, após o qual os caracteres começarão a literalmente escrever uns sobre os outros na tela, dando a aparência de uma linha preta. Não se preocupe: o texto está lá, ainda que não consiga vê-lo; pode cortá-lo e colá-lo em um ficheiro de texto para verificar.</p>
                 <p>Vamos reservar um momento para ter certeza de que entendemos como <code rend="inline">trial-contents.py</code> é capaz de usar as funções armazenadas em <code rend="inline">obo.py</code>. A função <emph>stripTags</emph> que salvamos em <code rend="inline">obo.py</code> requer um argumento. Em outras palavras, para que seja executada apropriadamente ela precisa que uma informação seja oferecida. Lembre-se do exemplo do cão treinado na lição anterior. Para latir, o cachorro precisa de duas coisas: ar e uma guloseima deliciosa. A função <emph>stripTags</emph> em <code rend="inline">obo.py</code> precisa de uma coisa: a string chamada <emph>pageContents</emph>. Mas você perceberá que, quando chamamos <emph>stripTags</emph> no programa final (<code rend="inline">trial-contents.py</code>), não há menção ao "<emph>pageContents</emph>". Em vez disso, a função recebe HTML como um argumento. Isso pode ser confuso para muitas pessoas quando começam a programar. Uma vez que uma função foi declarada, não precisamos usar o mesmo nome de variável quando chamamos a função. Desde que forneçamos o mesmo tipo de argumento, tudo deve funcionar bem, independente de como o chamarmos. Nesse caso, queríamos que <emph>pageContents</emph> usasse o conteúdo da nossa variável HTML. Você poderia ter passado qualquer string, inclusive uma que você insira diretamente entre aspas. Tente executar novamente <code rend="inline">trial-content.py</code>, alterando o argumento de <emph>stripTags</emph> para "Eu gosto muito de cachorros" e veja o que acontece. Note que, dependendo de como defina a sua função (e o que ela faz), o seu argumento pode precisar ser algo que não seja uma string: um número inteiro (<emph>integer</emph>), por exemplo.</p>
             </div>
             <div type="2">

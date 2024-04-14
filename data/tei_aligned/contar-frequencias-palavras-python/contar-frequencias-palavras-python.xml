@@ -1,0 +1,166 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="contar-frequencias-palavras-python" xml:base="contar-frequencias-palavras-python/contar-frequencias-palavras-python.xml">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Contagem de Frequências de Palavras com Python</title>
+                <author role="original_author">
+                    <persName>William J. Turkel</persName>
+                    <persName>Adam Crymble</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Jim Clifford</persName>
+                    <persName>Frederik Elwert</persName>
+                </editor>
+                <author role="translators">Felipe Lamarca</author>
+                <editor role="translation-reviewers">
+                    <persName>Ana Carolina Erthal</persName>
+                    <persName>Joana Vieira Paulino</persName>
+                </editor>
+                <editor role="editors">Miriam Posner</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">01/13/2022</date>
+                <idno type="doi">10.46430/phpt0023</idno>
+                <date type="published">07/17/2012</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#counting-frequencies"/>.</p>
+                <p>There are other translations: <ref target="#decomptes-de-frequences-de-mots-en-python #contar-frecuencias"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Contar a frequência de palavras específicas de uma lista pode fornecer dados esclarecedores. Esta lição ensinará uma maneira fácil de contar essas frequências com Python.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <div type="2" n="1">
+                <head>Objetivos da Lição</head>
+                <p>Sua lista agora está limpa o suficiente para que possa começar a analisar seu conteúdo de maneiras significativas. Contar a frequência de palavras específicas de uma lista pode fornecer dados esclarecedores. Python possui uma maneira fácil de contar frequências, mas requer o uso de um novo tipo de variável: o <emph>dicionário</emph>. Antes de começar a trabalhar com um dicionário, considere os processos utilizados para calcular frequências em uma lista.</p>
+                <div type="3" n="1.1">
+                    <head>Ficheiros Necessários para esta Lição</head>
+                    <list type="unordered">
+                        <item>
+                            <code rend="inline">obo.py</code>
+                        </item>
+                    </list>
+                    <p>Caso não possua esse ficheiro, pode fazer o <emph>download</emph> do ficheiro (<ref target="https://programminghistorian.org/assets/python-lessons4.zip">zip</ref>) que contém todo o código das lições anteriores desta série.</p>
+                </div>
+            </div>
+            <div type="2" n="2">
+                <head>Frequências</head>
+                <p>Agora desejamos contar a frequência de cada palavra em nossa lista. Já viu que é fácil de processar uma lista utilizando um <code rend="inline">for</code>
+                    <emph>loop</emph>. Tente salvar e executar o exemplo a seguir. Lembre-se de que <code rend="inline">+=</code> informa ao programa para acrescentar algo ao final de uma variável existente.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_0" corresp="code_contar-frequencias-palavras-python_0.txt" rend="block"/>
+                </ab>
+                <p>Aqui, começamos com uma string e separamo-la em uma lista, como fizemos anteriormente. Depois disso criamos uma lista (inicialmente vazia) chamada <code rend="inline">wordfreq</code>, percorremos cada palavra na <code rend="inline">wordlist</code> e contamos o número de vezes que aquela palavra aparece em toda a lista. Então, adicionamos a contagem de cada palavra à nossa lista <code rend="inline">wordfreq</code>. Utilizando a operação <code rend="inline">zip</code>, somos capazes de combinar a primeira palavra da lista de palavras com o primeiro número na lista de frequências, a segunda palavra e a segunda frequência e assim por diante. Terminamos com uma lista de pares de palavras e frequências. A função <code rend="inline">str</code> converte qualquer objeto numa string para que ele possa ser exibido.</p>
+                <p>Deve obter algo assim:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_1" corresp="code_contar-frequencias-palavras-python_1.txt" rend="block"/>
+                </ab>
+                <p>Valerá a pena estudar o código acima até entendê-lo antes de continuar.</p>
+                <p>O Python também inclui uma ferramenta muito conveniente chamada <emph>
+                        <ref target="http://docs.python.org/tutorial/datastructures.html#list-comprehensions">list comprehension</ref>
+                    </emph> (ver uma explicação do método de <ref target="https://pt.wikipedia.org/wiki/Compreens%C3%A3o_de_lista">compreensão de lista</ref> em português), que pode ser utilizada para fazer o mesmo que um <code rend="inline">for</code>
+                    <emph>loop</emph> de maneira mais económica.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_2" corresp="code_contar-frequencias-palavras-python_2.txt" rend="block"/>
+                </ab>
+                <p>Se estudar esse método de compreensão de lista cuidadosamente, descobrirá que ele faz exatamente o mesmo que o <code rend="inline">for</code>
+                    <emph>loop</emph> no exemplo anterior, mas de maneira condensada. Qualquer um dos métodos funcionará bem, então use a versão com a qual se sente mais confortável.</p>
+                <p>Em geral é prudente utilizar um código que entenda ao invés de um código que seja executado mais rapidamente.</p>
+                <p>Neste ponto, temos uma lista de pares, onde cada par contém uma palavra e sua frequência. Essa lista é um pouco redundante. Se 'the' ocorre 500 vezes, então essa lista contém quinhentas cópias do par ('the', 500). Essa lista também está ordenada pelas palavras no texto original, ao invés de listar as palavras na ordem da mais frequente para a menos frequente. Podemos resolver esses problemas convertendo-a em um dicionário, e depois exibindo o dicionário na ordem do item mais comum para o menos comum.</p>
+            </div>
+            <div type="2" n="3">
+                <head>Dicionários de Python</head>
+                <p>Tanto strings quanto listas são ordenadas sequencialmente, o que significa que pode acessar seus conteúdos utilizando um índice (<emph>index</emph>), um número que começa no 0. Caso tenha uma lista contendo strings, pode utilizar um par de índices para acessar uma string particular na lista, e depois um caractere particular naquela string. Estude os exemplos abaixo:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_3" corresp="code_contar-frequencias-palavras-python_3.txt" rend="block"/>
+                </ab>
+                <p>Para manter controle sobre as frequências, utilizaremos outro tipo de objeto Python: um dicionário. O dicionário é uma coleção não ordenada de objetos. Isso significa que não pode utilizar índices para recuperar seus elementos. Pode, por outro lado, buscá-los utilizando uma chave, ou <emph>key</emph> no inglês (daí o nome "dicionário"). Estude o exemplo a seguir:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_4" corresp="code_contar-frequencias-palavras-python_4.txt" rend="block"/>
+                </ab>
+                <p>Dicionários podem ser um pouco confusos para um novo programador. Tente pensar neles como um dicionário de idiomas. Caso não saiba (ou não se lembre) como exatamente "<emph>bijection</emph>" difere de "<emph>surjection</emph>", pode buscar pelos dois termos no <emph>Oxford English Dictionary</emph>. O mesmo princípio se aplica quando realiza um <code rend="inline">print(d['olá'])</code> exceto pelo fato de que, ao invés de exibir uma definição literária, ele exibe o valor associado à palavra-chave 'olá', conforme definido por você quando criou o dicionário chamado <code rend="inline">d</code>. Nesse caso, esse valor é "0".</p>
+                <p>Observe que usa chaves para definir um dicionário, mas colchetes para acessar coisas dentro dele. A operação <code rend="inline">keys</code> retorna uma lista de chaves que estão definidas no dicionário.</p>
+            </div>
+            <div type="2" n="4">
+                <head>Pares Palavra-Frequência</head>
+                <p>Com base no que temos até agora, queremos uma função que seja capaz de converter uma lista de palavras em um dicionário de pares palavra-frequência. O único comando novo que vamos precisar é <code rend="inline">dict</code>, que faz um dicionário a partir de uma lista de pares. Copie o código a seguir e adicione-o ao módulo <code rend="inline">obo.py</code>:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_5" corresp="code_contar-frequencias-palavras-python_5.txt" rend="block"/>
+                </ab>
+                <p>Também vamos querer uma função que seja capaz de ordenar o dicionário de pares palavra-frequência por frequência decrescente. Copie o código a seguir e adicione-o também ao módulo <code rend="inline">obo.py</code>:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_6" corresp="code_contar-frequencias-palavras-python_6.txt" rend="block"/>
+                </ab>
+                <p>Agora podemos escrever um programa que recebe uma URL e retorna pares palavra-frequência para a página web, de acordo com a ordem decrescente de frequência. Copie o programa a seguir no Komodo Edit, armazene-o como <code rend="inline">html-to-freq.py</code> e execute-o. Estude o programa e seu resultado cuidadosamente antes de continuar.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_7" corresp="code_contar-frequencias-palavras-python_7.txt" rend="block"/>
+                </ab>
+            </div>
+            <div type="2" n="5">
+                <head>Removendo <emph>Stop Words</emph>
+                </head>
+                <p>Quando vemos o resultado do nosso programa <code rend="inline">html-to-freq.py</code>, verificamos que muitas das palavras mais frequentes no texto são palavras funcionais como <emph>the</emph>, <emph>of</emph>, <emph>to</emph> e <emph>and</emph>.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_8" corresp="code_contar-frequencias-palavras-python_8.txt" rend="block"/>
+                </ab>
+                <p>Essas palavras são geralmente as mais comuns em qualquer texto de língua inglesa, então elas não nos dizem muito a respeito do julgamento de Bowsey. Em geral, estamos mais interessados em encontrar as palavras que nos auxiliarão a diferenciar esse texto de outros textos sobre assuntos distintos. Desse modo, vamos remover as palavras funcionais comuns. Palavras que são ignoradas dessa forma são conhecidas como <emph>stopwords</emph>
+                    <ref type="footnotemark" target="#pt_note_1"/>. Utilizaremos a lista a seguir, adaptada de uma publicação <emph>online</emph> por <ref target="http://ir.dcs.gla.ac.uk/resources/linguistic_utils/stop_words">cientistas da computação em Glasgow</ref>. Copie-a e adicione-a no início da biblioteca <code rend="inline">obo.py</code> que está construindo.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_9" corresp="code_contar-frequencias-palavras-python_9.txt" rend="block"/>
+                </ab>
+                <p>Agora, livrar-se das <emph>stop words</emph> em uma lista é fácil: basta usar outra <emph>list comprehension</emph>. Adicione também essa função ao módulo <code rend="inline">obo.py</code>:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_10" corresp="code_contar-frequencias-palavras-python_10.txt" rend="block"/>
+                </ab>
+            </div>
+            <div type="2" n="6">
+                <head>Juntando Tudo</head>
+                <p>Agora temos tudo o que precisamos para determinar frequências de palavras para páginas web. Copie o código a seguir no Komodo Edit, armazene-o como <code rend="inline">html-to-freq-2.py</code> e execute-o:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_11" corresp="code_contar-frequencias-palavras-python_11.txt" rend="block"/>
+                </ab>
+                <p>Se tudo correu bem, sua saída deve-se parecer com isto:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_contar-frequencias-palavras-python_12" corresp="code_contar-frequencias-palavras-python_12.txt" rend="block"/>
+                </ab>
+            </div>
+            <div type="2" n="7">
+                <head>Leituras Sugeridas</head>
+                <p>Lutz, Learning Python</p>
+                <list type="unordered">
+                    <item>Ch. 9: Tuples, Files, and Everything Else</item>
+                    <item>Ch. 11: Assignment, Expressions, and print</item>
+                    <item>Ch. 12: if Tests</item>
+                    <item>Ch. 13: while and for Loops</item>
+                </list>
+                <p>Pilgrim, Diving into Python</p>
+                <list type="unordered">
+                    <item>Ch. 7: <ref target="https://web.archive.org/web/20180416143856/http://www.diveintopython.net/regular_expressions/index.html">Regular Expressions</ref>
+                    </item>
+                </list>
+            </div>
+            <div type="2" n="8">
+                <head>Sincronização de Código</head>
+                <p>Para acompanhar lições futuras, é importante ter os ficheiros e programas corretos no seu diretório “programming-historian”. No final de cada lição, é possível fazer o <emph>download</emph> do ficheiro zip “programming-historian” para garantir que possui o código correto.</p>
+                <list type="unordered">
+                    <item>programming-historian-5 (<ref target="https://programminghistorian.org/assets/python-lessons5.zip">zip sync</ref>)</item>
+                </list>
+                <p>
+                    <ref type="footnotemark" target="#pt_note_1"/> : Na língua portuguesa, palavras similares seriam "e", "de", "da", "do", "um", "uma", dentre outras, a depender de cada caso.</p>
+            </div>
+        </body>
+    </text>
+</TEI>

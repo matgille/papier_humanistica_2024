@@ -1,0 +1,399 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="georeferencing-qgis" xml:base="georeferencing-qgis/georeferencing-qgis.xml">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Georeferencing in QGIS 2.0</title>
+                <author role="original_author">
+                    <persName>Jim Clifford</persName>
+                    <persName>Josh MacFadyen</persName>
+                    <persName>Daniel Macfarlane</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Finn Arne Jørgensen</persName>
+                    <persName>Peter Webster</persName>
+                    <persName>Abby Schreiber</persName>
+                </editor>
+                <editor role="editors">Adam Crymble</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0027</idno>
+                <date type="published">12/13/2013</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#georreferenciamento-qgis #georreferenciar-qgis"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>In this lesson, you will learn how to georeference historical maps so that they may be added to a GIS as a raster layer.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">mapping</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2" n="1">
+                <head>Lesson Goals</head>
+                <p>In this lesson, you will learn how to georeference historical maps so
+that they may be added to a GIS as a raster layer. Georeferencing is
+required for anyone who wants to accurately digitize data found on a
+paper map, and since historians work mostly in the realm of paper,
+georeferencing is one of our most commonly used tools. The technique
+uses a series of control points to give a two-dimensional object like a
+paper map the real world coordinates it needs to align with the
+three-dimensional features of the earth in GIS software (in <ref target="/lessons/googlemaps-googleearth">Intro to
+Google Maps and Google Earth</ref> we saw an 'overlay' which is a Google
+Earth shortcut version of georeferencing).</p>
+                <p>Georeferencing a historical map requires a knowledge of both the
+geography and the history of the place you are studying to ensure
+accuracy. The built and natural landscapes change over time, and it is
+important to confirm that the location of your control points — whether
+they be houses, intersections, or even towns — have remained constant.
+Entering control points in a GIS is easy, but behind the scenes,
+georeferencing uses complex transformation and compression processes.
+These are used to correct the distortions and inaccuracies found in many
+historical maps and stretch the maps so that they fit geographic
+coordinates. In cartography this is known as <ref target="http://en.wikipedia.org/wiki/Rubbersheeting">rubber-sheeting</ref> because
+it treats the map as if it were made of rubber and the control points as
+if they were tacks 'pinning' the historical document to a three
+dimensional surface like the globe.</p>
+            </div>
+            <div type="2" n="2">
+                <head>Getting Started</head>
+                <p>Before proceeding with georeferencing in Quantum GIS, we need to
+activate the appropriate Plugins. On the toolbar go to Plugins -&gt;
+Manage and Install Plugins</p>
+                <figure>
+                    <desc>Figure 1</desc>
+                    <graphic url="geo110.png"/>
+                </figure>
+                <p>A window titled Plugin Manager will open. Scroll down to Georeference
+GDAL and check the box beside it, and click OK.</p>
+                <figure>
+                    <desc>Figure 2</desc>
+                    <graphic url="geo210.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>At this point, you need to shut down and relaunch QGIS. For the
+purposes of this example, and to keep things as simple as possible,
+don't reload your existing project but instead start a new project.</item>
+                    <item>Set up the <ref target="http://en.wikipedia.org/wiki/Spatial_reference_system">Coordinate Reference System</ref> (CRS) correctly (see
+<ref target="/lessons/qgis-layers">Installing QGIS 2.0 and adding Layers</ref> for a reminder)</item>
+                    <item>Save this new project (under File menu, select Save Project) and
+call it 'georeferencing.'</item>
+                    <item>Add the 'coastline_polygon' layer (see <ref target="/lessons/qgis-layers">Installing QGIS 2.0 and
+adding Layers</ref> for a reminder)</item>
+                </list>
+            </div>
+            <div type="2" n="3">
+                <head>Open the Necessary GIS Layers</head>
+                <p>For the Prince Edward Island case study, we are going to use the
+township boundaries as control points because they were established in
+1764 by Samuel Holland, they are identified on most maps of PEI, and
+they have changed very minimally since then.</p>
+                <p>
+                    <emph>Download lot_township_polygon:</emph>
+                </p>
+                <p>This is the shapefile containing the modern vector layer we are going to
+use to georeference the historical map. Note that townships were not
+given names but rather a lot number in 1764, so they are usually
+referred to as 'Lots' in PEI. Hence the file name
+'lot_township_polygon'.</p>
+                <list type="unordered">
+                    <item>Navigate to the link below in your web browser and download the file.</item>
+                </list>
+                <p>
+                    <ref target="http://www.gov.pe.ca/gis/license_agreement.php3?name=lot_town&amp;file_format=SHP">http://www.gov.pe.ca/gis/license_agreement.php3?name=lot_town&amp;file_format=SHP</ref>
+                </p>
+                <list type="unordered">
+                    <item>After downloading the file called 'lot_township_polygon', move it
+into a folder that you can find later and unzip the file. (Remember
+to keep the files together as they are all required to open this
+layer in your GIS)</item>
+                </list>
+                <figure>
+                    <desc>Figure 3</desc>
+                    <graphic url="geo310.png"/>
+                </figure>
+                <p>
+                    <emph>Add lot_township_polygon to QGIS:</emph>
+                </p>
+                <list type="unordered">
+                    <item>under Layer on the toolbar, choose Add Vector Layer (alternatively
+the same icon you see next to 'Add Vector Layer' can also be
+selected from the tool bar)</item>
+                    <item>Click Browse. Navigate to your unzipped file and select the file
+titled 'lot_township_polygon.shp'</item>
+                    <item>Click Open</item>
+                </list>
+                <figure>
+                    <desc>Figure 4</desc>
+                    <graphic url="geo41.png"/>
+                </figure>
+                <p>For more information on adding and visualizing layers see <ref target="/lessons/qgis-layers">Installing
+QGIS 2.0 and adding Layers</ref>.</p>
+                <figure>
+                    <desc>Figure 5</desc>
+                    <graphic url="geo51.png"/>
+                </figure>
+            </div>
+            <div type="2" n="4">
+                <head>Open the Georeferencer Tool</head>
+                <p>Georeferencer is now available under the Raster menu on the toolbar –
+select it.</p>
+                <figure>
+                    <desc>Figure 6</desc>
+                    <graphic url="geo61.png"/>
+                </figure>
+                <p>
+                    <emph>Add your historical map:</emph>
+                </p>
+                <list type="unordered">
+                    <item>In the resulting window, click on the Open Raster button on the top
+left (which looks identical to the Add Raster layer).</item>
+                </list>
+                <figure>
+                    <desc>Figure 7</desc>
+                    <graphic url="geo71.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>Find the file titled 'PEI_LakeMap1863.jpg' on your computer and
+select Open (the file <ref target="https://geospatialhistorian.files.wordpress.com/2013/02/pei_lakemap1863.jpg">can be downloaded here</ref> or in its original
+location at the <ref target="https://islandimagined.ca/islandora/object/imagined:208687">Island Imagined</ref> online map repository)</item>
+                    <item>You will be prompted to define this layer's coordinate system. In
+the Filter box search for '2291′, then in the box below select
+'NAD83(CSRS98) / Prince Edward …'</item>
+                </list>
+                <p>The result will look like this:</p>
+                <figure>
+                    <desc>Figure 8</desc>
+                    <graphic url="geo81.png"/>
+                </figure>
+                <p>
+                    <emph>Adding control points:</emph>
+                </p>
+                <p>Plan the locations you are going to use as control points in advance of
+the steps that follow. It is much easier to navigate around the
+historical map first, so get a good idea of the best points to use and
+keep them in mind.</p>
+                <p>Some tips for choosing control points:</p>
+                <list type="unordered">
+                    <item>
+                        <hi rend="bold">How many</hi> points do you need? Usually the more points you assign
+the more accurate your georeferenced map will be. Two control points
+will tell the GIS to scale and rotate the map to those two points,
+but in order to truly rubber-sheet the historical document you need
+to add more points.</item>
+                    <item>
+                        <hi rend="bold">Where</hi> should you put control points? Select areas as close as
+possible to the four corners of your map so that these outer areas
+do not get omitted in the rubber-sheeting.</item>
+                    <item>Select additional control points close to your area of interest.
+Everything in between the four corner control points should
+georeference evenly, but if you are concerned about the accuracy of
+one place in particular, make sure to select additional control
+points in that area.</item>
+                    <item>Select the middle of intersections and roads, because the edges of
+roads changed a certain amount over time as road improvements were
+made.</item>
+                    <item>Check that your control points did not change location over time.
+Roads were often re-routed, and even houses and other buildings were
+moved, especially <ref target="http://books.google.ca/books?id=TqCNZYXWXAUC&amp;dq=tilting&amp;source=gbs_navlinks_s">in Atlantic Canada</ref>!</item>
+                </list>
+                <p>
+                    <emph>Add your first control point:</emph>
+                </p>
+                <p>
+                    <hi rend="bold">First</hi>, navigate to the location of your first control point on the
+<hi rend="bold">historical map</hi>.</p>
+                <list type="unordered">
+                    <item>click on Zoom In Magnifying Glass on the window tool bar or use the
+mouse roller wheel to zoom in</item>
+                </list>
+                <figure>
+                    <desc>Figure 9</desc>
+                    <graphic url="geo91.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>
+                        <p>zoom in to a point which you can recognize on both your printed map
+and your GIS</p>
+                    </item>
+                    <item>
+                        <p>Click on Add Point on toolbar</p>
+                    </item>
+                </list>
+                <figure>
+                    <desc>Figure 10</desc>
+                    <graphic url="geo101.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>Click on the place in the printed map that you can locate in your
+GIS (i.e. the control point). The Georeferencer window will now
+minimize automatically. If it does not (some versions have a bug in
+this plugin) manually minimize the window</item>
+                    <item>Click on the place in the GIS which matches the control point</item>
+                </list>
+                <figure>
+                    <desc>Figure 11</desc>
+                    <graphic url="geo111.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>At this stage we identified a problem in lot boundaries. We planned
+to use the location where the southern border of Lot 1 at the West
+end of the Province contains a "dog leg" near the middle of the land
+mass. However, it was clear that not all the dog legs on these lots
+matched the historical map. It is possible that lot boundaries have
+changed somewhat in the 250 years since they were established, so it
+is best to choose the point you are most sure of. In this case the
+dog leg between Lot 2 and Lot 3 was fine (see arrow). It was the
+border of Lots 3 and 4 that has changed. The discrepancy at the
+border of 1 and 2 shows that more control points are needed to
+properly rubber-sheet this somewhat distorted 1863 map to the
+Provincial GIS layer</item>
+                </list>
+                <figure>
+                    <desc>Figure 12</desc>
+                    <graphic url="geo121.png"/>
+                </figure>
+                <p>
+                    <emph>Add at least one more control point:</emph>
+                </p>
+                <list type="unordered">
+                    <item>return to the Georeferencer window and repeat the steps under '<emph>Add
+your first control point</emph>' above, to add additional control points.</item>
+                    <item>Add a point close to the opposite side of your printed map (the
+further apart your control points are placed the more accurate the
+georeferencing process) and another one near Charlottetown</item>
+                    <item>return to the Georeferencer window. You should see three red dots on
+the printed map, and three records in the GCP table at the bottom of
+your window (outlined in red on the following image)</item>
+                </list>
+                <figure>
+                    <desc>Figure 13</desc>
+                    <graphic url="geo131.png"/>
+                </figure>
+                <p>
+                    <emph>Determine the transformation settings:</emph>
+                </p>
+                <p>Before you click Play and start the automated georeferencing process you
+need to tell QGIS where to save the new file (this will be a raster
+file), how it should interpret your control points, and how it should
+compress the image.</p>
+                <list type="unordered">
+                    <item>Click on the Transformation Settings button</item>
+                </list>
+                <figure>
+                    <desc>Figure 14</desc>
+                    <graphic url="geo141.png"/>
+                </figure>
+                <p>Most of these settings can be left as default: linear transformation
+type, nearest neighbour resampling method, and LZW compression. (The
+<ref target="http://en.wikipedia.org/wiki/World_file">world file</ref> is not necessary, unless you want to georeference the
+same image again in another GIS or if someone else needs to georeference
+the image and does not have access to your GIS data, coordinate
+reference system, etc.) The target SRS is not important, but you could
+use this feature to give the new raster a different reference system.</p>
+                <list type="unordered">
+                    <item>Assign a folder for your new georeferenced raster file. <ref target="http://en.wikipedia.org/wiki/Tagged_Image_File_Format">Tif</ref> is
+the default format for rasters georeferenced in QGIS.</item>
+                    <item>Be aware that a Tif file is going to be much larger than your original map,
+even with LZW compression, so make sure you have adequate space if you are
+using a jump drive. (<emph>warning:</emph> the Tif file produced from this 6.8 Mb .jpg
+will be <hi rend="bold">over 1GB</hi> once georeferenced. One way to manage the size of the
+georeferenced raster file while maintaining a high enough resolution for
+legibility is to crop out only the area needed for the map project. In this
+case, a lower resolution option is also available from the <ref target="https://islandimagined.ca/islandora/object/imagined:208687">Island
+Imagined</ref> online map repository.)</item>
+                    <item>Leave the target resolution at the default</item>
+                    <item>You can select 'Use 0 transparency when needed' to eliminate black
+spaces around the edges of the map, but this is not necessary and
+you can experiment as needed</item>
+                    <item>Make sure 'Load in QGIS' is selected to save a step. This will
+automatically add the new file to your GIS's Table of Contents so
+that you don't have to go looking for the Tif file later</item>
+                </list>
+                <figure>
+                    <desc>Figure 15</desc>
+                    <graphic url="geo151.png"/>
+                </figure>
+            </div>
+            <div type="2" n="5">
+                <head>Georeference!</head>
+                <list type="unordered">
+                    <item>Click on the Play button on the toolbar (beside Add Raster) – this
+begins the georeferencing process</item>
+                </list>
+                <figure>
+                    <desc>Figure 16</desc>
+                    <graphic url="geo161.png"/>
+                </figure>
+                <figure>
+                    <desc>Figure 17</desc>
+                    <graphic url="geo171.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>A window will appear titled Define CRS: select 2291, click OK</item>
+                </list>
+                <figure>
+                    <desc>Figure 18</desc>
+                    <graphic url="geo181.png"/>
+                </figure>
+                <p>
+                    <emph>Explore your map:</emph>
+                </p>
+                <list type="unordered">
+                    <item>Drag the new layer 'PEI_LakeMap1863_modified' down to the bottom
+of your Table of Contents (i.e. below the 'lot_township_polygon'
+layer</item>
+                </list>
+                <figure>
+                    <desc>Figure 19</desc>
+                    <graphic url="geo191.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>Change the fill of the lot_township_polygon layer to 'no brush' by
+Selecting the layer, clicking on Layer -&gt; Properties, and clicking
+on Symbol Properties. Click OK</item>
+                </list>
+                <figure>
+                    <desc>Figure 20</desc>
+                    <graphic url="geo201.png"/>
+                </figure>
+                <list type="unordered">
+                    <item>Now you should see the modern GIS layer with the historical map in
+behind</item>
+                </list>
+                <figure>
+                    <desc>Figure 21</desc>
+                    <graphic url="geo211.png"/>
+                </figure>
+                <p>Now that you have a newly georeferenced map in your GIS you can explore
+the layer, adjust the transparency, contrast and brightness, and go back
+through <ref target="/lessons/vector-layers-qgis">Creating New Vector Layers in QGIS</ref> to digitize some of the
+historical information that you have created. For instance, this
+georeferenced map of PEI shows the locations of all homes in 1863,
+including the name of the head of household. By assigning points on the
+map you can enter home locations and owner names and then analyze or
+share that new geospatial layer as a shapefile.</p>
+                <p>By digitizing line vectors such as roads or coastlines you can compare
+the location of these features with other historical data, or simply
+compare them visually with the lot_township_polygon layer in this GIS.</p>
+                <p>In more advanced processes you can even drape this georeferenced image
+over a DEM (digital elevation model) to give it a hillshade terrain or
+3D effect and perform a 'fly-over' of PEI homes in the nineteenth
+century.</p>
+                <p>
+                    <emph>This lesson is part of the <ref target="http://geospatialhistorian.wordpress.com/">Geospatial Historian</ref>.</emph>
+                </p>
+            </div>
+        </body>
+    </text>
+</TEI>

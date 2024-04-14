@@ -1,0 +1,165 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="decomptes-de-frequences-de-mots-en-python" xml:base="decomptes-de-frequences-de-mots-en-python/decomptes-de-frequences-de-mots-en-python.xml">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Décomptes d'occurrences de mots en Python</title>
+                <author role="original_author">
+                    <persName>William J. Turkel</persName>
+                    <persName>Adam Crymble</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Jim Clifford</persName>
+                    <persName>Frederik Elwert</persName>
+                </editor>
+                <author role="translators">François Dominic Laramée</author>
+                <editor role="translation-reviewers">
+                    <persName>Alice Brenon</persName>
+                    <persName>Anaïs Chambat</persName>
+                </editor>
+                <editor role="editors">Miriam Posner</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">03/08/2023</date>
+                <idno type="doi">10.46430/phfr0025</idno>
+                <date type="published">07/17/2012</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#counting-frequencies"/>.</p>
+                <p>There are other translations: <ref target="#contar-frecuencias #contar-frequencias-palavras-python"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Compter les occurrences de mots spécifiques dans une liste peut constituer une source de données utiles. Cette leçon vous apprendra comment compter ces occurrences facilement en Python.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="fr">
+        <body>
+            <div type="2" n="1">
+                <head>Objectifs de la leçon</head>
+                <p>Supposons que vous ayez en votre possession un texte suffisamment propre pour pouvoir commencer à analyser son contenu. Le décompte des mots spécifiques dans la liste des mots qui composent le texte pourrait constituer une source de données pertinentes. Python dispose d’un mécanisme qui permet de réaliser cette opération facilement. Ce mécanisme requiert cependant l’utilisation d’un nouveau type de variable : le dictionnaire. Mais avant de commencer à travailler avec les dictionnaires, nous allons décrire les étapes nécessaires au calcul des occurrences.</p>
+                <div type="3" n="1.1">
+                    <head>Fichier requis pour cette leçon</head>
+                    <list type="unordered">
+                        <item>
+                            <code rend="inline">obo.py</code>
+                        </item>
+                    </list>
+                    <p>Si vous ne disposez pas déjà d'une copie de ce fichier, vous pouvez télécharger une archive (<ref target="/assets/python-lessons4.zip">
+                            <code rend="inline">.zip</code>
+                        </ref>) contenant tout le code développé dans le cadre des leçons précédentes de cette série.</p>
+                </div>
+            </div>
+            <div type="2" n="2">
+                <head>Décompte d'occurrences</head>
+                <p>Nous voulons compter le nombre d'occurrences de chacun des mots qui apparaissent au moins une fois dans une liste. Pour parcourir la liste, nous utiliserons une boucle <code rend="inline">for</code>. Sauvegardez et exécutez le programme suivant. (Rappel : <code rend="inline">+=</code> indique au programme d'ajouter quelque chose à la fin d'une variable qui existe déjà.)</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_0" corresp="code_decomptes-de-frequences-de-mots-en-python_0.txt" rend="block"/>
+                </ab>
+                <p>Le programme commence par diviser une chaîne de caractères en liste de mots, comme nous l'avons déjà fait dans d'autres leçons de cette série. Il crée ensuite une liste (vide au début) nommée <emph>frequences_mots</emph>. Nous examinons chacun des mots dans <emph>liste_mots</emph> et nous comptons le nombre d'apparitions de ce mot dans la liste. </p>
+                <p>Nous ajoutons ensuite chacun de ces décomptes à notre liste <emph>frequences_mots</emph>. À l'aide de l'opération <code rend="inline">zip</code>, nous pouvons associer le premier mot de la <emph>liste_mots</emph> avec le premier nombre dans <emph>frequences_mots</emph>, le second mot avec le second nombre, etc. </p>
+                <p>Nous obtenons ainsi une liste de paires formées d'un mot et du nombre de ses occurrences dans la liste. Note : la fonction <code rend="inline">str</code> convertit n'importe quel objet Python en une chaîne de caractères pour qu'il puisse être affiché à l'écran.</p>
+                <p>En exécutant le programme, vous devriez obtenir quelque chose qui ressemble à ceci :</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_1" corresp="code_decomptes-de-frequences-de-mots-en-python_1.txt" rend="block"/>
+                </ab>
+                <p>Prenez le temps de bien étudier le code ci-dessus jusqu'à ce que vous le maîtrisiez avant de poursuivre. Vous ne le regretterez pas.</p>
+                <p>Python inclut aussi un mécanisme très pratique appelé la <ref target="https://perma.cc/42NM-93XZ">compréhension de liste</ref>, que l'on peut utiliser pour accomplir les mêmes tâches que la boucle <code rend="inline">for</code> plus efficacement :</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_2" corresp="code_decomptes-de-frequences-de-mots-en-python_2.txt" rend="block"/>
+                </ab>
+                <p>Si vous examinez bien cette compréhension de liste, vous constaterez qu'elle accomplit exactement la même chose que la boucle <code rend="inline">for</code> de l'exemple précédent, mais de façon plus concise. Les deux approches fonctionnent aussi bien l'une que l'autre ; utilisez celle qui vous convient le mieux. En règle générale, il est préférable d'utiliser du code que l'on comprend bien, quitte à sacrifier un peu de vitesse d'exécution au besoin.</p>
+                <p>Nous disposons maintenant d'une liste de paires dans laquelle chaque paire contient un mot et son nombre d'occurrences. Cette liste est plutôt redondante. Si le mot « le » apparaissait 500 fois dans notre texte d'origine, la liste contiendrait 500 copies de la paire (« le », 500). La liste est aussi classée dans l'ordre où les mots apparaissent dans le texte et non pas en ordre décroissant de fréquences. Nous pouvons régler les deux problèmes en convertissant la liste en dictionnaire et en affichant le dictionnaire en ordre décroissant d'occurrences, du mot qui apparait le plus fréquemment à celui qui apparaît le moins fréquemment.</p>
+            </div>
+            <div type="2" n="3">
+                <head>Les dictionnaires en Python</head>
+                <p>Les chaînes de caractères et les listes sont des structures de données séquentielles. Cela signifie que l'on peut accéder à leurs contenus à l'aide d'un <emph>indice</emph>, c'est-à-dire un nombre entier supérieur ou égal à zéro. Si vous disposez d'une liste qui contient des chaînes de caractères, vous pouvez utiliser une paire d'indices pour accéder à une chaîne spécifique dans la liste, puis à un caractère particulier dans cette chaîne. Étudiez les exemples ci-dessous:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_3" corresp="code_decomptes-de-frequences-de-mots-en-python_3.txt" rend="block"/>
+                </ab>
+                <p>Nous allons maintenant enregistrer nos décomptes d'occurrences dans un nouveau type d'objet Python : le dictionnaire. Un dictionnaire est une collection <emph>non séquentielle</emph> d'objets. Cela signifie qu'il est impossible d'utiliser un indice pour accéder aux éléments contenus dans le dictionnaire. On peut cependant y accéder par la clé à laquelle ils sont associés dans ce dictionnaire (d'où le nom « dictionnaire »). Voici un exemple :</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_4" corresp="code_decomptes-de-frequences-de-mots-en-python_4.txt" rend="block"/>
+                </ab>
+                <p>Le fonctionnement des dictionnaires peut être déroutant pour les novices, mais il ressemble à celui des dictionnaires linguistiques. Si vous avez oublié la différence entre la « bijection » et la « surjection » en mathématiques, par exemple, vous pouvez consulter les définitions des deux termes dans votre Larousse. Le même principe s'applique lorsque vous entrez la commande <code rend="inline">print(dictionnaire['monde'])</code> sauf qu'au lieu d'accéder à la définition d'un mot vous obtenez plutôt la valeur associée au mot-clé « monde » dans le dictionnaire, telle que vous l'avez définie vous-même en créant le dictionnaire. Dans le cas présent, cette valeur est « 1 ».</p>
+                <p>Notez que nous utilisons des accolades pour définir un dictionnaire, mais des crochets pour accéder aux objets contenus dans celui-ci. La méthode <code rend="inline">keys</code> (qui signifie « clés ») renvoye une liste de toutes les clés qui ont été définies dans le dictionnaire.</p>
+            </div>
+            <div type="2" n="4">
+                <head>Paires mot-occurrences</head>
+                <p>Nous voulons maintenant construire une fonction capable de traduire une liste de mots en un dictionnaire de paires (mot, <emph>occurrences</emph>). La seule nouvelle commande dont nous aurons besoin est <code rend="inline">dict</code>, qui construit un dictionnaire à partir d'une liste de paires. Copiez le code ci-dessous et ajoutez-le au module <code rend="inline">obo.py</code>.</p>
+                <p style="alert alert-info">
+Note du traducteur : le nom de la fonction qui apparaît dans le bloc ci-dessous n'a pas été traduit de l'anglais, pas plus que ceux des autres fonctions à venir, afin de maintenir la compatibilité avec les différentes versions du fichier obo.py utilisées dans le cadre de cette série de leçons.
+</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_5" corresp="code_decomptes-de-frequences-de-mots-en-python_5.txt" rend="block"/>
+                </ab>
+                <p>Il nous faut aussi une fonction capable de trier un dictionnaire de paires (mot, occurrences) en ordre décroissant d'occurrences. Copiez aussi le segment de code suivant dans le module <code rend="inline">obo.py</code>:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_6" corresp="code_decomptes-de-frequences-de-mots-en-python_6.txt" rend="block"/>
+                </ab>
+                <p>Nous pouvons maintenant écrire un programme qui calcule les décomptes d'occurrences de chacun des mots qui apparaissent dans la page web qui se trouve à un URL spécifique, en ordre décroissant d'occurrences. Copiez le programme suivant dans votre éditeur de texte, sauvegardez-le et exécutez-le. Étudiez minutieusement le code et les résultats avant de poursuivre.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_7" corresp="code_decomptes-de-frequences-de-mots-en-python_7.txt" rend="block"/>
+                </ab>
+            </div>
+            <div type="2" n="5">
+                <head>Élimination des mots vides</head>
+                <p>Lorsque l'on examine les résultats produits par le programme <code rend="inline">html-vers-freqs.py</code> ci-dessus, on remarque que la plupart des mots les plus fréquents sont des mots qui jouent des rôles structurels dans le langage, comme « the », « of », « to » et « and » (« le/la », « de », « vers » et « et »).</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_8" corresp="code_decomptes-de-frequences-de-mots-en-python_8.txt" rend="block"/>
+                </ab>
+                <p>Ces petits mots (conjonctions, articles, etc.) occupent presque toujours le sommet de la liste des mots les plus fréquents <emph>quel que soit le texte que l'on examine</emph>, en français comme en anglais. Ils ne nous éclaire par réellement sur les sujets évoqués lors du procès de Bowsey. En règle générale, nous chercherons plutôt à identifier les mots qui nous aideront à distinguer un texte d'un ensemble d'autres textes portant sur des sujets différents. Pour ce faire, nous allons filtrer les mots structurels les plus courants avant de produire notre liste de décomptes. Ces mots structurels omniprésents sont souvent appelés <ref target="https://perma.cc/GL2H-XAHQ">« mots vides« </ref> par les linguistes, ou « stopwords » en anglais. Pour les besoins de cette leçon, nous utiliserons une liste de mots vides de la langue anglaise adaptée de celle publiée en ligne par des <ref target="https://perma.cc/RX7Z-F9YA">informaticiens de Glasgow, en Écosse</ref>. Copiez-collez cette liste au début du module <code rend="inline">obo.py</code> que vous êtes en train de bâtir :</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_9" corresp="code_decomptes-de-frequences-de-mots-en-python_9.txt" rend="block"/>
+                </ab>
+                <p>Filtrer les mots vides qui apparaissent dans une liste ne requiert qu'une compréhension de liste supplémentaire. Ajoutez la fonction ci-dessous à <code rend="inline">obo.py</code>, elle aussi :</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_10" corresp="code_decomptes-de-frequences-de-mots-en-python_10.txt" rend="block"/>
+                </ab>
+            </div>
+            <div type="2" n="6">
+                <head>L'assemblage final</head>
+                <p>Nous avons maintenant tout ce qu'il nous faut pour calculer des décomptes d'occurrences de mots dans des pages web. Copiez le code ci-dessous dans votre éditeur de texte, sauvegardez-le dans un fichier nommé <code rend="inline">html-vers-freqs-2.py</code> et exécutez-le :</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_11" corresp="code_decomptes-de-frequences-de-mots-en-python_11.txt" rend="block"/>
+                </ab>
+                <p>Si tout s'est bien passé, vous devriez obtenir des résultats qui ressemblent à ceci :</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_decomptes-de-frequences-de-mots-en-python_12" corresp="code_decomptes-de-frequences-de-mots-en-python_12.txt" rend="block"/>
+                </ab>
+            </div>
+            <div type="2" n="7">
+                <head>Lectures suggérées</head>
+                <p>Lutz, <emph>Learning Python</emph>
+                </p>
+                <list type="unordered">
+                    <item>Ch. 9: Tuples, Files, and Everything Else</item>
+                    <item>Ch. 11: Assignment, Expressions, and print</item>
+                    <item>Ch. 12: if Tests</item>
+                    <item>Ch. 13: while and for Loops</item>
+                </list>
+                <p>Pilgrim, <emph>Diving into Python</emph>
+                </p>
+                <list type="unordered">
+                    <item>Ch. 7: <ref target="https://web.archive.org/web/20180416143856/http://www.diveintopython.net/regular_expressions/index.html">Regular Expressions</ref>
+                    </item>
+                </list>
+                <div type="3" n="7.1">
+                    <head>Synchronisation du code</head>
+                    <p>Afin de suivre la progression des leçons suivantes, il est important de disposer des bons fichiers et des bons programmes dans votre répertoire « programming-historian ». À la fin de chacune des leçons de la série, vous pouvez télécharger une version à jour de l'archive zip « programming-historian » pour vous assurer d'avoir le bon code en main.</p>
+                    <list type="unordered">
+                        <item>programming-historian-5 (<ref target="/assets/python-lessons5.zip">synchronisation du code</ref>)</item>
+                    </list>
+                </div>
+            </div>
+        </body>
+    </text>
+</TEI>

@@ -1,0 +1,370 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="sumarizacao-narrativas-web-python" xml:base="sumarizacao-narrativas-web-python/sumarizacao-narrativas-web-python.xml">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Sumarização de narrativas acerca de eventos do passado documentados na web utilizando Python: o caso do Arquivo.pt</title>
+                <author role="original_author">
+                    <persName>Ricardo Campos</persName>
+                    <persName>Daniel Gomes</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Daniela Major</persName>
+                    <persName>Salete Farias</persName>
+                </editor>
+                <editor role="editors">Josir Cardoso Gomes</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phpt0037</idno>
+                <date type="published">04/29/2023</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Nesta lição aprenderá a criar automaticamente resumos de eventos do passado a partir de conteúdos históricos arquivados da web. Em particular, demonstraremos como obter resultados relevantes ao combinar o uso da API do Arquivo.pt com a utilização do *Conta-me Histórias* permitindo, desta forma, processar um elevado volume de dados num curto espaço de tempo.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">api</term>
+                    <term xml:lang="en">python</term>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">web-archiving</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <div type="2" n="1">
+                <head>Introdução</head>
+                <p>Ao longo dos séculos a comunicação evoluiu paralelamente à evolução do homem. Esta, que antes se fazia a partir de meios físicos, é hoje digital e tem presença online. A "culpa" é da web, que desde o final dos anos 90 do século passado, se tornou na principal fonte de informação e comunicação do século XXI. Porém, cerca de <ref target="https://dl.acm.org/doi/10.1145/1145581.1145623">80% da informação disponível na web desaparece ou é alterada no prazo de apenas 1 ano</ref> (em inglês). Este facto origina a perda de informação fundamental para documentar os eventos da era digital. </p>
+                <p>A mudança para um paradigma de comunicação baseado na internet obrigou a uma alteração profunda na forma como as informações publicadas são preservadas. Os arquivos da web assumem especial relevância, ao preservarem as informações publicadas online desde a década de 1990.</p>
+                <p>Apesar dos avanços recentes na preservação de informações arquivadas a partir da web, o problema de explorar de forma eficiente o património histórico preservado por estes arquivos permanece por resolver devido às enormes quantidades de dados históricos arquivados ao longo do tempo e à inexistência de ferramentas que possam processar automaticamente esse volume de dados. Neste contexto, as <emph>timelines</emph> (sistemas automáticos de sumarização temporal) surgem como a solução ideal para a produção automática de resumos de eventos ao longo do tempo e para a análise das informações publicadas online que os documentam, como é o caso das notícias. </p>
+                <p>Neste tutorial, pretendemos mostrar como explorar o <ref target="http://arquivo.pt">Arquivo.pt</ref>, o arquivo da web portuguesa, e como criar automaticamente resumos de eventos do passado a partir de conteúdos históricos arquivados da web. Mais concretamente, demonstraremos como obter resultados relevantes ao combinar o uso da <ref target="https://perma.cc/6ASS-KZFW">API (Interface de Programação de Aplicações)</ref> do Arquivo.pt com a utilização do <ref target="https://contamehistorias.pt">
+                        <emph>Conta-me Histórias</emph>
+                    </ref>, um sistema que permite criar automaticamente narrativas temporais sobre qualquer tema objeto de notícia. Para a concretização desse objetivo disponibilizamos um Jupyter Notebook que os usuários poderão usar para interagir com ambas as ferramentas. </p>
+                <p>Na primeira parte do tutorial, iremos apresentar sumariamente as funções de pesquisa e acesso disponibilizadas pelo Arquivo.pt. Demonstraremos como podem ser utilizadas de forma automática através da invocação dos métodos disponibilizados pela API do Arquivo.pt, recorrendo a exemplos simples e práticos. A pesquisa automática de palavras em páginas arquivadas ao longo do tempo é o serviço base para desenvolver rapidamente aplicações informáticas inovadoras, que permitem explorar e tirar maior partido da informação histórica preservada pelo Arquivo.pt, como é caso do projeto <emph>Conta-me Histórias</emph>.</p>
+                <p>Na segunda parte, recorremos ao <emph>Conta-me Histórias</emph> para exemplificar o processo de sumarização temporal de um evento. Nesse sentido, demonstraremos a forma como os usuários podem obter informações históricas resumidas sobre um determinado tópico (por exemplo, sobre <ref target="https://perma.cc/AWX8-9CA3">Jorge Sampaio</ref>, presidente da República Portuguesa entre 1996 e 2006), que envolva notícias do passado preservadas pelo Arquivo.pt. Uma tal infraestrutura permite aos usuários ter acesso a um conjunto de informações históricas a partir de páginas web que, muito provavelmente, já não existirão naquela que convencionalmente designamos como a web atual.</p>
+            </div>
+            <div type="2" n="2">
+                <head>Pré-requisitos</head>
+                <p>A participação neste tutorial pressupõe conhecimentos básicos de programação (nomeadamente Python) bem como familiarização com a instalação de pacotes python (via <ref target="https://perma.cc/6BK8-XZKR">git</ref> (em inglês)), com o <ref target="https://www.w3schools.com/js/js_json_intro.asp">formato JSON</ref> (em inglês) e com o consumo de APIs. A execução do código pressupõe o recurso ao Jupyter Notebook. Para a instalação deste <emph>software</emph> recomendamos o tutorial <ref target="/en/lessons/jupyter-notebooks#installing-jupyter-notebooks">Introduction to Jupyter Notebooks</ref> (em inglês) ou, em alternativa, o recurso ao <ref target="https://colab.research.google.com/">Google Colab</ref>. Este tutorial foi testado com a versão 3.6.5 do Python.</p>
+            </div>
+            <div type="2" n="3">
+                <head>Objetivos de Aprendizagem</head>
+                <p>No final deste tutorial os participantes devem estar aptos a: </p>
+                <list type="unordered">
+                    <item>Extrair informação relevante a partir do Arquivo.pt fazendo uso da <ref target="https://github.com/arquivo/pwa-technologies/wiki/Arquivo.pt-API">Arquivo.pt API (Full-text &amp; URL search)</ref> (em inglês)</item>
+                    <item>Saber usar a biblioteca Python do <ref target="https://github.com/LIAAD/TemporalSummarizationFramework">
+                            <emph>Conta-me Histórias</emph>
+                        </ref> (em inglês) no contexto da sumarização temporal automática de eventos a partir de elevados volumes de dados preservados no arquivo da web portuguesa</item>
+                </list>
+            </div>
+            <div type="2" n="4">
+                <head>Arquivo.pt</head>
+                <p>O <ref target="https://www.arquivo.pt">Arquivo.pt</ref> é um serviço público e gratuito disponibilizado pela <ref target="https://perma.cc/D3XA-5J78">Fundação para a Ciência e a Tecnologia I.P.</ref>, que permite a qualquer pessoa pesquisar e aceder a informação histórica preservada da web desde os anos 90. Embora se foque na preservação de informação de interesse para a comunidade portuguesa, contém também páginas escritas em várias línguas de interesse para a comunidade internacional e cerca de metade dos seus usuários são oriundos de fora de Portugal. </p>
+                <p>
+                    <ref target="https://www.youtube.com/embed/EnSys0HDnCc">Este vídeo</ref> introduz brevemente o Arquivo.pt.</p>
+                <div type="3" n="4.1">
+                    <head>Contributos</head>
+                    <p>O Arquivo.pt contém milhares de milhões de ficheiros recolhidos ao longo do tempo a partir de websites em várias línguas que documentam eventos nacionais e internacionais. Os serviços de pesquisa que fornece incluem a pesquisa de texto integral, a pesquisa de imagens, a listagem do histórico de versões, a pesquisa avançada e <ref target="https://arquivo.pt/api">APIs</ref>, que facilitam o desenvolvimento por terceiros de aplicações de valor acrescentado. </p>
+                    <p>Ao longo dos anos, o Arquivo.pt tem sido utilizado como recurso para suportar trabalhos de pesquisa em áreas como as Humanidades ou as Ciências Sociais. Desde 2018, o <ref target="https://perma.cc/8F6F-KZFP">Prémio Arquivo.pt</ref> distingue anualmente trabalhos inovadores baseados na informação histórica preservada pelo Arquivo.pt. Os pesquisadores e cidadãos têm vindo a ser sensibilizados para a importância da preservação da informação publicada na web através da realização de sessões de formação gratuitas, por exemplo, sobre a <ref target="https://sobre.arquivo.pt/pt/ajuda/formacao/modulo-c/">utilização das APIs disponibilizadas pelo Arquivo.pt</ref>.</p>
+                    <p>Todo o <emph>software</emph> desenvolvido está disponível como <ref target="https://github.com/arquivo/">projetos de código-aberto gratuitos</ref> (em inglês) e, desde 2008, tem sido documentado através de <ref target="https://arquivo.pt/publica">artigos técnicos e científicos</ref>. No decorrer das suas atividades, o Arquivo.pt gera dados que podem ser úteis para suportar novos trabalhos de pesquisa, como por exemplo a lista de Páginas do Governo de Portugal nas redes sociais ou de websites de partidos políticos. Estes <ref target="https://arquivo.pt/dadosabertos">dados estão disponíveis em acesso aberto</ref>.</p>
+                    <p>
+                        <ref target="https://www.youtube.com/embed/CZ6R4Zydg0Q">Este vídeo</ref> detalha os serviços públicos disponibilizados pelo Arquivo.pt. Pode também aceder diretamente aos <ref target="https://perma.cc/854E-9XEV">slides da apresentação</ref>. Para saber mais detalhes acerca dos serviços disponibilizados pelo Arquivo.pt consulte:</p>
+                    <list type="unordered">
+                        <item>
+                            <ref target="https://sobre.arquivo.pt/pt/ajuda/formacao/modulo-a/">Módulo A: Arquivo.pt: uma nova ferramenta para pesquisar o passado (módulo A)</ref> do programa de "Formação acerca de preservação da Web" do Arquivo.pt.</item>
+                    </list>
+                </div>
+                <div type="3" n="4.2">
+                    <head>Onde posso encontrar o Arquivo.pt?</head>
+                    <p>O serviço Arquivo.pt encontra-se disponível a partir dos seguintes apontadores:</p>
+                    <list type="unordered">
+                        <item>
+                            <ref target="https://www.arquivo.pt">Interfaces de usuário em português e inglês para aceder aos serviços de pesquisa de páginas, imagens e histórico de versões</ref>
+                        </item>
+                        <item>
+                            <ref target="https://sobre.arquivo.pt">Website informativo acerca do Arquivo.pt</ref>
+                        </item>
+                        <item>
+                            <ref target="https://perma.cc/FV3U-ZEL9">Documentação acerca das APIs do Arquivo.pt</ref> (em inglês)</item>
+                    </list>
+                </div>
+                <div type="3" n="4.3">
+                    <head>Como funciona a pesquisa automática via API?</head>
+                    <p>Periodicamente, o Arquivo.pt recolhe e armazena automaticamente a informação publicada na web. A infraestrutura de <emph>hardware</emph> do Arquivo.pt está alojada no seu próprio centro de dados e é gerida por pessoal a ela dedicado a tempo inteiro. </p>
+                    <p>O fluxo de trabalho de preservação é realizado através de um <ref target="https://perma.cc/A3Z7-E358">sistema de informação distribuído de grande escala</ref>. A informação web armazenada é processada automaticamente para realizar atividades de pesquisa sobre <ref target="https://perma.cc/9FMH-DUY8">grandes volumes de dados</ref> (em inglês, <emph>big data</emph>), através de uma plataforma de processamento distribuído para dados não estruturados (<ref target="https://perma.cc/B5PH-9B4V">Hadoop</ref>). Tal permite, por exemplo, a deteção automática de <emph>spam</emph> na web ou avaliar a acessibilidade web para pessoas com deficiências. </p>
+                    <p>Os serviços de pesquisa e acesso via APIs permitem que os pesquisadores tirem partido desta infraestrutura de processamento e dos dados históricos preservados sem terem de endereçar a complexidade do sistema que suporta o Arquivo.pt. <ref target="https://www.youtube.com/embed/PPuauEwIwPE">Este vídeo</ref> apresenta a <ref target="https://perma.cc/6ADS-LPLC">Arquivo.pt API (Full-text &amp; URL search)</ref> (em inglês). Pode também aceder diretamente aos <ref target="https://perma.cc/RMS4-UD76">slides da apresentação</ref>.</p>
+                    <p>Neste tutorial iremos abordar apenas a utilização da API Full-text &amp; URL Search do Arquivo.pt. Porém, este disponibiliza também outras APIs:</p>
+                    <list type="unordered">
+                        <item>
+                            <ref target="https://perma.cc/U682-VNKD">Image Search API v1.1 (beta version)</ref> (em inglês)</item>
+                        <item>
+                            <ref target="https://perma.cc/9M6Y-A4BW">CDX-server API (URL search): international standard</ref> (em inglês)</item>
+                        <item>
+                            <ref target="https://perma.cc/BF5E-32LR">Memento API (URL search): international standard</ref> (em inglês)</item>
+                    </list>
+                    <p>Para saber detalhes acerca de <ref target="https://perma.cc/FV3U-ZEL9">todas as APIs disponibilizadas pelo Arquivo.pt</ref> (em inglês) consulte os conteúdos de formação disponíveis em:</p>
+                    <list type="unordered">
+                        <item>
+                            <ref target="https://sobre.arquivo.pt/pt/ajuda/formacao/modulo-c/">Módulo C: Acesso e processamento automático de informação preservada da Web através de APIs</ref> do programa de "Formação acerca de preservação da Web" do Arquivo.pt.</item>
+                    </list>
+                </div>
+                <div type="3" n="4.4">
+                    <head>Utilização</head>
+                    <p>Em seguida, apresentaremos exemplos de como utilizar a <ref target="https://github.com/arquivo/pwa-technologies/wiki/Arquivo.pt-API">Arquivo.pt API (Full-text &amp; URL search)</ref> (em inglês) para pesquisar, de forma automática, páginas da web arquivadas entre determinados intervalos de tempo. Como exemplo, executaremos pesquisas acerca de "<ref target="https://pt.wikipedia.org/wiki/Jorge_Sampaio">Jorge Sampaio</ref>"(1939-2021), antigo Presidente da Câmara Municipal de Lisboa (1990-1995) e antigo Presidente da República Portuguesa (1996-2006). </p>
+                    <div type="4" n="4.4.1">
+                        <head>Definição dos parâmetros de pesquisa</head>
+                        <p>O parâmetro <emph>query</emph> define a(s) palavra(s) a pesquisar: <code rend="inline">Jorge Sampaio</code>. </p>
+                        <p>Para facilitar a leitura dos resultados de pesquisa obtidos iremos limitá-los a um máximo de 5 através do parâmetro <code rend="inline">maxItems</code>.</p>
+                        <p>A totalidade dos parâmetros de pesquisa disponíveis estão definidos na secção <ref target="https://perma.cc/2DMP-3XQC">
+                                <emph>Request Parameters</emph> da documentação da API do Arquivo.pt</ref> (link em inglês. Em português, parâmetros requeridos).</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_0" corresp="code_sumarizacao-narrativas-web-python_0.txt" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4" n="4.4.2">
+                        <head>Percorrer os resultados obtidos no Arquivo.pt</head>
+                        <p>O seguinte código mostra os resultados de pesquisa obtidos no seu formato original (JSON):</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_1" corresp="code_sumarizacao-narrativas-web-python_1.txt" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4" n="4.4.3">
+                        <head>Sumário dos resultados obtidos</head>
+                        <p>É possível extrair, para cada resultado, a seguinte informação:</p>
+                        <list type="unordered">
+                            <item>Título (campo <code rend="inline">title</code>)</item>
+                            <item>Endereço para o conteúdo arquivado (campo <code rend="inline">linkToArchive</code>)</item>
+                            <item>Data de arquivo (campo <code rend="inline">tstamp</code>)</item>
+                            <item>Texto extraído da página (campo <code rend="inline">linkToExtractedText</code>)</item>
+                        </list>
+                        <p>Todos os campos obtidos como resposta a pesquisas disponíveis estão definidos na secção <ref target="https://perma.cc/VK9Z-EC83">
+                                <emph>Response fields</emph> da documentação da API do Arquivo.pt</ref> (link em inglês. Em português, campos de resposta). </p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_2" corresp="code_sumarizacao-narrativas-web-python_2.txt" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4" n="4.4.4">
+                        <head>Definir o intervalo temporal da pesquisa</head>
+                        <p>Uma das mais-valias do Arquivo.pt é fornecer o acesso a informação histórica publicada na web ao longo do tempo. </p>
+                        <p>No processo de acesso à informação os usuários podem definir o intervalo temporal das datas de arquivo das páginas a serem pesquisadas, através da especificação das datas pretendidas nos parâmetros de pesquisa da API <code rend="inline">from</code> e <code rend="inline">to</code>. Estas devem seguir o formato: ano, mês, dia, hora, minuto e segundo (aaaammddhhmmss). Por exemplo, a data 9 de março de 1996 seria representada por:</p>
+                        <list type="unordered">
+                            <item>19960309000000</item>
+                        </list>
+                        <p>O seguinte código executa uma pesquisa por "Jorge Sampaio" de páginas arquivadas entre março de 1996 e março de 2006, período durante o qual este foi Presidente da República Portuguesa.</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_3" corresp="code_sumarizacao-narrativas-web-python_3.txt" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4" n="4.4.5">
+                        <head>Restringir a pesquisa a um determinado website</head>
+                        <p>Se os usuários apenas tiverem interesse na informação histórica publicada por um determinado website, podem restringir a pesquisa através da especificação no parâmetro de pesquisa da API <code rend="inline">siteSearch</code>. O seguinte código executa uma pesquisa por "Jorge Sampaio" de páginas arquivadas apenas a partir do website com o domínio "www.presidenciarepublica.pt", compreendidas entre março de 1996 e março de 2006, e apresenta os resultados obtidos.</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_4" corresp="code_sumarizacao-narrativas-web-python_4.txt" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4" n="4.4.6">
+                        <head>Restringir a pesquisa a um determinado tipo de ficheiro</head>
+                        <p>Além de páginas da web, o Arquivo.pt também preserva outros formatos de ficheiro vulgarmente publicados online, como por exemplo documentos do tipo PDF. Os usuários podem definir o tipo de ficheiro sobre o qual a pesquisa deverá incidir através da especificação no parâmetro de pesquisa <code rend="inline">type</code> da API.</p>
+                        <p>O seguinte código executa uma pesquisa por "Jorge Sampaio":</p>
+                        <list type="unordered">
+                            <item>Sobre ficheiros do tipo PDF</item>
+                            <item>Arquivados apenas a partir do website com o domínio "www.presidenciarepublica.pt" </item>
+                            <item>Entre março de 1996 e março de 2006</item>
+                        </list>
+                        <p>E apresenta os resultados obtidos. Quando o usuário abrir o endereço do conteúdo arquivado fornecido pelo campo de resposta <code rend="inline">linkToArchive</code> terá acesso ao ficheiro PDF.</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_5" corresp="code_sumarizacao-narrativas-web-python_5.txt" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+            </div>
+            <div type="2" n="5">
+                <head>
+                    <emph>Conta-me Histórias</emph>
+                </head>
+                <p>O projeto <emph>Conta-me Histórias</emph> é desenvolvido por pesquisadores do Laboratório de Inteligência Artificial e Apoio a Decisão (<ref target="https://perma.cc/B5U2-R74J">LIAAD</ref>) — <ref target="https://perma.cc/4XN7-A6TR">INESCTEC</ref>) e afiliados às instituições <ref target="https://perma.cc/7PDB-NRAL">Instituto Politécnico de Tomar</ref> — <ref target="https://perma.cc/M3CE-HQ6U">Centro de Investigação em Cidades Inteligentes (CI2)</ref>, <ref target="https://perma.cc/MGZ3-S9AQ">Universidade do Porto</ref> e <ref target="https://perma.cc/THE2-KA3L">Universidade de Innsbruck</ref> (em inglês). O projeto visa oferecer aos usuários a possibilidade de revisitarem tópicos do passado através de uma interface semelhante ao Google que, dada uma pesquisa, devolve uma sumarização temporal das notícias mais relevantes preservadas pelo Arquivo.pt acerca desse tópico. Um vídeo promocional do projeto pode ser visualizado <ref target="https://www.youtube.com/watch?v=fcPOsBCwyu8">aqui</ref>.</p>
+                <div type="3" n="5.1">
+                    <head>Contributos</head>
+                    <p>Nos últimos anos, o crescente aumento na disponibilização de conteúdos online tem colocado novos desafios àqueles que pretendem entender a estória de um dado evento. Mais recentemente, fenómenos como o <ref target="https://perma.cc/MH2W-5WL4">media bias</ref> (em português, viés mediático), as <ref target="https://perma.cc/945E-WVDK">fake news</ref> (em português, notícias falsas) e as <ref target="https://perma.cc/7M7E-S5CD">filter bubbles</ref> (link em inglês. Em português, filtro de bolha), vieram adensar ainda mais as dificuldades já existentes no acesso transparente à informação. O <emph>Conta-me Histórias</emph> surge, neste contexto, como um importante contributo para todos aqueles que pretendem ter acesso rápido a uma visão histórica de um dado evento, criando automaticamente narrativas resumidas a partir de um elevado volume de dados coletados no passado. A sua disponibilização em 2018, é um importante contributo para que estudantes, jornalistas, políticos, pesquisadores, etc, possam gerar conhecimento e verificar factos de uma forma rápida, a partir da consulta de <emph>timelines</emph> automaticamente geradas, mas também pelo recurso à consulta de páginas web tipicamente inexistentes na web mais convencional, a web do presente.</p>
+                </div>
+                <div type="3" n="5.2">
+                    <head>Onde posso encontrar o <emph>Conta-me Histórias</emph>?</head>
+                    <p>O projeto <emph>Conta-me Histórias</emph> encontra-se disponível, desde 2018, a partir dos seguintes endereços:</p>
+                    <list type="unordered">
+                        <item>Página web (versão PT): <ref target="https://contamehistorias.pt">https://contamehistorias.pt</ref>
+                        </item>
+                        <item>Google Play: <ref target="https://play.google.com/store/apps/details?id=com.app.projetofinal">https://play.google.com/store/apps/details?id=com.app.projetofinal</ref>
+                        </item>
+                        <item>Biblioteca Python: <ref target="https://perma.cc/J7BB-28YX">https://github.com/LIAAD/TemporalSummarizationFramework</ref> (em inglês)</item>
+                    </list>
+                    <p>Outros endereços de relevância:</p>
+                    <list type="unordered">
+                        <item>
+                            <emph>Conta-me Histórias front-end</emph>: <ref target="https://perma.cc/J7BB-28YX">https://github.com/LIAAD/contamehistorias-ui</ref> (em inglês)</item>
+                        <item>
+                            <emph>Conta-me Histórias back-end</emph>: <ref target="https://perma.cc/Q3MH-3T4J">https://github.com/LIAAD/contamehistorias-api</ref> (em inglês)</item>
+                    </list>
+                    <p>Mais recentemente, em setembro de 2021, o Arquivo.pt passou a disponibilizar a funcionalidade "Narrativa", através de um botão adicional na sua interface que redireciona os usuários para o website do <emph>Conta-me Histórias</emph>, para que a partir deste possam criar automaticamente narrativas temporais sobre qualquer tema. A funcionalidade "Narrativa" resulta da colaboração entre a equipa do <emph>Conta-me Histórias</emph>, vencedora do <ref target="https://perma.cc/8F6F-KZFP">Prémio Arquivo.pt 2018</ref>, e a equipa do Arquivo.pt.</p>
+                </div>
+                <div type="3" n="5.3">
+                    <head>Como Funciona?</head>
+                    <p>Quando um usuário insere um conjunto de palavras acerca de um tema na caixa de pesquisa do Arquivo.pt e clica no botão "Narrativa", é direcionado para o serviço <emph>Conta-me Histórias</emph> que, por sua vez, analisa automaticamente as notícias de 26 websites arquivados pelo Arquivo.pt ao longo do tempo e apresenta-lhe uma cronologia de notícias relacionadas com o tema pesquisado.</p>
+                    <p>Por exemplo, se pesquisarmos por "Jorge Sampaio" e carregarmos no botão "Narrativa",</p>
+                    <figure>
+                        <desc>Figura 1: Pesquisa por 'Jorge Sampaio' através da componente narrativa do Arquivo.pt.</desc>
+                        <figDesc>Pesquisa por Jorge Sampaio através do componente narrativa do Arquivo.pt</figDesc>
+                        <graphic url="sumarizacao-narrativas-web-python-1.jpeg"/>
+                    </figure>
+                    <p>seremos direcionados para o <emph>Conta-me Histórias</emph>, onde obteremos, automaticamente, uma narrativa de notícias arquivadas. Na figura seguinte é possível observar a linha de tempo e o conjunto de notícias relevantes no período compreendido entre 2016-04-07 e 2016-11-17. O último período temporal é referente ao ano de 2019.</p>
+                    <figure>
+                        <desc>Figura 2: Resultados da pesquisa por 'Jorge Sampaio' no *Conta-me Histórias* para o periodo compreendido entre 2016-04-07 e 2016-11-17.</desc>
+                        <figDesc>Resultados da pesquisa por Jorge Sampaio no Conta-me Histórias para o periodo compreendido entre 07/04/2016 e 17/11/2016</figDesc>
+                        <graphic url="sumarizacao-narrativas-web-python-2.jpeg"/>
+                    </figure>
+                    <p>Para a seleção das notícias mais relevantes recorremos ao <ref target="http://yake.inesctec.pt">YAKE!</ref> (em inglês), um extrator de palavras relevantes (desenvolvido pela nossa equipa de pesquisa) e que, neste contexto, é utilizado para selecionar os excertos mais importantes de uma notícia (mais concretamente os seus títulos) ao longo do tempo.</p>
+                    <p>Um aspeto interessante da aplicação é o facto desta facilitar o acesso à página web arquivada que dá nome ao título selecionado como relevante. Por exemplo, ao clicar em cima do título "Jorge Sampaio formaliza apoio a Sampaio da Nóvoa" o usuário poderá visualizar a seguinte página web:</p>
+                    <figure>
+                        <desc>Figura 3: Jorge Sampaio formaliza apoio a Sampaio da Nóvoa.</desc>
+                        <figDesc>Jorge Sampaio formaliza apoio a Sampaio da Nóvoa</figDesc>
+                        <graphic url="sumarizacao-narrativas-web-python-3.jpeg"/>
+                    </figure>
+                    <p>Paralelamente, poderá ter acesso a um conjunto de "termos relacionados" com o tópico de pesquisa. Na figura abaixo é possível observar, entre outros, a referência aos antigos presidentes da República Mário Soares e Cavaco Silva, bem como aos ex-primeiro-ministros Santana Lopes e Durão Barroso.</p>
+                    <figure>
+                        <desc>Figura 4: Nuvem de palavras com os termos relacionados com a pesquisa por 'Jorge Sampaio' ao longo de 10 anos.</desc>
+                        <figDesc>Nuvem de palavras com os termos relacionados com a pesquisa Jorge Sampaio ao longo de 10 anos</figDesc>
+                        <graphic url="sumarizacao-narrativas-web-python-4.jpeg"/>
+                    </figure>
+                    <p>O <emph>Conta-me Histórias</emph> pesquisa, analisa e agrega milhares de resultados para gerar cada narrativa acerca de um tema. Recomenda-se a escolha de palavras descritivas sobre temas bem definidos, personalidades ou eventos para obter boas narrativas. No seção seguinte descrevemos a forma como, através da biblioteca Python, os usuários podem interagir e fazer uso dos dados do <emph>Conta-me Histórias</emph>.</p>
+                </div>
+                <div type="3" n="5.4">
+                    <head>Instalação</head>
+                    <p>Para a instalação da <ref target="https://perma.cc/4ZXT-9FB5">biblioteca Conta-me Histórias</ref> (em inglês) necessita de ter o <ref target="https://perma.cc/6BK8-XZKR">git</ref> (em inglês) instalado. Após a sua instalação proceda à execução do seguinte código:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_6" corresp="code_sumarizacao-narrativas-web-python_6.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3" n="5.5">
+                    <head>Utilização</head>
+                    <div type="4" n="5.5.1">
+                        <head>Definição dos parâmetros de pesquisa</head>
+                        <p>No próximo código o usuário é convidado a definir o conjunto de parâmetros de pesquisa. A variável <code rend="inline">domains</code> lista o conjunto de 24 websites objeto de pesquisa. Um aspeto interessante desta variável é a possibilidade do usuário definir a sua própria lista de fontes noticiosas. Um exercício interessante passa por definir um conjunto de meios de comunicação de âmbito mais regional, por oposição aos meios de comunicação nacionais ali listados.</p>
+                        <p>Os parâmetros <code rend="inline">from</code> e <code rend="inline">to</code> permitem estabelecer o espectro temporal da pesquisa. Finalmente, na variável <code rend="inline">query</code> o usuário é convidado a definir o tema da pesquisa (e.g., "Jorge Sampaio") para o qual pretende construir uma narrativa temporal. Uma vez executado o código o sistema inicia o processo de pesquisa junto do Arquivo.pt. Para tal, recorre à utilização da <ref target="https://perma.cc/6ADS-LPLC">Arquivo.pt API (Full-text &amp; URL search)</ref> (em inglês).</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_7" corresp="code_sumarizacao-narrativas-web-python_7.txt" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4" n="5.5.2">
+                        <head>Percorrer os resultados obtidos no Arquivo.pt</head>
+                        <p>O objeto <code rend="inline">search_result</code> devolve o número total de resultados obtidos a partir da chamada à API do Arquivo.pt. O número total de resultados excede facilmente as 10.000 entradas, um volume de dados praticamente impossível de processar por qualquer usuário que, a partir dele, queira retirar conhecimento em tempo útil.</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_8" corresp="code_sumarizacao-narrativas-web-python_8.txt" rend="block"/>
+                        </ab>
+                        <p>Para lá do número total de resultados o objeto <code rend="inline">search_result</code> reúne informação extremamente útil para o passo seguinte do algoritmo, i.e., a seleção das notícias mais relevantes ao longo do tempo. Em concreto, este objeto permite ter acesso a:</p>
+                        <list type="unordered">
+                            <item>
+                                <code rend="inline">datatime</code>: data de coleta do recurso</item>
+                            <item>
+                                <code rend="inline">domain</code>: fonte noticiosa</item>
+                            <item>
+                                <code rend="inline">headline</code>: título da notícia</item>
+                            <item>
+                                <code rend="inline">url</code>: url original da notícia</item>
+                        </list>
+                        <p>bastando para tal executar o seguinte código:</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_9" corresp="code_sumarizacao-narrativas-web-python_9.txt" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4" n="5.5.3">
+                        <head>Determinação de datas importantes e seleção das <emph>keywords</emph>/títulos relevantes</head>
+                        <p>No próximo passo o sistema recorre ao algoritmo do <emph>Conta-me Histórias</emph> para criar um resumo das notícias mais importantes a partir do conjunto de documentos obtidos no Arquivo.pt. Cada bloco temporal determinado como relevante pelo sistema reúne um total de 20 notícias. Os vários blocos temporais determinados automaticamente pelo sistema oferecem ao usuário uma narrativa ao longo do tempo.</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_10" corresp="code_sumarizacao-narrativas-web-python_10.txt" rend="block"/>
+                        </ab>
+                        <div type="5" n="5.5.3.1">
+                            <head>Estatísticas da pesquisa</head>
+                            <p>O código seguinte permite ter acesso a um conjunto de estatísticas globais, nomeadamente, ao número total de documentos, de domínios, bem como ao tempo total de execução do algoritmo.</p>
+                            <ab>
+                                <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_11" corresp="code_sumarizacao-narrativas-web-python_11.txt" rend="block"/>
+                            </ab>
+                        </div>
+                    </div>
+                    <div type="4" n="5.5.4">
+                        <head>Obter a lista dos domínios dos resultados da pesquisa</head>
+                        <p>Para listar todos os domínios execute o seguinte código:</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_12" corresp="code_sumarizacao-narrativas-web-python_12.txt" rend="block"/>
+                        </ab>
+                    </div>
+                    <div type="4" n="5.5.5">
+                        <head>Resultados da pesquisa para a "Narrativa"</head>
+                        <p>Finalmente, o código seguinte recorre à variável <code rend="inline">summ_result ["results"]</code> para apresentar os resultados gerados com a informação necessária à produção de uma <emph>timeline</emph>, nomeadamente, o período temporal de cada bloco de notícias, as notícias propriamente ditas (um conjunto de 20 notícias relevantes por bloco temporal), a data de coleta, a fonte noticiosa, o url (ligação à página web original) e o título completo da notícia.</p>
+                        <ab>
+                            <code lang="language-python" xml:id="code_sumarizacao-narrativas-web-python_13" corresp="code_sumarizacao-narrativas-web-python_13.txt" rend="block"/>
+                        </ab>
+                    </div>
+                </div>
+            </div>
+            <div type="2" n="6">
+                <head>Conclusões</head>
+                <p>A web é hoje considerada uma ferramenta essencial de comunicação. Neste contexto, os arquivos web surgem como um importante recurso de preservação dos conteúdos aí publicados. Embora o seu uso seja dominado por pesquisadores, historiadores ou jornalistas, o elevado volume de dados aí disponíveis sobre o nosso passado faz deste tipo de infraestrutura uma fonte de recursos de elevado valor e extrema utilidade para os usuários mais comuns. O acesso generalizado a este tipo de infraestrutura obriga, no entanto, à existência de outro tipo de ferramentas capazes de satisfazer as necessidades de informação do usuário, diminuindo, ao mesmo tempo, os constrangimentos associados à exploração de elevados volumes de dados por parte de usuários não especialistas. </p>
+                <p>Neste tutorial, procurámos mostrar como criar automaticamente sumários temporais a partir de eventos coletados no passado, fazendo uso dos dados obtidos no Arquivo.pt e da aplicação da biblioteca de sumarização temporal <emph>Conta-me Histórias</emph>. O tutorial aqui apresentado é um primeiro passo na tentativa de mostrarmos aos interessados na temática uma forma simples de como qualquer usuário pode, utilizando conceitos minímos de programação, fazer uso de APIs e bibliotecas existentes para extrair conhecimento a partir de um elevado volume de dados num curto espaço de tempo.</p>
+            </div>
+            <div type="2" n="7">
+                <head>Prémios</head>
+                <p>O projeto <emph>Conta-me Histórias</emph> foi o vencedor do <ref target="https://sobre.arquivo.pt/pt/vencedores-premios-arquivo-pt/">Prémio Arquivo.pt 2018</ref> e o vencedor da <ref target="https://ecir2019.org/workshops/">Best Demo Presentation</ref> na <ref target="http://ecir2019.org/">41st European Conference on Information Retrieval (ECIR-19)</ref> (em inglês).</p>
+            </div>
+            <div type="2" n="8">
+                <head>Financiamento</head>
+                <p>Ricardo Campos foi financiado por fundos nacionais através do Fundação para a Ciência e Tecnologia (FCT) e pela Fundação Portuguesa para Ciência e Tecnologia (I.P.) com o projeto StorySense (2022.09312.PTDC).</p>
+            </div>
+            <div type="2" n="9">
+                <head>Bibliografia</head>
+                <list type="unordered">
+                    <item>
+                        <p>Campos, R., Pasquali, A., Jatowt, A., Mangaravite, V., and Jorge, A.. "Automatic Generation of Timelines for Past-Web Events" In <emph>The Past Web: Exploring Web Archives</emph>, edited by D. Gomes, E. Demidova, J. Winters, and T. Risse, 225-242. Springer: 2021. <ref target="https://perma.cc/F3SZ-5MVL">https://link.springer.com/chapter/10.1007/978-3-030-63291-5_18</ref>
+                        </p>
+                    </item>
+                    <item>
+                        <p>Campos, R., Mangaravite, V., Pasquali, A., Jorge, A., Nunes, C., and Jatowt, A.. "YAKE! Keyword Extraction from Single Documents using Multiple Local Features". <emph>Information Sciences Journal</emph>, vol. 509 (2020): 257-289. <ref target="https://doi.org/10.1016/j.ins.2019.09.013">https://doi.org/10.1016/j.ins.2019.09.013</ref>
+                        </p>
+                    </item>
+                    <item>
+                        <p>Campos, R., Mangaravite, V., Pasquali, A., Jorge, A., Nunes, C., and Jatowt, A.. "A Text Feature Based Automatic Keyword Extraction Method for Single Documents" In <emph>Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 ? 29). Lecture Notes in Computer Science</emph>, edited by  G. Pasi, B. Piwowarski, L. Azzopardi, and A. Hanbury, vol. 10772, 684-691. Springer: 2018. <ref target="https://perma.cc/3V3W-X6MZ">https://link.springer.com/chapter/10.1007/978-3-319-76941-7_63</ref>
+                        </p>
+                    </item>
+                    <item>
+                        <p>Pasquali, A., Mangaravite, V., Campos, R., Jorge, A., and Jatowt, A.."Interactive System for Automatically Generating Temporal Narratives" In
+<emph>Advances in Information Retrieval. ECIR'19 (Cologne, Germany. April 14-18). Lecture Notes in Computer Science</emph>, edited by L. Azzopardi, B. Stein, N. Fuhr, P. Mayr, C. Hauff, and D. Hiemstra, vol. 11438, 251 - 255. Springer: 2019. <ref target="https://perma.cc/MH6W-QQFD">https://link.springer.com/chapter/10.1007/978-3-030-15719-7_34</ref>
+                        </p>
+                    </item>
+                    <item>
+                        <p>Gomes, D., Demidova, E., Winters, J., and Risse, T. (eds.), <emph>The Past Web: Exploring Web Archives</emph>. Springer, 2021. <ref target="https://arquivo.pt/book">https://arquivo.pt/book</ref>
+                            <ref target="https://perma.cc/Q693-DLPA">Pre-print</ref>
+                        </p>
+                    </item>
+                    <item>
+                        <p>Gomes, D., and Costa M.. "The Importance of Web Archives for Humanities". <emph>International Journal of Humanities and Arts Computing</emph>, (April 2014).  <ref target="https://perma.cc/4WHP-Q534">http://sobre.arquivo.pt/wp-content/uploads/the-importance-of-web-archives-for-humanities.pdf</ref>.</p>
+                    </item>
+                    <item>
+                        <p>Alam,Sawood, Weigle, Michele C., Nelson, Michael L., Melo, Fernando, Bicho, Daniel, Gomes, Daniel. "MementoMap Framework for Flexible and Adaptive Web Archive Profiling" In <emph>Proceedings of Joint Conference on Digital Libraries 2019</emph>. Urbana-Champaign, Illinois, US: June 2019. <ref target="https://perma.cc/7ES7-A7H7">https://www.cs.odu.edu/~salam/drafts/mementomap-jcdl19-cameraready.pdf</ref>.</p>
+                    </item>
+                    <item>
+                        <p>Costa, M.. "Information Search in Web Archives" PhD thesis, Universidade de Lisboa, December 2014. <ref target="https://perma.cc/HU5S-M2XE">http://sobre.arquivo.pt/wp-content/uploads/phd-thesis-information-search-in-web-archives.pdf</ref>
+                        </p>
+                    </item>
+                    <item>
+                        <p>Mourão, A., Gomes, D.. <emph>The Anatomy of a Web Archive Image Search Engine. Technical Report</emph>. Lisboa, Portugal: Arquivo.pt, dezembro 2021. <ref target="https://perma.cc/2JF4-EF4T">https://sobre.arquivo.pt/wp-content/uploads/The_Anatomy_of_a_Web_Archive_Image_Search_Engine_tech_report.pdf</ref>
+                        </p>
+                    </item>
+                </list>
+            </div>
+        </body>
+    </text>
+</TEI>

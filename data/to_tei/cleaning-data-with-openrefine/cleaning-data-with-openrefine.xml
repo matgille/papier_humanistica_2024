@@ -148,7 +148,7 @@ as creating <ref target="http://en.wikipedia.org/wiki/Linked_data">Linked Data</
                 <div type="3">
                     <head>Getting started: installing OpenRefine and importing data</head>
                     <p>
-                        <ref target="http://openrefine.org/#download_openrefine">Download OpenRefine</ref> and follow the installation instructions.
+                        <ref target="https://openrefine.org/download">Download OpenRefine</ref> and follow the installation instructions.
 OpenRefine works on all platforms: Windows, Mac, and Linux. <emph>OpenRefine</emph>
 will open in your browser, but it is important to realise that the
 application is run locally and that your data won't be stored online.
@@ -161,8 +161,8 @@ downloaded data file and click <hi rend="bold">Next</hi>. By default, the first 
 be correctly parsed as the name of a column, but you need to unselect
 the 'Quotation marks are used to enclose cells containing column
 separators' checkbox, since the quotes inside the file do not have any
-meaning to <emph>OpenRefine</emph>. Additionally, select the 'Parse cell text into
-numbers, dates, ...' checkbox to let OpenRefine automatically detect
+meaning to <emph>OpenRefine</emph>. Additionally, select the 'Attempt to parse cell
+text into numbers' checkbox to let OpenRefine automatically detect
 numbers. Now click on '<hi rend="bold">Create project</hi>'. If all goes
 well, you will see 75,814 rows. Alternatively, you can download the
 <ref target="http://data.freeyourmetadata.org/powerhouse-museum/phm-collection.google-refine.tar.gz">initial OpenRefine project</ref> directly.</p>
@@ -298,7 +298,7 @@ separator. The rows now look like before, with a multi-valued Categories
 field.</p>
                 </div>
                 <div type="3">
-                    <head>Applying ad-hoc transformations through the use of regular expressions</head>
+                    <head>Applying ad-hoc transformations through the use of GREL expressions</head>
                     <p>You may remember there was an increase in the number of records after
 the splitting process: nine records appeared out of nowhere. In order to
 find the cause of this disparity, we need to go back in time before we
@@ -328,9 +328,9 @@ functionality of <emph>OpenRefine</emph> using the <emph>OpenRefine</emph> Expre
 (GREL).</p>
                     <p>The word 'value' in the text field represents the current value of each
 cell, which you can see below. We can modify this value by applying
-functions to it (see the <ref target="https://github.com/OpenRefine/OpenRefine/wiki/GREL-Functions">GREL documentation</ref> for a full list). In
+functions to it (see the <ref target="https://openrefine.org/docs/manual/grelfunctions">GREL documentation</ref> for a full list). In
 this case, we want to replace double pipes with a single pipe. This can
-be achieved by entering the following <ref target="http://en.wikipedia.org/wiki/Regular_expression">regular expression</ref> (be sure
+be achieved by entering the following GREL expression (be sure
 not to forget the quotes):</p>
                     <ab>
                         <code xml:id="code_cleaning-data-with-openrefine_0" corresp="code_cleaning-data-with-openrefine_0.txt" rend="block"/>
@@ -340,7 +340,15 @@ values, with double pipes removed. Click <hi rend="bold">OK</hi> and try again t
 categories with '<hi rend="bold">Edit cells</hi>' &gt; '<hi rend="bold">Split multi-valued cells</hi>', the number
 of records will now stay at 75,727 (click the '<hi rend="bold">records</hi>' link to
 double-check).</p>
-                    <p>* * *<hi rend="bold">Edit cells</hi>' &gt; '<hi rend="bold">Transform</hi>', also on the
+                    <p>* * *
+Another issue that can be solved with the help of GREL is the problem
+of records for which the same category is listed twice. Take record 41
+| for instance, whose categories are 'Models|Botanical specimens|Botanical |
+| Specimens|Didactic Displays|Models'. The category 'Models' appears twice |
+without any good reason, so we want to remove this duplicate. Click the
+Categories triangle and choose Edit cells, Join multi-valued cells, OK.
+Choose the pipe character as a separator. Now the categories are listed
+as before. Then select '<hi rend="bold">Edit cells</hi>' &gt; '<hi rend="bold">Transform</hi>', also on the
 categories column. Using GREL we can successively split the categories
 on the pipe character, look for unique categories and join them back
 again. To achieve this, just type the following expression:</p>
@@ -368,8 +376,8 @@ share it with others.</p>
 other exciting features of <emph>OpenRefine</emph>. The user community of
 <emph>OpenRefine</emph> has developed two particularly interesting extensions which
 allow you to link your data to data that has already been published on
-the Web. The <ref target="http://web.archive.org/web/20180113121435/http://refine.deri.ie/docs">RDF Refine extension</ref> transforms plaintext keywords into
-URLs. The <ref target="https://github.com/RubenVerborgh/Refine-NER-Extension">NER extension</ref> allows you to apply named-entity recognition
+the Web. The <ref target="https://github.com/AtesComp/rdf-transform#rdf-transform">RDF Transform extension</ref> transforms plaintext keywords into
+URLs. The <ref target="https://github.com/stkenny/Refine-NER-Extension">NER extension</ref> allows you to apply named-entity recognition
 (NER), which identifies keywords in flowing text and gives them a URL.</p>
                 </div>
             </div>

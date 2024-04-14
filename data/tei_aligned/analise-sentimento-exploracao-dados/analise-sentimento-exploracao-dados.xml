@@ -1,0 +1,246 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="analise-sentimento-exploracao-dados" xml:base="analise-sentimento-exploracao-dados/analise-sentimento-exploracao-dados.xml">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Análise de sentimento para exploração de dados</title>
+                <author role="original_author">Zo&amp;#235; Wilkinson Salda&amp;#241;a</author>
+                <editor role="reviewers">
+                    <persName>Anandi Silva Knuppel</persName>
+                    <persName>Puteri Zarina Megat Khalid</persName>
+                </editor>
+                <author role="translators">Caio Mello</author>
+                <editor role="translation-reviewers">
+                    <persName>Bruno Ponne</persName>
+                    <persName>Ian Araujo</persName>
+                </editor>
+                <editor role="editors">Adam Crymble</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">06/14/2021</date>
+                <idno type="doi">10.46430/phpt0017</idno>
+                <date type="published">01/15/2018</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#sentiment-analysis"/>.</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Nesta lição, você aprenderá a conduzir uma 'análise de sentimento' em textos e a interpretar os resultados. Esta é uma forma de análise exploratória de dados baseada no processamento de linguagem natural (PLN). Você aprenderá a instalar todos os softwares apropriados e a construir um programa reutilizável que pode ser aplicado aos seus próprios textos.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">distant-reading</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <div type="2" n="1">
+                <head>Objetivos da lição</head>
+                <p>Esta lição usa a análise de sentimento como base para uma análise exploratória de dados de um grande corpus textual. Portanto, é indicada para leitores com alguma experiência prévia em programação utilizando Python. Caso não tenha experiência com Python ou programação, a autora recomenda trabalhar nas primeiras lições da série “Introdução ao Python”. Ao final desta lição, você terá o conhecimento necessário para:</p>
+                <list type="unordered">
+                    <item>Elaborar questões de pesquisa que usem Processamento de Linguagem Natural (PLN) em um corpus textual.</item>
+                    <item>Utilizar Python e o Natural Language Processing Toolkit (NLTK) para gerar medidas de sentimento para um texto.</item>
+                    <item>Avaliar criticamente os resultados da análise de sentimento e ajustar os parâmetros e a metodologia conforme necessário.</item>
+                    <item>Identificar as próximas etapas para continuar o aprendizado sobre análise exploratória de dados e abordagens programáticas para dados qualitativos.</item>
+                </list>
+                <p>Nota do tradutor: Devido à falta de uma biblioteca de código que funcione bem com os textos em português, optamos por manter os textos dos exercícios na língua original.</p>
+                <div type="3" n="1.1">
+                    <head>O que é análise exploratória de dados?</head>
+                    <p>A análise exploratória de dados é um conjunto de estratégias que trazem à tona características importantes num conjunto de dados que normalmente não são facilmente identificadas por meio da leitura tradicional. Com os insights da análise exploratória de dados em mãos, os pesquisadores podem tomar decisões mais adequadas ao selecionar um método ou abordagem para sua questão de pesquisa, ou até mesmo, identificar novas questões.</p>
+                    <p>Em 1977, o matemático John Tukey descreveu a análise exploratória de dados como uma forma de trabalho de detetive, sem a qual, os estudiosos muitas vezes perderiam descobertas interessantes, porém menos óbvias:</p>
+                    <quote>
+                        <p>“A menos que o detetive encontre pistas, o juiz ou júri não terá como julgar. Caso a análise exploratória de dados não revele indícios, geralmente quantitativos, é provável que se considere não haver nada a ser comprovado. ” (Tukey 1977: 3, tradução livre)</p>
+                    </quote>
+                </div>
+                <div type="3" n="1.2">
+                    <head>Explorando Texto com Análise de Sentimento</head>
+                    <p>Quando confrontado com um corpus promissor, porém muito grande, como o pesquisador pode encontrar aquilo de mais importante, que pode levar às descobertas de pesquisa mais interessantes?</p>
+                    <p>O Processamento de Linguagem Natural (PLN) abrange uma ampla gama de técnicas que se baseiam na aplicação de métodos analíticos computacionais ao conteúdo textual, fornecendo meios de categorizar e quantificar o texto. Essas abordagens de PLN, que incluem análise de sentimento, podem ajudar os pesquisadores a explorar seus textos. Nas palavras de Tukey, podem ajudar o pesquisador a encontrar “pistas” sobre seus textos e “indícios” de que pode valer a pena investigar algo mais a fundo.</p>
+                    <p>Nesta lição, vamos nos concentrar numa ferramenta do kit de ferramentas do PLN: a análise de sentimento. A análise de sentimento busca quantificar a intensidade emocional de palavras e frases num texto. Algumas ferramentas de análise de sentimento levam em consideração, inclusive, o peso emocional de sinais linguísticos como a pontuação ou mesmo os emojis. As ferramentas de análise de sentimento geralmente processam uma unidade de texto (uma frase, um parágrafo, um livro, etc.) e produzem pontuações (“scores”, em inglês) ou classificações quantitativas para indicar se o algoritmo considera que aquele texto transmite emoções positivas ou negativas. Algumas ferramentas também podem quantificar o <emph>grau de positividade</emph> ou o <emph>grau de negatividade</emph> num texto. Combinada com outros métodos de PLN, como modelagem de tópicos (“topic modelling”, em inglês), a análise de sentimento fornece meios de caracterizar as emoções expressas sobre diferentes tópicos de uma conversa. Quando usada em conjunto com a análise de rede, pode lançar luz sobre as maneiras como os indivíduos interagem uns com os outros. Um pesquisador interessado em interações sobre um evento político pode usar a análise de sentimento para estudar como os indivíduos descrevem aquele evento nas redes sociais. Com os dados certos para inserir na ferramenta, pode ser possível fazer comparações regionais ou entender como diferentes grupos demográficos vêem o evento de forma diferente. Como a ferramenta pode processar muitos dados sequencialmente, é até possível analisar o sentimento em centenas de milhares ou até milhões de eventos discursivos.</p>
+                    <p>Para começar, esta lição fornece uma introdução à análise de sentimento tanto prática quanto crítica. Como qualquer ferramenta computacional, a análise de sentimento tem uma série de limitações e vieses que os pesquisadores devem levar em consideração. Os pesquisadores devem ser especialmente cautelosos ao fazer afirmações empíricas com base nos resultados da análise de sentimento. Você poderá ser melhor atendido usando a análise de sentimento em situações provisórias e exploratórias, como meio de orientar o processo de pesquisa. Ao manejar essas ferramentas com ceticismo e eficácia, é possível realizar um trabalho de detetive bastante notável.</p>
+                </div>
+                <div type="3" n="1.3">
+                    <head>Análise de grandes coleções de correspondência textual</head>
+                    <p>Correspondências escritas como cartas, e-mails, registros de bate-papo, tweets e históricos de mensagens de texto podem fornecer aos pesquisadores uma visão inestimável de seus autores. Os textos geralmente são ricos em emoções e informações que não estão disponibilizadas em nenhum outro lugar. Um pesquisador pode aprender sobre as opiniões que as pessoas, objetos de seu estudo, tiveram sobre vários tópicos ou sobre determinados eventos. Também poderia ser possível aprender sobre os relacionamentos que os indivíduos desenvolveram e mantiveram em organizações ou redes complexas.</p>
+                    <p>Embora metodologias como etnografia, leitura “manual” e análise do discurso ajudem os pesquisadores a analisar a correspondência histórica, esses métodos trazem desafios significativos quando o número de textos cresce de dezenas ou centenas para milhares ou milhões. A análise textual computacional fornece um conjunto de métodos para tornar visíveis as tendências, dinâmicas e relacionamentos que podem estar ocultos para o leitor humano por problemas de escala. Além disso, muitos métodos de computação produzem descobertas que podem ser expressas quantitativamente e que podem subsequentemente permitir que o pesquisador realize modelagem estatística, visualização de informações e aprendizado de máquina (Machine Learning) para fazer outras análises.</p>
+                </div>
+                <div type="3" n="1.4">
+                    <head>Estudo de caso: corpus de e-mails da Enron</head>
+                    <p>Este tutorial usa a correspondência de e-mail da falida empresa americana de energia Enron. A Enron ocultou uma ampla variedade de práticas contábeis ilegais até que uma investigação federal em 2001 a levou à falência. Na época, o Escândalo Enron foi o maior colapso de uma empresa de capital aberto da história. Em 2001, a empresa começou a mostrar sinais de problemas financeiros que não se alinhavam com as divulgações financeiras da empresa até aquele momento. As ações da Enron negociadas em bolsa caíram de US$ 90,75 em meados de 2000 para menos de um dólar em novembro de 2001, o que levou os acionistas a processar a empresa. Uma investigação subsequente da Comissão de Valores Mobiliários dos Estados Unidos (SEC) revelou que os executivos da Enron cometeram fraude e negligência contábil em grande escala. A Enron declarou falência em dezembro daquele ano. Nos anos que se seguiram, vários executivos enfrentaram condenações criminais por sua participação no escândalo. Para os pesquisadores, o Escândalo Enron resultou na criação de um dos maiores (e mais infames) corpus de texto por correspondência já coletado:</p>
+                    <quote>
+                        <p>“Um dos escândalos corporativos mais infames das últimas décadas deixou curiosamente em seu rastro um dos conjuntos de dados mais valiosos disponíveis publicamente. No final de 2001, o encobrimento de fraude contábil da Enron Corporation levou à falência da gigante da energia. A Federal Energy Regulatory Commission requereu todos os registros de e-mail da Enron como parte da investigação que se seguiu. Nos dois anos seguintes, a comissão divulgou, escondeu e depois divulgou novamente o corpus de e-mail para o público após excluir e-mails que continham informações pessoais, como números de previdência social. O corpus da Enron contém e-mails cujos assuntos variam de planejamento de férias de fim de semana a tópicos de discussão de estratégia política, e continua sendo o único grande exemplo de conjuntos de dados de e-mail do mundo real disponíveis para pesquisa ”. (Hardin, Sarkis e Urc, 2015)</p>
+                    </quote>
+                    <p>Quando o conjunto de dados de e-mail da Enron - organizado e editado - foi lançado em 2004, os pesquisadores descobriram uma oportunidade sem precedentes: acesso direto à maneira espontânea e sem censura como os funcionários de uma empresa condenada se comunicavam. De repente, os pesquisadores tiveram acesso a como as pessoas se comunicam no trabalho em uma escala sem precedentes. Isso era importante para pesquisadores interessados ​​no caso especial do escândalo e colapso da Enron, mas também para pesquisadores interessados ​​em um amplo espectro de questões sobre a comunicação cotidiana no trabalho.</p>
+                    <p>Na década seguinte, centenas de novos estudos surgiram a partir desses e-mails, realizados em diversos campos como teoria das redes sociais, comunidade e detecção de anomalias, gênero e comunicação dentro das organizações, mudança de comportamento durante uma crise organizacional, insularidade e formação de comunidade. O uso da teoria das redes sociais nas humanidades oferece algumas possibilidades fascinantes, mas não é tão simples.</p>
+                    <p>Além da grande quantidade de mensagens incluídas (o corpus contém mais de 600.000 mensagens), o corpus de e-mails da Enron também inclui os metadados necessários para que os pesquisadores realizem uma série de questões de pesquisa. Assim como a presença de envelopes com endereços legíveis do remetente e do destinatário seria um excelente trunfo para pesquisadores de correspondências de cartas históricas, a presença de endereços de e-mail do remetente e do destinatário permite que os pesquisadores associem os e-mails a determinados indivíduos conhecidos dentro da corporação. Como alguns indivíduos tinham vários endereços de e-mail, ou mais de um indivíduo pode ter compartilhado o mesmo endereço, os metadados não são de uso muito óbvio, mas são potencialmente elucidativos. O restante do tutorial explicará como aplicar e interpretar a análise de sentimento de e-mails neste corpus.</p>
+                </div>
+            </div>
+            <div type="2" n="2">
+                <head>Usando Python com o Natural Language Toolkit (NLTK)</head>
+                <p style="alert alert-warning">
+Programando pela primeira vez? Esta lição é destinada a iniciantes, mas pode ser conveniente revisar outras lições de Python no Programming Historian. No entanto, observe que, embora muitas lições usem o Python versão 2, esta lição requer o Python versão 3. As instruções de instalação do Python 3 serão apresentadas a seguir.
+</p>
+                <p>Neste tutorial, Python será usado junto com algumas ferramentas do Natural Language Toolkit (NLTK) para gerar indicadores de sentimento a partir de transcrições de e-mail. Para fazer isso, você primeiro aprenderá como carregar os dados textuais no Python, selecionar as ferramentas de PLN apropriadas para análise de sentimento e escrever um algoritmo que calcula pontuações de sentimento para um determinado texto. Também exploraremos como ajustar seu algoritmo para melhor atender a seu objetivo de pesquisa. Ao final, você irá arquivar seu algoritmo de solução de problemas como um pacote de código conhecido como <emph>função</emph>, que poderá ser reutilizado e reaproveitado (inclusive na parte 2 deste tutorial)</p>
+                <div type="3" n="2.1">
+                    <head>Instalação</head>
+                    <p>Para continuar, as seguintes instalações serão necessárias:</p>
+                    <list type="unordered">
+                        <item>Python 3 (preferivelmente 3.5 ou superior) - <ref target="https://wiki.python.org/moin/BeginnersGuide/Download">Instruções para baixar e instalar Python</ref>
+                        </item>
+                        <item>NLTK (3.2.5 or superior) - <ref target="http://www.nltk.org/install.html">Instruções para baixar e instalar NLTK</ref>
+                        </item>
+                    </list>
+                </div>
+                <div type="3" n="2.2">
+                    <head>Primeiros passos com NLTK</head>
+                    <p>O Natural Language Toolkit (NLTK) é uma coleção de ferramentas Python reutilizáveis (também conhecido como uma biblioteca Python) que ajuda os pesquisadores a aplicar um conjunto de métodos computacionais a textos. As ferramentas variam desde métodos que ajudam a quebrar o texto em pedaços menores, alguns que identificam se uma palavra pertence a um determinado idioma, até aqueles textos de amostra que os pesquisadores podem usar para fins de treinamento e desenvolvimento (como o texto completo de <emph>Moby Dick</emph>).</p>
+                    <p>Se você precisar de ajuda para baixar e instalar o módulo para <ref target="https://www.python.org/download/releases/3.0/">Python 3</ref>, dê uma olhada na lição Instalando Módulos Python com pip de <ref target="/en/lessons/installing-python-modules-pip">Fred Gibbs</ref> (em inglês).</p>
+                    <p>Em nosso caso, usaremos duas ferramentas NLTK em particular:</p>
+                    <list type="unordered">
+                        <item>A ferramenta <ref target="http://www.nltk.org/_modules/nltk/sentiment/vader.html">"Análise de sentimento VADER"</ref> (que gera pontuações de sentimento positivas, negativas e neutras para uma determinada entrada)</item>
+                        <item>A ferramenta de toquenização ‘word_tokenize’ (divide um texto grande em uma sequência de unidades menores, como frases ou palavras)</item>
+                    </list>
+                    <p>Para usar VADER e word_tokenize, primeiro precisamos baixar e instalar alguns dados extras para NLTK. O NLTK é um kit de ferramentas muito grande e várias de suas ferramentas requerem uma segunda etapa de download para reunir a coleção de dados necessária (geralmente léxicos codificados) para funcionar corretamente.</p>
+                    <p>Para instalar a análise de sentimento e o tokenizador de palavras que usaremos neste tutorial, escreva um novo script em Python com as três linhas a seguir:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_analise-sentimento-exploracao-dados_0" corresp="code_analise-sentimento-exploracao-dados_0.txt" rend="block"/>
+                    </ab>
+                    <p>Você pode salvar este arquivo como <code rend="inline">“installation.py”</code>. Se você não tiver certeza de como salvar e executar scripts em Python, reveja o tutorial sobre como configurar um 'Ambiente de Desenvolvimento Integrado' usando Python, substituindo o comando '% (python)% f' por '% (python3)% f' quando você chegar a esse parte no tutorial.</p>
+                    <list type="unordered">
+                        <item>Configurando um ambiente de desenvolvimento integrado para Python no <ref target="/pt/licoes/instalacao-windows">Windows</ref>.</item>
+                        <item>Configurando um ambiente de desenvolvimento integrado para Python no <ref target="/pt/licoes/instalacao-mac">Mac</ref>.</item>
+                        <item>Configurando um ambiente de desenvolvimento integrado para Python no <ref target="/pt/licoes/instalacao-linux">Linux</ref>.</item>
+                    </list>
+                    <p>Se você sabe como executar scripts Python, execute o arquivo usando Python 3.</p>
+                    <p>
+                        <ref target="http://www.nltk.org/_modules/nltk/sentiment/vader.html">VADER</ref> (Valence Aware Dictionary and sEntiment Reasoner) é uma ferramenta de atribuição de intensidade de sentimento acrescentada ao NLTK em 2014. Ao contrário de outras técnicas que exigem treinamento em textos parecidos antes do uso, o VADER está pronto para ser usado sem qualquer configuração especial. O VADER é o único que faz distinções refinadas entre vários graus de positividade e negatividade. Por exemplo, VADER pontua “conforto” como moderadamente positivo e “euforia” como extremamente positivo. Ele também tenta capturar e pontuar características textuais comuns em texto online informal, como letras maiúsculas, pontos de exclamação e emoticons, conforme mostrado na tabela abaixo:</p>
+                    <figure>
+                        <desc>Vader captura pequenas gradações de entusiasmo. (Hutto e Gilbert, 2014). **Versão do tradutor**. Acesse a original [aqui](/en/lessons/sentiment-analysis)</desc>
+                        <graphic url="analise-sentimento1.png"/>
+                    </figure>
+                    <p>Como qualquer ferramenta de análise de texto, o VADER deve ser avaliado com criticidade e de forma contextualizada. O VADER foi desenvolvido em meados da década de 2010 principalmente para analisar microblogs em inglês e sites de rede social (especialmente o Twitter). Esse tipo de texto tende a ser muito mais informal do que o e-mail profissional, e contém padrões de linguagem e de uso de recursos que diferem dos padrões de 1999-2002 quando os e-mails da Enron foram escritos. No entanto, VADER também foi desenvolvido como uma ferramenta de análise de sentimento de propósito geral, e o estudo inicial dos autores mostra que ele se compara favoravelmente com ferramentas que foram treinadas para domínios específicos, usam léxicos especializados ou técnicas de aprendizado de máquina com muitos recursos (Hutto e Gilbert, 2014 ). A sensibilidade da ferramenta em relação aos graus de afeto se mostrou útil para descrever as sutilezas das emoções expressas nos e-mails profissionais - como pesquisadores, podemos estar especialmente interessados ​​em capturar os momentos em que a emoção surge em um texto formal. No entanto, a análise de sentimento continua se dedicando a encontrar soluções para capturar sentimentos complexos como ironia, sarcasmo e zombaria, quando o leitor médio seria capaz de fazer a distinção entre o texto literal e seu significado pretendido.</p>
+                    <p>Embora o VADER seja uma boa ferramenta de uso geral para textos contemporâneos e históricos em inglês, a ferramenta fornece apenas suporte nativo parcial para textos em outras línguas (detecta emojis / maiúsculas / etc., mas não a escolha de palavras). No entanto, os desenvolvedores incentivam os usuários a usar a tradução automática para pré-processar textos que não sejam em inglês e, em seguida, inserir os resultados no VADER. O "VADER demo" inclui um código para enviar o texto de entrada automaticamente para o serviço web ‘My Memory Translation Service’, (leitores avançados podem encontrar no <ref target="https://github.com/cjhutto/vaderSentiment/blob/master/vaderSentiment/vaderSentiment.py">Github</ref> a partir da linha 554 - no momento da escrita deste artigo). A implementação deste método de tradução é mais indicada para usuários intermediários de Python. Você pode aprender mais sobre o estado da arte da análise de sentimento multilíngue (que infelizmente quase sempre requer uma etapa de tradução) em <ref target="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4981629/">"Análise de sentimento multilíngue: o estado da arte e comparação independente de técnicas"</ref>, de Kia Dashtipour, et al (2016).</p>
+                </div>
+                <div type="3" n="2.3">
+                    <head>Calculando Sentimento para um Parágrafo</head>
+                    <p>Leia o seguinte trecho:</p>
+                    <quote>
+                        <p>“Like you, I am getting very frustrated with this process. I am genuinely trying to be as reasonable as possible. I am not trying to “hold up” the deal at the last minute. I’m afraid that I am being asked to take a fairly large leap of faith after this company (I don’t mean the two of you – I mean Enron) has screwed me and the people who work for me.”</p>
+                    </quote>
+                    <p>Este é o primeiro parágrafo do e-mail de janeiro de 2012 de Timothy Belden para Louise Kitchen e John Lavorato sobre o “Acordo de Contratos de Trabalho”. Belden dirigiu os Serviços de Energia da Enron e mais tarde seria condenado por conspiração a fim de aumentar os custos de energia na Califórnia, o que levou a uma crise energética em todo o estado.</p>
+                    <p>Apesar do sentimento de frustração e ansiedade que você pode deduzir do parágrafo como um todo, observe a ambivalência das frases específicas dentro do parágrafo. Alguns parecem expressar esforços de boa fé, por exemplo: “Não estou tentando ‘atrasar’ o negócio” e “genuinamente tentando”. E, no entanto, há declarações negativas ainda mais fortes sobre "ficar frustrado", "Receio" e "esta empresa [...] ferrou comigo e com as pessoas que trabalham para mim".</p>
+                    <p>Vamos calcular as pontuações de sentimento para este e-mail usando o VADER para ter uma ideia do que a ferramenta pode fazer. Para começar, crie um novo diretório de trabalho (pasta) em seu computador chamado <code rend="inline">“sentimento”</code> em algum lugar onde você possa encontrá-lo. Dentro dessa pasta, crie um novo arquivo de texto e salve-o como <code rend="inline">“sentimento.py”</code>. É aqui que escreveremos o código para esta tarefa.</p>
+                    <p>Primeiro, temos que dizer ao Python onde o código NLTK para a análise de sentimento VADER está localizado. No início do nosso arquivo, importaremos o código do VADER:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_analise-sentimento-exploracao-dados_1" corresp="code_analise-sentimento-exploracao-dados_1.txt" rend="block"/>
+                    </ab>
+                    <p>Também devemos habilitar o Python para usar este código com nosso conjunto particular de código. Embora tenhamos todas as instruções de que precisamos na biblioteca NLTK, o Python gosta de agrupar essas instruções em um único <code rend="inline">objeto</code> (nossa ferramenta de Análise de Sentimentos) que nosso programa pode acessar. <emph>SentimentIntensityAnalyzer</emph> é uma <code rend="inline">classe</code>, que é um “modelo” que instrui o Python a construir um <code rend="inline">objeto</code> com um conjunto especial de <code rend="inline">funções</code> e <code rend="inline">variáveis</code>. No nosso caso, queremos construir um único <code rend="inline">objeto</code>: nosso analisador de sentimento, que segue este “modelo”. Para fazer isso, executamos <emph>SentimentIntensityAnalyzer( )</emph> e atribuímos a saída - nosso novo analisador de sentimento - a uma variável, que chamaremos de <emph>‘sid’</emph>.</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_analise-sentimento-exploracao-dados_2" corresp="code_analise-sentimento-exploracao-dados_2.txt" rend="block"/>
+                    </ab>
+                    <p>Fazendo isso, fornecemos à nossa nova variável <emph>sid</emph> todos os recursos do código de análise de sentimento VADER. Assim, <emph>sid</emph> se tornou nossa ferramenta de análise de sentimento, mas com um nome mais curto.</p>
+                    <p>Em seguida, precisamos armazenar o texto que queremos analisar em um lugar que o <emph>sid</emph> possa acessar. Em Python, podemos armazenar uma única sequência de texto como uma variável de <code rend="inline">string</code> (Nota do tradutor: Optamos por manter a palavra 'string' como no original em inglês para facilitar o entendimento de seu uso mais comum em códigos ['str']).</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_analise-sentimento-exploracao-dados_3" corresp="code_analise-sentimento-exploracao-dados_3.txt" rend="block"/>
+                    </ab>
+                    <p>Como este texto inclui aspas e apóstrofos, é necessário circundar todo o texto com três aspas (“”” ou ’’’). Isso significa que quaisquer aspas e apóstrofos no texto serão reconhecidos como tal. Essa abordagem também mantém qualquer espaçamento que nosso texto já inclua.</p>
+                    <p>Agora você está pronto para processar o texto.</p>
+                    <p>Para fazer isso, o texto <emph>(message_text)</emph> deve ser inserido na ferramenta <emph>(sid)</emph> e o programa deve ser executado. Estamos interessados na "pontuação de polaridade" do analisador de sentimento, que nos dá uma pontuação positiva ou negativa. Este recurso é integrado ao VADER e pode ser solicitado sob demanda.</p>
+                    <p>Queremos ter certeza de capturar a saída de sid.polarity_scores () atribuindo-a a uma variável que chamaremos de <emph>scores</emph>:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_analise-sentimento-exploracao-dados_4" corresp="code_analise-sentimento-exploracao-dados_4.txt" rend="block"/>
+                    </ab>
+                    <p>Quando você executa este código, os resultados da análise de sentimento agora são armazenados no <code rend="inline">dicionário</code> de <emph>pontuação</emph> (scores). Um dicionário, muito parecido com o tipo que você usa para pesquisar a definição de palavras, é uma variável que armazena informações conhecidas como 'valores' que são acessíveis dando ao programa a 'chave' para a entrada que você deseja ler. Isso significa que um dicionário como <emph>scores</emph> pode armazenar muitos <code rend="inline">pares de valores-chave</code>. Para solicitar os dados, você só precisa conhecer as <code rend="inline">chaves</code>. Mas não sabemos as <code rend="inline">chaves</code>. Felizmente, Python nos dará uma lista de todas as <code rend="inline">chaves</code>, classificadas em ordem alfabética, se usarmos a função <code rend="inline">sorted(scores)</code>.</p>
+                    <p>Para imprimir cada <code rend="inline">chave</code> e <code rend="inline">valor</code> armazenado no dicionário, precisamos de um <code rend="inline">for loop</code>, que aplica o mesmo código sequencialmente a todas as <code rend="inline">chaves</code> do dicionário.</p>
+                    <p>Aqui está o código para imprimir cada par de <code rend="inline">valores-chave</code> dentro da variável de pontuação (score):</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_analise-sentimento-exploracao-dados_5" corresp="code_analise-sentimento-exploracao-dados_5.txt" rend="block"/>
+                    </ab>
+                    <p>Aqui está todo o código em um único programa:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_analise-sentimento-exploracao-dados_6" corresp="code_analise-sentimento-exploracao-dados_6.txt" rend="block"/>
+                    </ab>
+                    <p>Salve seu arquivo Python. Agora estamos prontos para executar o código. Usando seu método preferido (ou seu Ambiente de Desenvolvimento Integrado ou a linha de comando), execute seu arquivo Python, <code rend="inline">sentimento.py</code>.</p>
+                    <p>O resultado deve ser semelhante a este:</p>
+                    <ab>
+                        <code lang="language-python" xml:id="code_analise-sentimento-exploracao-dados_7" corresp="code_analise-sentimento-exploracao-dados_7.txt" rend="block"/>
+                    </ab>
+                    <p style="alert alert-warning">
+Lembre-se de usar três aspas simples para envolver a string *message_text* acima. Se você usar aspas duplas, a string terminará mais cedo devido às aspas dentro do texto.
+</p>
+                    <p>O VADER coleta e pontua palavras e características negativas, neutras e positivas (e é responsável por fatores como negação ao longo do caminho). Os valores “neg”, “neu” e “pos” descrevem a fração das pontuações ponderadas que se enquadram em cada categoria. VADER também soma todas as pontuações ponderadas para calcular um valor “composto” normalizado entre -1 e 1; este valor tenta descrever o efeito geral de todo o texto de fortemente negativo (-1) a fortemente positivo (1). Neste caso, a análise com VADER descreve a passagem como ligeiramente a moderadamente negativa (-0,3804). Podemos pensar nesse valor como uma estimativa da impressão geral de um leitor médio ao considerar o e-mail como um todo, apesar de alguma ambiguidade e ambivalência ao longo do caminho.</p>
+                    <p>Ao ler o texto, estaria inclinado a concordar com essa avaliação geral. O valor de saída de -0,3804 é negativo, mas não fortemente negativo. Os pesquisadores podem desejar definir um limite mínimo para positividade ou negatividade antes de declarar um texto definitivamente positivo ou negativo - por exemplo, a documentação oficial do VADER sugere um limite de -0,5 e 0,5, que este trecho específico não alcançaria (em outras palavras , este texto é negativo, mas não extremamente negativo).</p>
+                    <p>O que isso implica, para você, sobre a maneira como esse sentimento pode ser expresso em um contexto de e-mail profissional? Como você definiria seus valores limite quando o texto expressa emoções de maneira mais sutil ou cortês? Você acha que a análise de sentimento é uma ferramenta apropriada para nossa análise exploratória de dados?</p>
+                    <p>Desafio: tente substituir o conteúdo de <emph>message_text</emph> pelas seguintes cadeias de caracteres e execute novamente o programa. Não se esqueça de cercar cada texto com três aspas simples ao atribuí-lo à variável <emph>message_text</emph> (como em: <emph>message_text</emph> = ''' algumas palavras '''). Antes de executar o programa, tente adivinhar o resultado da análise de sentimento: positivo ou negativo? Quão positivo ou negativo?</p>
+                    <p>Texto 1:</p>
+                    <ab>
+                        <code xml:id="code_analise-sentimento-exploracao-dados_8" corresp="code_analise-sentimento-exploracao-dados_8.txt" rend="block"/>
+                    </ab>
+                    <p>Texto 2:</p>
+                    <ab>
+                        <code xml:id="code_analise-sentimento-exploracao-dados_9" corresp="code_analise-sentimento-exploracao-dados_9.txt" rend="block"/>
+                    </ab>
+                    <p>Experimente uma terceira vez com algum texto de uma de suas próprias fontes de pesquisa. Que resultados você obteve para cada um? Você concorda com os resultados?</p>
+                </div>
+            </div>
+            <div type="2" n="3">
+                <head>Determine o escopo apropriado para e-mail</head>
+                <p>Quando analisado por meio da ferramenta de análise de sentimento VADER, o texto produz um conjunto de pontuações positivas, neutras e negativas, que são então agregadas e dimensionadas como uma "pontuação composta". Embora seja útil saber em teoria, como esse método pode ser aplicado aos dados no exemplo da Enron - isto é, uma coleção de dados de e-mail e metadados? E o que isso pode nos dizer sobre as emoções, relacionamentos e mudanças ao longo do tempo dos funcionários da Enron?</p>
+                <p>Nesta seção, apresentaremos a você o processo de seleção do escopo de análise para nossa ferramenta de análise de sentimento. Considere os seguintes dados brutos pertencentes a um e-mail de 3 de outubro de 2000 escrito por Jeffrey Shankman, então presidente de mercados globais da Enron (Quinn, 2006):</p>
+                <ab>
+                    <code xml:id="code_analise-sentimento-exploracao-dados_10" corresp="code_analise-sentimento-exploracao-dados_10.txt" rend="block"/>
+                </ab>
+                <p>No texto da mensagem do e-mail, Shankman traça uma estratégia corporativa para avançar no que ele percebe como um contexto geopolítico ambíguo. A mensagem descreve uma série de situações difíceis, bem como exasperação ("As reuniões matinais não são inspiradoras") e incerteza ("Não tenho um sentimento real de paixão de todos"). Ao mesmo tempo, Shankman descreve um conjunto de etapas de ação junto com pedidos educados ("Eu gostaria de pedir ...") e expressões de gratidão ("Obrigado").</p>
+                <p>Antes de prosseguirmos, pare um minuto para refletir sobre a mensagem. Como você acha que um leitor típico descreveria a intensidade emocional deste e-mail? Considerando o que você sabe agora sobre VADER, que proporção de positividade, negatividade e neutralidade você espera que a ferramenta de análise de sentimento encontre na mensagem? Finalmente, o que você acha que a pontuação composta irá sugerir sobre o efeito geral na mensagem?</p>
+                <p>Como discutimos acima, a análise de sentimento não fornece uma saída objetiva, mas sim indicadores de orientação que refletem nossa escolha e calibração de ferramentas analíticas. Talvez o elemento mais importante da calibração seja selecionar o escopo do texto que está sendo analisado, ou seja, quanto de uma mensagem colocamos na ferramenta de uma vez. Em nosso caso, podemos determinar o escopo da análise decidindo entre analisar a mensagem inteira como uma única unidade ou, em vez disso, dividir a mensagem em unidades menores como frases e analisar cada uma separadamente.</p>
+                <p>Primeiro, vamos considerar uma abordagem no nível da mensagem, na qual analisamos a mensagem como um único bloco:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_analise-sentimento-exploracao-dados_11" corresp="code_analise-sentimento-exploracao-dados_11.txt" rend="block"/>
+                </ab>
+                <p>Substitua <code rend="inline">sentimento.py</code> pelo código acima, salve-o e execute-o. A saída deve ser semelhante a esta:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_analise-sentimento-exploracao-dados_12" corresp="code_analise-sentimento-exploracao-dados_12.txt" rend="block"/>
+                </ab>
+                <p>Aqui você pode ver que, ao analisar o e-mail como um todo, VADER retorna valores que sugerem que a mensagem é principalmente neutra (neu: 0,765), mas que mais recursos parecem ser positivos (pos: 0,14) em vez de negativos (0,096). VADER calcula uma pontuação geral de sentimento de 0,889 para a mensagem (em uma escala de -1 a 1), o que sugere um efeito fortemente positivo para a mensagem como um todo.</p>
+                <p>Isso atendeu às suas expectativas? Se não, por que você acha que o VADER encontrou mais características positivas do que negativas?</p>
+                <p>No nível da entidade da mensagem, não há como destacar sentimentos particularmente positivos ou negativos na mensagem. Essa perda de detalhes pode ser irrelevante ou pode ser vital ao conduzir uma análise exploratória. Isso depende das necessidades de pesquisa de seu estudo. Por exemplo, identificar frases negativas em e-mails de outra forma adequados pode ser especialmente importante ao procurar explosões emocionais ou trocas abusivas que podem ocorrer muito raramente, mas revelam algo essencial sobre a natureza de um relacionamento. Se quisermos capturar esse nível de nuance, precisamos de um método para passar da análise do nível da mensagem para a análise do sentimento.</p>
+                <p>Felizmente, o NLTK oferece uma coleção de ferramentas para dividir o texto em componentes menores. Os tokenizadores dividem as sequências de texto em pedaços menores, como frases. Alguns podem ainda dividir uma frase em partes específicas do discurso, como o substantivo, adjetivo e assim por diante. No nosso caso, usaremos o tokenizer english.pickle do NLTK para dividir os parágrafos em sentenças.</p>
+                <p>Agora podemos reescrever o script de análise de sentimento para analisar cada frase separadamente:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_analise-sentimento-exploracao-dados_13" corresp="code_analise-sentimento-exploracao-dados_13.txt" rend="block"/>
+                </ab>
+                <p>O resultado deve ser semelhante a este:</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_analise-sentimento-exploracao-dados_14" corresp="code_analise-sentimento-exploracao-dados_14.txt" rend="block"/>
+                </ab>
+                <p>Aqui, você notará uma visalização muito mais detalhada do sentimento neste e-mail. O VADER identifica com sucesso sentenças moderadas a fortemente negativas no e-mail, especialmente as principais descrições de crises. A análise no nível da frase permite que você identifique frases e tópicos específicos nos extremos do sentimento, o que pode ser útil mais tarde.</p>
+                <p>Mas, mesmo nesse nível, o VADER também comete vários erros. A frase que começa com “As reuniões matinais não são inspiradoras” resulta em uma pontuação surpreendentemente positiva - talvez por causa de uma leitura incorreta dos termos “paixão” e “respeito”.</p>
+                <p>Observe também que o ponto de interrogação no início do e-mail e o ponto de abreviação após <emph>Mon</emph> (Segunda-feira: <emph>seg.</emph>) próximo ao final fazem com que o tokenizador english.pickle quebre as frases por engano. Este é um risco constante de pontuação informal e complexa no texto.</p>
+                <p>O que você nota sobre a distribuição dos scores de sentimento? Como você poderia coletá-los de uma maneira que o ajude a entender melhor seus dados e as questões de pesquisa de seu interesse? (Sinta-se à vontade para experimentar diferentes tipos de texto na variável <emph>message_text</emph> para ver como a ferramenta responde a diferentes tipos de construções de linguagem). O código que você acabou de escrever pode ser reaproveitado para qualquer texto.</p>
+            </div>
+            <div type="2" n="4">
+                <head>Agradecimentos</head>
+                <p>Meus sinceros agradecimentos a Justin Joque, Bibliotecário de Visualização da Biblioteca da Universidade de Michigan e do Digital Projects Studio, pelo apoio na formulação das ideias e abordagem por trás desta lição. Muito obrigado também a Adam Crymble, que forneceu diversas ideias e apoio durante todo o processo editorial. E obrigado a Anandi Silva Knuppel e Puteri Zarina Megat Khalid por seus comentários atenciosos.</p>
+            </div>
+            <div type="2" n="5">
+                <head>Referências</head>
+                <p>Barton, D., &amp; Hall, N. (Eds.). (2000). Letter writing as a social practice (Vol. 9). John Benjamins Publishing.</p>
+                <p>Hardin, J., Sarkis, G., &amp; Urc, P. C. (2015). Network Analysis with the Enron Email Corpus. Journal of Statistics Education, 23:2. <ref target="https://doi.org/10.1080/10691898.2015.11889734">https://doi.org/10.1080/10691898.2015.11889734</ref>
+                </p>
+                <p>Hutto, C.J. &amp; Gilbert, E.E. (2014). VADER: A Parsimonious Rule-based Model for Sentiment Analysis of Social Media Text. Eighth International Conference on Weblogs and Social Media (ICWSM-14). Ann Arbor, MI, June 2014. <ref target="https://www.aaai.org/ocs/index.php/ICWSM/ICWSM14/paper/viewPaper/8109">https://www.aaai.org/ocs/index.php/ICWSM/ICWSM14/paper/viewPaper/8109</ref>
+                </p>
+                <p>Klimt, B., &amp; Yang, Y. (2004, July). Introducing the Enron Corpus. In CEAS. <ref target="https://bklimt.com/papers/2004_klimt_ceas.pdf">https://bklimt.com/papers/2004_klimt_ceas.pdf</ref>
+                </p>
+                <p>Klimt, B., &amp; Yang, Y. (2004). The Enron corpus: A new dataset for email classification research. Machine learning: ECML 2004, 217-226. <ref target="https://bklimt.com/papers/2004_klimt_ecml.pdf">https://bklimt.com/papers/2004_klimt_ecml.pdf</ref>
+                </p>
+                <p>Tukey, J.W. (1977). Exploratory Data Analysis. Addison-Wesley Publishing Company</p>
+                <p>Quinn, J. (2006, November 14). Ex-Enron man goes back into energy. Retrieved January 10, 2018, from <ref target="http://www.telegraph.co.uk/finance/2950645/Ex-Enron-man-goes-back-into-energy.html">http://www.telegraph.co.uk/finance/2950645/Ex-Enron-man-goes-back-into-energy.html</ref>
+                </p>
+            </div>
+        </body>
+    </text>
+</TEI>

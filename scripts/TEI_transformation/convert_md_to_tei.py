@@ -100,9 +100,10 @@ def save_file(string, path):
     with open(path, "w") as output_file:
         output_file.write(string)
 
+
 def xmlify(path):
     """
-    This function takes a md file and returns a TEI-like document (not fully compliant though)
+    This function takes a md file and returns a TEI document. It is the core of this python script.
     :param path: path to the md file
     :return: None; creates a TEI file
     """
@@ -116,6 +117,7 @@ def xmlify(path):
     lesson_name = path.split("/")[-1].replace(".md", "")
 
     print(f"../../data/to_tei/{lesson_name}/{lesson_name}.xml")
+
     ## Metadata management; yaml-xml conversion
     minimal_teiHeader = """<teiHeader>
  <fileDesc>
@@ -239,7 +241,8 @@ def xmlify(path):
     # We add a space before the colon to avoid this.
     footnotemark_pattern = r"(\[\^\d+\]):"
     transformed = re.sub(footnotemark_pattern, r"\1 :", transformed)
-    
+
+    # Mathematical formulas in LaTeX markup.
     formulas_pattern = r"\$\$([^\$]*)\$\$"
     transformed = re.sub(formulas_pattern, r"<formula>\1</formula>", transformed)
 
@@ -247,6 +250,7 @@ def xmlify(path):
     transformed = transformed.replace("%}", "%}\n\n")
     transformed = transformed.replace("{% include toc.html %}", "")
     transformed = transformed.replace("<hr/>", "")
+    transformed = transformed.replace("<br/>", "")
 
     ## Next, some regexp-based rules to identify tricky elements (footnotes, etc)
     footnotes_pattern = re.compile(r"\[\^([^\[\]\^]*)\]:([^\n]*)\n", re.DOTALL)
@@ -254,8 +258,7 @@ def xmlify(path):
 
     footnotemarks_pattern = re.compile(r"\[\^([^\[\]\^]*)\]")
     transformed = re.sub(footnotemarks_pattern, rf"<ref type='footnotemark' target='#\1'/>", transformed)
-    
-    
+
     # Some images are tagged inline, which leads to huge transformation problems.
     inline_images_pattern = re.compile(r"(\!\[[^\[\]]*\]\([^\(\)]*\)):?")
     transformed = re.sub(inline_images_pattern, r"\1\n\n", transformed)
@@ -267,7 +270,7 @@ def xmlify(path):
     transformed = re.sub(inclusion_pattern, replacement, transformed)
 
     # GFM extension of marko parses tables too.
-    # Let's strip some markup marko doesnt process correctly
+    # Let's strip some markup marko doesnt process correctly, like the style element.
     style_regex = re.compile(r"<style[^>]*>.+?(?=<\/style>)<\/style>", re.DOTALL)
     transformed = re.sub(style_regex, "", transformed)
 
@@ -282,12 +285,14 @@ def xmlify(path):
 
     # Let's convert the document to HTML
     converted_doc = gfm.convert(transformed)
+    converted_doc = converted_doc.replace("<hr />", "")
+    converted_doc = converted_doc.replace("<br />", "")
     parser = ET.HTMLParser(recover=True)
     lesson_as_xml_tree = ET.fromstring(converted_doc, parser=parser)
+    save_file(transformed, "/home/mgl/Documents/test_after_transformation.md")
+    serialize_tree_to_file(lesson_as_xml_tree, "/home/mgl/Documents/test_after_transformation.xml")
 
-    serialize_tree_to_file(lesson_as_xml_tree, "/home/mgl/Documents/test.xml")
-
-    ## First we need to correct the structure. The first level of division will be 1.
+    ## Then we need to correct the structure. The first level of division will be 1.
     all_headings = []
     for section_level in range(6):
         all_headings.extend(
@@ -308,11 +313,11 @@ def xmlify(path):
         minimal_heading_check = False
     if any([all_heads[n] - all_heads[n + 1] < - 1 for n in range(len(all_heads[:-1]))]):
         structural_jump_check = False
-    # We modify just in case of 
 
     # Write log
     if all(check is True for check in [minimal_heading_check, structural_jump_check, heading_check]):
-        pass
+        write_to_log(f"\n\nLesson {lesson_name}")
+        write_to_log(f"All checks passed\n\n")
     else:
         write_to_log(f"Lesson {lesson_name}")
         write_to_log(f"Lesson structure: [{','.join([str(head) for head in all_heads])}]")
@@ -330,11 +335,13 @@ def xmlify(path):
 
     # Correct structure    
     if minimal_heading == 1 and all(check is True for check in [minimal_heading_check, structural_jump_check]):
+        print("Minimal heading is 1")
         for section_level in reversed(range(minimal_heading, 6)):
             all_nodes = lesson_as_xml_tree.xpath(f"descendant::h{section_level}")
             for heading in all_nodes:
                 heading.tag = f"h{str(section_level + 1)}"
     elif minimal_heading != 2 and all(check is True for check in [minimal_heading_check, structural_jump_check]):
+        print("Minimal heading not 2")
         for section_level in range(minimal_heading, 6):
             difference = minimal_heading - 2
             all_nodes = lesson_as_xml_tree.xpath(f"descendant::h{section_level}")
@@ -399,6 +406,8 @@ def xmlify(path):
     # for empty_pre in lesson_as_xml_tree.xpath("//pre", namespaces=ns_decl):
     #     empty_pre.getparent().remove(empty_pre)
 
+
+    # The next phase is to modify the nodes to make them TEI conformant.
     root = lesson_as_xml_tree.xpath("/node()")[0]
     # Let's modify some tagnames, clean some other
     change_element_name(root, "strong", "hi", "rend", "bold")
@@ -407,9 +416,9 @@ def xmlify(path):
     remove_parent_keep_self(root, "//div[parent::p[@style='alert alert-warning']]", "p[@style='alert alert-warning']")
     remove_parent_keep_self(root, "//p[@style='alert alert-warning'][p[@style='alert alert-warning']]", "p[@style"
                                                                                                         "='alert "
-                                                                                                        "alert-warning']") 
+                                                                                                        "alert-warning']")
     pop_attribute(root, "p", "role")
-    pop_attribute(root, "p", "class")  
+    pop_attribute(root, "p", "class")
     print("Changing alert alert-info")
     change_element_name(root, "div[@class='alert alert-info']", "p", "style", "alert alert-info")
     pop_attribute(root, "p[@class='alert alert-info']", "class")
@@ -459,7 +468,7 @@ def xmlify(path):
     pop_attribute(root, "ref", "title")
     pop_attribute(root, "cell", "valign")
     pop_attribute(root, "row", "style")
-    
+
     # Let's put the caption back into the tables
     all_captions_outside_table = root.xpath("//caption[following-sibling::node()[self::table]]")
     for caption in all_captions_outside_table:
@@ -467,9 +476,7 @@ def xmlify(path):
         following_table.insert(0, caption)
     print(all_captions_outside_table)
     change_element_name(root, "table/caption", "head")
-    
-    
-    
+
     # This is another problem: the indication of starting point of a numbered list. Ignoring for now
     pop_attribute(root, "list", "start")
     pop_attribute(root, "ref", "download")
@@ -717,7 +724,12 @@ def link_lessons(lesson):
     return all_lessons
 
 
-def create_main_TEI_file(lessons: dict) -> None:
+def create_main_tei_file(lessons: dict) -> None:
+    """
+    This function creates the main TEI document, linking to the other documents with xi:include elements
+    :param lessons:  The lessons to parse
+    :return:  None
+    """
     Incomplete_TEI = """
     <TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <teiHeader>
@@ -744,7 +756,7 @@ def create_main_TEI_file(lessons: dict) -> None:
         all_tests = []
         test_expression = "//tei:head[preceding-sibling::node()[not(self::text())]] | //tei:h2 | //tei:h3 | //tei:h4 | " \
                           "//tei:h5 | //tei:h6 | //tei:h7"
-        html_heads_test = new_tree.xpath(test_expression, namespaces=ns_decl) 
+        html_heads_test = new_tree.xpath(test_expression, namespaces=ns_decl)
         all_tests.extend(html_heads_test)
         new_TEI_node = ET.fromstring(Incomplete_TEI)
         if len(html_heads_test) == 0:
@@ -764,7 +776,7 @@ def create_main_TEI_file(lessons: dict) -> None:
                 include.set('href', f"{element}/{element}.xml")
                 new_TEI_node.append(include)
             else:
-                print("File not valid, removing")
+                print("File not valid, excluding it from main TEI file.")
         # If there is at least one correct lesson, append the TEI subfile to the main corpus.
         print(all_tests)
         if len(all_tests) == 0:
@@ -789,10 +801,11 @@ if __name__ == '__main__':
     lessons = [f for f in glob.glob(f"/home/mgl/Bureau/Travail/PH/jekyll/*/l*/{target_lesson}.md") if
                re.search(regexp, f)]
     # Those two lessons break the script because of tei elements they have.
-    lessons = [lesson for lesson in lessons if lesson != "/home/mgl/Bureau/Travail/PH/jekyll/es/lecciones/introduccion-a-tei-1.md"]
+    lessons = [lesson for lesson in lessons if
+               lesson != "/home/mgl/Bureau/Travail/PH/jekyll/es/lecciones/introduccion-a-tei-1.md"]
     lessons = [lesson for lesson in lessons if lesson != "/home/mgl/Bureau/Travail/PH/jekyll/pt/licoes/introducao" \
-                                                         "-codificacao-textos-tei-1.md"] 
-    
+                                                         "-codificacao-textos-tei-1.md"]
+
     # Removing log file
     try:
         os.remove("logs/log.txt")
@@ -803,4 +816,4 @@ if __name__ == '__main__':
         xmlify(lesson)
 
     lessons = link_lessons(target_lesson)
-    create_main_TEI_file(lessons)
+    create_main_tei_file(lessons)

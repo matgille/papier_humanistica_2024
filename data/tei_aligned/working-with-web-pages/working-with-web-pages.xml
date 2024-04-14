@@ -1,0 +1,220 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="working-with-web-pages" xml:base="working-with-web-pages/working-with-web-pages.xml">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Downloading Web Pages with Python</title>
+                <author role="original_author">
+                    <persName>William J. Turkel</persName>
+                    <persName>Adam Crymble</persName>
+                </author>
+                <editor role="reviewers">
+                    <persName>Jim Clifford</persName>
+                    <persName>Frederik Elwert</persName>
+                </editor>
+                <editor role="editors">Miriam Posner</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0021</idno>
+                <date type="published">07/17/2012</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#download-paginas-web-python #telecharger-des-pages-web-avec-python #trabajar-con-paginas-web"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>This lesson introduces Uniform Resource Locators (URLs) and explains how to use Python to download and save the contents of a web page to your local hard drive.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">python</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div type="2" n="1">
+                <head>Lesson Goals</head>
+                <p>This lesson introduces <emph>Uniform Resource Locators</emph> (URLs) and explains how
+to use Python to download and save the contents of a web page to your
+local hard drive.</p>
+                <div type="3" n="1.1">
+                    <head>About URLs</head>
+                    <p>A <emph>web page</emph> is a file that is stored on another computer, a machine known
+as a <emph>web server</emph>. When you "go to" a web page, what is actually happening
+is that your computer, (the <emph>client</emph>) sends a request to the server (the
+<emph>host</emph>) out over the network, and the server replies by sending a copy of
+the page back to your machine. One way to get to a web page with your
+browser is to follow a link from somewhere else. You also have the
+ability, of course, to paste or type a Uniform Resource Locator (URL)
+directly into your browser. The URL tells your browser where to find an
+online resource by specifying the server, directory and name of the file
+to be retrieved, as well as the kind of <emph>protocol</emph> that the server and
+your browser will agree to use while exchanging information (like HTTP,
+the <emph>Hypertext Transfer Protocol</emph>). The basic structure of a URL is</p>
+                    <ab>
+                        <code xml:id="code_working-with-web-pages_0" corresp="code_working-with-web-pages_0.txt" rend="block"/>
+                    </ab>
+                    <p>Let's look at a few examples.</p>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_working-with-web-pages_1" corresp="code_working-with-web-pages_1.txt" rend="block"/>
+                    </ab>
+                    <p>The most basic kind of URL simply specifies the protocol and host. If
+you give this URL to your browser, it will return the main page of The
+<ref target="http://www.oldbaileyonline.org/">Old Bailey Online</ref> website. The default assumption is that the main
+page in a given directory will be named index, usually <code rend="inline">index.html</code>.</p>
+                    <p>The URL can also include an optional <emph>port number</emph>. Without getting into
+too much detail, the network protocol that underlies the
+exchange of information on the Internet allows computers to connect in
+different ways. Port numbers are used to distinguish these different
+kinds of connection. Since the default port for HTTP is 80, the
+following URL is equivalent to the previous one.</p>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_working-with-web-pages_2" corresp="code_working-with-web-pages_2.txt" rend="block"/>
+                    </ab>
+                    <p>As you know, there are usually many web pages on a given website. These
+are stored in directories on the server, and you can specify the path to
+a particular page. The "About" page for <emph>The Old Bailey Online</emph> has the
+following URL.</p>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_working-with-web-pages_3" corresp="code_working-with-web-pages_3.txt" rend="block"/>
+                    </ab>
+                    <p>Finally, some web pages allow you to enter queries. <emph>The Old Bailey
+Online</emph> website, for example, is laid out in such a way that you can
+request a particular page within it by using a <emph>query string</emph>. The
+following URL will take you to a search results page for criminal record
+trials containing the word "arsenic".</p>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_working-with-web-pages_4" corresp="code_working-with-web-pages_4.txt" rend="block"/>
+                    </ab>
+                    <p>The snippet after the "?" represents the query. You can learn more about
+building queries in <ref target="/lessons/downloading-multiple-records-using-query-strings">Downloading Multiple Records Using Query
+Strings</ref>.</p>
+                </div>
+            </div>
+            <div type="2" n="2">
+                <head>Opening URLs with Python</head>
+                <p>As a digital historian you will often find yourself wanting to use data
+held in scholarly databases online. To get this data you could open URLs
+one at a time and copy and paste their contents to a text file, or you
+can use Python to automatically harvest and process webpages. To do
+this, you're going to need to be able to open URLs with your own
+programs. The Python language includes a number of standard ways to do
+this.</p>
+                <p>As an example, let's work with the kind of file that you might encounter
+while doing historical research. Say you're interested in race relations
+in eighteenth century Britain. 'The Old Bailey Online' (OBO) is a rich resource that provides trial transcripts from
+1674 to 1913 and is one good place to seek sources.</p>
+                <figure>
+                    <desc>The Old Bailey Online Homepage</desc>
+                    <graphic url="old-bailey.png"/>
+                </figure>
+                <p>For this example, we will be using the trial transcript of Benjamin
+Bowsey, a “black moor” who was convicted of breaking the peace during
+the <ref target="http://en.wikipedia.org/wiki/Gordon_Riots">Gordon Riots</ref> of 1780. The URL for the entry is</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_working-with-web-pages_5" corresp="code_working-with-web-pages_5.txt" rend="block"/>
+                </ab>
+                <p>By studying the URL we can learn a few things. First, The OBO is written
+in JSP (<emph>JavaServer Pages</emph>, a web programming language which outputs
+HTML), and it’s possible to retrieve individual trial entries by making
+use of the query string. Each is apparently given a unique ID number
+(<emph>id=t</emph> in the URL), built from the date of the trial session in the
+format (<emph>YYYYMMDD</emph>) and the trial number from within that court session,
+in this case: <emph>33</emph>. If you change the two instances of <code rend="inline">33</code> to <code rend="inline">34</code> in
+your browser and press Enter, you should be taken to the next trial.
+Unfortunately, not all websites have such readable and reliable URLs.</p>
+                <figure>
+                    <desc>Trial Transcript Page of Benjamin Bowsey, 1780</desc>
+                    <graphic url="bowsey-trial-page.png"/>
+                </figure>
+                <p>Spend a few minutes looking at Benjamin Bowsey’s trial page. Here we are
+not so much interested in what the transcript says, but what features
+the page has. Notice the <ref target="http://www.oldbaileyonline.org/browse.jsp?foo=bar&amp;path=sessionsPapers/17800628.xml&amp;div=t17800628-33&amp;xml=yes">View as XML</ref> link at the bottom that takes
+you to a heavily marked up version of the text which may be useful to
+certain types of research. You can also look at a <ref target="http://www.oldbaileyonline.org/images.jsp?doc=178006280084">scan of the original
+document</ref>, which was transcribed to make this resource.</p>
+                <p>Now let's try opening the page using Python. Copy the following program
+into Komodo Edit and save it as <code rend="inline">open-webpage.py</code>. When you execute the
+program, it will <code rend="inline">open</code> the trial file, <code rend="inline">read</code> its contents into a Python
+string called webContent and then <code rend="inline">print</code> the first three hundred
+characters of the string to the "Command Output" pane. Use the
+<code rend="inline">View -&gt; Web Developer -&gt; View Page Source</code> command in Firefox to verify
+that the HTML source of the page is the same as the source that your
+program retrieved. Each browser has a different shortcut key to open the
+page source. In Firefox on PC it is <code rend="inline">CTRL+u</code>. If you cannot find it on
+your browser, try using a search engine to find where it is. (See the
+Python library reference to learn more about <ref target="https://docs.python.org/3/library/urllib.html?highlight=urllib">urllib</ref>.)</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_working-with-web-pages_6" corresp="code_working-with-web-pages_6.txt" rend="block"/>
+                </ab>
+                <p>These five lines of code achieve an awful lot very quickly. Let us take
+a moment to make sure that everything is clear and that you can
+recognize the building blocks that allow us to make this program do what
+we want it to do.</p>
+                <p>
+                    <emph>url</emph>, <emph>response</emph>, and <emph>webContent</emph> are all variables that we have named
+ourselves.</p>
+                <p>
+                    <emph>url</emph> holds the URL of the web page that we want to download. In this
+case, it is the trial of Benjamin Bowsey.</p>
+                <p>On the following line, we call the function <code rend="inline">urlopen</code>, which is stored in
+a Python module named <code rend="inline">urllib.py</code>, and we have asked that function to
+open the website found at the URL we just specified. We then saved the
+result of that process into a variable named <emph>response</emph>. That variable now
+contains an open version of the requested website.</p>
+                <p>We then use the <code rend="inline">read</code> method, which we used earlier, to copy the contents
+of that open webpage into a new variable named <emph>webContent</emph>.</p>
+                <p>Make sure you can pick out the variables (there are 3 of them), the
+modules (1), the methods (2), and the parameters (1) before you move on.</p>
+                <p>In the resulting output, you will notice a little bit of HTML markup:</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_working-with-web-pages_7" corresp="code_working-with-web-pages_7.txt" rend="block"/>
+                </ab>
+                <p>The content of the trial itself is much further down the page. What we
+see here is the HTML code at the top of the document. This is not quite
+what we need for historical research, but don't worry; you
+will soon learn how to remove that excess markup and get the content you are after.</p>
+            </div>
+            <div type="2" n="3">
+                <head>Saving a Local Copy of a Web Page</head>
+                <p>Given what you already know about writing to files, it is quite easy to
+modify the above program so that it writes the contents of the
+<emph>webContent</emph> string to a local file on our computer rather than to the
+"Command Output" pane. Copy the following program into Komodo Edit, save
+it as <code rend="inline">save-webpage.py</code> and execute it. Using the <code rend="inline">File -&gt; Open File</code>
+command in Firefox, open the file on your hard drive that it creates
+(<code rend="inline">obo-t17800628-33.html</code>) to confirm that your saved copy is the same as
+the online copy.</p>
+                <ab>
+                    <code lang="language-python" xml:id="code_working-with-web-pages_8" corresp="code_working-with-web-pages_8.txt" rend="block"/>
+                </ab>
+                <p>So, if you can save a single file this easily, could you write a program
+to download a bunch of files? Could you step through trial IDs, for
+example, and make your own copies of a whole bunch of them? Yep. You can learn
+how to do that in <ref target="/lessons/downloading-multiple-records-using-query-strings">Downloading Multiple Files using Query Strings</ref>,
+which we recommend after you have completed the introductory lessons in this series.</p>
+            </div>
+            <div type="2" n="4">
+                <head>Suggested Readings</head>
+                <list type="unordered">
+                    <item>Lutz, Mark. “Ch. 4: Introducing Python Object Types”, <emph>Learning
+Python</emph> (O’Reilly, 1999).</item>
+                </list>
+                <div type="3" n="4.1">
+                    <head>Code Syncing</head>
+                    <p>To follow along with future lessons it is important that you have the
+right files and programs in your "programming-historian" directory. At
+the end of each lesson you can download the "programming-historian" zip
+file to make sure you have the correct code.</p>
+                    <list type="unordered">
+                        <item>programming-historian-1 (<ref target="/assets/python-lessons1.zip">zip</ref>)</item>
+                    </list>
+                </div>
+            </div>
+        </body>
+    </text>
+</TEI>

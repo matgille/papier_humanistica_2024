@@ -1,0 +1,570 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="transforming-xml-with-xsl" xml:base="transforming-xml-with-xsl/transforming-xml-with-xsl.xml">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Transforming Data for Reuse and Re-publication with XML and XSL</title>
+                <author role="original_author">M. H. Beals</author>
+                <editor role="reviewers">
+                    <persName>Jonathan Blaney</persName>
+                    <persName>Tessa C Hauswedell</persName>
+                </editor>
+                <editor role="editors">Adam Crymble</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <idno type="doi">10.46430/phen0097</idno>
+                <date type="published">07/07/2016</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. This lesson is original. Available translations are the following:<ref type="translations" target="#transformacion-datos-xml-xsl"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>This tutorial will provide you with the ability to convert or transform historical data from an XML database (whether a single file or several linked documents) into a variety of different presentations—condensed tables, exhaustive lists or paragraphed narratives—and file formats.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">data-manipulation</term>
+                    <term xml:lang="en">data-visualization</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <p style="alert alert-info">
+Due to recent changes in security policies of web browser, which can no longer execute XSL code from local sources, the original approach of this lesson has had to be rethought.
+This lesson was updated in March 2022 by Nicolás Vaughan.
+</p>
+            <div type="2" n="1">
+                <head>Introduction</head>
+                <p>The day before your colleague is due to give a seminar on <emph>Slave Rebellions in the New World</emph>, he phones you to say he is ill and needs you to cover his sessions. You decide to compile a selection of primary sources to work through in class. You find some websites and readers with good sources, but scanning or cutting-and-pasting them into a new document is time consuming; the formatting and citations are inconsistent and you begin to wonder if the ones you have chosen work well together. One site allows you to download an <ref target="https://en.wikipedia.org/wiki/XML">XML</ref> version of all its sources, but there are so many records, and so much <ref target="https://en.wikipedia.org/wiki/Metadata">metadata</ref>, that you cannot find the material you want quickly.</p>
+                <p>Or perhaps...</p>
+                <p>You find an old copy of <emph>Inscriptions of Roman Tripolitania</emph> (1952) and wish that you could run a statistical analysis on the appearance of certain phrases in certain locations. Fortunately, King's College London has produced an extensive <ref target="https://irt.kcl.ac.uk/irt2009/">e-version of the text</ref> with images, translations and location information. You can search through the material manually using the full-text search on the site, but curating the information you want, in the format you need to run an analysis, will take time.</p>
+                <p>Then again...</p>
+                <p>You are starting a new project analysing book auction catalogues from the early seventeenth century. You start recording the publication details and auction listings into a series of Word documents and Excel spreadsheets. A month into the project, you are invited to present your research to the Pro-Vice Chancellor. Your head of department suggests that you create a 'snazzy' set of slides and handouts to help her understand your project.  You have some preliminary conclusions about the material, but the data is scattered in several places and formatting it properly will take more time than you have.</p>
+                <p>In all three of these situations, a basic understanding of XML, and its sister-language <ref target="https://en.wikipedia.org/wiki/XSL">XSL</ref>, could have saved you time and aggravation.<ref type="footnotemark" target="#en_note_1"/>
+This tutorial will provide you with the ability to convert or transform historical data from an <ref target="https://en.wikipedia.org/wiki/XML">XML</ref> database (whether a single file or several linked documents) into a variety of different presentations---condensed tables, exhaustive lists or paragraphed narratives---and file formats. Whether filtering a large database or adding formatting such as headings and pagination, XSL offers digital researchers the ability to reshape databases to support their changing research or publication needs.</p>
+            </div>
+            <div type="2" n="2">
+                <head>What is XML?</head>
+                <p>The eXtensible Markup Language (XML) is a highly flexible method for encoding or structuring your data.
+Unlike <ref target="https://en.wikipedia.org/wiki/HTML">Hypertext Markup Language (HTML)</ref>, which has a set vocabulary, XML is extensible; it can be expanded to include whatever sections, sub-sections, and sub-sub-sections you need in order to store your data in the way you wish.</p>
+                <p>A database can be made up of one or more XML files and each file has the same basic structure. Each section, or layer, of the file is surrounded by a set of <ref target="https://en.wikipedia.org/wiki/XSLT_elements">elements</ref>. An element is, essentially, a category or name for the type of data you are providing. Like <ref target="https://en.wikipedia.org/wiki/Matryoshka_doll">Russian Nesting Dolls</ref>, each level of elements exists entirely within another one. The <hi rend="bold">top-level element</hi> encloses the entire database. Each element within the top-level element is a <hi rend="bold">child</hi> of that element. Likewise, the element surrounding a child element is called the <hi rend="bold">parent</hi> element. </p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_0" corresp="code_transforming-xml-with-xsl_0.txt" rend="block"/>
+                </ab>
+                <p>Depending on the rules of your database, every element can have a value (textual or numerical) as well as any number of child elements.</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_1" corresp="code_transforming-xml-with-xsl_1.txt" rend="block"/>
+                </ab>
+                <p>They can also have <ref target="https://en.wikipedia.org/wiki/Attribute_(computing)">attributes</ref>, which can be thought of as metadata for the element. Attributes can, for example, help you distinguish between different types of values without having to create a new type of element.</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_2" corresp="code_transforming-xml-with-xsl_2.txt" rend="block"/>
+                </ab>
+                <p>Once you are given an XML database, or have stored your own data within one, you can use XSL to sort, filter and display this information in (almost) any way you wish. You can even break open OpenXML files, such as Word (.docx) or Excel (.xslx) files, and see or remove any additional information that Microsoft has inserted into your documents, such as tags identifying geographical locations.</p>
+                <p>A more detailed discussion of XML, its structure, and its use in the humanities, is available from the <ref target="https://www.tei-c.org/release/doc/tei-p5-doc/en/html/SG.html">Text Encoding Initative</ref>.</p>
+            </div>
+            <div type="2" n="3">
+                <head>What is XSL?</head>
+                <p>eXtensible Stylesheet Language (XSL) is the natural complement to XML. At its most basic level, it provides layout and formatting instructions in much the same way as <ref target="https://en.wikipedia.org/wiki/Cascading_Style_Sheets">Cascading Stylesheets (CSS)</ref> do for HTML files. This allows you to transform your plain-text data into richly formatted text, as well as dictate its layout on a screen or in print, without altering your original data files. At a more advanced level, it also allows you to sort or filter your records based on particular critera, or create and display compound or derived values based on your original dataset.</p>
+                <p>By keeping your data (XML) and formatting instructions (XSL) separate, you are able to refine and alter your layout without the risk of compromising the structure of your data. You are also able to create a number of different <emph>styles</emph>, each serving a different purpose, and apply them as necessary to a single data set. In practice, this means only having to update your data in one place, even if you export it to many different documents.</p>
+                <p>The following tutorial will therefore explain:</p>
+                <list type="unordered">
+                    <item>
+                        <hi rend="bold">editors</hi>: the tools needed to create XSL transformation files</item>
+                    <item>
+                        <hi rend="bold">transformers</hi>: the tools needed to apply your XSL transformation instructions to your XML documents</item>
+                    <item>
+                        <hi rend="bold">choosing and preparing XML data</hi>: how to connect your XML data to your XSL transformation instructions</item>
+                </list>
+                <p>It will walk you through the creation of some of the most common transformations intructions as well, including:</p>
+                <list type="unordered">
+                    <item>
+                        <hi rend="bold">printing values</hi>: how to print or display your data</item>
+                    <item>
+                        <hi rend="bold">for-each loops</hi>: how to display particular data for each record</item>
+                    <item>
+                        <hi rend="bold">sorting results</hi>: how to display your data in a particular order</item>
+                    <item>
+                        <hi rend="bold">filtering results</hi>: how to select which records you display</item>
+                </list>
+            </div>
+            <div type="2" n="4">
+                <head>Necessary and Helpful Software Packages</head>
+                <div type="3" n="4.1">
+                    <head>Editors</head>
+                    <p>One of the advantages of storing data in a plain-text format is the ease of obtaining appropriate software for viewing and manipulating it.
+For the purposes of this tutorial,
+we recommend that you install the open-source editor <ref target="https://code.visualstudio.com/">Visual Studio Code</ref> ("VSCode", for short),
+although any other programming editor can be used for this tutorial (Notepad++, Atom, Emacs, Vim, etc.).
+VSCode handles and conserves the plain-text format of your data while providing you with different colour schemes (such as green-on-black or brown-on-beige) as well the ability to collapse (hide) sections or easily comment-out (temporarily disable) sections of your code.</p>
+                    <p>When you become more comfortable with XML and XSL, and are ready to tackle more complicated transformations, you may want to consider using a dedicated XML editor, such as <ref target="https://www.oxygenxml.com/">OxygenXML</ref>, although it is neither free nor open-source.</p>
+                </div>
+                <div type="3" n="4.2">
+                    <head>XSL Processors</head>
+                    <p>Once you have installed VSCode on your system, you will need to install an <hi rend="bold">XSL processor</hi>.
+There are several ways to use XSL stylesheets to transform your XML data:</p>
+                    <list type="unordered">
+                        <item>via the web browser, using an embedded simple XSL processor</item>
+                        <item>via an XSL processor included in an XML program or editor</item>
+                        <item>via a standalone XSL processor from the command line (or as a binding within another programming language)</item>
+                    </list>
+                    <p>Until recently, the first option would have been the most comfortable way to learn how to work with XSL.
+However, web browsers have introduced security restrictions that make it more difficult to natively transform local XML documents.
+In order to avoid this problem, you could install add-ons in Chrome or Firefox, or modify their security policies directly, to allow transformations to run.
+However, this has the disadvantage of making the web browser vulnerable to certain kinds of cyber attacks.
+For this reason, we will avoid taking this route.</p>
+                    <p>The second option requires the installation of a specialised editor such as Oxygen XML Editor or Altova XMLSpy.
+However, since these are neither free nor open source editors, we will not take this route either.</p>
+                    <p>We are left with the third option.
+We will use a free and open source XSL processor called <ref target="https://www.saxonica.com/download/java.xml">Saxon-HE</ref>, developed by Michael Kay, one of the most renowned specialists in the field of XML, XSLT, XPath, XQuery, and related technologies.
+The "HE" in "Saxon-HE" stands for "Home Edition".
+<ref target="https://www.saxonica.com/">Saxonica</ref>, Michael Kay's software house, also has much more powerful editions of the Saxon processor for sale, suitable for larger projects and higher technical requirements.
+However, for our purposes —and indeed for most projects requiring XML transformation via XSLT— the Saxon-HE edition is more than sufficient.</p>
+                    <div type="4" n="4.2.1">
+                        <head>Saxon-HE Installation</head>
+                        <p>Saxon-HE is a Java application (in fact, its full technical name is "SaxonJ-HE").
+Accordingly, our system must have a Java Virtual Machine (Java VM) installed in order to run this edition of Saxon.
+Saxon-HE version 11, the latest version to date, requires at least Java SE 8 (JDK 1.8).
+We must make sure that it is installed on our system.
+If it is not, we must install it ourselves.</p>
+                        <p>To check if it is, we will use the command line of our operating system.
+In order to do that, let us open our terminal emulator (hereinafter, the "terminal").
+If you are on Microsoft Windows, it is advisable to use either <ref target="https://docs.microsoft.com/en-us/powershell/">PowerShell</ref> or <ref target="https://git-scm.com/downloads">Git Bash</ref>.
+If you are on Mac OS, you can use the application <ref target="https://support.apple.com/guide/terminal/welcome/mac">Terminal.app</ref> (included by default in the system).
+Finally, on Linux you can use any terminal application.</p>
+                        <p>If you are on Windows, type the following command and press enter:</p>
+                        <ab>
+                            <code lang="language-sh" xml:id="code_transforming-xml-with-xsl_3" corresp="code_transforming-xml-with-xsl_3.txt" rend="block"/>
+                        </ab>
+                        <p>On MacOS and Linux you must type the following:</p>
+                        <ab>
+                            <code lang="language-sh" xml:id="code_transforming-xml-with-xsl_4" corresp="code_transforming-xml-with-xsl_4.txt" rend="block"/>
+                        </ab>
+                        <p>(note the double hyphen <code rend="inline">--</code>).</p>
+                        <p>If Java is not installed, you will get an error message like this one:</p>
+                        <ab>
+                            <code lang="language-sh" xml:id="code_transforming-xml-with-xsl_5" corresp="code_transforming-xml-with-xsl_5.txt" rend="block"/>
+                        </ab>
+                        <p>But if it is installed, you will get something like this:</p>
+                        <ab>
+                            <code lang="language-sh" xml:id="code_transforming-xml-with-xsl_6" corresp="code_transforming-xml-with-xsl_6.txt" rend="block"/>
+                        </ab>
+                        <p>Now, if the Java version is less than 1.8, or if it is simply not installed, you must download and install the latest version.
+To do this, go to the official Java download page, <ref target="https://www.java.com/en/download/">https://www.java.com/en/download/</ref>,
+and download the appropriate version for your operating system.
+After installing it, you must reboot your system so that the global variables, which inform the system where the Java executable is, are applied.
+Once this is done, check the Java version again at the command line.<ref type="footnotemark" target="#en_note_2"/>
+                        </p>
+                        <p>Next you will need to download and install Saxon.
+Do this from the Saxonica SourceForge repository at this address:
+<ref target="https://sourceforge.net/projects/saxon/files/Saxon-HE/11/Java/">https://sourceforge.net/projects/saxon/files/Saxon-HE/11/Java/</ref>
+Look for the most recent version in the list, which as of today is 11.2.
+Now download the <code rend="inline">SaxonHE11-2J.zip</code> file (or the most recent one) and unzip it inside some folder on your computer.</p>
+                        <p>Next open the terminal <emph>in that exact folder</emph> and run the following command (bear in mind that the executable —<code rend="inline">saxon-he-11.2.jar</code>— may be named differently in your case):</p>
+                        <ab>
+                            <code lang="language-sh" xml:id="code_transforming-xml-with-xsl_7" corresp="code_transforming-xml-with-xsl_7.txt" rend="block"/>
+                        </ab>
+                        <p>(the <code rend="inline">-t</code> option tells Saxon to display its version, as well as other useful information).</p>
+                        <p>For example, on Windows you will get:</p>
+                        <ab>
+                            <code lang="language-sh" xml:id="code_transforming-xml-with-xsl_8" corresp="code_transforming-xml-with-xsl_8.txt" rend="block"/>
+                        </ab>
+                        <p>Now, since you have unzipped Saxon into a random folder (in <code rend="inline">C:\Users\user\Downloads</code>, in our example), you will only be able to run Saxon from there.
+This means that if you are in another location on your system, you won't be able to simply run the <code rend="inline">java -jar saxon-he-11.2.jar</code> command to get started, since the <code rend="inline">saxon-he-11.2.jar</code> executable won't be available there.
+This is not really a problem.
+You just need to make sure that the XML and XSL documents you want to use in your transformations are always <hi rend="bold">in the same folder</hi> as your Saxon executable.<ref type="footnotemark" target="#en_note_3"/>
+The command line code examples we will show here will assume that this is the case.</p>
+                    </div>
+                </div>
+            </div>
+            <div type="2" n="5">
+                <head>Choosing and Preparing XML Data</head>
+                <p>In order to begin transforming XML, you will need to obtain a well-formed dataset. Many online historical databases are built upon XML and provide their data freely. This tutorial will make use of the <ref target="http://www.scissorsandpaste.net">Scissors and Paste Database</ref>.</p>
+                <p>The <emph>Scissors and Paste Database</emph> is a collaborative and growing collection of articles from British and imperial newspapers in the 18th and 19th centuries. Its original purpose was to allow for careful comparisons of reprints (copies) that appeared in multiple newspapers as well as to detect similarly themed articles across different English-language publications. Like many XML databases, <emph>Scissors and Paste</emph> contains both data (the article's text), formatting information (such as italics and justification), and metadata. This metadata includes documentation about the particular article, such as its pagination and printing date, information about the newspaper in which it was published, and the themes, individuals or locations mentioned in the text.</p>
+                <p>As of 2015, the database contained over 350 individual articles, each with attached metadata. Although some researchers may need all of this information, most will only be interested in a subsection of the data---a particular year, theme or publication. By using XSL, these researchers can quickly filter out the information they do not need or re-arrange the material in the way that is most helpful for their project. For example, the module tutor in our introduction or a researcher who wants a simple table of the dates, publications and page numbers of humorous articles within the database. Both can be quickly created using XSL.</p>
+                <p>To begin work with the Scissors and Paste Database, download the following ZIP archive: <ref target="/assets/transforming-xml-with-xsl/master.zip">
+                        <code rend="inline">master.zip</code>
+                    </ref>.
+Open the ZIP file and you will find a folder named <hi rend="bold">scissorsandpaste-master</hi>.  Extract this folder by either using the extract button of your unzipping programme or by dragging and dropping the folder onto your desktop.</p>
+                <p>This data package has three main items:</p>
+                <list type="unordered">
+                    <item>
+                        <code rend="inline">TEISAP.XML</code>: The central XML database</item>
+                    <item>
+                        <code rend="inline">Transformers</code>: A collection of XSL stylesheets</item>
+                    <item>
+                        <code rend="inline">Outputs</code>: Outputs derived from the database using the XSL stylesheets</item>
+                </list>
+                <p>The package also includes:</p>
+                <list type="unordered">
+                    <item>a <code rend="inline">Template</code>, for anyone wishing to contribute to the database</item>
+                    <item>a <code rend="inline">README</code> file, providing information about the database</item>
+                    <item>a <code rend="inline">Cite</code> file, explaining the preferred way to cite the database</item>
+                    <item>a <code rend="inline">License</code> file, explaining the terms of use</item>
+                </list>
+                <p>Once you have completed the tutorial, you can explore the different XSL stylesheets (transformers) included here, and their associated outputs, to discover additional possibilities for your own datasets.</p>
+                <p>The main <code rend="inline">TEISAP.XML</code> database has been encoded to <ref target="https://tei-c.org/">Text-Encoding Initiative (TEI)</ref> standards and includes a significant amount of metadata. For the purposes of this tutorial, however, we will be using a simplified version of the database that focuses on some of the core historical data.</p>
+                <p>Open the outputs folder and continue into the XML folder. Here you will find a folder entitled <code rend="inline">Simplified</code>. Next, copy the <code rend="inline">SimplifiedSAP.xml</code> file to the same folder you previously unzipped the Saxon executable into.</p>
+                <p>Open the <code rend="inline">SimplifiedSAP.xml</code> file in VSCode and examine it now.</p>
+                <figure>
+                    <desc>Figure 1: Viewing the XML</desc>
+                    <graphic url="transforming-xml-with-xsl-1.png"/>
+                </figure>
+                <p>The first line of the XML database is:</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_9" corresp="code_transforming-xml-with-xsl_9.txt" rend="block"/>
+                </ab>
+                <p>which indicates the version of XML used (1.0) and the encoding method of the text (<ref target="https://en.wikipedia.org/wiki/UTF-8">UTF-8</ref>). The second line is <code rend="inline">&lt;root&gt;</code>, which has a matching line, <code rend="inline">&lt;/root&gt;</code>, at the end of the file.</p>
+                <p>
+                    <code rend="inline">&lt;root&gt;</code> is the top-level element of this database and surrounds all the records within it. Each individual record, containing the information for one historical newspaper article, is opened by the element <code rend="inline">&lt;record&gt;</code> and closed with the element <code rend="inline">&lt;/record&gt;</code>.</p>
+                <p>Within these records there are a number of different child elements. The Text-Encoding Initiative allows for hundreds of different sub-elements to fit a very wide range of data. Moreover, the beauty of XML is that you can name your elements anything you like (<ref target="https://www.w3schools.com/xml/xml_elements.asp">with a few small exceptions</ref>).
+In the Scissors and Paste Database, each record has the following elements:</p>
+                <list type="unordered">
+                    <item>
+                        <code rend="inline">&lt;id&gt;</code>: The ID number of the record</item>
+                    <item>
+                        <code rend="inline">&lt;title&gt;</code>: The title of the newspaper</item>
+                    <item>
+                        <code rend="inline">&lt;city&gt;</code>: The city of the newspaper</item>
+                    <item>
+                        <code rend="inline">&lt;province&gt;</code>: The province or administrative region of the newspaper</item>
+                    <item>
+                        <code rend="inline">&lt;country&gt;</code>: The country of the newspaper</item>
+                    <item>
+                        <code rend="inline">&lt;date&gt;</code>: The full <ref target="https://en.wikipedia.org/wiki/ISO_8601">ISO date</ref> of the article</item>
+                    <item>
+                        <code rend="inline">&lt;year&gt;</code>: The year of publication</item>
+                    <item>
+                        <code rend="inline">&lt;month&gt;</code>: The month of publication</item>
+                    <item>
+                        <code rend="inline">&lt;day&gt;</code>: The day of publication</item>
+                    <item>
+                        <code rend="inline">&lt;keywords&gt;</code>: The section containing keywords describing the article</item>
+                    <item>
+                        <code rend="inline">&lt;keyword&gt;</code>: An individual keyword describing the article</item>
+                    <item>
+                        <code rend="inline">&lt;headline&gt;</code>: The headline of the article. This may be blank.</item>
+                    <item>
+                        <code rend="inline">&lt;text&gt;</code>: The section containing the text of the article</item>
+                    <item>
+                        <code rend="inline">&lt;p&gt;</code>: An individual paragraph within the text.</item>
+                </list>
+                <p>These are the different types of data that you will be able to use in creating your outputs.</p>
+            </div>
+            <div type="2" n="6">
+                <head>Creating and Testing Your XSL File</head>
+                <p>It is now time to create your XSL file.
+To do this, open VSCode, create a new blank file and save it as <code rend="inline">mystyle.xsl</code>.
+Once again, make sure the file is saved in the same directory that contains both the <code rend="inline">SimplifiedSAP.xml</code> file and the Saxon executable.</p>
+                <p>The first three lines of your XSL file should be the following:</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_10" corresp="code_transforming-xml-with-xsl_10.txt" rend="block"/>
+                </ab>
+                <p>The first line documents that this is an XML document encoded as UTF-8.
+The second line states that the document is an XSL document version 1.0 and the standards (or <ref target="https://en.wikipedia.org/wiki/Namespace">namespace</ref>) established by the <ref target="http://www.w3.org/">World Wide Web Consortium</ref>, whose web address you have listed.
+(Note that an XSL document is ultimately an XML document!)
+Finally, the third line tells your transformer what sort of output you would like to create. In this case, you are indicating that you will be creating a plain-text file.
+(You could also have written <code rend="inline">xml</code> or <code rend="inline">html</code>, instead of <code rend="inline">text</code>, in order to produce an XML or and HTML document, respectively.)</p>
+                <p>Every time you open an element <code rend="inline">&lt;element&gt;</code> you will need to close it <code rend="inline">&lt;/element&gt;</code> (or however the element is named); otherwise you will receive an syntax error as the document is not well-formed.
+Close your stylesheet by adding the following as the final line of your file:</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_11" corresp="code_transforming-xml-with-xsl_11.txt" rend="block"/>
+                </ab>
+                <p>The next part of your XSL stylesheet will be the main template, or formatting instructions, for your output.
+On a new line, directly underneath <code rend="inline">&lt;xsl:output method="text"/&gt;</code> type</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_12" corresp="code_transforming-xml-with-xsl_12.txt" rend="block"/>
+                </ab>
+                <p>It is between these two elements that you will put all your layout instructions.</p>
+                <p>You have written <code rend="inline">/</code> in your <code rend="inline">match</code> attribute to indicate that you will be referring to everything within the XML file.
+You could have also used <code rend="inline">root</code>, which would have indicated that you were only using data within the <code rend="inline">&lt;root&gt;</code> element.
+However, using <code rend="inline">root</code> may cause unexpected later on, so it is best practice to use <code rend="inline">/</code> for your main template.</p>
+                <p>Your file should now look like this:</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_13" corresp="code_transforming-xml-with-xsl_13.txt" rend="block"/>
+                </ab>
+                <p>Save your file.  For the remainder of the tutorial, remember to save your file after each change you make. </p>
+                <p>In between your template elements, type <code rend="inline">&lt;xsl:value-of select="root"/&gt;</code> You do not need to do so on a new line, nor to indent it to the right, but doing so will make your stylesheet more readable. You'll notice that I didn't include a closing  <code rend="inline">&lt;/xsl:value-of&gt;</code> tag. This is because <code rend="inline">&lt;xsl:value-of select="root"/&gt;</code> is self-closing; the <code rend="inline">/</code> at the end of the element closes it immediately.</p>
+                <p>Your <code rend="inline">mystyle.xsl</code> file should look like this:</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_14" corresp="code_transforming-xml-with-xsl_14.txt" rend="block"/>
+                </ab>
+                <p>Next, you will transform the contents of the <code rend="inline">SimplifiedSAP.xml</code> document into plain text, by means of the XSL stylesheet you have just created.
+To do this, go to the command line and run the following:</p>
+                <ab>
+                    <code lang="language-sh" xml:id="code_transforming-xml-with-xsl_15" corresp="code_transforming-xml-with-xsl_15.txt" rend="block"/>
+                </ab>
+                <p>When you run this command, you will see a huge amount of text displayed in the terminal, so much so that it is not easy to read it right there.
+The <code rend="inline">-xsl:</code> option provides the name of the XSL stylesheet that Saxon will use to transform the XML document, while the <code rend="inline">-s:</code> option (from <emph>source</emph>) provides the name of that very document.
+If you want to save the text given by Saxon as its output, you must use the <code rend="inline">-o:</code> option (from <emph>output</emph>), followed by a filename, for example like so:</p>
+                <ab>
+                    <code lang="language-sh" xml:id="code_transforming-xml-with-xsl_16" corresp="code_transforming-xml-with-xsl_16.txt" rend="block"/>
+                </ab>
+                <p>(This will always be the command you must run in the terminal to transform an XML document via an XSLT stylesheet.
+You must run it <emph>every time</emph> you want to perform a transformation.
+In other words, you can't just make changes to your stylesheet to make the transformation happen; you must always run Saxon to do it.)</p>
+                <p>Now you can open the <emph>output.txt</emph> file in VSCode to inspect it.
+The result should be the text with the existing line breaks, but <emph>without</emph> the XML elements, as seen in the following image:</p>
+                <figure>
+                    <desc>Figure 2: Initial text output</desc>
+                    <graphic url="transforming-xml-with-xsl-2.png"/>
+                </figure>
+            </div>
+            <div type="2" n="7">
+                <head>Populating Your Outputs</head>
+                <p>Your single line of code <code rend="inline">&lt;xsl:value-of select="root"/&gt;</code> selected (and printed) the entire database in plain-text format.
+If you look at the components of this line, you can see why:</p>
+                <list type="unordered">
+                    <item>
+                        <p>
+                            <code rend="inline">xsl:value-of</code>: an instruction for selecting the value of an element; that is, the text between the opening and closing tag of an element within the XML file.</p>
+                    </item>
+                    <item>
+                        <p>
+                            <code rend="inline">select="root"</code>: an instruction that explains which element it should select the value of.
+Unless you instruct it otherwise, pointing to a parent (outside) element will also tell the transformer to select the values of any child (inside) elements as well.
+Thus, pointing to element <code rend="inline">&lt;root&gt;</code>  also selects elements <code rend="inline">&lt;id&gt;</code>, <code rend="inline">&lt;title&gt;</code> and so on, which are contained in it.
+(Technically speaking <code rend="inline">select</code> is an <emph>attribute</emph> of the <code rend="inline">&lt;xsl:value-of&gt;</code> element, and  the <emph>value</emph> of that attribute is <code rend="inline">root</code> here.)</p>
+                    </item>
+                </list>
+            </div>
+            <div type="2" n="8">
+                <head>Selecting and Printing Values</head>
+                <p>In order to select and print the value of a particular element, you simply need to replace <code rend="inline">root</code> with its name. Let's try it.
+In your XSL stylesheet, replace <code rend="inline">root</code> with <code rend="inline">title</code> in the proper line:</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_17" corresp="code_transforming-xml-with-xsl_17.txt" rend="block"/>
+                </ab>
+                <p>Save your file, run the transformation command in the terminal once again, and examine the result in VSCode.
+(VSCode with automatically refresh the window whenever it detects the output file has changed.)</p>
+                <p>It didn't work? That is because the XSL processor didn't know where to find the <code rend="inline">&lt;title&gt;</code> elements. Let's see why.</p>
+                <div type="3" n="8.1">
+                    <head>Parents and Children</head>
+                    <p>
+                        <code rend="inline">&lt;title&gt;</code> is not the top-level element, so we must explain to the XSL processor how to get to the element we mean.
+This more specific direction is known as the <ref target="https://en.wikipedia.org/wiki/XPath">
+                            <emph>XPATH</emph>
+                        </ref> of the element, and works in a similar way to the file paths on your computer. Replace <code rend="inline">title</code> with <code rend="inline">root/record/title</code>, like so;</p>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_18" corresp="code_transforming-xml-with-xsl_18.txt" rend="block"/>
+                    </ab>
+                    <p>Save the file, execute Saxon to run the transformation again, and examine the result in VSCode.</p>
+                    <p>The editor should now display <code rend="inline">Caledonian Mercury</code>, the title of the first register in our database. Where are the rest? Although, we have over 300 <emph>title</emph> values in the database, we did not specify which we wanted the XSL processor to select and print, so it assumed we meant the first one, and only the first one. When the XSL processor selects and prints it, it stops.<ref type="footnotemark" target="#en_note_4"/>
+                    </p>
+                </div>
+                <div type="3" n="8.2">
+                    <head>
+                        <code rend="inline">For</code> Loops</head>
+                    <p>To a human being, it may seem natural that we wanted <emph>all</emph> the titles, but the XSL processor does not know this by default.
+Instead, we must create a <emph>
+                            <code rend="inline">for</code> loop</emph>, which, besides selecting and printing them, affords us a great deal of control on the way it does so.</p>
+                    <p>In XSL, a <code rend="inline">for</code> loop tells the transformer that <emph>for</emph> a certain condition, it should <emph>loop</emph> through the entire database and follow the instructions each time the data meets certain criteria.</p>
+                    <p>Create a new line after <code rend="inline">&lt;xsl:template match="/"&gt;</code> and insert <code rend="inline">&lt;xsl:for-each select="root/record"&gt;</code>.  This tells the transformer that for each <emph>record</emph> within the <emph>root</emph> element, it should take some action.</p>
+                    <p>Remove <code rend="inline">root/record</code> from your <code rend="inline">&lt;xsl:value-of&gt;</code> element.
+It should now simply say <code rend="inline">title</code>, because we are now already within a <code rend="inline">root/record</code> context.
+After your <code rend="inline">&lt;xsl:value-of&gt;</code>, add a new line that closes the <code rend="inline">&lt;xsl:for-each&gt;</code> element, <code rend="inline">&lt;/xsl:for-each&gt;</code>
+                    </p>
+                    <p>Your file should look like this now:</p>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_19" corresp="code_transforming-xml-with-xsl_19.txt" rend="block"/>
+                    </ab>
+                    <p>Here you can see that your <code rend="inline">&lt;xsl:template&gt;</code> contains three lines of code:</p>
+                    <list type="ordered">
+                        <item>an opening tag for your loop</item>
+                        <item>an instruction for selecting one <code rend="inline">&lt;title&gt;</code> and printing its contents</item>
+                        <item>a closing tag for your loop</item>
+                    </list>
+                    <p>Save your file, run the transformation, and examine the output in VSCode again.
+You should now have a very messy line of text, listing the value of every title element in the database. </p>
+                    <p>You can organise this data by instructing the transformer to add a new line after each entry.
+Just below the <code rend="inline">&lt;xsl:value-of select="title"/&gt;</code> line, type <code rend="inline">&lt;xsl:text&gt;&amp;#xA;&lt;/xsl:text&gt;</code> to add a line break.
+<code rend="inline">&amp;#xA;</code> is the <ref target="https://en.wikipedia.org/wiki/Newline">ISO 10646 hex code</ref> for a new line.<ref type="footnotemark" target="#en_note_5"/>
+The <code rend="inline">&lt;xsl:text&gt;</code> element tells the transformer to print the value as plain text.
+Depending on the type of outputs you are using (with the <code rend="inline">&lt;xsl:output&gt;</code> element), some special characters, particularly multiple spaces or line breaks, may not render correctly if entered on their own.
+Using <code rend="inline">&lt;xsl:text&gt;</code> elements ensures that your text renders exactly the way you intend it to.</p>
+                    <p>The complete code of your XSL file is therefore the following:</p>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_20" corresp="code_transforming-xml-with-xsl_20.txt" rend="block"/>
+                    </ab>
+                    <p>Save the file, execute Saxon to run the transformation again, and examine the result in VSCode.
+Using this information, you should now be able to print the value of any element for each record in the database.</p>
+                    <div type="4" n="8.2.1">
+                        <head>Exercise A:</head>
+                        <quote>
+                            <p>Note: Possible solutions for the following exercises are located at the end of the tutorial.</p>
+                        </quote>
+                        <p>Print an inventory of the records in database, displaying the <emph>id</emph>, <emph>title</emph> and <emph>date</emph> of each record. A solution to this and the following exercises is available at the end of the tutorial.</p>
+                    </div>
+                    <div type="4" n="8.2.2">
+                        <head>Exercise B:</head>
+                        <p>Print the text of all the articles in the database, displaying the <emph>id</emph> in square brackets (<code rend="inline">[]</code>) at the start of each article.</p>
+                    </div>
+                </div>
+                <div type="3" n="8.3">
+                    <head>Attributes</head>
+                    <p>In an element, not all data is stored as its <emph>content</emph> (i.e., what is found between its opening and closing tags).
+Some data can be stored as the value of an <emph>attribute</emph> of that element.
+For example the <code rend="inline">&lt;date&gt;</code> element has an attribute called <code rend="inline">when</code> with the value of the date of the article:</p>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_21" corresp="code_transforming-xml-with-xsl_21.txt" rend="block"/>
+                    </ab>
+                    <p>To print the value of <code rend="inline">when</code> you will need to reference the attribute using <code rend="inline">@when</code> (note the <code rend="inline">@</code> before it):</p>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_22" corresp="code_transforming-xml-with-xsl_22.txt" rend="block"/>
+                    </ab>
+                    <p>which means: select and print the value <code rend="inline">when</code> of element <code rend="inline">&lt;date&gt;</code>.</p>
+                    <div type="4" n="8.3.1">
+                        <head>Exercise C</head>
+                        <p>Create an inventory of records in the database, listing the title of the newspaper followed by the date of publication.</p>
+                    </div>
+                </div>
+            </div>
+            <div type="2" n="9">
+                <head>Sorting Results</head>
+                <p>This XML database was compiled as data was collected, rather than by date or title.
+To re-sort it, you can add a <code rend="inline">&lt;xsl:sort&gt;</code> element to the top of any <code rend="inline">for</code> loop, immediately following the <code rend="inline">&lt;xsl:for-each&gt;</code> element.
+This instruction has several optional attributes that will dictate how your data is sorted:</p>
+                <list type="unordered">
+                    <item>
+                        <code rend="inline">select</code>: contains the name of the element to sort the data by</item>
+                    <item>
+                        <code rend="inline">order</code>: informs the XSL processor if the data should be sorted in an <code rend="inline">ascending</code> or <code rend="inline">descending</code> order</item>
+                    <item>
+                        <code rend="inline">data-type</code>: informs the transformer if the data is <code rend="inline">text</code> or a <code rend="inline">number</code>
+                    </item>
+                </list>
+                <p>It must be attributed in this order.
+For example, to sort the element <code rend="inline">&lt;id&gt;</code>, whose content is numerical, in reverse order, use:</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_23" corresp="code_transforming-xml-with-xsl_23.txt" rend="block"/>
+                </ab>
+                <p>You can sort by an element even if you do not print that element in your output.</p>
+                <div type="3" n="9.1">
+                    <head>Exercise D</head>
+                    <p>Print the text of all the articles in the database, sorting from earliest to latest. For the purposes of the <code rend="inline">&lt;xsl:sort&gt;</code> element, treat dates as <code rend="inline">text</code>.</p>
+                </div>
+            </div>
+            <div type="2" n="10">
+                <head>Filtering Results</head>
+                <p>So far, you have selected and printed all the records contained in the database.
+If you only want a selection of records, you will need to filter the results using an <hi rend="bold">
+                        <code rend="inline">if</code> statement</hi>.
+An <code rend="inline">&lt;xsl:if&gt;</code> element has one attribute, which is a test condition.
+If the condition is true, the XSL processor will follow the instructions within the <code rend="inline">&lt;xsl:if&gt;</code> element.
+If not, it will ignore these statements and move onto the next part of the template.</p>
+                <p>For example, to print the <emph>id</emph> numbers of all the records from 1789, you would type:</p>
+                <ab>
+                    <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_24" corresp="code_transforming-xml-with-xsl_24.txt" rend="block"/>
+                </ab>
+                <p>If you want to exclude year 1789, use <code rend="inline">date/year!='1789'</code> instead. (<code rend="inline">!=</code> means <emph>not equal to</emph>.)</p>
+                <div type="3" n="10.1">
+                    <head>Exercise E</head>
+                    <p>Using all you have learned so far, create a list of records from 1789, starting with the most recent, listing the id, title, and date of each record.
+Separate the data elements with commas and place each record on its own line.</p>
+                    <p>If you wish, you can specify the output file to be a <ref target="https://en.wikipedia.org/wiki/Comma-separated_values">Comma Separated Values (CSV)</ref> file, which can be opened and manipulated as a spreadsheet with Microsoft Excel or LibreOffice Calc.
+To do this, simply specify it on the command line when you perform the transformation:</p>
+                    <ab>
+                        <code lang="language-sh" xml:id="code_transforming-xml-with-xsl_25" corresp="code_transforming-xml-with-xsl_25.txt" rend="block"/>
+                    </ab>
+                </div>
+            </div>
+            <div type="2" n="11">
+                <head>Conclusion</head>
+                <p>You now know the basics of XSL stylesheet creation.
+With this information you can create a range of outputs including plain text, comma-separated, tab-separated and markdown files.
+You can also create web pages by changing your <code rend="inline">&lt;xsl:output&gt;</code> method to <emph>html</emph> and  wrapping your <code rend="inline">&lt;xsl:value-of&gt;</code> commands in the appropriate HTML tags.</p>
+                <p>There are many more transformation commands that you can use to further customise your outputs.
+Some of these require the use of a 2.0 or 3.0 XSL processor, but the above should cover most of your day-to-day transformation needs.</p>
+                <p>Once you are comfortable using the commands listed here, explore the <code rend="inline">Transformers</code> folder of the Scissors and Paste Database to see further examples of how to transform XML structured data.</p>
+            </div>
+            <div type="2" n="12">
+                <head>Possible Solutions to the Exercises</head>
+                <div type="3" n="12.1">
+                    <head>Introduction (Primary Source Reader)</head>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_26" corresp="code_transforming-xml-with-xsl_26.txt" rend="block"/>
+                    </ab>
+                    <p>The dot (<code rend="inline">.</code>) in the XSL element <code rend="inline">&lt;xsl:value-of select="."/&gt;</code> is a shorthand for the name of the current element in context.
+In this case it is the element selected with the <code rend="inline">&lt;xsl:for-each select="text/p"&gt;</code> statement, i.e. the <code rend="inline">&lt;p&gt;</code> child of <code rend="inline">&lt;text&gt;</code>.
+If we had used <code rend="inline">p</code> instead, we would not select anything, as there is no <code rend="inline">text/p/p</code>.</p>
+                </div>
+                <div type="3" n="12.2">
+                    <head>Exercise A</head>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_27" corresp="code_transforming-xml-with-xsl_27.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3" n="12.3">
+                    <head>Exercise B</head>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_28" corresp="code_transforming-xml-with-xsl_28.txt" rend="block"/>
+                    </ab>
+                    <p>To remove the indentation preceding the ID number between brackets, you will need to take more direct control of your whitespace by using line-breaks before each ID number and paragraph, as seen below:</p>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_29" corresp="code_transforming-xml-with-xsl_29.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3" n="12.4">
+                    <head>Exercise C</head>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_30" corresp="code_transforming-xml-with-xsl_30.txt" rend="block"/>
+                    </ab>
+                    <p>You'll notice I used <code rend="inline">&amp;#32;</code> in between my two values. This is the HEX code for a space. You could have also used a literal space, but this is may not render correctly in all cases. You could have also used a comma or any other divider.</p>
+                </div>
+                <div type="3" n="12.5">
+                    <head>Exercise D</head>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_31" corresp="code_transforming-xml-with-xsl_31.txt" rend="block"/>
+                    </ab>
+                </div>
+                <div type="3" n="12.6">
+                    <head>Exercise E</head>
+                    <ab>
+                        <code lang="language-xml" xml:id="code_transforming-xml-with-xsl_32" corresp="code_transforming-xml-with-xsl_32.txt" rend="block"/>
+                    </ab>
+                </div>
+            </div>
+            <div type="2" n="13">
+                <head>Further Reading</head>
+                <list type="unordered">
+                    <item>Hunter, David <emph>et al</emph>. <emph>Beginning XML</emph>, 4th ed. Indianapolis, IN: Wiley, 2007.</item>
+                    <item>Kay, Michael, <emph>XSLT 2.0 and XPATH 2.0: Programmer's Reference</emph>. Indianapolis, IN: Wiley, 2011.</item>
+                    <item>Kelly, David J. <emph>XSLT Jumpstarter: Level the Learning Curve and Put Your XML to Work</emph>. Raleigh, NC: Peloria Press, May 2015.</item>
+                    <item>Mangano, Sal. <emph>XSLT Cookbook</emph>, 2nd ed. Sebstopol, CA: O'Reilly, 2006.</item>
+                    <item>Riley, Jenn. <ref target="https://www.niso.org/node/12366">
+                            <emph>Understanding Metadata: What is Metadata, and What is For?</emph>
+                        </ref> NISO, 2017.</item>
+                    <item>Tennison, Jeni. <emph>Beginning XSLT 2.0. From Novice to Professional</emph>. New York: Apress, 2005.</item>
+                    <item>Tidwell, Doug. <emph>XSLT</emph>, 2nd ed. Sebstopol, CA: O'Reilly, 2008.</item>
+                </list>
+            </div>
+            <div type="2" n="14">
+                <head>Notes</head>
+                <p>
+                    <ref type="footnotemark" target="#en_note_1"/> : The XSL language has two branches: (1) <emph>XSL Formatting Objects</emph> (XSL:FO), which contains formatting instructions for producing a PDF document from an XML document; and (2) <emph>Extensible Stylesheet Language Transformations</emph> (XSLT), which contains instructions for transforming an XML document into other documents (XML, HTML, XHTML and plain text). In this tutorial only the second one is discussed.</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_2"/> : If you have already installed the latest version and still get an error message that it is not installed, you will have to manually adjust the <code rend="inline">PATH</code> variable on your system.
+See <ref target="https://stackoverflow.com/questions/16811332/cannot-run-java-from-the-windows-powershell-command-prompt">this explanation</ref> for more details.</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_3"/> : An alternative solution is to place the Saxon executable in a folder that is already included in the <code rend="inline">PATH</code> global system variable (or to change that variable to include the folder we have chosen for Saxon).
+However, such technical details are beyond the scope of this tutorial.
+(For those interested, see these pages on how to do this on <ref target="https://www.computerhope.com/issues/ch000549.htm">Windows</ref>,
+<ref target="https://stackoverflow.com/questions/22465332/setting-path-environment-variable-in-osx-permanently">MacOS</ref> and
+<ref target="https://opensource.com/article/17/6/set-path-linux">Linux</ref>.)</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_4"/> : As of XSLT version 2.0, the <code rend="inline">&lt;xsl:value-of&gt;</code> statement selects <emph>all</emph> occurrences of the expression in the XML document.
+(On this, see <ref target="https://www.w3.org/TR/2021/REC-xslt20-20210330/#changes">here</ref>.)
+If the reader wishes to try this, they should change the value of the <code rend="inline">@version</code> attribute from <code rend="inline">1.0</code> to <code rend="inline">2.0</code> (or <code rend="inline">3.0</code>) in the <code rend="inline">&lt;xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"&gt;</code> line of the XSL stylesheet.</p>
+                <p>
+                    <ref type="footnotemark" target="#en_note_5"/> : Alternatively, you can replace that line with this code:</p>
+                <ab>
+                    <code xml:id="code_transforming-xml-with-xsl_33" corresp="code_transforming-xml-with-xsl_33.txt" rend="block"/>
+                </ab>
+            </div>
+        </body>
+    </text>
+</TEI>

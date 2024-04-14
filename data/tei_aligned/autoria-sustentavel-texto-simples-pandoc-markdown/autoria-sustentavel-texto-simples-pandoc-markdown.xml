@@ -1,0 +1,261 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="autoria-sustentavel-texto-simples-pandoc-markdown" xml:base="autoria-sustentavel-texto-simples-pandoc-markdown/autoria-sustentavel-texto-simples-pandoc-markdown.xml">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Autoria Sustentável em Texto Simples usando Pandoc e Markdown</title>
+                <author role="original_author">
+                    <persName>Dennis Tenen</persName>
+                    <persName>Grant Wythoff</persName>
+                </author>
+                <author role="translators">Gabriela Kucuruza</author>
+                <editor role="translation-reviewers">
+                    <persName>Daniel Bonatto Seco</persName>
+                    <persName>André Salvo</persName>
+                </editor>
+                <editor role="editors">Fred Gibbs</editor>
+            </titleStmt>
+            <publicationStmt>
+                <distributor>Programming Historian</distributor>
+                <date type="translated">11/27/2022</date>
+                <idno type="doi">10.46430/phpt0036</idno>
+                <date type="published">03/19/2014</date>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#sustainable-authorship-in-plain-text-using-pandoc-and-markdown"/>.</p>
+                <p>There are other translations: <ref target="#redaction-durable-avec-pandoc-et-markdown #escritura-sostenible-usando-pandoc-y-markdown"/>
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <abstract>
+                <p>Neste tutorial, você aprenderá primeiro o básico do Markdown - uma sintaxe de marcação fácil de ler e escrever para texto simples - bem como Pandoc, uma ferramenta de linha de comando que converte texto simples em vários tipos de ficheiros formatados: PDF, docx, HTML, LaTeX, apresentação de slides e muito mais.</p>
+            </abstract>
+            <textClass>
+                <keywords>
+                    <term xml:lang="en">website</term>
+                    <term xml:lang="en">data-management</term>
+                </keywords>
+            </textClass>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="pt">
+        <body>
+            <figure>
+                <desc/>
+                <graphic url="lexoriter.jpg"/>
+            </figure>
+            <div type="2" n="1">
+                <head>Objetivos</head>
+                <p>Neste tutorial, você aprenderá primeiro o básico do Markdown - uma sintaxe de marcação fácil de ler e de escrever para texto simples - assim como o <ref target="http://johnmacfarlane.net/pandoc/">Pandoc</ref>, uma ferramenta de linha de comando que converte texto simples em vários tipos de ficheiro belamente formatados: PDF, docx, HTML, LaTeX, apresentações de slides e muito mais.<ref type="footnotemark" target="#pt_note_1"/> Com o Pandoc como sua ferramenta de composição digital, você pode usar a sintaxe Markdown para adicionar figuras, bibliografia, formatação e alterar facilmente os estilos de citação de Chicago para MLA (por exemplo), todos usando texto simples.</p>
+                <p>Este tutorial não pressupõe nenhum conhecimento técnico prévio, mas aumenta com a experiência, uma vez que vamos sugerir técnicas mais avançadas ao final de cada seção. Elas estão claramente marcadas e podem ser revisitadas após alguma prática e experimentação.</p>
+                <p>Ao invés de seguir esse tutorial de maneira mecânica, recomendamos que se esforce para entender as soluções oferecidas aqui como uma <emph>metodologia</emph>, que pode precisar de adaptações para se adequar ao seu ambiente e fluxo de trabalho. A instalação das ferramentas necessárias apresenta talvez a maior barreira à participação. Tenha tempo e paciência suficientes para instalar tudo corretamente, ou faça isso com um/a colega que tenha uma configuração semelhante e ajudem-se mutuamente. Consulte a seção <ref target="/pt/licoes/autoria-sustentavel-texto-simples-pandoc-markdown#recursos-uteis">Recursos Úteis</ref> abaixo se ficar preso.<ref type="footnotemark" target="#pt_note_2"/>
+                </p>
+            </div>
+            <div type="2" n="2">
+                <head>Filosofia</head>
+                <p>Escrever, armazenar e recuperar documentos são atividades centrais para o fluxo de trabalho de pesquisa das humanidades. Mesmo assim, muitos autores baseiam suas práticas em ferramentas e formatos proprietários que, às vezes, ficam aquém dos requisitos mais básicos da escrita acadêmica. Talvez possa se lembrar de certa frustração com a fragilidade de notas de rodapé, bibliografias, figuras e rascunhos de livros escritos em Microsoft Word ou Google Docs. No entanto, a maioria dos periódicos ainda insiste em submissões no formato .docx.</p>
+                <p>Mais do que causar frustração pessoal, essa dependência de ferramentas e de formatos proprietários tem implicações negativas de longo prazo para a comunidade acadêmica. Em tal ambiente, os periódicos devem terceirizar a composição, alienando os autores dos contextos materiais de publicação e adicionando outras barreiras desnecessárias à circulação irrestrita do conhecimento.<ref type="footnotemark" target="#pt_note_3"/>
+                </p>
+                <p>Quando se usa MS Word, Google Docs ou Open Office para escrever documentos, o que se vê não é o que se obtém. Embaixo da camada visível de palavras, frases e parágrafos, encontra-se uma complicada camada de código compreensível apenas para as máquinas. Por causa dessa camada oculta, os ficheiros .docx e .pdf dependem de ferramentas proprietárias para serem visualizados corretamente. Esses documentos são difíceis de pesquisar, imprimir e converter em outros formatos de ficheiros.</p>
+                <p>Além disso, o tempo gasto formatando documentos em MS Word ou Open Office é perdido, pois toda essa formatação é removida pelo editor durante a submissão. Tanto os autores quanto os editores se beneficiariam da troca de ficheiros com formatação mínima, deixando a composição tipográfica para o estágio final de composição do processo de publicação.</p>
+                <p>Aqui é onde o Markdown brilha. Markdown é uma sintaxe para marcar explicitamente elementos semânticos dentro de um documento, não em alguma camada oculta. A ideia é identificar as unidades que são significativas para humanos, como títulos, seções, subseções, notas de rodapé e ilustrações. No mínimo, os seus ficheiros sempre permanecerão compreensíveis <hi rend="bold">para você</hi>, mesmo se o editor de texto que estiver usando parar de funcionar ou "sair do mercado".</p>
+                <p>Escrever dessa forma libera o autor da ferramenta. Markdown pode ser escrito em qualquer editor de texto simples e oferece um rico ecossistema de software que pode renderizar o texto em documentos belamente formatados. Por esta razão, o Markdown está atualmente passando por um período de crescimento, não apenas como meio para escrever artigos acadêmicos, mas como uma convenção para edição online em geral.</p>
+                <p>Os editores de texto simples de uso geral populares incluem <ref target="https://atom.io/">Atom</ref> (todas as plataformas) e <ref target="https://notepad-plus-plus.org/">Notepad ++</ref> (somente para Windows).</p>
+                <p>É importante entender que o Markdown é apenas uma convenção. Os ficheiros Markdown são armazenados como texto simples, aumentando ainda mais a flexibilidade do formato. Ficheiros de texto simples existem desde a máquina de escrever eletrônica. A longevidade deste padrão torna, de modo inerente, o texto simples mais sustentável e estável do que os formatos proprietários. Enquanto os ficheiros produzidos até dez anos atrás no Microsoft Word e no Apple Pages, podem causar problemas significativos quando abertos nas versões mais recentes, ainda é possível abrir um ficheiro escrito em qualquer editor de texto simples “morto” nas últimas décadas: AlphaPlus, Perfect Writer, Text Wizard, Spellbinder, WordStar ou o favorito de Isaac Asimov, SCRIPSIT 2.0 , feito por Radio Shack. Escrever em texto simples garante que seus ficheiros permanecerão legíveis daqui a dez, quinze, vinte anos. Neste tutorial, descrevemos um fluxo de trabalho que libera o pesquisador de softwares proprietários de processamento de texto e de formatos de ficheiro frágeis.</p>
+                <p>Agora é possível escrever uma ampla variedade de documentos em um formato - artigos, postagens de blog, wikis, programas de estudos e cartas de recomendação - usando o mesmo conjunto de ferramentas e técnicas para pesquisar, descobrir, fazer backup e distribuir nossos materiais. Suas notas, entradas de blog, documentação de código e wikis podem ser criados no Markdown. Cada vez mais, muitas plataformas como WordPress, Reddit e GitHub suportam a autoria Markdown nativamente. A longo prazo, sua pesquisa se beneficiará desses fluxos de trabalho unificados, tornando mais fácil salvar, pesquisar, compartilhar e organizar seus materiais.</p>
+            </div>
+            <div type="2" n="3">
+                <head>Princípios</head>
+                <p>Inspirados pelas melhores práticas em uma variedade de disciplinas, nós fomos guiados pelos seguintes princípios: </p>
+                <list type="ordered">
+                    <item>
+                        <emph>Sustentabilidade</emph>. O texto simples garante tanto transparência, como atende aos padrões de preservação de longo prazo. O Word pode seguir o caminho do <ref target="https://pt.wikipedia.org/wiki/WordPerfect">Word Perfect</ref> no futuro, mas o texto simples sempre permanecerá fácil de ler, catalogar, extrair e transformar. Além disso, o texto simples permite um controle fácil e poderoso do versionamento do documento, o que é útil na colaboração e na organização de rascunhos. Seus ficheiros de texto simples estarão acessíveis em telefones celulares, tablets ou, talvez, em um terminal de baixa potência em alguma biblioteca remota. O texto simples é compatível com versões anteriores e à prova de futuro. Qualquer que seja o software ou hardware que vier a seguir, ele será capaz de entender os seus ficheiros de texto simples.</item>
+                    <item>
+                        <emph>Preferência por formatos legíveis por humanos</emph>. Quando escrevemos no Word ou no Google Docs, o que vemos não é o que obtemos. O ficheiro .doc contem uma formatação oculta de caracteres gerados automaticamente, criando uma camada de composição tipográfica ofuscada que é difícil para o usuário solucionar. Algo tão simples como colar uma imagem ou texto do navegador pode ter efeitos imprevisíveis na formatação do seu documento.</item>
+                    <item>
+                        <emph>Separação entre forma e conteúdo</emph>. Escrever e formatar ao mesmo tempo é distrativo. A ideia é escrever primeiro e formatar depois, o mais próximo possível da hora da publicação. Uma tarefa como mudar da formatação Chicago para MLA deve ser simples. Os editores de periódicos que desejam economizar tempo na formatação desnecessária e na edição de cópias devem ser capazes de fornecer aos seus autores um modelo de formatação que cuida dos detalhes da composição tipográfica.</item>
+                    <item>
+                        <emph>Apoio ao aparato acadêmico</emph>. O fluxo de trabalho precisa lidar com notas de rodapé, figuras, caracteres internacionais e bibliografias com elegância.</item>
+                    <item>
+                        <emph>Independência de plataforma</emph>. Na medida em que os vetores de publicação se multiplicam, precisamos ser capazes de gerar uma multiplicidade de formatos, incluindo projeção de slides, impressão, web e celular. Idealmente, gostaríamos de poder gerar os formatos mais comuns sem quebrar as dependências bibliográficas. Nosso fluxo de trabalho também precisa ser portátil - seria bom poder copiar uma pasta para um pen drive e saber que ela contém tudo o que é necessário para publicação de estudos. Escrever em texto simples significa que é possível facilmente compartilhar, editar e arquivar seus documentos em praticamente qualquer ambiente. Por exemplo, um programa escrito em Markdown pode ser salvo como PDF, impresso como um folheto e convertido em HTML para a web, tudo a partir do mesmo ficheiro. Tanto os documentos da web quanto os impressos devem ser publicados da mesma fonte e ter aparência semelhante, preservando o layout lógico do material.</item>
+                </list>
+                <p>Mardown e LaTeX cumprem todos esses requisitos. Nós escolhemos Markdown (e não LaTeX) porque ele oferece a sintaxe mais leve e organizada (por isso, <emph>mark down</emph>) e porque quando unido com Pandoc, permite maior flexibilidade nas saídas (incluindo ficheiros .docs e .tex).<ref type="footnotemark" target="#pt_note_4"/>
+                </p>
+            </div>
+            <div type="2" n="4">
+                <head>Requisitos de Software</head>
+                <p>Nós omitimos propositalmente alguns dos detalhes menores vinculados à plataforma ou ao sistema operacional de instalação do software listado abaixo. Por exemplo, não faz sentido fornecer instruções de instalação para o LaTeX, quando as instruções online para o seu sistema operacional serão sempre mais atuais e completas. Da mesma forma, o processo de instalação do Pandoc é melhor explorado pesquisando por “instalar o Pandoc” no Google, com o provável primeiro resultado sendo a página inicial do Pandoc.</p>
+                <list type="unordered">
+                    <item>
+                        <hi rend="bold">Editor de texto simples</hi>. Entrar no mundo de edição de texto simples expande dramaticamente as suas escolhas de ferramentas inovadoras de autoria. Pesquise online por "editor de texto markdown" e experimente as opções. Não importa qual for usada, contanto que seja explicitamente um editor de texto simples, como Atom e Notepad++. Lembre-se de que nós não estamos presos a ferramenta, é possível trocar de editor a qualquer momento. </item>
+                    <item>
+                        <hi rend="bold">Terminal de linha de comando</hi>. Trabalhar na "linha de comando" equivale a escrever comandos no terminal. Em um Mac, apenas pesquise por "Terminal". No Windows, use o <ref target="https://pt.wikipedia.org/wiki/PowerShell">PowerShell</ref>. Usuários de Linux provavelmente já devem estar familiarizados com seus terminais. Nós iremos cobrir o básico de como procurar e usar a linha de comando abaixo. </item>
+                    <item>
+                        <hi rend="bold">Pandoc</hi>. Instruções de instalação detalhadas e para plataformas específicas estão disponíveis no <ref target="https://pandoc.org/installing.html">site do Pandoc</ref>. <emph>A instalação do Pandoc na sua máquina é crucial para esse tutorial</emph>, então tome o seu tempo navegando pelas instruções. O Pandoc foi criado e é mantido por John MacFarlane, Professor de Filosofia na Universidade da Califórnia, Berkeley. Isso é a humanidade computacional em sua melhor expressão e servirá como o motor de nosso fluxo de trabalho. Com o Pandoc, será possível compilar texto e bibliografia em documentos belamente formatados e flexíveis. Depois de seguir as instruções de instalação, verifique se o Pandoc está instalado digitando <code rend="inline">pandoc --version</code> na linha de comando. Presumimos que a sua versão seja ao menos a versão 1.12.3, lançada em janeiro de 2014.</item>
+                </list>
+                <p>Os próximos dois softwares são recomendados, mas não requisitados para realizar esse tutorial. </p>
+                <list type="unordered">
+                    <item>
+                        <hi rend="bold">Zotero ou Endnote</hi>. Softwares de referência bibliográfica como Zotero e Endnote são ferramentas indispensáveis para organizar e formatar citações em um artigo de pesquisa. Esses programas podem exportar suas bibliotecas como um ficheiro BibTeX (sobre o qual você aprenderá mais no Caso 2 a seguir). Este ficheiro, por si só um documento de texto simples formatado com todas as suas citações, permitirá que você cite referências de forma rápida e fácil usando <code rend="inline">@tags</code>. Deve-se notar que também é possível digitar todas as suas referências bibliográficas à mão, usando <ref target="https://github.com/dh-notes/pandoc-workflow/blob/master/pandoctut.bib">nossa bibliografia</ref> como modelo.</item>
+                    <item>
+                        <hi rend="bold">LaTeX</hi>. Instruções de instalação detalhadas e específicas da plataforma estão disponíveis no <ref target="https://pandoc.org/installing.html">site do Pandoc</ref>. Embora o LaTeX não seja abordado neste tutorial, ele é usado pelo Pandoc para a criação de .pdf. Usuários avançados frequentemente irão converter para LaTeX diretamente para ter um controle mais minucioso sobre a composição do .pdf. Os iniciantes podem querer pular esta etapa. Caso contrário, digite<code rend="inline">latex -v</code> para ver se o LaTeX está instalado corretamente (você receberá um erro se não estiver e algumas informações sobre a versão, se estiver).</item>
+                </list>
+            </div>
+            <div type="2" n="5">
+                <head>Básico do Markdown</head>
+                <p>O Markdown é uma convenção para estruturar os seus documentos de texto simples semanticamente. A ideia é identificar estruturas lógicas no seu documento (títulos, seções, subseções, notas de rodapé, etc.), marcá-las com caracteres discretos e então "compilar" o texto resultante com um interpretador de composição tipográfica que formatará o documento consistentemente, de acordo com um estilo específico. </p>
+                <p>As convenções de Markdown vêm em várias “versões” projetadas para uso em contextos específicos, como blogs, wikis ou repositórios de código. O do Markdown usado pelo <ref target="http://pandoc.org/README.html#pandocs-markdown">Pandoc</ref> é voltado para uso acadêmico. Suas convenções são descritas na página Markdown do Pandoc. Suas convenções incluem o bloco “<ref target="http://johnmacfarlane.net/pandoc/README.html#yaml-metadata-block">YAML</ref>”, que contém alguns metadados úteis. </p>
+                <p>Vamos agora criar um documento simples no Markdown. Abra um editor de texto simples de sua escolha e comece a digitar. Deve ser assim:</p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_0" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_0.txt" rend="block"/>
+                </ab>
+                <p>A versão do Markdown usada pelo Pandoc armazena cada um dos valores acima, e "imprime-os" na localização apropriada do seu documento de saída quando o documento estiver pronto para a composição tipográfica. Aprenderemos mais tarde a adicionar outros campos mais poderosos ao bloco "YAML". Por enquanto, vamos fingir que estamos escrevendo um artigo que contém três seções, cada uma subdividida em duas subseções. Deixe uma linha em branco após os três últimos traços no bloco "YAML" e cole o seguinte:</p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_1" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_1.txt" rend="block"/>
+                </ab>
+                <p>Vá em frente e escreva um texto simulado também. Espaços em branco são significativos em Markdown: não recue os seus parágrafos.  Ao invés disso, separe parágrafos usando uma linha vazia. Linhas vazias também devem preceder os cabeçalhos das seções. </p>
+                <p>Use asteriscos para adicionar ênfases em negrito ou em itálico, assim: <code rend="inline">*itálico*</code> e <code rend="inline">**negrito**</code>. Nós devemos também adicionar um link e uma nota de rodapé no nosso texto para cobrir os componentes básicos de um artigo médio. Digite: </p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_2" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_2.txt" rend="block"/>
+                </ab>
+                <p>Quando o texto do link e o endereço são iguais, é mais rápido escrever <code rend="inline">&lt;www.eff.org&gt;</code> ao invés de <code rend="inline">[www.eff.org](www.eff.org)</code>. </p>
+                <p>Vamos salvar nosso ficheiro antes de avançar. Crie a nova pasta que irá armazenar esse projeto. É provável que tenha algum sistema de organização de seus documentos, projetos, ilustrações e bibliografias, mas geralmente, o seu documento, e as suas ilustrações e bibliografia estão em pastas diferentes, o que os torna mais difíceis de achar. Nosso objetivo é criar uma única pasta para cada projeto, com todos os materiais relevantes incluídos. A regra geral é um projeto, um artigo, uma pasta. Nomeie seu ficheiro como <code rend="inline">main.md</code>, onde “md” significa markdown.</p>
+                <p>Depois que seu ficheiro for salvo, vamos adicionar uma ilustração. Copie uma imagem (qualquer imagem pequena) para a sua pasta e adicione o seguinte em algum lugar no corpo do texto: `<figure>
+                        <figDesc>legenda da imagem</figDesc>
+                        <graphic url="sua_imagem.jpg"/>
+                    </figure>
+                </p>
+                <p>`.</p>
+                <p>Nesse ponto, o seu <code rend="inline">main.md</code> deve parecer com o que está abaixo. É possível baixar esse exemplo de ficheiro teste.md <ref target="/assets/teste.md">aqui</ref>.</p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_3" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_3.txt" rend="block"/>
+                </ab>
+                <p>Como faremos em breve, esse ficheiro de texto simples pode ser renderizado em um belo PDF: </p>
+                <figure>
+                    <desc>Exemplo de captura de tela de Word renderizado no Pandoc</desc>
+                    <figDesc>Imagem representando o ficheiro MarkDown e a respectiva versão em Word produzida com o Pandoc</figDesc>
+                    <graphic url="autoria-sustentavel-texto-simples-pandoc-markdown-01.png"/>
+                </figure>
+                <p>Se quiser ter uma ideia de como esse tipo de marcação será interpretado como formatação HTML, experimente esse <ref target="https://daringfireball.net/projects/markdown/dingus">espaço de teste online</ref> e brinque com vários tipos de sintaxe. Lembre-se de que certos elementos do Markdown com o sabor do Pandoc (como o bloco de título e as notas de rodapé) não funcionarão neste formulário da web, que aceita apenas o básico.</p>
+                <p>Neste ponto, gaste algum tempo explorando alguns dos outros recursos do Markdown, como citações (referenciadas pelo símbolo <code rend="inline">&gt;</code>), listas de marcadores que começam com <code rend="inline">*</code> ou <code rend="inline">-</code>, quebras de linha textuais que começam com <code rend="inline">|</code> (útil para poesia), tabelas e algumas das outras funções listadas na página de marcação do Pandoc.</p>
+                <p>Preste bastante atenção em espaços vazios e no fluxo dos parágrafos. A documentação coloca sucintamente quando define um parágrafo como "uma ou mais linhas de texto seguida por uma ou mais linhas vazias.". Note que "linhas novas são tratadas como espaços" e que "se precisa de uma quebra de linha forte, coloque dois ou mais espaços no final de uma linha." A melhor maneira de entender o que isso significa é experimentar livremente. Use o modo de visualização do seu editor ou apenas execute o Pandoc para ver os resultados dos seus experimentos.  </p>
+                <p>Acima de tudo, evite a vontade de formatar. Lembre-se de que estamos identificando unidades semânticas: seções, subseções, ênfases, notas de rodapé e figuras. Mesmo  <emph>itálico</emph>  e  <hi rend="bold">negrito</hi> em Markdown não são realmente marcos de formatação, mas indicam diferentes níveis de <emph>ênfase</emph>. A formatação acontecerá depois, quando souber o lugar e os requisitos da publicação. </p>
+                <p>Existem programas que permitem que se veja uma pré-visualização em tempo real da saída do Markdown enquanto se edita o ficheiro de texto simples, que nós detalhamos abaixo na seção de Recursos Úteis. Poucos deles suportam, entretanto, notas de rodapé, figuras e bibliografias. Para aproveitar o Pandoc ao máximo, nós recomendamos que use ficheiros de texto simples armazenados localmente, no seu computador. </p>
+            </div>
+            <div type="2" n="6">
+                <head>Entrando em contato com a linha de comendos do seu computador</head>
+                <p>Antes de começarmos a publicar o nosso ficheiro <code rend="inline">main.md</code> em outros formatos, nós precisamos nos orientar sobre como trabalhar com a linha de comando usando o programa de terminal do seu computador, que é o único (e melhor) modo de usar o Pandoc. </p>
+                <p>A linha de comando é um lugar amigável, uma vez que se acostuma com ela. Se já estiver familiarizado com o uso da linha de comando, sinta-se à vontade para pular esta seção. Para outros, é importante entender que ser capaz de usar seu programa de terminal diretamente permitirá que se use uma ampla gama de poderosas ferramentas de pesquisa que não poderiam ser usadas de outra forma, e podem servir como base para um trabalho mais avançado. Para os fins deste tutorial, é preciso aprender apenas alguns comandos muito simples.</p>
+                <p>Primeiro, abra uma janela de linha de comando. Se você estiver usando o macOS, abra o aplicativo Terminal no diretório ‘Aplicativos / Utilitários’. No Windows, recomendamos que use o PowerShell ou, para uma solução mais robusta, instale o subsistema do Windows para Linux e use o terminal que vem com sua distribuição favorita do Linux. Para obter uma excelente introdução à linha de comando, consulte <ref target="/en/lessons/intro-to-bash">“Introdução à linha de comando Bash” (em inglês)</ref>, de Ian Milligan e James Baker.  </p>
+                <p>No terminal, deve-se ver uma janela de texto e um prompt que parece com isso: <code rend="inline">nome-do-computador:~nome-do-usuário$</code>. O título indica qual é o diretório do usuário, e é possível escrever <code rend="inline">$ cd~</code> em qualquer ponto para retornar para o seu diretório de usuário. Não escreva o cifrão, ele apenas simboliza o prompt de comando no seu terminal, indicando que se digite algo no terminal (em oposição a digitar algo no seu documento); lembre-se de apertar "Enter" após todo comando. </p>
+                <p>É bem provável que a sua pasta "Documentos" esteja localizada aqui. Digite <code rend="inline">$ pwd</code>(= <emph>print working directory</emph>, exibe o diretório de trabalho) e aperte "Enter" para exibir o nome do diretório atual. Use <code rend="inline">$ pwd</code> sempre que se sentir perdido. </p>
+                <p>O comando <code rend="inline">$ ls</code> (= <emph>list</emph>, listar) simplesmente lista os ficheiros no diretório atual. Enfim, pode usar <code rend="inline">$cd&gt;</code>(= <emph>change directory,</emph> mudar diretório) assim: <code rend="inline">$ cd NOME_DIRETÓRIO</code> (em que <code rend="inline">NOME_DIRETÓRIO</code> é o nome do diretório que se quer acessar). Use <code rend="inline">$ cd ..</code> para mover automaticamente um nível para cima na estrutura de diretórios (o diretório-pai do diretório em que se está). Uma vez que começar a digitar o nome do diretório, use a tecla Tab para completar automaticamente o texto - particularmente útil para nomes de diretório longos ou nomes de diretórios que contenham espaços.<ref type="footnotemark" target="#pt_note_5"/>
+                </p>
+                <p>Esses três comandos de terminal: <code rend="inline">pwd</code>, <code rend="inline">ls</code> e <code rend="inline">cd</code> são tudo o que é preciso para esse tutorial. Pratique-os por alguns minutos para navegar pela sua pasta de documentos e pense na forma em que os seus ficheiros estão organizados. Se quiser, acompanhe seu gerenciador gráficos regular de ficheiros para se manter informado.</p>
+            </div>
+            <div type="2" n="7">
+                <head>Usando Pandoc para converter Markdown em um documento do MS Word</head>
+                <p>Nós estamos agora prontos para formatar! Abra a sua janela de terminal, use o <code rend="inline">$ pwd</code>e <code rend="inline">$ cd NOME_DIRETÓRIO</code> para navegar até a pasta correta para o seu projeto. Chegando lá, digite <code rend="inline">$ ls</code> no terminal para listar os ficheiros. Se encontrar o seu ficheiro .md e suas imagens, está no lugar certo. Para converter o .md em um .docx escreva: </p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_4" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_4.txt" rend="block"/>
+                </ab>
+                <p>Abra o ficheiro no MS Word e confira os resultados. Alternativamente, se usa o Open- ou LibreOffice, escreva:</p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_5" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_5.txt" rend="block"/>
+                </ab>
+                <p>Se não estiver acostumado com a linha de comando, imagine ler o comando acima como se fosse algo como: "Pandoc, crie um ficheiro MS Word a partir do meu ficheiro Markdown". A parte <code rend="inline">-o</code> é uma "bandeira", que nesse caso diz algo como "ao invés de eu lhe dizer explicitamente os formatos de ficheiro de origem e destino, apenas tente adivinhar olhando para a extensão do ficheiro" ou simplesmente "output (saída)". Muitas opções estão disponíveis através desses sinalizadores no Pandoc. É possível ver a lista completa no  <ref target="http://johnmacfarlane.net/pandoc/README.html">site do Pandoc</ref> ou digitando <code rend="inline">$ man pandoc</code> no terminal. </p>
+                <p>Tente rodar o comando:</p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_6" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_6.txt" rend="block"/>
+                </ab>
+                <p>Agora navegue de volta para o diretório do seu projeto. O que aconteceu? </p>
+                <p>Usuários mais avançados que tem o LaTeX instalado podem querer experimentar convertendo o Markdown em .tex ou ficheiros .pdf especialmente formatados. Uma vez que o LaTeX estiver instalado, um ficheiro PDF belamente formatado pode ser criado usando a mesma estrutura de comando:</p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_7" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_7.txt" rend="block"/>
+                </ab>
+                <p style="alert alert-warning">
+  Se este comando falhar, você pode precisar adicionar um componente que forneça ao pandoc o caminho completo para o motor LaTeX que deseja usar, especificando onde está armazenado. A localização variará se você estiver trabalhando em Mac, Windows ou Linux. Os leitores são aconselhados a verificar o caminho correto para o motor LaTeX em seu sistema e seguir <ref target="https://pandoc.org/MANUAL.html#creating-a-pdf">as instruções de instalação atuais</ref> (em inglês).
+</p>
+                <p>Se o seu documento estiver escrito em outros idiomas que não o inglês, você provavelmente precisará usar o mecanismo XeLaTeX em vez do LaTeX simples para conversão .pdf:</p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_8" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_8.txt" rend="block"/>
+                </ab>
+                <p>Tenha certeza de que o seu editor de texto suporta a codificação UTF-8. Quando usar XeLaTeX para conversão em .pdf, ao invés do atributo <code rend="inline">fontfamily</code> no "YAML" para mudar fontes, especifique o atributo <code rend="inline">mainfont</code> para produzir algo como isto:</p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_9" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_9.txt" rend="block"/>
+                </ab>
+                <p>Por exemplo, estilos de fontes podem ser passados para o Pandoc na forma de <code rend="inline">pandoc main.md -- mainfont=times -o destino.pdf</code>. Nós preferimos, entretanto, usar as opções de cabeçalho do "YAML" sempre que possível, uma vez que os comandos são mais fáceis de lembrar. Usar uma ferramenta de controle de versão como o Git preservará as mudanças "YAML", onde o que é digitado no terminal é mais efêmero. Consulte a seção de Templates (Modelos) no manual do Pandoc (<code rend="inline">man pandoc</code>) para a lista de variáveis do "YAML" disponíveis.</p>
+            </div>
+            <div type="2" n="8">
+                <head>Trabalhando com Bibliografias</head>
+                <p>Nesta seção, adicionaremos uma bibliografia ao nosso documento e, em seguida, converteremos os formatos de Chicago para MLA.</p>
+                <p>Se não estiver usando um gerenciador de referência como Endnote ou Zotero, use. Preferimos o Zotero porque, como o Pandoc, foi criado pela comunidade acadêmica e, como outros projetos de código aberto, é lançado sob a GNU, General Public License. O mais importante para nós é que o seu gerenciador de referência deve ter a capacidade de gerar bibliografias em formato de texto simples, para manter o alinhamento com nosso princípio “tudo em texto simples”. Vá em frente e abra um gerenciador de referência de sua escolha e adicione algumas entradas de amostra. Quando estiver pronto, encontre a opção de exportar sua bibliografia no formato BibTeX (.bib). Salve o ficheiro .bib no diretório do projeto e dê a ele um título razoável como “projeto.bib”.</p>
+                <p>A ideia geral é manter as suas fontes organizadas sob um banco de dados bibliográfico centralizado, enquanto geramos ficheiros .bib menores e mais específicos que devem ficar no mesmo diretório que o seu projeto. Vá em frente e abra o seu ficheiro .bib com o editor de texto simples que escolher.<ref type="footnotemark" target="#pt_note_6"/>
+                </p>
+                <p>O seu ficheiro .bib deve conter múltiplas entradas que se parecem com esta: </p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_10" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_10.txt" rend="block"/>
+                </ab>
+                <p>Raramente será necessário editá-las manualmente (embora seja possível). Na maioria dos casos, simplesmente o ficheiro .bib será exportado do Zotero ou de um gerenciador de referências semelhante. Reserve um momento para se orientar aqui. Cada entrada consiste em um tipo de documento, “artigo” em nosso caso, um identificador exclusivo (fyfe_digital_2011) e os metadados relevantes sobre título, volume, autor e assim por diante. O que mais nos interessa é o ID exclusivo que segue imediatamente a chave na primeira linha de cada entrada. O ID único é o que nos permite conectar a bibliografia ao documento principal. Deixe este ficheiro aberto por enquanto e volte para o seu ficheiro <code rend="inline">main.md</code>.</p>
+                <p>Edite a nota de rodapé na primeira linha do seu ficheiro <code rend="inline">main.md</code> para se parecer com algo como os seguintes exemplos, em que o <code rend="inline">@nome_título_data</code> pode ser substituído por um dos IDs únicos do seu ficheiro <code rend="inline">projeto.bib</code>. </p>
+                <list type="unordered">
+                    <item>
+                        <code rend="inline">Uma referência formatada como esta será renderizada apropriadamente como citação no estilo em linha - ou nota de rodapé [@nome_título_data, 67].</code>
+                        <ref type="footnotemark" target="#pt_note_7"/>
+                    </item>
+                    <item>
+                        <code rend="inline">Para citações entre aspas, coloque a vírgula fora das marcas de citação [@nome_título_data, 67]. </code>
+                    </item>
+                </list>
+                <p>Uma vez que rodarmos o Markdown através do Pandoc, "@fyfe_digital_2011" será expandido em uma citação completa no estilo que desejar. É possível usar a sintaxe da <code rend="inline">@citação</code> como preferir: em linha com o seu texto ou em notas de rodapé. Para gerar a bibliografia simplesmente inclua uma seção chamada <code rend="inline"># Bibliografia</code> no fim do documento. </p>
+                <p>Agora, retorne para o seu cabeçalho de metadados no topo do seu documento .md, e especifique o ficheiro de bibliografia a ser usado, assim: </p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_11" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_11.txt" rend="block"/>
+                </ab>
+                <p>Isso diz ao Pandoc para procurar pela bibliografia no ficheiro <code rend="inline">projeto.bib</code>, sob o mesmo diretório que o seu <code rend="inline">main.md</code>. Vamos ver se funciona. Salve o ficheiro, mude para a janela do terminal e execute: </p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_12" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_12.txt" rend="block"/>
+                </ab>
+                <p>O filtro “pandoc-citeproc” analisará quaisquer tags de citação encontradas em seu documento. O resultado deve ser um ficheiro MS Word formatado. Se tiver o LaTeX instalado, converta para .pdf usando a mesma sintaxe para resultados mais bonitos. Não se preocupe se as coisas não estiverem exatamente como prefere - lembre-se de que fará o ajuste refinado da formatação de uma vez mais tarde, o mais próximo possível da data da publicação. Por enquanto, estamos apenas criando rascunhos baseados em padrões razoáveis. </p>
+            </div>
+            <div type="2" n="9">
+                <head>Mudando estilos de citação</head>
+                <p>O estilo de citação padrão no Pandoc é <ref target="https://www.chicagomanualofstyle.org/tools_citationguide/citation-guide-2.html">Chicago Author-date</ref>. Podemos especificar um estilo diferente usando a folha de estilo, escrita na “Linguagem de Estilo de Citação” (outra convenção de texto simples, neste caso para descrever estilos de citação) e denotada pela extensão de ficheiro .csl. Felizmente, o projeto CSL mantém um repositório de estilos de citação comuns, alguns até personalizados para periódicos específicos. Visite <ref target="http://editor.citationstyles.org/about/">http://editor.citationstyles.org/about/</ref> para localizar o ficheiro .csl para Modern Language Association (Associação de Linguagem Moderna), baixe <code rend="inline">modern-language-association.csl</code> e salve no diretório do projeto como <code rend="inline">mla.csl</code>. Agora precisamos dizer ao Pandoc para usar a folha de estilo MLA em vez do padrão Chicago. Fazemos isso atualizando o cabeçalho YAML:</p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_13" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_13.txt" rend="block"/>
+                </ab>
+                <p>Então repita o comando Pandoc para carregar seu ficheiro markdown em seu formato de destino (.pdf ou .docx):</p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_14" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_14.txt" rend="block"/>
+                </ab>
+                <p>Traduza o comando para o Português enquanto digita. Na minha cabeça, eu traduzo o comando acima em algo como: "Pandoc, pegue o meu ficheiro markdown, aplique o filtro de citação sobre ele e retorne um ficheiro PDF". Quanto ficar mais familiarizado com as páginas de estilo de citação, considere adicionar os seus ficheiros .csl customizados para periódicos do seu campo no ficheiro como um serviço para a comunidade. </p>
+            </div>
+            <div type="2" n="10">
+                <head>Resumo</head>
+                <p>Agora, você deve ser capaz de escrever artigos em Markdown, criar rascunhos em múltiplos formatos, adicionar bibliografias e facilmente mudar os estilos de citação. Um último olhar no diretório do projeto revelará vários ficheiros de origem: o ficheiro <code rend="inline">main.md</code>, o ficheiro <code rend="inline">projeto.bib</code>, o ficheiro <code rend="inline">mla.csl</code> e algumas imagens. Além dos ficheiros origens, deve haver alguns ficheiros "destino" que criamos ao longo desse tutorial: <code rend="inline">main.docx</code> ou <code rend="inline">main.pdf</code>. A sua pasta deve se parecer com isso:</p>
+                <ab>
+                    <code xml:id="code_autoria-sustentavel-texto-simples-pandoc-markdown_15" corresp="code_autoria-sustentavel-texto-simples-pandoc-markdown_15.txt" rend="block"/>
+                </ab>
+                <p>Trate seus ficheiros de origem como uma versão autorizada de seu texto e seus ficheiros de destino como “impressões” descartáveis que podem ser geradas facilmente com o Pandoc em tempo real. Todas as revisões devem ser feitas no <code rend="inline">main.md</code>. O ficheiro <code rend="inline">main.docx</code> está lá para formatação e limpeza em estágio final. Se, por exemplo, o periódico requisitar manuscritos com espaçamento duplo, é possível rapidamente colocar o espaçamento duplo no Open Office ou Microsoft Word. Mas não gaste muito tempo formatando. Lembre-se, tudo é retirado quando o seu manuscrito vai para a impressão. O tempo gasto em formatação desnecessária pode ser usado melhorando a prosa do seu rascunho. </p>
+            </div>
+            <div type="2" n="11">
+                <head>Recursos úteis</head>
+                <p>Se tiver problemas, não há lugar melhor para começar a procurar ajuda do que o <ref target="http://johnmacfarlane.net/pandoc/">site do Pandoc</ref> de John MacFarlane e a <ref target="https://groups.google.com/forum/#%21forum/pandoc-discuss">lista de e-mails</ref> associados.  Pelo menos dois sites do tipo “Pergunta e Resposta” podem responder a perguntas no Pandoc: <ref target="https://stackoverflow.com/questions/tagged/pandoc">Stack Overflow</ref> e <ref target="https://web.archive.org/web/20190203062832/http://digitalhumanities.org/answers/">Digital Humanities Q&amp;A</ref>. As perguntas também podem ser feitas ao vivo, no Freenode IRC, canal #Pandoc, frequentado por um amigável grupo de regulares. Conforme aprender mais sobre o Pandoc, também pode explorar um de seus recursos mais poderosos: <ref target="https://github.com/jgm/pandoc/wiki/Pandoc-Filters">filtros</ref>.</p>
+                <p>Embora nossa sugestão seja começar com um editor simples, muitas (mais de 70, de acordo com <ref target="https://web.archive.org/web/20140120195538/http://mashable.com/2013/06/24/markdown-tools/">esta postagem do blog</ref> outras alternativas específicas do Markdown para o MS Word estão disponíveis online, e muitas vezes sem custo. Dos autônomos, gostamos de <ref target="http://writemonkey.com/">Write Monkey</ref> e <ref target="https://www.sublimetext.com/">Sublime Text</ref>. Várias plataformas baseadas na web surgiram recentemente que fornecem interfaces gráficas elegantes para escrita colaborativa e controle de versão usando Markdown. Algumas delas são: <ref target="http://prose.io/">prose.io</ref>, <ref target="https://www.authorea.com/">Authorea</ref>, <ref target="http://www.draftin.com/">Draft</ref> e <ref target="https://stackedit.io/">StackEdit</ref>.</p>
+                <p>Mas o ecossistema não é limitado a editores. <ref target="http://gitit.net/">Gitit</ref> e <ref target="https://github.com/dubiousjim/pandoc-iki">Ikiwiki</ref> suportam autoria em Markdown com Pandoc como analisador. Podemos incluir nesta lista uma série de ferramentas que geram páginas da Web estáticas e rápidas, <ref target="https://github.com/jgm/yst">Yst</ref>, <ref target="https://github.com/fauno/jekyll-pandoc-multiple-formats">Jekyll</ref>, <ref target="http://jaspervdj.be/hakyll/">Hakyll</ref> e o <ref target="https://github.com/wcaleb/website">script de shell bash</ref> do historiador Caleb McDaniel.</p>
+                <p>Por fim, plataformas de publicação completas estão se formando ao redor do uso de Markdown. O Markdown na plataforma de marketplace <ref target="https://leanpub.com/">Leanpub</ref> pode ser uma alternativa interessante ao modelo de publicação tradicional. E nós mesmos estamos experimentando o design de periódicos acadêmicos com base no GitHub e <ref target="https://readthedocs.org/">readthedocs.org</ref> (ferramentas geralmente usadas para documentação técnica).</p>
+                <div type="3" n="11.1">
+                    <head>Notas</head>
+                    <p>
+                        <ref type="footnotemark" target="#pt_note_1"/> : Não se preocupe se não entender essa terminologia ainda!
+<ref type="footnotemark" target="#pt_note_2"/> : Os ficheiros fonte para essa documentação podem ser <ref target="https://github.com/dh-notes/pandoc-workflow">baixados no GitHub</ref>. Use a opção "raw" quando visualizar no GitHub para ver o Markdown fonte. Os autores gostariam de agradecer a Alex Gil e seus colegas do Digital Humanities Center de Columbia e aos participantes do openLab no Studio na biblioteca Butler por testar o código deste tutorial em uma variedade de plataformas.
+<ref type="footnotemark" target="#pt_note_3"/> : Veja a excelente discussão de Charlie Stross sobre esse tópico em <ref target="http://www.antipope.org/charlie/blog-static/2013/10/why-microsoft-word-must-die.html">Porque Microsoft Word Deve Morrer (em inglês)</ref>.
+<ref type="footnotemark" target="#pt_note_4"/> : Não existem boas soluções para chegar diretamente no MS Word a partir do LaTeX.
+<ref type="footnotemark" target="#pt_note_5"/> : É uma boa ideia criar o hábito de não usar espaços em nomes de pastas ou ficheiros. Traços ou sublinhados ao invés de espaços nos nomes de seus ficheiros garantem uma duradoura compatibilidade entre plataformas.
+<ref type="footnotemark" target="#pt_note_6"/> : Note que a extensão .bib pode estar "registrada" no Zotero no seu sistema operacional. Isso significa que quando se clica em um ficheiro .bib é provável que se chame o Zotero para abri-lo, enquanto nós queremos abrir com o editor de texto. Eventualmente, pode querer associar a extensão .bib ao seu editor de texto,
+<ref type="footnotemark" target="#pt_note_7"/> : Agradeço a <ref target="https://github.com/njbart">@njbart</ref> pela correção. Em resposta a nossa sugestão original, <code rend="inline">Algumas frases precisam de citação.^[@fyfe_digital_2011 argumenta isso também.]</code>, <ref target="https://github.com/programminghistorian/jekyll/issues/46#issue-45559983">ele escreve</ref>: “Isso não é recomendado, pois evita que se alterne facilmente entre os estilos de nota de rodapé e data do autor. É melhor usar o [corrigido] (sem circunflexo, sem ponto final entre colchetes e a pontuação final da frase do texto após os colchetes; com estilos de notas de rodapé, o pandoc ajusta automaticamente a posição da pontuação final). ”</p>
+                </div>
+            </div>
+        </body>
+    </text>
+</TEI>
