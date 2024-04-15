@@ -16,11 +16,10 @@ def main():
 
 def sentences_to_list(version):
     list_of_sentences = []
-    all_sents = version.xpath("//tei:s", namespaces=namespaces)
+    all_sents = version.xpath("descendant::tei:s", namespaces=namespaces)
     for sentence in all_sents:
-        text = " ".join(sentence.xpath("descendant::node()[self::tei:w or self::tei:pc]/text()", namespaces=namespaces))
+        text = " ".join(sentence.xpath("descendant::node()[self::tei:w or self::tei:pc or self::tei:ref or self::tei:code]/text()", namespaces=namespaces))
         list_of_sentences.append(text)
-    print(list_of_sentences)
     return list_of_sentences
 
 def retrieve_lessons(file):
@@ -42,9 +41,12 @@ def retrieve_lessons(file):
         for version in all_versions:
             all_texts.append(sentences_to_list(version))
         
+        print(len(all_texts[0]))
+        print(len(all_texts[1]))
         aligner = Bertalign(all_texts[0], all_texts[1], max_align=3, win=5, skip=-.2)
         aligner.align_sents()
         aligner.print_sents()
+        exit(0)
 
 
 if __name__ == '__main__':
