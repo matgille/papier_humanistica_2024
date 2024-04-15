@@ -42,7 +42,6 @@ def retrieve_lessons(file):
         for version in all_versions:
             all_texts.append(sentences_to_list(version))
         
-        print(len(all_texts[0], len(all_texts[1])))
         aligner = Bertalign(all_texts[0], all_texts[1], max_align=3, win=5, skip=-.2)
         aligner.align_sents()
         aligner.print_sents()
