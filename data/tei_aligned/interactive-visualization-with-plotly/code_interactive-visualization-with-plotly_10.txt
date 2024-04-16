@@ -1,0 +1,20 @@
+# Create DataFrame which provides counts of prosecutions by gender and year
+phl_by_gender_year = phl_crime.groupby(
+    ["Gender of accused", "Year"], as_index=False
+).size()
+
+# Use px.bar() to create a bar chart
+fig = px.bar(
+    phl_by_gender_year,
+    x="Gender of accused",
+    y="size",
+    labels={"size": "Count"},
+    range_y=[
+        0,
+        200,
+    ],  # The range_y parameter allows customization of the y-axis range (optional)
+    color="Gender of accused",
+    # title="Add a title here",
+    animation_frame="Year", # Use animation_frame to specify which variable to measure for change
+)
+fig.show()

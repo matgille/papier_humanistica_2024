@@ -1,0 +1,33 @@
+@pyqtSlot()
+def mergeDocSlot(self):
+    output_file_name = 'merged.pdf'  # default name for file output
+
+    if self.file_list_widget.count() > 1:  # no merging unless there are enough documents to merge
+
+        options = QtWidgets.QFileDialog.Options()
+|         options |= QtWidgets.QFileDialog.DontUseNativeDialog |
+        output_file_name, _ = QtWidgets.QFileDialog.getSaveFileName(
+            None, "Save File", "merged", "PDF File (*.pdf)", options=options)
+
+        for i in range(self.file_list_widget.count()):
+            if output_file_name + ".pdf" == self.file_list_widget.item(i).text():
+                error_message = QtWidgets.QMessageBox.critical(None, "Error!",
+                                                               "Error! Your file name is already in use!")
+                return
+
+        if output_file_name:  # check to make sure there is a name
+            # user's file name won't include .pdf unless they type it in
+            output_file_name = output_file_name + '.pdf'
+
+            # create PDF merger object
+            pdf_merger = PdfFileMerger(open(output_file_name, "wb"))
+
+            for i in range(self.file_list_widget.count()):
+                # get everything from the file list
+                pdf_merger.append(self.file_list_widget.item(i).text())
+
+            pdf_merger.write(output_file_name)
+            pdf_merger.close()
+
+            success_message = QtWidgets.QMessageBox.information(
+                None, "Files Merged", f"{output_file_name} has been successfully written!")

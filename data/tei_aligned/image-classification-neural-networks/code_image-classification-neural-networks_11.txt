@@ -1,0 +1,27 @@
+
+function draw() {
+  noLoop();
+  imageMode(CENTER);
+  image(testImage, width/2, height/2);
+  classifier.classify(testImage, getResults); 
+}
+
+function getResults(error, results) {
+  if (error) {
+    console.error(error);
+  } else {
+    // Set the color of the text to white
+    fill('#FFFFFF');
+    // Set the size of the text to 30
+    textSize(30);
+    // Set the anchor point of the text to the center
+    textAlign(CENTER)
+    // Place text on canvas below image with most likely classification and confidence score
+    text("Confidence " + (results[0].confidence*100).toFixed(2) + "%", width/2, height/2+165)
+    text("Most Likely " + results[0].label, width/2 , height/2+200);    
+    // Output most likely classification and confidence score to console
+    console.log("Most likely " + results[0].label);
+    console.log("Confidence " + (results[0].confidence*100).toFixed(2) + "%",);
+    console.log(results);
+  }
+}

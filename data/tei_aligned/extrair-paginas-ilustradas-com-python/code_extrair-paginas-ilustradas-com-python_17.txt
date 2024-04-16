@@ -1,0 +1,15 @@
+# Veja: https://iiif.archivelab.org/iiif/documentation
+urls = ["https://iiif.archivelab.org/iiif/{}${}/full/full/0/default.jpg".format(item_id, page)
+    for page in img_pages]
+
+# Sem download de página direto a partir da biblioteca do Python, construa uma solicitação GET
+for i, page, url in zip(range(1,total_pages), img_pages, urls):
+
+    rsp = requests.get(url, allow_redirects=True)
+
+    if rsp.status_code == 200:
+        print("[{}] Downloading page {} ({}/{})".format(item_id, \
+			page, i+1, total_pages))
+
+        with open(os.path.join(out_dir, str(page) + ".jpg"), "wb") as fp:
+            fp.write(rsp.content)

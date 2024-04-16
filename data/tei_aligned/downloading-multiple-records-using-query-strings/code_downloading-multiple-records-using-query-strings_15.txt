@@ -1,0 +1,41 @@
+#create URLs for search results pages and save the files
+def getSearchResults(query, kwparse, fromYear, fromMonth, toYear, toMonth, entries):
+
+    import urllib.request, math, os
+
+    #This line is new! Create a new directory
+    if not os.path.exists(query):
+        os.makedirs(query)
+
+    startValue = 0
+
+    #Determine how many files need to be downloaded.
+    pageCount = entries / 10
+    pageCount = math.ceil(pageCount)
+
+    for pages in range(1, pageCount +1):
+
+        #each part of the URL. Split up to be easier to read.
+        url = 'https://www.oldbaileyonline.org/search.jsp?gen=1&form=searchHomePage&_divs_fulltext='
+        url += query
+        url += '&kwparse=' + kwparse
+        url += '&_divs_div0Type_div1Type=sessionsPaper_trialAccount'
+        url += '&fromYear=' + fromYear
+        url += '&fromMonth=' + fromMonth
+        url += '&toYear=' + toYear
+        url += '&toMonth=' + toMonth
+        url += '&start=' + str(startValue)
+        url += '&count=0'
+
+        #download the page and save the result.
+        response = urllib.request.urlopen(url)
+        webContent = response.read().decode('UTF-8')
+
+        #save the result to the new directory
+        filename = 'search-result' + str(startValue)
+
+        f = open(filename + ".html", 'w')
+        f.write(webContent)
+        f.close
+
+        startValue = startValue + 10

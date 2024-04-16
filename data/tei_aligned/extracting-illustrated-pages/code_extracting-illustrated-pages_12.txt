@@ -1,0 +1,20 @@
+for i, page in enumerate(img_pages):
+    try:
+		# simple status message
+        print("[{}] Downloading page {} ({}/{})".format(item_id, \
+			page, i+1, total_pages))
+
+        img = data_api.getpageimage(item_id, page)
+
+        # N.B. loop only executes if out_dir is not None
+        img_out = os.path.join(out_dir, str(page) + ".jpg")
+
+        # write out the image
+        with open(img_out, 'wb') as fp:
+            fp.write(img)
+
+        # to avoid exceeding the allowed API usage
+        time.sleep(2)
+
+    except Exception as e:
+        print("[{}] Error downloading page {}: {}".format(item_id, page,e))

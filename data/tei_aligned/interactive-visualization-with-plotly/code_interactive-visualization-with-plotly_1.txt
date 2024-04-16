@@ -1,0 +1,54 @@
+# Import data as DataFrame (only the columns specified under 'fields' list will be kept)
+fields = [
+    "Year",
+    "Charge",
+    "Gender of accused",
+    "Age of accused",
+    "Victim age",
+    "Weapon",
+    "Gang",
+]
+
+# Store csv data as DataFrame, keeping specified columns with 'usecols' parameter
+phl_crime = pd.read_csv("philadelphia homicides 1902-1932 5-2004.csv", usecols=fields) 
+
+# Replace missing numeric values (classified in original dataset as '99') to NumPy NaN
+phl_crime.replace(99, np.NaN, inplace=True)
+
+# Drop rows with where crime type is unknown (those classified as either '4' or '9' under the 'Charge' column)
+phl_crime = phl_crime.drop(
+|     phl_crime[(phl_crime.Charge == 4) | (phl_crime.Charge == 9)].index |
+)
+
+# Re-label crime types (under "Charge" column) as nouns (originally coded numerically)
+phl_crime["Charge"].replace(
+    {1: "Murder", 2: "Manslaughter", 3: "Abortion"}, inplace=True
+)
+
+# Re-label gender (under "Gender of accused" column) as nouns (originally coded numerically)
+phl_crime["Gender of accused"].replace(
+    {1: "Male", 2: "Female", 3: np.NaN, 9: np.NaN}, inplace=True
+)
+
+# Replace erroneous data and typos in "Year" column
+phl_crime["Year"].replace(
+    {1514: 1914, 1520: 1920, 1526: 1926, 1532: 1932, 1915: 1914}, inplace=True
+)
+
+# Re-label gang affilation (under "Gang" column) as nouns (originally coded numerically)
+phl_crime["Gang"].replace({1: "No gang", 2: "Teen gang", 3: "Adult gang"}, inplace=True)
+
+# Re-label weapons (under "Weapon" column) as nouns (originally coded numerically)
+phl_crime["Weapon"].replace(
+    {
+        1: "Gun",
+        2: "Knife, sharp instrument",
+        3: "Blunt object",
+        4: "Fist, other body part",
+        5: "Vehicle",
+        6: "Other",
+        7: "Poison",
+        9: np.NaN,
+    },
+    inplace=True,
+)
