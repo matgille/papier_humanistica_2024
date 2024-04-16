@@ -81,6 +81,8 @@ def main():
                 division.set("n", str(identifier))
 
                 # try:
+                
+                
                 try:
                     os.mkdir(f"../../data/tei_aligned/{directory_name}")
                 except FileExistsError:
@@ -88,7 +90,10 @@ def main():
                 except FileNotFoundError:
                     os.mkdir(f"../../data/tei_aligned/")
                     os.mkdir(f"../../data/tei_aligned/{directory_name}")
-
+                
+                for text_file in glob.glob(f"../../data/to_tei/{filename}/*.txt"):
+                    shutil.copy(text_file, f"../../data/tei_aligned/{filename}/")
+                
                 with open(f"../../data/tei_aligned/{filename}/{filename}.xml", "w") as structured_div:
                     print(f"Saving to ../../data/tei_aligned/{filename}/{filename}.xml")
                     structured_div.write(ET.tostring(tree, pretty_print=True, encoding="utf-8").decode('utf8'))

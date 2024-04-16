@@ -445,7 +445,6 @@ def xmlify(path):
     change_element_name(root, "p[parent::figcaption]", "figcaption")
     print("Captions")
     remove_parent_keep_self(root, "//figcaption[figcaption]", "figcaption")
-
     ## Let's clean the tables
     pop_attribute(root, "table", "border")
     pop_element(root, "colgroup")
@@ -484,6 +483,7 @@ def xmlify(path):
     pop_attribute(root, "ref", "download")
     pop_attribute(root, "emph", "class")
     pop_element(root, "a")
+    pop_element(root, "comment()")
     change_element_name(root, "p[parent::p[@style='alert alert-info']]", "p", "rend", "alert")
     remove_parent_keep_self(root, "//p[@style='alert alert-info'][p]", "p")
     pop_attribute(root, "p", "class")
