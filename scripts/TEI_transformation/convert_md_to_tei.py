@@ -4,9 +4,10 @@ import lxml.etree as ET
 import re
 import yaml
 from marko.ext.gfm import gfm
+from io import StringIO, BytesIO
 
 tei_ns = "http://www.tei-c.org/ns/1.0"
-ns_decl = {"tei": tei_ns}
+ns_decl = {"tei": tei_ns, "xi": "http://www.w3.org/2001/XInclude"}
 
 
 def remove_parent_keep_self(tree, ancestors, node):
@@ -197,8 +198,10 @@ def xmlify(path):
     try:
         python_dict['original']
         new_p_text = f"<p>Born digital, in a markdown format. Original file: <ref type='original_file' target='#{python_dict['original']}'/>.</p>"
+        is_translation = True
     except KeyError:
         new_p_text = f"<p>Born digital, in a markdown format. This lesson is original.</p>"
+        is_translation = False
     as_node = ET.fromstring(new_p_text)
     sourceDesc.append(as_node)
 
@@ -406,7 +409,6 @@ def xmlify(path):
     # for empty_pre in lesson_as_xml_tree.xpath("//pre", namespaces=ns_decl):
     #     empty_pre.getparent().remove(empty_pre)
 
-
     # The next phase is to modify the nodes to make them TEI conformant.
     root = lesson_as_xml_tree.xpath("/node()")[0]
     # Let's modify some tagnames, clean some other
@@ -492,6 +494,12 @@ def xmlify(path):
     root.tag = "TEI"
     root.set('xmlns', tei_ns)
     root.set("xml:id", lesson_name.split("/")[-1].split(".")[0])
+
+    if is_translation:
+        root.set("type", "translation")
+    else:
+        root.set("type", "original")
+
     root.insert(0, new_metadata)
     text_element = ET.Element("text")
     body = root.xpath("//body")
@@ -730,26 +738,45 @@ def create_main_tei_file(lessons: dict) -> None:
     :param lessons:  The lessons to parse
     :return:  None
     """
-    Incomplete_TEI = """
+    Main_teiHeader = """
     <TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <teiHeader>
           <fileDesc>
              <titleStmt>
-                <title>Title</title>
+                <title>Corpus des leçons de Programming Historian</title>
              </titleStmt>
              <publicationStmt>
-                <p>Publication information</p>        
+                <p>Corpus produit en XML-TEI à partir des leçons publiées sur le Github de Programming Historian. 
+                L'objectif est la production d'une table de concepts techniques multilingues, un alignement de
+                toutes les leçons à la phrase, et une étude traductologique du corpus.</p>        
              </publicationStmt>
              <sourceDesc>
-                <p>Information about the source</p>
+                <p>Ensemble des leçons, multilingues.</p>
              </sourceDesc>
           </fileDesc>
       </teiHeader>
     </TEI>
     """
 
-    tei_tree = ET.fromstring(Incomplete_TEI)
-    root = tei_tree
+    Incomplete_TEI = """
+    <TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+      <teiHeader>
+          <fileDesc>
+             <titleStmt>
+                <title/>
+             </titleStmt>
+             <publicationStmt>  
+             <p>Paper on the alignment on the Programming Historian lessons.</p>
+             </publicationStmt>
+             <sourceDesc>
+                <p>Transformed from a markdown file.</p>      
+             </sourceDesc>
+          </fileDesc>
+      </teiHeader>
+    </TEI>
+    """
+
+    root = ET.fromstring(Main_teiHeader)
     for orig, translations in lessons.items():
         corresp_tree = ET.parse(f"../../data/to_tei/{orig}/{orig}.xml")
         new_tree = corresp_tree.getroot()
@@ -758,11 +785,11 @@ def create_main_tei_file(lessons: dict) -> None:
                           "//tei:h5 | //tei:h6 | //tei:h7"
         html_heads_test = new_tree.xpath(test_expression, namespaces=ns_decl)
         all_tests.extend(html_heads_test)
-        new_TEI_node = ET.fromstring(Incomplete_TEI)
+        lessons_node = ET.fromstring(Incomplete_TEI)
         if len(html_heads_test) == 0:
             include = ET.Element("{http://www.w3.org/2001/XInclude}include")
-            include.set('href', f"{orig}/{orig}.xml")
-            new_TEI_node.append(include)
+            include.set('href', f"/home/mgl/Bureau/Travail/Communications_et_articles/humanistica_PH/data/to_tei/{orig}/{orig}.xml")
+            lessons_node.append(include)
         else:
             print("Error")
         for element in translations:
@@ -773,19 +800,48 @@ def create_main_tei_file(lessons: dict) -> None:
             if len(html_heads_test_2) == 0:
                 print("Including file to corpus")
                 include = ET.Element("{http://www.w3.org/2001/XInclude}include")
-                include.set('href', f"{element}/{element}.xml")
-                new_TEI_node.append(include)
+                include.set('href', f"/home/mgl/Bureau/Travail/Communications_et_articles/humanistica_PH/data/to_tei/{element}/{element}.xml")
+                lessons_node.append(include)
             else:
                 print("File not valid, excluding it from main TEI file.")
         # If there is at least one correct lesson, append the TEI subfile to the main corpus.
         print(all_tests)
+
+        # Let's update the teiHeader. We are copying the TEI tree, to parse it completely
+        # The trick is not to develop the XInclusion, so we're parsing a copy tree, and modify
+        # the original one
+        copied_tree = ET.parse(StringIO(ET.tostring(lessons_node).decode()))
+        copied_tree.xinclude()
+        try:
+            original_title = \
+            copied_tree.xpath("descendant::tei:TEI[@type='original']/descendant::tei:titleStmt/tei:title",
+                               namespaces=ns_decl)[0].text
+        except IndexError:
+            print("Error 1")
+            continue
+        try:
+            title = lessons_node.xpath("descendant::tei:teiHeader[1]/descendant::tei:titleStmt/tei:title", namespaces=ns_decl)[0]
+            title.text = original_title
+            print(original_title)
+            print("OK")
+        except IndexError:
+            print("Error 2")
+            pass
+        
+        # Let's change the path to make it relative to the main file.
+        for include in root.xpath("descendant::xi:include", namespaces=ns_decl):
+            print("Replacing href in include")
+            current_target = include.xpath("@href")[0]
+            new_target = current_target.replace("/home/mgl/Bureau/Travail/Communications_et_articles/humanistica_PH/data/to_tei/", "") 
+            print(new_target)
+            include.set('href', new_target)
+        
         if len(all_tests) == 0:
             print("Appending tei Node")
-            print(new_TEI_node)
-            root.append(new_TEI_node)
+            root.append(lessons_node)
 
     with open("../../data/to_tei/main.xml", "w") as output_file:
-        output_file.write(ET.tostring(tei_tree, pretty_print=True, encoding='utf8').decode('utf8'))
+        output_file.write(ET.tostring(root, pretty_print=True, encoding='utf8').decode('utf8'))
 
 
 if __name__ == '__main__':
