@@ -3,7 +3,7 @@ import os
 import re
 import shutil
 import subprocess
-# from bertalign.Bertalign import Bertalign
+from bertalign.Bertalign import Bertalign
 import numpy as np
 
 import lxml.etree as ET
@@ -51,15 +51,16 @@ class NpEncoder(json.JSONEncoder):
 
 def align_lessons(file):
     """
-    This script takes a TEI file and identifies the sentences using basic punctuation
-    :param file: The main file containing all translations
+    This script takes tokenized files and aligns the original file and its translations.
+    The alignments information is stored in a @corresp attribute, in the form of a 
+    dictionnary {'translation_a': ['sentence_a', 'sentence_b'], 'translation_b': ['sentence_a']}
+    :param file: The main file containing all translations_as_xml_tree
     :return: None
     """
     print(file)
     main_tree = ET.parse(file)
     main_tree.xinclude()
-    pop_attribute(main_tree, "descendant::tei:s", "corresp")
-    all_tei_nodes = main_tree.xpath("/tei:TEI/tei:TEI[descendant::tei:TEI[@xml:id = 'jupyter-notebooks']]",
+    all_tei_nodes = main_tree.xpath("/tei:TEI/tei:TEI[count(descendant::tei:TEI) > 1]",
                                     namespaces=namespaces)
     print(len(all_tei_nodes))
     for lesson in all_tei_nodes:
@@ -67,91 +68,106 @@ def align_lessons(file):
         original_id = lesson.xpath("descendant::tei:TEI[@type='original']/@xml:id", namespaces=namespaces)[0]
         translations_id = lesson.xpath("descendant::tei:TEI[@type='translation']/@xml:id", namespaces=namespaces)
         original_file = lesson.xpath("descendant::tei:TEI[@type='original']", namespaces=namespaces)[0]
-        translations = lesson.xpath("descendant::tei:TEI[@type='translation']", namespaces=namespaces)
-        print(original_id)
-        if len(original_file) == 0:
+        translations_as_xml_tree = lesson.xpath("descendant::tei:TEI[@type='translation'][not(descendant::tei:s["
+                                                "@corresp])]", namespaces=namespaces) 
+        if len(original_file) == 0 or len(translations_as_xml_tree) == 0:
             continue
+        print(len(translations_as_xml_tree))
         original_file_as_list, original_ids_as_dict = sentences_to_list(original_file)
 
         all_translations_id = []
         all_translations = []
-        for version in translations:
+        for version in translations_as_xml_tree:
             all_translations.append(sentences_to_list(version)[0])
             all_translations_id.append(sentences_to_list(version)[1])
 
-        for index, translation in enumerate(all_translations):
-            current_translation_id = translations_id[index]
-            # aligner = Bertalign(original_file_as_list, translation, max_align=3, win=5, skip=-.2)
-            # aligner.align_sents()
-            # results = aligner.result
-            # save_file(json.dumps(results, cls=NpEncoder), f"/home/mgl/Documents/{current_translation_id}.json")
+        for translation_index, translation_as_list_of_sentences in enumerate(all_translations):
+            if len(translations_as_xml_tree[translation_index].xpath("descendant::tei:s[@corresp]", namespaces=namespaces)) != 0:
+                print("Already done")
+                continue
+            print(f"\n\nNew translation: {translations_id[translation_index]}\n---")
+            current_translation_id = translations_id[translation_index]
+            aligner = Bertalign(original_file_as_list, translation_as_list_of_sentences, max_align=3, win=5, skip=-.2)
+            aligner.align_sents()
+            results = aligner.result
+            save_file(json.dumps(results, cls=NpEncoder), f"/home/mgl/Documents/{current_translation_id}.json")
             with open(f"/home/mgl/Documents/{current_translation_id}.json", "r") as input_results:
                 results = json.load(input_results)
             aligned_positions_and_ids = []
-
-            for model_idx, translation_idx in results:
+            for original_idx, translation_idx in results:
                 try:
-                    original_sentence_id = [original_ids_as_dict[model_idx[index]] for index in
-                                            range(len(model_idx))]
+                    original_sentence_id = [original_ids_as_dict[original_idx[index]] for index in
+                                            range(len(original_idx))]
                 except KeyError:
                     print(original_ids_as_dict)
-                    print(model_idx)
+                    print(original_idx)
                     print("Error")
                     print(exit(0))
-                    
                 except IndexError:
                     original_sentence_id = None
                 try:
-                    corresponding_translation_sentence_id = [all_translations_id[index][translation_idx[index]] for
-                                                             index in
+                    corresponding_translation_sentence_id = [all_translations_id[translation_index][translation_idx[index_in_list]] for
+                                                             index_in_list in
                                                              range(len(translation_idx))]
                 except IndexError:
                     corresponding_translation_sentence_id = None
                 aligned_positions_and_ids.append(
                     (original_sentence_id, corresponding_translation_sentence_id))
-            print(aligned_positions_and_ids)
 
             original_as_XML = original_file
-            translation_as_xml = translations[index]
+            translation_as_xml = translations_as_xml_tree[translation_index]
             # An xml base is being written before, we'll remove it.
             pop_attribute(original_file, "self::node()", "xml:base")
             pop_attribute(translation_as_xml, "self::node()", "xml:base")
-            print(aligned_positions_and_ids[0])
-            for original_sent_id, translated_sent_id in aligned_positions_and_ids[:1]:
-                print(original_sent_id)
-                print(translated_sent_id)
+            for original_sent_id, translated_sent_id in aligned_positions_and_ids:
                 # We start with the original file
                 try:
                     corresponding_sentence_in_original = \
-                        original_as_XML.xpath(f"descendant::tei:s[contains(@xml:id, '{''.join(original_sent_id)}')]",
+                        original_as_XML.xpath(f"descendant::tei:s[contains('{''.join(original_sent_id)}', @xml:id)]",
                                               namespaces=namespaces)[0]
                 except IndexError:
-                    print("Not found")
+                    print(f"Not found: {''.join(original_sent_id)}")
+                    print(f"Corresponding in translation: {''.join(translated_sent_id)}")
+                    print("---")
                     pass
                 try:
-                    print(translated_sent_id)
-                    current_corresp = json.loads(corresponding_sentence_in_original.xpath("@corresp")[0].replace("\'","\""))
-                    current_corresp[translations_id[index]] = json.dumps(translated_sent_id)
+                    current_corresp = json.loads(
+                        corresponding_sentence_in_original.xpath("@corresp")[0].replace("\'", "\""))
+                    current_corresp[translations_id[translation_index]] = json.dumps(translated_sent_id)
                     corresponding_sentence_in_original.set("corresp", json.dumps(current_corresp).replace("\"", "\'"))
                 except IndexError:
                     corresponding_sentence_in_original.set("corresp",
-                                                           json.dumps({translations_id[index]: translated_sent_id}).replace("\"", "\'"))
+                                                           json.dumps(
+                                                               {translations_id[translation_index]: translated_sent_id}).replace(
+                                                               "\"", "\'"))
 
                 # Let's pass to the translation
                 try:
                     corresponding_sentence_in_translation = \
                         translation_as_xml.xpath(
-                            f"descendant::tei:s[contains(@xml:id,'{''.join(translated_sent_id)}')]",
+                            f"descendant::tei:s[contains('{''.join(translated_sent_id)}', @xml:id)]",
                             namespaces=namespaces)[0]
                 except IndexError:
                     pass
                 try:
-                    current_corresp = json.loads(corresponding_sentence_in_translation.xpath("@corresp")[0].replace("\'","\""))
+                    current_corresp = json.loads(
+                        corresponding_sentence_in_translation.xpath("@corresp")[0].replace("\'", "\""))
                     current_corresp[original_id] = json.dumps(original_sent_id)
-                    corresponding_sentence_in_translation.set("corresp", json.dumps(current_corresp).replace("\"", "\'"))
+                    corresponding_sentence_in_translation.set("corresp",
+                                                              json.dumps(current_corresp).replace("\"", "\'"))
                 except IndexError:
                     corresponding_sentence_in_translation.set("corresp",
-                                                           json.dumps({original_id: original_sent_id}).replace("\"", "\'"))
+                                                              json.dumps({original_id: original_sent_id}).replace("\"",
+                                                                                                                  "\'"))
+            
+            for sentence_without_corresp in translations_as_xml_tree[translation_index].xpath("descendant::tei:s[not("
+                                                                                              "@corresp)]", 
+                                                                                              namespaces=namespaces):
+                id = sentence_without_corresp.xpath("@xml:id")[0]
+                corresponding_identifier = [orig for (orig, transl) in aligned_positions_and_ids 
+                if id in transl][0]
+                sentence_without_corresp.set("corresp", json.dumps({original_id: corresponding_identifier}))
+                
 
             with open(f"../../data/tei_sentences_tokenized/{original_id}/{original_id}.xml",
                       "w") as output_original:
@@ -162,6 +178,7 @@ def align_lessons(file):
                 output_translation.write(
                     ET.tostring(translation_as_xml, pretty_print=True, encoding='utf8').decode('utf8'))
     print("Done !")
+
 
 if __name__ == '__main__':
     namespaces = {"tei": "http://www.tei-c.org/ns/1.0"}
