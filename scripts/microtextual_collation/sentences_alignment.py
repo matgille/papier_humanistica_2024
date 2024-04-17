@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import re
@@ -56,14 +57,14 @@ def align_lessons(file, overwrite=False):
     dictionnary {'translation_a': ['sentence_a', 'sentence_b'], 'translation_b': ['sentence_a']}
     :param overwrite: should we re-run the alignments if it has been already done?
     :param file: The main file containing all translations_as_xml_tree
-    :return: NoneKeyboardInterrupt
+    :return: None
 
     """
     print(file)
     main_tree = ET.parse(file)
     main_tree.xinclude()
-    all_tei_nodes = main_tree.xpath("/tei:TEI/tei:TEI[count(descendant::tei:TEI) > 1]",
-                                    namespaces=namespaces)
+
+    all_tei_nodes = main_tree.xpath("/tei:TEI/tei:TEI[count(descendant::tei:TEI) > 1]", namespaces=namespaces)
     print(len(all_tei_nodes))
     for lesson in all_tei_nodes:
         print("New lesson")
@@ -76,7 +77,7 @@ def align_lessons(file, overwrite=False):
         if len(original_file) == 0 or len(translations_as_xml_tree) == 0:
             continue
         original_file_as_list, original_ids_as_dict = sentences_to_list(original_file)
-
+        print(f"Original file: {original_file}")
         all_translations_id = []
         all_translations = []
         for version in translations_as_xml_tree:
@@ -86,6 +87,8 @@ def align_lessons(file, overwrite=False):
         for translation_index, translation_as_list_of_sentences in enumerate(all_translations):
             current_translation_id = translations_id[translation_index]
             print(current_translation_id)
+            
+            # Test overwiting param, do nothing it file exists
             if overwrite:
                 pass
             else:
@@ -139,18 +142,20 @@ def align_lessons(file, overwrite=False):
                     print(f"Not found: {''.join(original_sent_id)}")
                     print(f"Corresponding in translation: {''.join(translated_sent_id)}")
                     print("---")
-                    pass
+                    continue
                 try:
                     current_corresp = json.loads(
-                        corresponding_sentence_in_original.xpath("@corresp")[0].replace("\'", "\""))
-                    current_corresp[translations_id[translation_index]] = json.dumps(translated_sent_id)
-                    corresponding_sentence_in_original.set("corresp", json.dumps(current_corresp).replace("\"", "\'"))
+                        corresponding_sentence_in_original.xpath("@corresp")[0].replace("'", "\""))
+                    current_corresp[translations_id[translation_index]] = translated_sent_id
+                    print(json.dumps(translated_sent_id))
+                    print(current_corresp)
+                    corresponding_sentence_in_original.set("corresp", json.dumps(current_corresp).replace("\"", "'"))
                 except IndexError:
-                    corresponding_sentence_in_original.set("corresp",
-                                                           json.dumps(
-                                                               {translations_id[
-                                                                    translation_index]: translated_sent_id}).replace(
-                                                               "\"", "\'"))
+                    print("Index error")
+                    current_corresp = json.dumps({translations_id[translation_index]: translated_sent_id}).replace(
+                        "\"", "'")
+                    corresponding_sentence_in_original.set("corresp", current_corresp)
+                print(current_corresp)
 
                 # Let's pass to the translation
                 try:
@@ -161,18 +166,16 @@ def align_lessons(file, overwrite=False):
                 except IndexError:
                     pass
                 try:
-                    try:
-                        current_corresp = json.loads(
-                            corresponding_sentence_in_translation.xpath("@corresp")[0].replace("\'", "\""))
-                        current_corresp[original_id] = json.dumps(original_sent_id)
-                    except json.decoder.JSONDecodeError:
-                        current_corresp = {original_id: json.dumps(original_sent_id)}
+                    current_corresp = json.loads(
+                        corresponding_sentence_in_translation.xpath("@corresp")[0].replace("'", "\""))
+                    current_corresp[original_id] = original_sent_id
+                    print(current_corresp)
                     corresponding_sentence_in_translation.set("corresp",
-                                                              json.dumps(current_corresp).replace("\"", "\'"))
+                                                              json.dumps(current_corresp).replace("\"", "'"))
                 except IndexError:
-                    corresponding_sentence_in_translation.set("corresp",
-                                                              json.dumps({original_id: original_sent_id}).replace("\"",
-                                                                                                                  "\'"))
+                    current_corresp = json.dumps({original_id: original_sent_id}).replace("\"", "'")
+                    corresponding_sentence_in_translation.set("corresp", current_corresp)
+                print(current_corresp)
 
             for sentence_without_corresp in translations_as_xml_tree[translation_index].xpath("descendant::tei:s[not("
                                                                                               "@corresp)]",
@@ -180,6 +183,8 @@ def align_lessons(file, overwrite=False):
                 id = sentence_without_corresp.xpath("@xml:id")[0]
                 corresponding_identifier = [orig for (orig, transl) in aligned_positions_and_ids
                                             if id in transl][0]
+                print(corresponding_identifier)
+                print(json.dumps({original_id: corresponding_identifier}))
                 sentence_without_corresp.set("corresp", json.dumps({original_id: corresponding_identifier}))
 
             os.makedirs(f"../../data/tei_sentences_aligned/{original_id}", exist_ok=True)
