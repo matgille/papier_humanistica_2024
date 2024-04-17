@@ -6,6 +6,13 @@ import re
 
 
 def prettify(file: str):
+    """
+    This function uses beautifulsoup to automatically indent the chosen files, 
+    and then some regexp cleaning is performed to have one token per line with no leading
+    or trailing space in it.
+    :param file: 
+    :return: 
+    """
     bs = BeautifulSoup(open(file), 'xml')
     pretty_xml = bs.prettify()
     opening_pattern = re.compile(r"<(pc|w)>\s+")
