@@ -1,47 +1,1793 @@
-<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="contar-frequencias-palavras-python" type="translation">
-    <teiHeader>
-        <fileDesc>
-            <titleStmt>
-                <title>Contagem de Frequências de Palavras com Python</title>
-                <author role="original_author">
-                    <persName>William J. Turkel</persName>
-                    <persName>Adam Crymble</persName>
-                </author>
-                <editor role="reviewers">
-                    <persName>Jim Clifford</persName>
-                    <persName>Frederik Elwert</persName>
-                </editor>
-                <author role="translators">Felipe Lamarca</author>
-                <editor role="translation-reviewers">
-                    <persName>Ana Carolina Erthal</persName>
-                    <persName>Joana Vieira Paulino</persName>
-                </editor>
-                <editor role="editors">Miriam Posner</editor>
-            </titleStmt>
-            <publicationStmt>
-                <distributor>Programming Historian</distributor>
-                <date type="translated">01/13/2022</date>
-                <idno type="doi">10.46430/phpt0023</idno>
-                <date type="published">07/17/2012</date>
-            </publicationStmt>
-            <sourceDesc>
-                <p>Born digital, in a markdown format. Original file: <ref type="original_file" target="#counting-frequencies"/>.</p>
-                <p>There are other translations: <ref target="#decomptes-de-frequences-de-mots-en-python #contar-frecuencias"/>
-                </p>
-            </sourceDesc>
-        </fileDesc>
-        <profileDesc>
-            <abstract>
-                <p>Contar a frequência de palavras específicas de uma lista pode fornecer dados esclarecedores. Esta lição ensinará uma maneira fácil de contar essas frequências com Python.</p>
-            </abstract>
-            <textClass>
-                <keywords>
-                    <term xml:lang="en">python</term>
-                </keywords>
-            </textClass>
-        </profileDesc>
-    </teiHeader>
-    <text xml:lang="pt">
-        <body><div type="2" n="1"><head><s xml:id="s_iWOkJ8" corresp="{'counting-frequencies': ['s_qgTnDu']}"><w>Objetivos</w><w>da</w><w>Lição</w></s></head><p><s xml:id="s_pim4GN" corresp="{'counting-frequencies': ['s_IzE9ZI']}"><w>Sua</w><w>lista</w><w>agora</w><w>está</w><w>limpa</w><w>o</w><w>suficiente</w><w>para</w><w>que</w><w>possa</w><w>começar</w><w>a</w><w>analisar</w><w>seu</w><w>conteúdo</w><w>de</w><w>maneiras</w><w>significativas</w><pc>.</pc></s><s xml:id="s_UP6iBe" corresp="{'counting-frequencies': ['s_lwCpOH']}"><w>Contar</w><w>a</w><w>frequência</w><w>de</w><w>palavras</w><w>específicas</w><w>de</w><w>uma</w><w>lista</w><w>pode</w><w>fornecer</w><w>dados</w><w>esclarecedores</w><pc>.</pc></s><s xml:id="s_tVNgEm" corresp="{'counting-frequencies': ['s_wZERLQ']}"><w>Python</w><w>possui</w><w>uma</w><w>maneira</w><w>fácil</w><w>de</w><w>contar</w><w>frequências</w><w>,</w><w>mas</w><w>requer</w><w>o</w><w>uso</w><w>de</w><w>um</w><w>novo</w><w>tipo</w><w>de</w><w>variável</w><w>:</w><w>o</w><emph><w>dicionário</w></emph><pc>.</pc></s><s xml:id="s_lZ1ZL3" corresp="{'counting-frequencies': ['s_Y0HGFe']}"><w>Antes</w><w>de</w><w>começar</w><w>a</w><w>trabalhar</w><w>com</w><w>um</w><w>dicionário</w><w>,</w><w>considere</w><w>os</w><w>processos</w><w>utilizados</w><w>para</w><w>calcular</w><w>frequências</w><w>em</w><w>uma</w><w>lista</w><pc>.</pc></s></p><div type="3" n="1.1"><head><s xml:id="s_I5JerQ" corresp="{'counting-frequencies': ['s_lFNDlM']}"><w>Ficheiros</w><w>Necessários</w><w>para</w><w>esta</w><w>Lição</w></s></head><list type="unordered"><item><code rend="inline"><w>obo.py</w></code></item></list><p><s xml:id="s_Fz5fIl" corresp="{'counting-frequencies': ['s_zFyh65']}"><w>Caso</w><w>não</w><w>possua</w><w>esse</w><w>ficheiro</w><w>,</w><w>pode</w><w>fazer</w><w>o</w><emph><w>download</w></emph><w>do</w><w>ficheiro</w><w>(</w><ref target="https://programminghistorian.org/assets/python-lessons4.zip"><w>zip</w></ref><w>)</w><w>que</w><w>contém</w><w>todo</w><w>o</w><w>código</w><w>das</w><w>lições</w><w>anteriores</w><w>desta</w><w>série</w><pc>.</pc></s></p></div></div><div type="2" n="2"><head><s xml:id="s_FabuJb" corresp="{'counting-frequencies': ['s_3sjkNX']}"><w>Frequências</w></s></head><p><s xml:id="s_DZ3iRV" corresp="{'counting-frequencies': ['s_TkZw4c']}"><w>Agora</w><w>desejamos</w><w>contar</w><w>a</w><w>frequência</w><w>de</w><w>cada</w><w>palavra</w><w>em</w><w>nossa</w><w>lista</w><pc>.</pc></s><s xml:id="s_FPbXYW" corresp="{'counting-frequencies': ['s_MvR9bV']}"><w>Já</w><w>viu</w><w>que</w><w>é</w><w>fácil</w><w>de</w><w>processar</w><w>uma</w><w>lista</w><w>utilizando</w><w>um</w><code rend="inline"><w>for</w></code><emph><w>loop</w></emph><pc>.</pc></s><s xml:id="s_vfRECi" corresp="{'counting-frequencies': ['s_3omk6j']}"><w>Tente</w><w>salvar</w><w>e</w><w>executar</w><w>o</w><w>exemplo</w><w>a</w><w>seguir</w><pc>.</pc></s><s xml:id="s_nZslls" corresp="{'counting-frequencies': ['s_r0Qdlc']}"><w>Lembre-se</w><w>de</w><w>que</w><code rend="inline"><w>+=</w></code><w>informa</w><w>ao</w><w>programa</w><w>para</w><w>acrescentar</w><w>algo</w><w>ao</w><w>final</w><w>de</w><w>uma</w><w>variável</w><w>existente</w><pc>.</pc></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_0" corresp="code_contar-frequencias-palavras-python_0.txt" rend="block"/></ab><p><s xml:id="s_NzUv9K" corresp="{'counting-frequencies': ['s_57TrT1']}"><w>Aqui</w><w>,</w><w>começamos</w><w>com</w><w>uma</w><w>string</w><w>e</w><w>separamo-la</w><w>em</w><w>uma</w><w>lista</w><w>,</w><w>como</w><w>fizemos</w><w>anteriormente</w><pc>.</pc></s><s xml:id="s_5uiSG8" corresp="{'counting-frequencies': ['s_NdfHOv']}"><w>Depois</w><w>disso</w><w>criamos</w><w>uma</w><w>lista</w><w>(</w><w>inicialmente</w><w>vazia</w><w>)</w><w>chamada</w><code rend="inline"><w>wordfreq</w></code><w>,</w><w>percorremos</w><w>cada</w><w>palavra</w><w>na</w><code rend="inline"><w>wordlist</w></code><w>e</w><w>contamos</w><w>o</w><w>número</w><w>de</w><w>vezes</w><w>que</w><w>aquela</w><w>palavra</w><w>aparece</w><w>em</w><w>toda</w><w>a</w><w>lista</w><pc>.</pc></s><s xml:id="s_esTQEo" corresp="{'counting-frequencies': ['s_XR94X7']}"><w>Então</w><w>,</w><w>adicionamos</w><w>a</w><w>contagem</w><w>de</w><w>cada</w><w>palavra</w><w>à</w><w>nossa</w><w>lista</w><code rend="inline"><w>wordfreq</w></code><pc>.</pc></s><s xml:id="s_qNWa2k" corresp="{'counting-frequencies': ['s_JsS95l']}"><w>Utilizando</w><w>a</w><w>operação</w><code rend="inline"><w>zip</w></code><w>,</w><w>somos</w><w>capazes</w><w>de</w><w>combinar</w><w>a</w><w>primeira</w><w>palavra</w><w>da</w><w>lista</w><w>de</w><w>palavras</w><w>com</w><w>o</w><w>primeiro</w><w>número</w><w>na</w><w>lista</w><w>de</w><w>frequências</w><w>,</w><w>a</w><w>segunda</w><w>palavra</w><w>e</w><w>a</w><w>segunda</w><w>frequência</w><w>e</w><w>assim</w><w>por</w><w>diante</w><pc>.</pc></s><s xml:id="s_OPXSGm" corresp="{'counting-frequencies': ['s_M8Ylhv']}"><w>Terminamos</w><w>com</w><w>uma</w><w>lista</w><w>de</w><w>pares</w><w>de</w><w>palavras</w><w>e</w><w>frequências</w><pc>.</pc></s><s xml:id="s_RvtxMk" corresp="{'counting-frequencies': ['s_nsX6pk']}"><w>A</w><w>função</w><code rend="inline"><w>str</w></code><w>converte</w><w>qualquer</w><w>objeto</w><w>numa</w><w>string</w><w>para</w><w>que</w><w>ele</w><w>possa</w><w>ser</w><w>exibido</w><pc>.</pc></s></p><p><s xml:id="s_qh81Kf" corresp="{'counting-frequencies': ['s_n7NZNZ']}"><w>Deve</w><w>obter</w><w>algo</w><w>assim</w><w>:</w></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_1" corresp="code_contar-frequencias-palavras-python_1.txt" rend="block"/></ab><p><s xml:id="s_VYY60P" corresp="{'counting-frequencies': ['s_GmMvgU']}"><w>Valerá</w><w>a</w><w>pena</w><w>estudar</w><w>o</w><w>código</w><w>acima</w><w>até</w><w>entendê-lo</w><w>antes</w><w>de</w><w>continuar</w><pc>.</pc></s></p><p><s xml:id="s_afxMUM" corresp="{'counting-frequencies': ['s_FECxdT']}"><w>O</w><w>Python</w><w>também</w><w>inclui</w><w>uma</w><w>ferramenta</w><w>muito</w><w>conveniente</w><w>chamada</w><emph><ref target="http://docs.python.org/tutorial/datastructures.html#list-comprehensions"><w>list</w><w>comprehension</w></ref></emph><w>(</w><w>ver</w><w>uma</w><w>explicação</w><w>do</w><w>método</w><w>de</w><ref target="https://pt.wikipedia.org/wiki/Compreens%C3%A3o_de_lista"><w>compreensão</w><w>de</w><w>lista</w></ref><w>em</w><w>português</w><w>)</w><w>,</w><w>que</w><w>pode</w><w>ser</w><w>utilizada</w><w>para</w><w>fazer</w><w>o</w><w>mesmo</w><w>que</w><w>um</w><code rend="inline"><w>for</w></code><emph><w>loop</w></emph><w>de</w><w>maneira</w><w>mais</w><w>económica</w><pc>.</pc></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_2" corresp="code_contar-frequencias-palavras-python_2.txt" rend="block"/></ab><p><s xml:id="s_1J2poI" corresp="{'counting-frequencies': ['s_cAc3kJ']}"><w>Se</w><w>estudar</w><w>esse</w><w>método</w><w>de</w><w>compreensão</w><w>de</w><w>lista</w><w>cuidadosamente</w><w>,</w><w>descobrirá</w><w>que</w><w>ele</w><w>faz</w><w>exatamente</w><w>o</w><w>mesmo</w><w>que</w><w>o</w><code rend="inline"><w>for</w></code><emph><w>loop</w></emph><w>no</w><w>exemplo</w><w>anterior</w><w>,</w><w>mas</w><w>de</w><w>maneira</w><w>condensada</w><pc>.</pc></s><s xml:id="s_dzv3ns" corresp="{'counting-frequencies': ['s_E0Yfmb']}"><w>Qualquer</w><w>um</w><w>dos</w><w>métodos</w><w>funcionará</w><w>bem</w><w>,</w><w>então</w><w>use</w><w>a</w><w>versão</w><w>com</w><w>a</w><w>qual</w><w>se</w><w>sente</w><w>mais</w><w>confortável</w><pc>.</pc></s></p><p><s xml:id="s_HrfAWO" corresp="{'counting-frequencies': ['s_wKq2Ky']}"><w>Em</w><w>geral</w><w>é</w><w>prudente</w><w>utilizar</w><w>um</w><w>código</w><w>que</w><w>entenda</w><w>ao</w><w>invés</w><w>de</w><w>um</w><w>código</w><w>que</w><w>seja</w><w>executado</w><w>mais</w><w>rapidamente</w><pc>.</pc></s></p><p><s xml:id="s_xDZLl1" corresp="{'counting-frequencies': ['s_PjfrSc']}"><w>Neste</w><w>ponto</w><w>,</w><w>temos</w><w>uma</w><w>lista</w><w>de</w><w>pares</w><w>,</w><w>onde</w><w>cada</w><w>par</w><w>contém</w><w>uma</w><w>palavra</w><w>e</w><w>sua</w><w>frequência</w><pc>.</pc></s><s xml:id="s_fR9Ces" corresp="{'counting-frequencies': ['s_veuZBn']}"><w>Essa</w><w>lista</w><w>é</w><w>um</w><w>pouco</w><w>redundante</w><pc>.</pc></s><s xml:id="s_Rr7l04" corresp="{'counting-frequencies': ['s_kSufhy']}"><w>Se</w><w>'the</w><w>'</w><w>ocorre</w><w>500</w><w>vezes</w><w>,</w><w>então</w><w>essa</w><w>lista</w><w>contém</w><w>quinhentas</w><w>cópias</w><w>do</w><w>par</w><w>(</w><w>'the</w><w>'</w><w>,</w><w>500</w><w>)</w><pc>.</pc></s><s xml:id="s_YhnaYa" corresp="{'counting-frequencies': ['s_evZfk7']}"><w>Essa</w><w>lista</w><w>também</w><w>está</w><w>ordenada</w><w>pelas</w><w>palavras</w><w>no</w><w>texto</w><w>original</w><w>,</w><w>ao</w><w>invés</w><w>de</w><w>listar</w><w>as</w><w>palavras</w><w>na</w><w>ordem</w><w>da</w><w>mais</w><w>frequente</w><w>para</w><w>a</w><w>menos</w><w>frequente</w><pc>.</pc></s><s xml:id="s_B6IU1i" corresp="{'counting-frequencies': ['s_1Y67zb']}"><w>Podemos</w><w>resolver</w><w>esses</w><w>problemas</w><w>convertendo-a</w><w>em</w><w>um</w><w>dicionário</w><w>,</w><w>e</w><w>depois</w><w>exibindo</w><w>o</w><w>dicionário</w><w>na</w><w>ordem</w><w>do</w><w>item</w><w>mais</w><w>comum</w><w>para</w><w>o</w><w>menos</w><w>comum</w><pc>.</pc></s></p></div><div type="2" n="3"><head><s xml:id="s_lmBvFZ" corresp="{'counting-frequencies': ['s_2r2FL8']}"><w>Dicionários</w><w>de</w><w>Python</w></s></head><p><s xml:id="s_YFkYpV" corresp="{'counting-frequencies': ['s_HR2jIk']}"><w>Tanto</w><w>strings</w><w>quanto</w><w>listas</w><w>são</w><w>ordenadas</w><w>sequencialmente</w><w>,</w><w>o</w><w>que</w><w>significa</w><w>que</w><w>pode</w><w>acessar</w><w>seus</w><w>conteúdos</w><w>utilizando</w><w>um</w><w>índice</w><w>(</w><emph><w>index</w></emph><w>)</w><w>,</w><w>um</w><w>número</w><w>que</w><w>começa</w><w>no</w><w>0</w><pc>.</pc></s><s xml:id="s_a27K3S" corresp="{'counting-frequencies': ['s_ETE2jl']}"><w>Caso</w><w>tenha</w><w>uma</w><w>lista</w><w>contendo</w><w>strings</w><w>,</w><w>pode</w><w>utilizar</w><w>um</w><w>par</w><w>de</w><w>índices</w><w>para</w><w>acessar</w><w>uma</w><w>string</w><w>particular</w><w>na</w><w>lista</w><w>,</w><w>e</w><w>depois</w><w>um</w><w>caractere</w><w>particular</w><w>naquela</w><w>string</w><pc>.</pc></s><s xml:id="s_NttorX" corresp="{'counting-frequencies': ['s_ti8Ndx']}"><w>Estude</w><w>os</w><w>exemplos</w><w>abaixo</w><w>:</w></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_3" corresp="code_contar-frequencias-palavras-python_3.txt" rend="block"/></ab><p><s xml:id="s_3Wl6pf" corresp="{'counting-frequencies': ['s_qu6A8I']}"><w>Para</w><w>manter</w><w>controle</w><w>sobre</w><w>as</w><w>frequências</w><w>,</w><w>utilizaremos</w><w>outro</w><w>tipo</w><w>de</w><w>objeto</w><w>Python</w><w>:</w><w>um</w><w>dicionário</w><pc>.</pc></s><s xml:id="s_yKrMIW" corresp="{'counting-frequencies': ['s_aadIfH']}"><w>O</w><w>dicionário</w><w>é</w><w>uma</w><w>coleção</w><w>não</w><w>ordenada</w><w>de</w><w>objetos</w><pc>.</pc></s><s xml:id="s_Ba3B1x" corresp="{'counting-frequencies': ['s_wKIbwG']}"><w>Isso</w><w>significa</w><w>que</w><w>não</w><w>pode</w><w>utilizar</w><w>índices</w><w>para</w><w>recuperar</w><w>seus</w><w>elementos</w><pc>.</pc></s><s xml:id="s_hVuKck" corresp="{'counting-frequencies': ['s_1qlc11']}"><w>Pode</w><w>,</w><w>por</w><w>outro</w><w>lado</w><w>,</w><w>buscá-los</w><w>utilizando</w><w>uma</w><w>chave</w><w>,</w><w>ou</w><emph><w>key</w></emph><w>no</w><w>inglês</w><w>(</w><w>daí</w><w>o</w><w>nome</w><w>``</w><w>dicionário</w><w>''</w><w>)</w><pc>.</pc></s><s xml:id="s_qwHDml" corresp="{'counting-frequencies': ['s_i3dnMi']}"><w>Estude</w><w>o</w><w>exemplo</w><w>a</w><w>seguir</w><w>:</w></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_4" corresp="code_contar-frequencias-palavras-python_4.txt" rend="block"/></ab><p><s xml:id="s_yAS5E1" corresp="{'counting-frequencies': ['s_I9lKEn']}"><w>Dicionários</w><w>podem</w><w>ser</w><w>um</w><w>pouco</w><w>confusos</w><w>para</w><w>um</w><w>novo</w><w>programador</w><pc>.</pc></s><s xml:id="s_MnrEyb" corresp="{'counting-frequencies': ['s_ctHlkv']}"><w>Tente</w><w>pensar</w><w>neles</w><w>como</w><w>um</w><w>dicionário</w><w>de</w><w>idiomas</w><pc>.</pc></s><s xml:id="s_G7xsUG" corresp="{'counting-frequencies': ['s_D44EBY']}"><w>Caso</w><w>não</w><w>saiba</w><w>(</w><w>ou</w><w>não</w><w>se</w><w>lembre</w><w>)</w><w>como</w><w>exatamente</w><w>``</w><emph><w>bijection</w></emph><w>``</w><w>difere</w><w>de</w><w>``</w><emph><w>surjection</w></emph><w>``</w><w>,</w><w>pode</w><w>buscar</w><w>pelos</w><w>dois</w><w>termos</w><w>no</w><emph><w>Oxford</w><w>English</w><w>Dictionary</w></emph><pc>.</pc></s><s xml:id="s_S0PzeG" corresp="{'counting-frequencies': ['s_JxqCwE']}"><w>O</w><w>mesmo</w><w>princípio</w><w>se</w><w>aplica</w><w>quando</w><w>realiza</w><w>um</w><code rend="inline"><w>print</w><w>(</w><w>d</w><w>[</w><w>'olá</w><w>'</w><w>]</w><w>)</w></code><w>exceto</w><w>pelo</w><w>fato</w><w>de</w><w>que</w><w>,</w><w>ao</w><w>invés</w><w>de</w><w>exibir</w><w>uma</w><w>definição</w><w>literária</w><w>,</w><w>ele</w><w>exibe</w><w>o</w><w>valor</w><w>associado</w><w>à</w><w>palavra-chave</w><w>'olá</w><w>'</w><w>,</w><w>conforme</w><w>definido</w><w>por</w><w>você</w><w>quando</w><w>criou</w><w>o</w><w>dicionário</w><w>chamado</w><code rend="inline"><w>d</w></code><pc>.</pc></s><s xml:id="s_A2nxLq" corresp="{'counting-frequencies': ['s_BumUeq']}"><w>Nesse</w><w>caso</w><w>,</w><w>esse</w><w>valor</w><w>é</w><w>``</w><w>0</w><w>''</w><pc>.</pc></s></p><p><s xml:id="s_SDBihf" corresp="{'counting-frequencies': ['s_RffJ2D']}"><w>Observe</w><w>que</w><w>usa</w><w>chaves</w><w>para</w><w>definir</w><w>um</w><w>dicionário</w><w>,</w><w>mas</w><w>colchetes</w><w>para</w><w>acessar</w><w>coisas</w><w>dentro</w><w>dele</w><pc>.</pc></s><s xml:id="s_StkNhs" corresp="{'counting-frequencies': ['s_It73Mr']}"><w>A</w><w>operação</w><code rend="inline"><w>keys</w></code><w>retorna</w><w>uma</w><w>lista</w><w>de</w><w>chaves</w><w>que</w><w>estão</w><w>definidas</w><w>no</w><w>dicionário</w><pc>.</pc></s></p></div><div type="2" n="4"><head><s xml:id="s_sLmAGD" corresp="{'counting-frequencies': ['s_kj6NTX']}"><w>Pares</w><w>Palavra-Frequência</w></s></head><p><s xml:id="s_F8boJS" corresp="{'counting-frequencies': ['s_XkA25z']}"><w>Com</w><w>base</w><w>no</w><w>que</w><w>temos</w><w>até</w><w>agora</w><w>,</w><w>queremos</w><w>uma</w><w>função</w><w>que</w><w>seja</w><w>capaz</w><w>de</w><w>converter</w><w>uma</w><w>lista</w><w>de</w><w>palavras</w><w>em</w><w>um</w><w>dicionário</w><w>de</w><w>pares</w><w>palavra-frequência</w><pc>.</pc></s><s xml:id="s_1WF9p7" corresp="{'counting-frequencies': ['s_Torl8d']}"><w>O</w><w>único</w><w>comando</w><w>novo</w><w>que</w><w>vamos</w><w>precisar</w><w>é</w><code rend="inline"><w>dict</w></code><w>,</w><w>que</w><w>faz</w><w>um</w><w>dicionário</w><w>a</w><w>partir</w><w>de</w><w>uma</w><w>lista</w><w>de</w><w>pares</w><pc>.</pc></s><s xml:id="s_oEwYzv" corresp="{'counting-frequencies': ['s_k6EEJt']}"><w>Copie</w><w>o</w><w>código</w><w>a</w><w>seguir</w><w>e</w><w>adicione-o</w><w>ao</w><w>módulo</w><code rend="inline"><w>obo.py</w></code><w>:</w></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_5" corresp="code_contar-frequencias-palavras-python_5.txt" rend="block"/></ab><p><s xml:id="s_9al8rQ" corresp="{'counting-frequencies': ['s_3tmsGA']}"><w>Também</w><w>vamos</w><w>querer</w><w>uma</w><w>função</w><w>que</w><w>seja</w><w>capaz</w><w>de</w><w>ordenar</w><w>o</w><w>dicionário</w><w>de</w><w>pares</w><w>palavra-frequência</w><w>por</w><w>frequência</w><w>decrescente</w><pc>.</pc></s><s xml:id="s_E5byES" corresp="{'counting-frequencies': ['s_n91nqz']}"><w>Copie</w><w>o</w><w>código</w><w>a</w><w>seguir</w><w>e</w><w>adicione-o</w><w>também</w><w>ao</w><w>módulo</w><code rend="inline"><w>obo.py</w></code><w>:</w></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_6" corresp="code_contar-frequencias-palavras-python_6.txt" rend="block"/></ab><p><s xml:id="s_OI1o0c" corresp="{'counting-frequencies': ['s_fMICtK']}"><w>Agora</w><w>podemos</w><w>escrever</w><w>um</w><w>programa</w><w>que</w><w>recebe</w><w>uma</w><w>URL</w><w>e</w><w>retorna</w><w>pares</w><w>palavra-frequência</w><w>para</w><w>a</w><w>página</w><w>web</w><w>,</w><w>de</w><w>acordo</w><w>com</w><w>a</w><w>ordem</w><w>decrescente</w><w>de</w><w>frequência</w><pc>.</pc></s><s xml:id="s_HOlIAd" corresp="{'counting-frequencies': ['s_kojCem', 's_G2DYp1']}"><w>Copie</w><w>o</w><w>programa</w><w>a</w><w>seguir</w><w>no</w><w>Komodo</w><w>Edit</w><w>,</w><w>armazene-o</w><w>como</w><code rend="inline"><w>html-to-freq.py</w></code><w>e</w><w>execute-o.</w><w>Estude</w><w>o</w><w>programa</w><w>e</w><w>seu</w><w>resultado</w><w>cuidadosamente</w><w>antes</w><w>de</w><w>continuar</w><pc>.</pc></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_7" corresp="code_contar-frequencias-palavras-python_7.txt" rend="block"/></ab></div><div type="2" n="5"><head><s xml:id="s_IQZKFz" corresp="{'counting-frequencies': ['s_FF9nAM']}"><w>Removendo</w><emph><w>Stop</w><w>Words</w></emph></s></head><p><s xml:id="s_wYltxb" corresp="{'counting-frequencies': ['s_4Kv75B']}"><w>Quando</w><w>vemos</w><w>o</w><w>resultado</w><w>do</w><w>nosso</w><w>programa</w><code rend="inline"><w>html-to-freq.py</w></code><w>,</w><w>verificamos</w><w>que</w><w>muitas</w><w>das</w><w>palavras</w><w>mais</w><w>frequentes</w><w>no</w><w>texto</w><w>são</w><w>palavras</w><w>funcionais</w><w>como</w><emph><w>the</w></emph><w>,</w><emph><w>of</w></emph><w>,</w><emph><w>to</w></emph><w>e</w><emph><w>and</w></emph><pc>.</pc></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_8" corresp="code_contar-frequencias-palavras-python_8.txt" rend="block"/></ab><p><s xml:id="s_nKIpw4" corresp="{'counting-frequencies': ['s_5FsS7M']}"><w>Essas</w><w>palavras</w><w>são</w><w>geralmente</w><w>as</w><w>mais</w><w>comuns</w><w>em</w><w>qualquer</w><w>texto</w><w>de</w><w>língua</w><w>inglesa</w><w>,</w><w>então</w><w>elas</w><w>não</w><w>nos</w><w>dizem</w><w>muito</w><w>a</w><w>respeito</w><w>do</w><w>julgamento</w><w>de</w><w>Bowsey</w><pc>.</pc></s><s xml:id="s_xqnl2B" corresp="{'counting-frequencies': ['s_JPVtpR']}"><w>Em</w><w>geral</w><w>,</w><w>estamos</w><w>mais</w><w>interessados</w><w>em</w><w>encontrar</w><w>as</w><w>palavras</w><w>que</w><w>nos</w><w>auxiliarão</w><w>a</w><w>diferenciar</w><w>esse</w><w>texto</w><w>de</w><w>outros</w><w>textos</w><w>sobre</w><w>assuntos</w><w>distintos</w><pc>.</pc></s><s xml:id="s_3CYvpq" corresp="{'counting-frequencies': ['s_8izn9b']}"><w>Desse</w><w>modo</w><w>,</w><w>vamos</w><w>remover</w><w>as</w><w>palavras</w><w>funcionais</w><w>comuns</w><pc>.</pc></s><s xml:id="s_eyz5IR" corresp="{'counting-frequencies': ['s_gYBhDj']}"><w>Palavras</w><w>que</w><w>são</w><w>ignoradas</w><w>dessa</w><w>forma</w><w>são</w><w>conhecidas</w><w>como</w><emph><w>stopwords</w></emph><ref type="footnotemark" target="#pt_note_1"/><pc>.</pc></s><s xml:id="s_1RIsOf" corresp="{'counting-frequencies': ['s_qFslkm']}"><w>Utilizaremos</w><w>a</w><w>lista</w><w>a</w><w>seguir</w><w>,</w><w>adaptada</w><w>de</w><w>uma</w><w>publicação</w><emph><w>online</w></emph><w>por</w><ref target="http://ir.dcs.gla.ac.uk/resources/linguistic_utils/stop_words"><w>cientistas</w><w>da</w><w>computação</w><w>em</w><w>Glasgow</w></ref><pc>.</pc></s><s xml:id="s_h9aHdm" corresp="{'counting-frequencies': ['s_FuUzOE']}"><w>Copie-a</w><w>e</w><w>adicione-a</w><w>no</w><w>início</w><w>da</w><w>biblioteca</w><code rend="inline"><w>obo.py</w></code><w>que</w><w>está</w><w>construindo</w><pc>.</pc></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_9" corresp="code_contar-frequencias-palavras-python_9.txt" rend="block"/></ab><p><s xml:id="s_DDB7On" corresp="{'counting-frequencies': ['s_qzWWZU']}"><w>Agora</w><w>,</w><w>livrar-se</w><w>das</w><emph><w>stop</w><w>words</w></emph><w>em</w><w>uma</w><w>lista</w><w>é</w><w>fácil</w><w>:</w><w>basta</w><w>usar</w><w>outra</w><emph><w>list</w><w>comprehension</w></emph><pc>.</pc></s><s xml:id="s_Kdpj1n" corresp="{'counting-frequencies': ['s_QTGea3']}"><w>Adicione</w><w>também</w><w>essa</w><w>função</w><w>ao</w><w>módulo</w><code rend="inline"><w>obo.py</w></code><w>:</w></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_10" corresp="code_contar-frequencias-palavras-python_10.txt" rend="block"/></ab></div><div type="2" n="6"><head><s xml:id="s_l3S9ZE" corresp="{'counting-frequencies': ['s_Q7KueJ']}"><w>Juntando</w><w>Tudo</w></s></head><p><s xml:id="s_F0rod7" corresp="{'counting-frequencies': ['s_4pFEAC']}"><w>Agora</w><w>temos</w><w>tudo</w><w>o</w><w>que</w><w>precisamos</w><w>para</w><w>determinar</w><w>frequências</w><w>de</w><w>palavras</w><w>para</w><w>páginas</w><w>web</w><pc>.</pc></s><s xml:id="s_RxGrM6" corresp="{'counting-frequencies': ['s_KqAxVv']}"><w>Copie</w><w>o</w><w>código</w><w>a</w><w>seguir</w><w>no</w><w>Komodo</w><w>Edit</w><w>,</w><w>armazene-o</w><w>como</w><code rend="inline"><w>html-to-freq-2.py</w></code><w>e</w><w>execute-o</w><w>:</w></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_11" corresp="code_contar-frequencias-palavras-python_11.txt" rend="block"/></ab><p><s xml:id="s_j0M3Jd" corresp="{'counting-frequencies': ['s_s8464E']}"><w>Se</w><w>tudo</w><w>correu</w><w>bem</w><w>,</w><w>sua</w><w>saída</w><w>deve-se</w><w>parecer</w><w>com</w><w>isto</w><w>:</w></s></p><ab><code lang="language-python" xml:id="code_contar-frequencias-palavras-python_12" corresp="code_contar-frequencias-palavras-python_12.txt" rend="block"/></ab></div><div type="2" n="7"><head><s xml:id="s_fXVwja" corresp="{'counting-frequencies': ['s_9HLY2i']}"><w>Leituras</w><w>Sugeridas</w></s></head><p><s xml:id="s_6VGQVb" corresp="{'counting-frequencies': ['s_vYMsWF']}"><w>Lutz</w><w>,</w><w>Learning</w><w>Python</w></s></p><list type="unordered"><item><s xml:id="s_kEWlyI" corresp="{'counting-frequencies': ['s_9BIksl']}"><w>Ch</w><pc>.</pc></s><s xml:id="s_bTS2zU" corresp="{'counting-frequencies': ['s_O0bXVn']}"><w>9</w><w>:</w><w>Tuples</w><w>,</w><w>Files</w><w>,</w><w>and</w><w>Everything</w><w>Else</w></s></item><item><s xml:id="s_TyOPRY" corresp="{'counting-frequencies': ['s_1KOhkI']}"><w>Ch</w><pc>.</pc></s><s xml:id="s_X27yTm" corresp="{'counting-frequencies': ['s_8TIHTT']}"><w>11</w><w>:</w><w>Assignment</w><w>,</w><w>Expressions</w><w>,</w><w>and</w><w>print</w></s></item><item><s xml:id="s_sg5dXh" corresp="{'counting-frequencies': ['s_0uNOEB']}"><w>Ch</w><pc>.</pc></s><s xml:id="s_Owa7mD" corresp="{'counting-frequencies': ['s_UWhOgM']}"><w>12</w><w>:</w><w>if</w><w>Tests</w></s></item><item><s xml:id="s_LyDlkK" corresp="{'counting-frequencies': ['s_VOxPqE']}"><w>Ch</w><pc>.</pc></s><s xml:id="s_PYqAv8" corresp="{'counting-frequencies': ['s_dusDUJ']}"><w>13</w><w>:</w><w>while</w><w>and</w><w>for</w><w>Loops</w></s></item></list><p><s xml:id="s_AgmcbD" corresp="{'counting-frequencies': ['s_JkcSFC']}"><w>Pilgrim</w><w>,</w><w>Diving</w><w>into</w><w>Python</w></s></p><list type="unordered"><item><s xml:id="s_AsbLW2" corresp="{'counting-frequencies': ['s_Wq1Jct']}"><w>Ch</w><pc>.</pc></s><s xml:id="s_2W9xKr" corresp="{'counting-frequencies': ['s_B4VaXg']}"><w>7</w><w>:</w><ref target="https://web.archive.org/web/20180416143856/http://www.diveintopython.net/regular_expressions/index.html"><w>Regular</w><w>Expressions</w></ref></s></item></list></div><div type="2" n="8"><head><s xml:id="s_DR4HPZ" corresp="{'counting-frequencies': ['s_LY6usA']}"><w>Sincronização</w><w>de</w><w>Código</w></s></head><p><s xml:id="s_w8ZimP" corresp="{'counting-frequencies': ['s_mZpWkC']}"><w>Para</w><w>acompanhar</w><w>lições</w><w>futuras</w><w>,</w><w>é</w><w>importante</w><w>ter</w><w>os</w><w>ficheiros</w><w>e</w><w>programas</w><w>corretos</w><w>no</w><w>seu</w><w>diretório</w><w>“</w><w>programming-historian</w><w>”</w><pc>.</pc></s><s xml:id="s_He7Ltt" corresp="{'counting-frequencies': ['s_SGAvfl']}"><w>No</w><w>final</w><w>de</w><w>cada</w><w>lição</w><w>,</w><w>é</w><w>possível</w><w>fazer</w><w>o</w><emph><w>download</w></emph><w>do</w><w>ficheiro</w><w>zip</w><w>“</w><w>programming-historian</w><w>”</w><w>para</w><w>garantir</w><w>que</w><w>possui</w><w>o</w><w>código</w><w>correto</w><pc>.</pc></s></p><list type="unordered"><item><s xml:id="s_SZzDMi" corresp="{'counting-frequencies': ['s_OosUHW']}"><w>programming-historian-5</w><w>(</w><ref target="https://programminghistorian.org/assets/python-lessons5.zip"><w>zip</w><w>sync</w></ref><w>)</w></s></item></list><p><s xml:id="s_DCyWby" corresp="{'counting-frequencies': []}"><ref type="footnotemark" target="#pt_note_1"/><w>:</w><w>Na</w><w>língua</w><w>portuguesa</w><w>,</w><w>palavras</w><w>similares</w><w>seriam</w><w>``</w><w>e</w><w>''</w><w>,</w><w>``</w><w>de</w><w>''</w><w>,</w><w>``</w><w>da</w><w>''</w><w>,</w><w>``</w><w>do</w><w>''</w><w>,</w><w>``</w><w>um</w><w>''</w><w>,</w><w>``</w><w>uma</w><w>''</w><w>,</w><w>dentre</w><w>outras</w><w>,</w><w>a</w><w>depender</w><w>de</w><w>cada</w><w>caso</w><pc>.</pc></s></p></div></body>
-    </text>
+<?xml version="1.0" encoding="utf-8"?>
+<TEI type="translation" xml:base="contar-frequencias-palavras-python/contar-frequencias-palavras-python/contar-frequencias-palavras-python.xml" xml:id="contar-frequencias-palavras-python" xmlns:="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+ <teiHeader>
+  <fileDesc>
+   <titleStmt>
+    <title>
+     Contagem de Frequências de Palavras com Python
+    </title>
+    <author role="original_author">
+     <persName>
+      William J. Turkel
+     </persName>
+     <persName>
+      Adam Crymble
+     </persName>
+    </author>
+    <editor role="reviewers">
+     <persName>
+      Jim Clifford
+     </persName>
+     <persName>
+      Frederik Elwert
+     </persName>
+    </editor>
+    <author role="translators">
+     Felipe Lamarca
+    </author>
+    <editor role="translation-reviewers">
+     <persName>
+      Ana Carolina Erthal
+     </persName>
+     <persName>
+      Joana Vieira Paulino
+     </persName>
+    </editor>
+    <editor role="editors">
+     Miriam Posner
+    </editor>
+   </titleStmt>
+   <publicationStmt>
+    <distributor>
+     Programming Historian
+    </distributor>
+    <date type="translated">
+     01/13/2022
+    </date>
+    <idno type="doi">
+     10.46430/phpt0023
+    </idno>
+    <date type="published">
+     07/17/2012
+    </date>
+   </publicationStmt>
+   <sourceDesc>
+    <p>
+     Born digital, in a markdown format. Original file:
+     <ref target="#counting-frequencies" type="original_file"/>
+     .
+    </p>
+    <p>
+     There are other translations:
+     <ref target="#decomptes-de-frequences-de-mots-en-python #contar-frecuencias"/>
+    </p>
+   </sourceDesc>
+  </fileDesc>
+  <profileDesc>
+   <abstract>
+    <p>
+     Contar a frequência de palavras específicas de uma lista pode fornecer dados esclarecedores. Esta lição ensinará uma maneira fácil de contar essas frequências com Python.
+    </p>
+   </abstract>
+   <textClass>
+    <keywords>
+     <term xml:lang="en">
+      python
+     </term>
+    </keywords>
+   </textClass>
+  </profileDesc>
+ </teiHeader>
+ <text xml:lang="pt">
+  <body>
+   <div n="1" type="2">
+    <head>
+     <s xml:id="s_yZVZgw">
+      <w>Objetivos</w>
+      <w>da</w>
+      <w>Lição</w>
+     </s>
+    </head>
+    <p>
+     <s xml:id="s_YSqP8b">
+      <w>Sua</w>
+      <w>lista</w>
+      <w>agora</w>
+      <w>está</w>
+      <w>limpa</w>
+      <w>o</w>
+      <w>suficiente</w>
+      <w>para</w>
+      <w>que</w>
+      <w>possa</w>
+      <w>começar</w>
+      <w>a</w>
+      <w>analisar</w>
+      <w>seu</w>
+      <w>conteúdo</w>
+      <w>de</w>
+      <w>maneiras</w>
+      <w>significativas</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_cRbjeR">
+      <w>Contar</w>
+      <w>a</w>
+      <w>frequência</w>
+      <w>de</w>
+      <w>palavras</w>
+      <w>específicas</w>
+      <w>de</w>
+      <w>uma</w>
+      <w>lista</w>
+      <w>pode</w>
+      <w>fornecer</w>
+      <w>dados</w>
+      <w>esclarecedores</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_kLYlMF">
+      <w>Python</w>
+      <w>possui</w>
+      <w>uma</w>
+      <w>maneira</w>
+      <w>fácil</w>
+      <w>de</w>
+      <w>contar</w>
+      <w>frequências</w>
+      <w>,</w>
+      <w>mas</w>
+      <w>requer</w>
+      <w>o</w>
+      <w>uso</w>
+      <w>de</w>
+      <w>um</w>
+      <w>novo</w>
+      <w>tipo</w>
+      <w>de</w>
+      <w>variável</w>
+      <w>:</w>
+      <w>o</w>
+      <emph>
+       <w>dicionário</w>
+      </emph>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_uYwOJH">
+      <w>Antes</w>
+      <w>de</w>
+      <w>começar</w>
+      <w>a</w>
+      <w>trabalhar</w>
+      <w>com</w>
+      <w>um</w>
+      <w>dicionário</w>
+      <w>,</w>
+      <w>considere</w>
+      <w>os</w>
+      <w>processos</w>
+      <w>utilizados</w>
+      <w>para</w>
+      <w>calcular</w>
+      <w>frequências</w>
+      <w>em</w>
+      <w>uma</w>
+      <w>lista</w>
+      <pc>.</pc>
+     </s>
+    </p>
+    <div n="1.1" type="3">
+     <head>
+      <s xml:id="s_0sxUiF">
+       <w>Ficheiros</w>
+       <w>Necessários</w>
+       <w>para</w>
+       <w>esta</w>
+       <w>Lição</w>
+      </s>
+     </head>
+     <list type="unordered">
+      <item>
+       <code rend="inline">
+        <w>obo.py</w>
+       </code>
+      </item>
+     </list>
+     <p>
+      <s xml:id="s_y3FCaB">
+       <w>Caso</w>
+       <w>não</w>
+       <w>possua</w>
+       <w>esse</w>
+       <w>ficheiro</w>
+       <w>,</w>
+       <w>pode</w>
+       <w>fazer</w>
+       <w>o</w>
+       <emph>
+        <w>download</w>
+       </emph>
+       <w>do</w>
+       <w>ficheiro</w>
+       <w>(</w>
+       <ref target="https://programminghistorian.org/assets/python-lessons4.zip">
+        <w>zip</w>
+       </ref>
+       <w>)</w>
+       <w>que</w>
+       <w>contém</w>
+       <w>todo</w>
+       <w>o</w>
+       <w>código</w>
+       <w>das</w>
+       <w>lições</w>
+       <w>anteriores</w>
+       <w>desta</w>
+       <w>série</w>
+       <pc>.</pc>
+      </s>
+     </p>
+    </div>
+   </div>
+   <div n="2" type="2">
+    <head>
+     <s xml:id="s_xGrRp1">
+      <w>Frequências</w>
+     </s>
+    </head>
+    <p>
+     <s xml:id="s_4oluCe">
+      <w>Agora</w>
+      <w>desejamos</w>
+      <w>contar</w>
+      <w>a</w>
+      <w>frequência</w>
+      <w>de</w>
+      <w>cada</w>
+      <w>palavra</w>
+      <w>em</w>
+      <w>nossa</w>
+      <w>lista</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_oO9JwZ">
+      <w>Já</w>
+      <w>viu</w>
+      <w>que</w>
+      <w>é</w>
+      <w>fácil</w>
+      <w>de</w>
+      <w>processar</w>
+      <w>uma</w>
+      <w>lista</w>
+      <w>utilizando</w>
+      <w>um</w>
+      <code rend="inline">
+       <w>for</w>
+      </code>
+      <emph>
+       <w>loop</w>
+      </emph>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_hVHjDu">
+      <w>Tente</w>
+      <w>salvar</w>
+      <w>e</w>
+      <w>executar</w>
+      <w>o</w>
+      <w>exemplo</w>
+      <w>a</w>
+      <w>seguir</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_Te0699">
+      <w>Lembre-se</w>
+      <w>de</w>
+      <w>que</w>
+      <code rend="inline">
+       <w>+=</w>
+      </code>
+      <w>informa</w>
+      <w>ao</w>
+      <w>programa</w>
+      <w>para</w>
+      <w>acrescentar</w>
+      <w>algo</w>
+      <w>ao</w>
+      <w>final</w>
+      <w>de</w>
+      <w>uma</w>
+      <w>variável</w>
+      <w>existente</w>
+      <pc>.</pc>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_0.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_0"/>
+    </ab>
+    <p>
+     <s xml:id="s_U9AOdC">
+      <w>Aqui</w>
+      <w>,</w>
+      <w>começamos</w>
+      <w>com</w>
+      <w>uma</w>
+      <w>string</w>
+      <w>e</w>
+      <w>separamo-la</w>
+      <w>em</w>
+      <w>uma</w>
+      <w>lista</w>
+      <w>,</w>
+      <w>como</w>
+      <w>fizemos</w>
+      <w>anteriormente</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_tWFXZt">
+      <w>Depois</w>
+      <w>disso</w>
+      <w>criamos</w>
+      <w>uma</w>
+      <w>lista</w>
+      <w>(</w>
+      <w>inicialmente</w>
+      <w>vazia</w>
+      <w>)</w>
+      <w>chamada</w>
+      <code rend="inline">
+       <w>wordfreq</w>
+      </code>
+      <w>,</w>
+      <w>percorremos</w>
+      <w>cada</w>
+      <w>palavra</w>
+      <w>na</w>
+      <code rend="inline">
+       <w>wordlist</w>
+      </code>
+      <w>e</w>
+      <w>contamos</w>
+      <w>o</w>
+      <w>número</w>
+      <w>de</w>
+      <w>vezes</w>
+      <w>que</w>
+      <w>aquela</w>
+      <w>palavra</w>
+      <w>aparece</w>
+      <w>em</w>
+      <w>toda</w>
+      <w>a</w>
+      <w>lista</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_elAkSD">
+      <w>Então</w>
+      <w>,</w>
+      <w>adicionamos</w>
+      <w>a</w>
+      <w>contagem</w>
+      <w>de</w>
+      <w>cada</w>
+      <w>palavra</w>
+      <w>à</w>
+      <w>nossa</w>
+      <w>lista</w>
+      <code rend="inline">
+       <w>wordfreq</w>
+      </code>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_FUDcuP">
+      <w>Utilizando</w>
+      <w>a</w>
+      <w>operação</w>
+      <code rend="inline">
+       <w>zip</w>
+      </code>
+      <w>,</w>
+      <w>somos</w>
+      <w>capazes</w>
+      <w>de</w>
+      <w>combinar</w>
+      <w>a</w>
+      <w>primeira</w>
+      <w>palavra</w>
+      <w>da</w>
+      <w>lista</w>
+      <w>de</w>
+      <w>palavras</w>
+      <w>com</w>
+      <w>o</w>
+      <w>primeiro</w>
+      <w>número</w>
+      <w>na</w>
+      <w>lista</w>
+      <w>de</w>
+      <w>frequências</w>
+      <w>,</w>
+      <w>a</w>
+      <w>segunda</w>
+      <w>palavra</w>
+      <w>e</w>
+      <w>a</w>
+      <w>segunda</w>
+      <w>frequência</w>
+      <w>e</w>
+      <w>assim</w>
+      <w>por</w>
+      <w>diante</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_GUYW69">
+      <w>Terminamos</w>
+      <w>com</w>
+      <w>uma</w>
+      <w>lista</w>
+      <w>de</w>
+      <w>pares</w>
+      <w>de</w>
+      <w>palavras</w>
+      <w>e</w>
+      <w>frequências</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_VMXsbI">
+      <w>A</w>
+      <w>função</w>
+      <code rend="inline">
+       <w>str</w>
+      </code>
+      <w>converte</w>
+      <w>qualquer</w>
+      <w>objeto</w>
+      <w>numa</w>
+      <w>string</w>
+      <w>para</w>
+      <w>que</w>
+      <w>ele</w>
+      <w>possa</w>
+      <w>ser</w>
+      <w>exibido</w>
+      <pc>.</pc>
+     </s>
+    </p>
+    <p>
+     <s xml:id="s_DdKsDS">
+      <w>Deve</w>
+      <w>obter</w>
+      <w>algo</w>
+      <w>assim</w>
+      <w>:</w>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_1.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_1"/>
+    </ab>
+    <p>
+     <s xml:id="s_pKkbvO">
+      <w>Valerá</w>
+      <w>a</w>
+      <w>pena</w>
+      <w>estudar</w>
+      <w>o</w>
+      <w>código</w>
+      <w>acima</w>
+      <w>até</w>
+      <w>entendê-lo</w>
+      <w>antes</w>
+      <w>de</w>
+      <w>continuar</w>
+      <pc>.</pc>
+     </s>
+    </p>
+    <p>
+     <s xml:id="s_sHzpw2">
+      <w>O</w>
+      <w>Python</w>
+      <w>também</w>
+      <w>inclui</w>
+      <w>uma</w>
+      <w>ferramenta</w>
+      <w>muito</w>
+      <w>conveniente</w>
+      <w>chamada</w>
+      <emph>
+       <ref target="http://docs.python.org/tutorial/datastructures.html#list-comprehensions">
+        <w>list</w>
+        <w>comprehension</w>
+       </ref>
+      </emph>
+      <w>(</w>
+      <w>ver</w>
+      <w>uma</w>
+      <w>explicação</w>
+      <w>do</w>
+      <w>método</w>
+      <w>de</w>
+      <ref target="https://pt.wikipedia.org/wiki/Compreens%C3%A3o_de_lista">
+       <w>compreensão</w>
+       <w>de</w>
+       <w>lista</w>
+      </ref>
+      <w>em</w>
+      <w>português</w>
+      <w>)</w>
+      <w>,</w>
+      <w>que</w>
+      <w>pode</w>
+      <w>ser</w>
+      <w>utilizada</w>
+      <w>para</w>
+      <w>fazer</w>
+      <w>o</w>
+      <w>mesmo</w>
+      <w>que</w>
+      <w>um</w>
+      <code rend="inline">
+       <w>for</w>
+      </code>
+      <emph>
+       <w>loop</w>
+      </emph>
+      <w>de</w>
+      <w>maneira</w>
+      <w>mais</w>
+      <w>económica</w>
+      <pc>.</pc>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_2.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_2"/>
+    </ab>
+    <p>
+     <s xml:id="s_AdwaHP">
+      <w>Se</w>
+      <w>estudar</w>
+      <w>esse</w>
+      <w>método</w>
+      <w>de</w>
+      <w>compreensão</w>
+      <w>de</w>
+      <w>lista</w>
+      <w>cuidadosamente</w>
+      <w>,</w>
+      <w>descobrirá</w>
+      <w>que</w>
+      <w>ele</w>
+      <w>faz</w>
+      <w>exatamente</w>
+      <w>o</w>
+      <w>mesmo</w>
+      <w>que</w>
+      <w>o</w>
+      <code rend="inline">
+       <w>for</w>
+      </code>
+      <emph>
+       <w>loop</w>
+      </emph>
+      <w>no</w>
+      <w>exemplo</w>
+      <w>anterior</w>
+      <w>,</w>
+      <w>mas</w>
+      <w>de</w>
+      <w>maneira</w>
+      <w>condensada</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_EdcFxZ">
+      <w>Qualquer</w>
+      <w>um</w>
+      <w>dos</w>
+      <w>métodos</w>
+      <w>funcionará</w>
+      <w>bem</w>
+      <w>,</w>
+      <w>então</w>
+      <w>use</w>
+      <w>a</w>
+      <w>versão</w>
+      <w>com</w>
+      <w>a</w>
+      <w>qual</w>
+      <w>se</w>
+      <w>sente</w>
+      <w>mais</w>
+      <w>confortável</w>
+      <pc>.</pc>
+     </s>
+    </p>
+    <p>
+     <s xml:id="s_CzvQLe">
+      <w>Em</w>
+      <w>geral</w>
+      <w>é</w>
+      <w>prudente</w>
+      <w>utilizar</w>
+      <w>um</w>
+      <w>código</w>
+      <w>que</w>
+      <w>entenda</w>
+      <w>ao</w>
+      <w>invés</w>
+      <w>de</w>
+      <w>um</w>
+      <w>código</w>
+      <w>que</w>
+      <w>seja</w>
+      <w>executado</w>
+      <w>mais</w>
+      <w>rapidamente</w>
+      <pc>.</pc>
+     </s>
+    </p>
+    <p>
+     <s xml:id="s_nOU3bE">
+      <w>Neste</w>
+      <w>ponto</w>
+      <w>,</w>
+      <w>temos</w>
+      <w>uma</w>
+      <w>lista</w>
+      <w>de</w>
+      <w>pares</w>
+      <w>,</w>
+      <w>onde</w>
+      <w>cada</w>
+      <w>par</w>
+      <w>contém</w>
+      <w>uma</w>
+      <w>palavra</w>
+      <w>e</w>
+      <w>sua</w>
+      <w>frequência</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_GtzbAC">
+      <w>Essa</w>
+      <w>lista</w>
+      <w>é</w>
+      <w>um</w>
+      <w>pouco</w>
+      <w>redundante</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_Qzx20H">
+      <w>Se</w>
+      <w>'the</w>
+      <w>'</w>
+      <w>ocorre</w>
+      <w>500</w>
+      <w>vezes</w>
+      <w>,</w>
+      <w>então</w>
+      <w>essa</w>
+      <w>lista</w>
+      <w>contém</w>
+      <w>quinhentas</w>
+      <w>cópias</w>
+      <w>do</w>
+      <w>par</w>
+      <w>(</w>
+      <w>'the</w>
+      <w>'</w>
+      <w>,</w>
+      <w>500</w>
+      <w>)</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_w9UEe4">
+      <w>Essa</w>
+      <w>lista</w>
+      <w>também</w>
+      <w>está</w>
+      <w>ordenada</w>
+      <w>pelas</w>
+      <w>palavras</w>
+      <w>no</w>
+      <w>texto</w>
+      <w>original</w>
+      <w>,</w>
+      <w>ao</w>
+      <w>invés</w>
+      <w>de</w>
+      <w>listar</w>
+      <w>as</w>
+      <w>palavras</w>
+      <w>na</w>
+      <w>ordem</w>
+      <w>da</w>
+      <w>mais</w>
+      <w>frequente</w>
+      <w>para</w>
+      <w>a</w>
+      <w>menos</w>
+      <w>frequente</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_NmS9PC">
+      <w>Podemos</w>
+      <w>resolver</w>
+      <w>esses</w>
+      <w>problemas</w>
+      <w>convertendo-a</w>
+      <w>em</w>
+      <w>um</w>
+      <w>dicionário</w>
+      <w>,</w>
+      <w>e</w>
+      <w>depois</w>
+      <w>exibindo</w>
+      <w>o</w>
+      <w>dicionário</w>
+      <w>na</w>
+      <w>ordem</w>
+      <w>do</w>
+      <w>item</w>
+      <w>mais</w>
+      <w>comum</w>
+      <w>para</w>
+      <w>o</w>
+      <w>menos</w>
+      <w>comum</w>
+      <pc>.</pc>
+     </s>
+    </p>
+   </div>
+   <div n="3" type="2">
+    <head>
+     <s xml:id="s_quttXD">
+      <w>Dicionários</w>
+      <w>de</w>
+      <w>Python</w>
+     </s>
+    </head>
+    <p>
+     <s xml:id="s_cuK5he">
+      <w>Tanto</w>
+      <w>strings</w>
+      <w>quanto</w>
+      <w>listas</w>
+      <w>são</w>
+      <w>ordenadas</w>
+      <w>sequencialmente</w>
+      <w>,</w>
+      <w>o</w>
+      <w>que</w>
+      <w>significa</w>
+      <w>que</w>
+      <w>pode</w>
+      <w>acessar</w>
+      <w>seus</w>
+      <w>conteúdos</w>
+      <w>utilizando</w>
+      <w>um</w>
+      <w>índice</w>
+      <w>(</w>
+      <emph>
+       <w>index</w>
+      </emph>
+      <w>)</w>
+      <w>,</w>
+      <w>um</w>
+      <w>número</w>
+      <w>que</w>
+      <w>começa</w>
+      <w>no</w>
+      <w>0</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_LU0NdV">
+      <w>Caso</w>
+      <w>tenha</w>
+      <w>uma</w>
+      <w>lista</w>
+      <w>contendo</w>
+      <w>strings</w>
+      <w>,</w>
+      <w>pode</w>
+      <w>utilizar</w>
+      <w>um</w>
+      <w>par</w>
+      <w>de</w>
+      <w>índices</w>
+      <w>para</w>
+      <w>acessar</w>
+      <w>uma</w>
+      <w>string</w>
+      <w>particular</w>
+      <w>na</w>
+      <w>lista</w>
+      <w>,</w>
+      <w>e</w>
+      <w>depois</w>
+      <w>um</w>
+      <w>caractere</w>
+      <w>particular</w>
+      <w>naquela</w>
+      <w>string</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_L9PShE">
+      <w>Estude</w>
+      <w>os</w>
+      <w>exemplos</w>
+      <w>abaixo</w>
+      <w>:</w>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_3.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_3"/>
+    </ab>
+    <p>
+     <s xml:id="s_sjLP6c">
+      <w>Para</w>
+      <w>manter</w>
+      <w>controle</w>
+      <w>sobre</w>
+      <w>as</w>
+      <w>frequências</w>
+      <w>,</w>
+      <w>utilizaremos</w>
+      <w>outro</w>
+      <w>tipo</w>
+      <w>de</w>
+      <w>objeto</w>
+      <w>Python</w>
+      <w>:</w>
+      <w>um</w>
+      <w>dicionário</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_CYL8QG">
+      <w>O</w>
+      <w>dicionário</w>
+      <w>é</w>
+      <w>uma</w>
+      <w>coleção</w>
+      <w>não</w>
+      <w>ordenada</w>
+      <w>de</w>
+      <w>objetos</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_W2tHq2">
+      <w>Isso</w>
+      <w>significa</w>
+      <w>que</w>
+      <w>não</w>
+      <w>pode</w>
+      <w>utilizar</w>
+      <w>índices</w>
+      <w>para</w>
+      <w>recuperar</w>
+      <w>seus</w>
+      <w>elementos</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_F2W9fG">
+      <w>Pode</w>
+      <w>,</w>
+      <w>por</w>
+      <w>outro</w>
+      <w>lado</w>
+      <w>,</w>
+      <w>buscá-los</w>
+      <w>utilizando</w>
+      <w>uma</w>
+      <w>chave</w>
+      <w>,</w>
+      <w>ou</w>
+      <emph>
+       <w>key</w>
+      </emph>
+      <w>no</w>
+      <w>inglês</w>
+      <w>(</w>
+      <w>daí</w>
+      <w>o</w>
+      <w>nome</w>
+      <w>``</w>
+      <w>dicionário</w>
+      <w>''</w>
+      <w>)</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_mI4VIw">
+      <w>Estude</w>
+      <w>o</w>
+      <w>exemplo</w>
+      <w>a</w>
+      <w>seguir</w>
+      <w>:</w>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_4.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_4"/>
+    </ab>
+    <p>
+     <s xml:id="s_btEX36">
+      <w>Dicionários</w>
+      <w>podem</w>
+      <w>ser</w>
+      <w>um</w>
+      <w>pouco</w>
+      <w>confusos</w>
+      <w>para</w>
+      <w>um</w>
+      <w>novo</w>
+      <w>programador</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_N7jg1l">
+      <w>Tente</w>
+      <w>pensar</w>
+      <w>neles</w>
+      <w>como</w>
+      <w>um</w>
+      <w>dicionário</w>
+      <w>de</w>
+      <w>idiomas</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_K4GTPo">
+      <w>Caso</w>
+      <w>não</w>
+      <w>saiba</w>
+      <w>(</w>
+      <w>ou</w>
+      <w>não</w>
+      <w>se</w>
+      <w>lembre</w>
+      <w>)</w>
+      <w>como</w>
+      <w>exatamente</w>
+      <w>``</w>
+      <emph>
+       <w>bijection</w>
+      </emph>
+      <w>``</w>
+      <w>difere</w>
+      <w>de</w>
+      <w>``</w>
+      <emph>
+       <w>surjection</w>
+      </emph>
+      <w>``</w>
+      <w>,</w>
+      <w>pode</w>
+      <w>buscar</w>
+      <w>pelos</w>
+      <w>dois</w>
+      <w>termos</w>
+      <w>no</w>
+      <emph>
+       <w>Oxford</w>
+       <w>English</w>
+       <w>Dictionary</w>
+      </emph>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_Ws5MDv">
+      <w>O</w>
+      <w>mesmo</w>
+      <w>princípio</w>
+      <w>se</w>
+      <w>aplica</w>
+      <w>quando</w>
+      <w>realiza</w>
+      <w>um</w>
+      <code rend="inline">
+       <w>print</w>
+       <w>(</w>
+       <w>d</w>
+       <w>[</w>
+       <w>'olá</w>
+       <w>'</w>
+       <w>]</w>
+       <w>)</w>
+      </code>
+      <w>exceto</w>
+      <w>pelo</w>
+      <w>fato</w>
+      <w>de</w>
+      <w>que</w>
+      <w>,</w>
+      <w>ao</w>
+      <w>invés</w>
+      <w>de</w>
+      <w>exibir</w>
+      <w>uma</w>
+      <w>definição</w>
+      <w>literária</w>
+      <w>,</w>
+      <w>ele</w>
+      <w>exibe</w>
+      <w>o</w>
+      <w>valor</w>
+      <w>associado</w>
+      <w>à</w>
+      <w>palavra-chave</w>
+      <w>'olá</w>
+      <w>'</w>
+      <w>,</w>
+      <w>conforme</w>
+      <w>definido</w>
+      <w>por</w>
+      <w>você</w>
+      <w>quando</w>
+      <w>criou</w>
+      <w>o</w>
+      <w>dicionário</w>
+      <w>chamado</w>
+      <code rend="inline">
+       <w>d</w>
+      </code>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_ctxC2u">
+      <w>Nesse</w>
+      <w>caso</w>
+      <w>,</w>
+      <w>esse</w>
+      <w>valor</w>
+      <w>é</w>
+      <w>``</w>
+      <w>0</w>
+      <w>''</w>
+      <pc>.</pc>
+     </s>
+    </p>
+    <p>
+     <s xml:id="s_1ojll6">
+      <w>Observe</w>
+      <w>que</w>
+      <w>usa</w>
+      <w>chaves</w>
+      <w>para</w>
+      <w>definir</w>
+      <w>um</w>
+      <w>dicionário</w>
+      <w>,</w>
+      <w>mas</w>
+      <w>colchetes</w>
+      <w>para</w>
+      <w>acessar</w>
+      <w>coisas</w>
+      <w>dentro</w>
+      <w>dele</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_RUdE6Q">
+      <w>A</w>
+      <w>operação</w>
+      <code rend="inline">
+       <w>keys</w>
+      </code>
+      <w>retorna</w>
+      <w>uma</w>
+      <w>lista</w>
+      <w>de</w>
+      <w>chaves</w>
+      <w>que</w>
+      <w>estão</w>
+      <w>definidas</w>
+      <w>no</w>
+      <w>dicionário</w>
+      <pc>.</pc>
+     </s>
+    </p>
+   </div>
+   <div n="4" type="2">
+    <head>
+     <s xml:id="s_lWfKA1">
+      <w>Pares</w>
+      <w>Palavra-Frequência</w>
+     </s>
+    </head>
+    <p>
+     <s xml:id="s_SVXHXJ">
+      <w>Com</w>
+      <w>base</w>
+      <w>no</w>
+      <w>que</w>
+      <w>temos</w>
+      <w>até</w>
+      <w>agora</w>
+      <w>,</w>
+      <w>queremos</w>
+      <w>uma</w>
+      <w>função</w>
+      <w>que</w>
+      <w>seja</w>
+      <w>capaz</w>
+      <w>de</w>
+      <w>converter</w>
+      <w>uma</w>
+      <w>lista</w>
+      <w>de</w>
+      <w>palavras</w>
+      <w>em</w>
+      <w>um</w>
+      <w>dicionário</w>
+      <w>de</w>
+      <w>pares</w>
+      <w>palavra-frequência</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_TRHVu2">
+      <w>O</w>
+      <w>único</w>
+      <w>comando</w>
+      <w>novo</w>
+      <w>que</w>
+      <w>vamos</w>
+      <w>precisar</w>
+      <w>é</w>
+      <code rend="inline">
+       <w>dict</w>
+      </code>
+      <w>,</w>
+      <w>que</w>
+      <w>faz</w>
+      <w>um</w>
+      <w>dicionário</w>
+      <w>a</w>
+      <w>partir</w>
+      <w>de</w>
+      <w>uma</w>
+      <w>lista</w>
+      <w>de</w>
+      <w>pares</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_iB9JHH">
+      <w>Copie</w>
+      <w>o</w>
+      <w>código</w>
+      <w>a</w>
+      <w>seguir</w>
+      <w>e</w>
+      <w>adicione-o</w>
+      <w>ao</w>
+      <w>módulo</w>
+      <code rend="inline">
+       <w>obo.py</w>
+      </code>
+      <w>:</w>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_5.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_5"/>
+    </ab>
+    <p>
+     <s xml:id="s_VEMEhk">
+      <w>Também</w>
+      <w>vamos</w>
+      <w>querer</w>
+      <w>uma</w>
+      <w>função</w>
+      <w>que</w>
+      <w>seja</w>
+      <w>capaz</w>
+      <w>de</w>
+      <w>ordenar</w>
+      <w>o</w>
+      <w>dicionário</w>
+      <w>de</w>
+      <w>pares</w>
+      <w>palavra-frequência</w>
+      <w>por</w>
+      <w>frequência</w>
+      <w>decrescente</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_l0wSro">
+      <w>Copie</w>
+      <w>o</w>
+      <w>código</w>
+      <w>a</w>
+      <w>seguir</w>
+      <w>e</w>
+      <w>adicione-o</w>
+      <w>também</w>
+      <w>ao</w>
+      <w>módulo</w>
+      <code rend="inline">
+       <w>obo.py</w>
+      </code>
+      <w>:</w>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_6.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_6"/>
+    </ab>
+    <p>
+     <s xml:id="s_XkoWnC">
+      <w>Agora</w>
+      <w>podemos</w>
+      <w>escrever</w>
+      <w>um</w>
+      <w>programa</w>
+      <w>que</w>
+      <w>recebe</w>
+      <w>uma</w>
+      <w>URL</w>
+      <w>e</w>
+      <w>retorna</w>
+      <w>pares</w>
+      <w>palavra-frequência</w>
+      <w>para</w>
+      <w>a</w>
+      <w>página</w>
+      <w>web</w>
+      <w>,</w>
+      <w>de</w>
+      <w>acordo</w>
+      <w>com</w>
+      <w>a</w>
+      <w>ordem</w>
+      <w>decrescente</w>
+      <w>de</w>
+      <w>frequência</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_nvVVcP">
+      <w>Copie</w>
+      <w>o</w>
+      <w>programa</w>
+      <w>a</w>
+      <w>seguir</w>
+      <w>no</w>
+      <w>Komodo</w>
+      <w>Edit</w>
+      <w>,</w>
+      <w>armazene-o</w>
+      <w>como</w>
+      <code rend="inline">
+       <w>html-to-freq.py</w>
+      </code>
+      <w>e</w>
+      <w>execute-o.</w>
+      <w>Estude</w>
+      <w>o</w>
+      <w>programa</w>
+      <w>e</w>
+      <w>seu</w>
+      <w>resultado</w>
+      <w>cuidadosamente</w>
+      <w>antes</w>
+      <w>de</w>
+      <w>continuar</w>
+      <pc>.</pc>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_7.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_7"/>
+    </ab>
+   </div>
+   <div n="5" type="2">
+    <head>
+     <s xml:id="s_i0Wtg1">
+      <w>Removendo</w>
+      <emph>
+       <w>Stop</w>
+       <w>Words</w>
+      </emph>
+     </s>
+    </head>
+    <p>
+     <s xml:id="s_2FrGLT">
+      <w>Quando</w>
+      <w>vemos</w>
+      <w>o</w>
+      <w>resultado</w>
+      <w>do</w>
+      <w>nosso</w>
+      <w>programa</w>
+      <code rend="inline">
+       <w>html-to-freq.py</w>
+      </code>
+      <w>,</w>
+      <w>verificamos</w>
+      <w>que</w>
+      <w>muitas</w>
+      <w>das</w>
+      <w>palavras</w>
+      <w>mais</w>
+      <w>frequentes</w>
+      <w>no</w>
+      <w>texto</w>
+      <w>são</w>
+      <w>palavras</w>
+      <w>funcionais</w>
+      <w>como</w>
+      <emph>
+       <w>the</w>
+      </emph>
+      <w>,</w>
+      <emph>
+       <w>of</w>
+      </emph>
+      <w>,</w>
+      <emph>
+       <w>to</w>
+      </emph>
+      <w>e</w>
+      <emph>
+       <w>and</w>
+      </emph>
+      <pc>.</pc>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_8.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_8"/>
+    </ab>
+    <p>
+     <s xml:id="s_gaSRQx">
+      <w>Essas</w>
+      <w>palavras</w>
+      <w>são</w>
+      <w>geralmente</w>
+      <w>as</w>
+      <w>mais</w>
+      <w>comuns</w>
+      <w>em</w>
+      <w>qualquer</w>
+      <w>texto</w>
+      <w>de</w>
+      <w>língua</w>
+      <w>inglesa</w>
+      <w>,</w>
+      <w>então</w>
+      <w>elas</w>
+      <w>não</w>
+      <w>nos</w>
+      <w>dizem</w>
+      <w>muito</w>
+      <w>a</w>
+      <w>respeito</w>
+      <w>do</w>
+      <w>julgamento</w>
+      <w>de</w>
+      <w>Bowsey</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_Y0qRxt">
+      <w>Em</w>
+      <w>geral</w>
+      <w>,</w>
+      <w>estamos</w>
+      <w>mais</w>
+      <w>interessados</w>
+      <w>em</w>
+      <w>encontrar</w>
+      <w>as</w>
+      <w>palavras</w>
+      <w>que</w>
+      <w>nos</w>
+      <w>auxiliarão</w>
+      <w>a</w>
+      <w>diferenciar</w>
+      <w>esse</w>
+      <w>texto</w>
+      <w>de</w>
+      <w>outros</w>
+      <w>textos</w>
+      <w>sobre</w>
+      <w>assuntos</w>
+      <w>distintos</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_HqGE2x">
+      <w>Desse</w>
+      <w>modo</w>
+      <w>,</w>
+      <w>vamos</w>
+      <w>remover</w>
+      <w>as</w>
+      <w>palavras</w>
+      <w>funcionais</w>
+      <w>comuns</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_eFD0I3">
+      <w>Palavras</w>
+      <w>que</w>
+      <w>são</w>
+      <w>ignoradas</w>
+      <w>dessa</w>
+      <w>forma</w>
+      <w>são</w>
+      <w>conhecidas</w>
+      <w>como</w>
+      <emph>
+       <w>stopwords</w>
+      </emph>
+      <ref target="#pt_note_1" type="footnotemark"/>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_NCHKIT">
+      <w>Utilizaremos</w>
+      <w>a</w>
+      <w>lista</w>
+      <w>a</w>
+      <w>seguir</w>
+      <w>,</w>
+      <w>adaptada</w>
+      <w>de</w>
+      <w>uma</w>
+      <w>publicação</w>
+      <emph>
+       <w>online</w>
+      </emph>
+      <w>por</w>
+      <ref target="http://ir.dcs.gla.ac.uk/resources/linguistic_utils/stop_words">
+       <w>cientistas</w>
+       <w>da</w>
+       <w>computação</w>
+       <w>em</w>
+       <w>Glasgow</w>
+      </ref>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_tyJBRC">
+      <w>Copie-a</w>
+      <w>e</w>
+      <w>adicione-a</w>
+      <w>no</w>
+      <w>início</w>
+      <w>da</w>
+      <w>biblioteca</w>
+      <code rend="inline">
+       <w>obo.py</w>
+      </code>
+      <w>que</w>
+      <w>está</w>
+      <w>construindo</w>
+      <pc>.</pc>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_9.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_9"/>
+    </ab>
+    <p>
+     <s xml:id="s_7O40gG">
+      <w>Agora</w>
+      <w>,</w>
+      <w>livrar-se</w>
+      <w>das</w>
+      <emph>
+       <w>stop</w>
+       <w>words</w>
+      </emph>
+      <w>em</w>
+      <w>uma</w>
+      <w>lista</w>
+      <w>é</w>
+      <w>fácil</w>
+      <w>:</w>
+      <w>basta</w>
+      <w>usar</w>
+      <w>outra</w>
+      <emph>
+       <w>list</w>
+       <w>comprehension</w>
+      </emph>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_ZEupsJ">
+      <w>Adicione</w>
+      <w>também</w>
+      <w>essa</w>
+      <w>função</w>
+      <w>ao</w>
+      <w>módulo</w>
+      <code rend="inline">
+       <w>obo.py</w>
+      </code>
+      <w>:</w>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_10.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_10"/>
+    </ab>
+   </div>
+   <div n="6" type="2">
+    <head>
+     <s xml:id="s_N4TnND">
+      <w>Juntando</w>
+      <w>Tudo</w>
+     </s>
+    </head>
+    <p>
+     <s xml:id="s_EHoR2Y">
+      <w>Agora</w>
+      <w>temos</w>
+      <w>tudo</w>
+      <w>o</w>
+      <w>que</w>
+      <w>precisamos</w>
+      <w>para</w>
+      <w>determinar</w>
+      <w>frequências</w>
+      <w>de</w>
+      <w>palavras</w>
+      <w>para</w>
+      <w>páginas</w>
+      <w>web</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_0cAJ45">
+      <w>Copie</w>
+      <w>o</w>
+      <w>código</w>
+      <w>a</w>
+      <w>seguir</w>
+      <w>no</w>
+      <w>Komodo</w>
+      <w>Edit</w>
+      <w>,</w>
+      <w>armazene-o</w>
+      <w>como</w>
+      <code rend="inline">
+       <w>html-to-freq-2.py</w>
+      </code>
+      <w>e</w>
+      <w>execute-o</w>
+      <w>:</w>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_11.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_11"/>
+    </ab>
+    <p>
+     <s xml:id="s_t2HlZ6">
+      <w>Se</w>
+      <w>tudo</w>
+      <w>correu</w>
+      <w>bem</w>
+      <w>,</w>
+      <w>sua</w>
+      <w>saída</w>
+      <w>deve-se</w>
+      <w>parecer</w>
+      <w>com</w>
+      <w>isto</w>
+      <w>:</w>
+     </s>
+    </p>
+    <ab>
+     <code corresp="code_contar-frequencias-palavras-python_12.txt" lang="language-python" rend="block" xml:id="code_contar-frequencias-palavras-python_12"/>
+    </ab>
+   </div>
+   <div n="7" type="2">
+    <head>
+     <s xml:id="s_GRuQwl">
+      <w>Leituras</w>
+      <w>Sugeridas</w>
+     </s>
+    </head>
+    <p>
+     <s xml:id="s_P5bvjQ">
+      <w>Lutz</w>
+      <w>,</w>
+      <w>Learning</w>
+      <w>Python</w>
+     </s>
+    </p>
+    <list type="unordered">
+     <item>
+      <s xml:id="s_YZHgVj">
+       <w>Ch</w>
+       <pc>.</pc>
+      </s>
+      <s xml:id="s_JfxA4X">
+       <w>9</w>
+       <w>:</w>
+       <w>Tuples</w>
+       <w>,</w>
+       <w>Files</w>
+       <w>,</w>
+       <w>and</w>
+       <w>Everything</w>
+       <w>Else</w>
+      </s>
+     </item>
+     <item>
+      <s xml:id="s_MIgclG">
+       <w>Ch</w>
+       <pc>.</pc>
+      </s>
+      <s xml:id="s_OrWm0f">
+       <w>11</w>
+       <w>:</w>
+       <w>Assignment</w>
+       <w>,</w>
+       <w>Expressions</w>
+       <w>,</w>
+       <w>and</w>
+       <w>print</w>
+      </s>
+     </item>
+     <item>
+      <s xml:id="s_tCuwa7">
+       <w>Ch</w>
+       <pc>.</pc>
+      </s>
+      <s xml:id="s_gt89JR">
+       <w>12</w>
+       <w>:</w>
+       <w>if</w>
+       <w>Tests</w>
+      </s>
+     </item>
+     <item>
+      <s xml:id="s_Flolkw">
+       <w>Ch</w>
+       <pc>.</pc>
+      </s>
+      <s xml:id="s_004ymd">
+       <w>13</w>
+       <w>:</w>
+       <w>while</w>
+       <w>and</w>
+       <w>for</w>
+       <w>Loops</w>
+      </s>
+     </item>
+    </list>
+    <p>
+     <s xml:id="s_mEZ8B9">
+      <w>Pilgrim</w>
+      <w>,</w>
+      <w>Diving</w>
+      <w>into</w>
+      <w>Python</w>
+     </s>
+    </p>
+    <list type="unordered">
+     <item>
+      <s xml:id="s_Ebwyp1">
+       <w>Ch</w>
+       <pc>.</pc>
+      </s>
+      <s xml:id="s_m3pB6V">
+       <w>7</w>
+       <w>:</w>
+       <ref target="https://web.archive.org/web/20180416143856/http://www.diveintopython.net/regular_expressions/index.html">
+        <w>Regular</w>
+        <w>Expressions</w>
+       </ref>
+      </s>
+     </item>
+    </list>
+   </div>
+   <div n="8" type="2">
+    <head>
+     <s xml:id="s_gRXfNW">
+      <w>Sincronização</w>
+      <w>de</w>
+      <w>Código</w>
+     </s>
+    </head>
+    <p>
+     <s xml:id="s_VhAEK6">
+      <w>Para</w>
+      <w>acompanhar</w>
+      <w>lições</w>
+      <w>futuras</w>
+      <w>,</w>
+      <w>é</w>
+      <w>importante</w>
+      <w>ter</w>
+      <w>os</w>
+      <w>ficheiros</w>
+      <w>e</w>
+      <w>programas</w>
+      <w>corretos</w>
+      <w>no</w>
+      <w>seu</w>
+      <w>diretório</w>
+      <w>“</w>
+      <w>programming-historian</w>
+      <w>”</w>
+      <pc>.</pc>
+     </s>
+     <s xml:id="s_K2KQkR">
+      <w>No</w>
+      <w>final</w>
+      <w>de</w>
+      <w>cada</w>
+      <w>lição</w>
+      <w>,</w>
+      <w>é</w>
+      <w>possível</w>
+      <w>fazer</w>
+      <w>o</w>
+      <emph>
+       <w>download</w>
+      </emph>
+      <w>do</w>
+      <w>ficheiro</w>
+      <w>zip</w>
+      <w>“</w>
+      <w>programming-historian</w>
+      <w>”</w>
+      <w>para</w>
+      <w>garantir</w>
+      <w>que</w>
+      <w>possui</w>
+      <w>o</w>
+      <w>código</w>
+      <w>correto</w>
+      <pc>.</pc>
+     </s>
+    </p>
+    <list type="unordered">
+     <item>
+      <s xml:id="s_alsCk8">
+       <w>programming-historian-5</w>
+       <w>(</w>
+       <ref target="https://programminghistorian.org/assets/python-lessons5.zip">
+        <w>zip</w>
+        <w>sync</w>
+       </ref>
+       <w>)</w>
+      </s>
+     </item>
+    </list>
+    <p>
+     <s xml:id="s_d9TU5s">
+      <ref target="#pt_note_1" type="footnotemark"/>
+      <w>:</w>
+      <w>Na</w>
+      <w>língua</w>
+      <w>portuguesa</w>
+      <w>,</w>
+      <w>palavras</w>
+      <w>similares</w>
+      <w>seriam</w>
+      <w>``</w>
+      <w>e</w>
+      <w>''</w>
+      <w>,</w>
+      <w>``</w>
+      <w>de</w>
+      <w>''</w>
+      <w>,</w>
+      <w>``</w>
+      <w>da</w>
+      <w>''</w>
+      <w>,</w>
+      <w>``</w>
+      <w>do</w>
+      <w>''</w>
+      <w>,</w>
+      <w>``</w>
+      <w>um</w>
+      <w>''</w>
+      <w>,</w>
+      <w>``</w>
+      <w>uma</w>
+      <w>''</w>
+      <w>,</w>
+      <w>dentre</w>
+      <w>outras</w>
+      <w>,</w>
+      <w>a</w>
+      <w>depender</w>
+      <w>de</w>
+      <w>cada</w>
+      <w>caso</w>
+      <pc>.</pc>
+     </s>
+    </p>
+   </div>
+  </body>
+ </text>
 </TEI>
