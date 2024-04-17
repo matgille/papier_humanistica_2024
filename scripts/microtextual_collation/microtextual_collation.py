@@ -65,21 +65,30 @@ def run_align(src, tgt):
         print(f'{color.BOLD}{color.BLUE}{sent_src[i]}{color.END}==={color.BOLD}{color.RED}{sent_tgt[j]}{color.END}')
 
 def main():
-
-    main_file = "../../data/tei_sentences_tokenized/main.xml"
+    main_file = "../../data/tei_sentences_aligned/main.xml"
     as_tree = ET.parse(main_file)
     as_tree.xinclude()
-    for sent in as_tree.xpath(f"descendant::tei:TEI[@type='original']/descendant::tei:s", namespaces=namespaces)[:10]:
+    for sent in as_tree.xpath(f"descendant::tei:TEI[count(descendant::tei:TEI) > 1]/tei:TEI["
+                              f"@type='original']/descendant::tei:s", namespaces=namespaces): 
         all_texts = []
-        corresp_sent_id = sent.xpath("@corresp")[0]
-        corresp_dict = json.loads(corresp_sent_id.replace("'", "\""))
-        print(corresp_dict)
-        print(list(corresp_dict.values())[0][0])
-        corresponding_sentence = as_tree.xpath(f"descendant::tei:s[@xml:id='{list(corresp_dict.values())[0][0]}']", namespaces=namespaces)[0]
         all_texts.append(text_from_tokens(sent))
-        as_text = text_from_tokens(corresponding_sentence)
-        all_texts.append(as_text)
+        try:
+            corresp_sent_id = sent.xpath("@corresp")[0]
+        except:
+            continue
+        corresp_dict = json.loads(corresp_sent_id.replace("'", "\""))
+        print(f"Corresp dict: {corresp_dict}")
+        corresponding_text = []
+        for witness, identifiers in corresp_dict.items():
+            print(witness)
+            print(identifiers)
+            for sentence in identifiers:
+                print(f"{sentence}")
+                corresponding_sentence = as_tree.xpath(f"descendant::tei:s[@xml:id='{sentence}']", namespaces=namespaces)[0]
+                corresponding_text.append(text_from_tokens(corresponding_sentence))
+            all_texts.append(" ".join(corresponding_text))
         print(all_texts)
+        continue
     
         for text in all_texts[1:]:
             source = all_texts[0]
