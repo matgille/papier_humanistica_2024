@@ -34,7 +34,7 @@ def main():
                     print(division.xpath("@type"))
                     print(ET.tostring(division, pretty_print=True))
                     print(f"firefox ../../data/to_tei/{filename}/{filename}.xml")
-                    print(f"firefox ../../data/tei_aligned/{filename}/{filename}.xml")
+                    print(f"firefox ../../data/tei_with_numbered_divs/{filename}/{filename}.xml")
                     continue
                 div_position = int(
                     division.xpath(f"count(preceding-sibling::tei:div[@type='{division_level}'])",
@@ -84,18 +84,18 @@ def main():
                 
                 
                 try:
-                    os.mkdir(f"../../data/tei_aligned/{directory_name}")
+                    os.mkdir(f"../../data/tei_with_numbered_divs/{directory_name}")
                 except FileExistsError:
                     pass
                 except FileNotFoundError:
-                    os.mkdir(f"../../data/tei_aligned/")
-                    os.mkdir(f"../../data/tei_aligned/{directory_name}")
+                    os.mkdir(f"../../data/tei_with_numbered_divs/")
+                    os.mkdir(f"../../data/tei_with_numbered_divs/{directory_name}")
                 
                 for text_file in glob.glob(f"../../data/to_tei/{filename}/*.txt"):
-                    shutil.copy(text_file, f"../../data/tei_aligned/{filename}/")
+                    shutil.copy(text_file, f"../../data/tei_with_numbered_divs/{filename}/")
                 
-                with open(f"../../data/tei_aligned/{filename}/{filename}.xml", "w") as structured_div:
-                    print(f"Saving to ../../data/tei_aligned/{filename}/{filename}.xml")
+                with open(f"../../data/tei_with_numbered_divs/{filename}/{filename}.xml", "w") as structured_div:
+                    print(f"Saving to ../../data/tei_with_numbered_divs/{filename}/{filename}.xml")
                     structured_div.write(ET.tostring(tree, pretty_print=True, encoding="utf-8").decode('utf8'))
 
 
@@ -104,9 +104,9 @@ def copy_main_file():
     xi_namespace={"xi": "http://www.w3.org/2001/XInclude"}
     for inclusion in new_tree.xpath("//xi:include", namespaces=xi_namespace):
         url = inclusion.xpath("@href")[0]
-        inclusion.set("href", url.replace("to_tei", "tei_aligned"))
+        inclusion.set("href", url.replace("to_tei", "tei_with_numbered_divs"))
 
-    with open(f"../../data/tei_aligned/main.xml", "w") as structured_div:
+    with open(f"../../data/tei_with_numbered_divs/main.xml", "w") as structured_div:
         structured_div.write(ET.tostring(new_tree, pretty_print=True, encoding="utf-8").decode('utf8'))
 
 if __name__ == '__main__':

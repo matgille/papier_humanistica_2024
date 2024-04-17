@@ -133,7 +133,7 @@ def tokenize_sentences(version_id):
     with open(f"../../data/tei_sentences_tokenized/{version_id}/{version_id}.xml", "w") as output_file:
         output_file.write(ET.tostring(as_tree, pretty_print=True, encoding="utf8").decode("utf8"))
 
-    shutil.copy("../../data/tei_aligned/main.xml", "../../data/tei_sentences_tokenized/")
+    shutil.copy("../../data/tei_with_numbered_divs/main.xml", "../../data/tei_sentences_tokenized/")
 
 
 def retrieve_lessons(file):
@@ -157,5 +157,5 @@ def retrieve_lessons(file):
 
 if __name__ == '__main__':
     namespaces = {"tei": "http://www.tei-c.org/ns/1.0"}
-    retrieve_lessons("../../data/tei_aligned/main.xml")
-    shutil.copy("../../data/tei_aligned/main.xml", "../../data/tei_sentences_tokenized/main.xml")
+    retrieve_lessons("../../data/tei_with_numbered_divs/main.xml")
+    shutil.copy("../../data/tei_with_numbered_divs/main.xml", "../../data/tei_sentences_tokenized/main.xml")
