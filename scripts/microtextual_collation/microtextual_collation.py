@@ -28,9 +28,6 @@ def run_align(src, tgt, align_layer, threshold):
                                                    truncation=True, model_max_length=tokenizer.model_max_length)[
                            'input_ids']
 
-    model.to("cuda:0")
-    ids_src.to("cuda:0")
-    ids_tgt.to("cuda:0")
     sub2word_map_src = []
     for i, word_list in enumerate(token_src):
         sub2word_map_src += [i for x in word_list]
@@ -39,7 +36,10 @@ def run_align(src, tgt, align_layer, threshold):
         sub2word_map_tgt += [i for x in word_list]
 
     # alignment
+    model.to("cuda:0")
     model.eval()
+    ids_src = ids_src.cuda()
+    ids_tgt = ids_tgt.cuda()
     with torch.no_grad():
         out_src = model(ids_src.unsqueeze(0), output_hidden_states=True)[2][align_layer][0, 1:-1]
         out_tgt = model(ids_tgt.unsqueeze(0), output_hidden_states=True)[2][align_layer][0, 1:-1]
@@ -52,6 +52,7 @@ def run_align(src, tgt, align_layer, threshold):
         softmax_inter = (softmax_srctgt > threshold) * (softmax_tgtsrc > threshold)
 
     align_subwords = torch.nonzero(softmax_inter, as_tuple=False)
+    align_subwords.to("cuda:0")
     align_words = set()
     for i, j in align_subwords:
         align_words.add((sub2word_map_src[i], sub2word_map_tgt[j]))
