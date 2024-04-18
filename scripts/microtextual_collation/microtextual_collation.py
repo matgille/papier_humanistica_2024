@@ -83,6 +83,8 @@ def write_to_log(string):
         if type(string) != str:
             if type(string) in [list, dict]:
                 json.dump(string, log_file)
+            else:
+                log_file.write(str(string))
         else:
             log_file.write(string)
         log_file.write("\n")
@@ -102,8 +104,9 @@ def main():
     as_tree = ET.parse(main_file)
     as_tree.xinclude()
     concepts_dictionary = dict()
-    for lesson in tqdm.tqdm(as_tree.xpath("descendant::tei:TEI/tei:TEI["
-                                          f"@type='original']", namespaces=namespaces)):
+    # "descendant::tei:TEI[descendant::tei:TEI[@xml:id='preservar-datos-de-investigacion']]/tei:TEI[@type='original']
+    for lesson in tqdm.tqdm(
+            as_tree.xpath("descendant::tei:TEI/tei:TEI[@type='original']", namespaces=namespaces)[20:25]):
         lesson_lang = lesson.xpath("descendant::tei:text/@xml:lang", namespaces=namespaces)[0]
         write_to_log(f"Lesson lang: {lesson_lang}")
         write_to_log(f"Corresponding concepts: {concepts[lesson_lang]}")
@@ -182,7 +185,7 @@ def retrieve_translated_concepts(alignment_results, concepts, src_lang, tgt_lang
         write_to_log(found_keywords)
         write_to_log(original_sent)
         write_to_log(translated_sent)
-        
+
         # TODO: this is done without context if a keyword is repeated, there may be a problem.
         for keyword in found_keywords:
             write_to_log(f"New keyword: {keyword}")
@@ -190,6 +193,8 @@ def retrieve_translated_concepts(alignment_results, concepts, src_lang, tgt_lang
             # If the keyword is a composed word
             if " " in keyword:
                 write_to_log("Composed keyword")
+                
+                # Check with alignment table better, and index of matching element.
                 first_alignment_unit = [index for index, element in enumerate(original_sent.split()) if
                                         keyword.split(" ")[0] == element][0]
                 last_alignment_unit = [index for index, element in enumerate(original_sent.split()) if
@@ -214,7 +219,15 @@ def retrieve_translated_concepts(alignment_results, concepts, src_lang, tgt_lang
                     write_to_log(translated_sent)
                     all_targets.append((target[0][-2], ' '.join([translated_sent.split(' ')[idx] for idx in ranges])))
                 all_targets.sort(key=lambda x: x[0])
-                corresponding_span_of_text = " ".join(text for index, text in all_targets).strip()
+                write_to_log(f"After sorting: {all_targets}")
+
+                # On va trouver le texte qui est inclus entre le premier et le dernier mot de la phrase cible
+                try:
+                    corresponding_span_of_text = " ".join(translated_sent.split(' ')[idx] for idx in
+                                                          range(all_targets[0][0], all_targets[-1][0] + 1)).strip()
+                except IndexError:
+                    print("Something went wrong, please check line 223 and correct code. It has to do with multiple matching"
+                          "words in target sentence (protocol appears twice for instance.)")
                 write_to_log(f"Corresponding span for keyword '{keyword}': '{corresponding_span_of_text}'")
                 # We check if the identified target is not too different in length -- meaning a probable error
                 if len(corresponding_span_of_text.split(" ")) - len(keyword.split(" ")) > 4:
