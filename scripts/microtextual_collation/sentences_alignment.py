@@ -151,7 +151,6 @@ def align_lessons(file, overwrite=False):
                     print(current_corresp)
                     corresponding_sentence_in_original.set("corresp", json.dumps(current_corresp).replace("\"", "'"))
                 except IndexError:
-                    print("Index error")
                     current_corresp = json.dumps({translations_id[translation_index]: translated_sent_id}).replace(
                         "\"", "'")
                     corresponding_sentence_in_original.set("corresp", current_corresp)

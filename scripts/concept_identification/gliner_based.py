@@ -33,12 +33,13 @@ def extract_terms():
         except  IndexError:
             continue
         for entity in identified_ents:
-            try:
-                current_lang_entities = all_entities[lang]
-                current_lang_entities.append(entity['text'])
-                all_entities[lang] = list(set(current_lang_entities))
-            except KeyError:
-                all_entities[lang] = [entity['text']]
+            if len(entity['text']) != 1:
+                try:
+                    current_lang_entities = all_entities[lang]
+                    current_lang_entities.append(entity['text'])
+                    all_entities[lang] = list(set(current_lang_entities))
+                except KeyError:
+                    all_entities[lang] = [entity['text']]
 
     with open("../../data/concepts.json", "w", encoding='utf8') as output_json:
         json.dump(all_entities, output_json)

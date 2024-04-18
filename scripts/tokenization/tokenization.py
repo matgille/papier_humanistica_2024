@@ -1,3 +1,4 @@
+import copy
 import os
 import re
 import shutil
@@ -27,7 +28,6 @@ def word_tokenization(lesson):
     lang = lesson.xpath("descendant::tei:text/@xml:lang", namespaces=namespaces)[0]
     nltk_language = langs_dict[lang]
     all_nodes = lesson.xpath("descendant::tei:text/descendant::node()[not(self::text() or self::comment())]", namespaces=namespaces)
-    # print("---")
     for index, node in enumerate(all_nodes):
         if node.text is not None:
             tokenized = word_tokenize(node.text, language=nltk_language)
@@ -65,8 +65,8 @@ def word_tokenization(lesson):
                     w = ET.Element("w")
                     w.text = token
                     node.addnext(w)
-    with open(".tmp/tokenized.xml", "w") as text:
-        text.write(ET.tostring(lesson, pretty_print=True, encoding='utf8').decode('utf8'))
+    # This is a trick to make all elements of tree inherit tei namespace of root.
+    return ET.fromstring(ET.tostring(lesson))
 
 
 def generateur_id(size=6, chars=string.ascii_uppercase + string.ascii_lowercase + string.digits) -> str:
@@ -75,7 +75,7 @@ def generateur_id(size=6, chars=string.ascii_uppercase + string.ascii_lowercase 
     return first_char + random_string
 
 
-def tokenize_sentences(version_id):
+def tokenize_sentences(version_id, word_tokenized):
     """
     This function creates sentences after tokenizing an XML-TEI file.
     :param version_id: 
@@ -90,10 +90,10 @@ def tokenize_sentences(version_id):
         os.mkdir(f"../../data/tei_sentences_tokenized/{version_id}")
     except FileExistsError:
         pass
-    with open(".tmp/tokenized.xml", "r") as input_file:
-        as_tree = ET.parse(input_file)
+    as_tree = word_tokenized
     for possible_nodes in as_tree.xpath(
-            "//tei:body/descendant::node()[child::tei:pc or child::tei:w][not(self::tei:ref | self::tei:emph | self::tei:code)]",
+            "//tei:body/descendant::node()[child::tei:pc or child::tei:w][not(self::tei:ref | self::tei:emph | "
+            "self::tei:code)]", 
             namespaces=namespaces):
         if len(possible_nodes.xpath("descendant::tei:pc", namespaces=namespaces)) == 0:
             sentence = ET.Element("s")
@@ -133,7 +133,6 @@ def tokenize_sentences(version_id):
     with open(f"../../data/tei_sentences_tokenized/{version_id}/{version_id}.xml", "w") as output_file:
         output_file.write(ET.tostring(as_tree, pretty_print=True, encoding="utf8").decode("utf8"))
 
-    shutil.copy("../../data/tei_with_numbered_divs/main.xml", "../../data/tei_sentences_tokenized/")
 
 
 def retrieve_lessons(file):
@@ -144,18 +143,43 @@ def retrieve_lessons(file):
     """
     print(file)
     main_tree = ET.parse(file)
+    new_main_tree = copy.deepcopy(main_tree)
     main_tree.xinclude()
     print(main_tree)
-    all_tei_nodes = main_tree.xpath("/tei:TEI/tei:TEI", namespaces=namespaces)
+    
+    all_tei_lessons = main_tree.xpath("/tei:TEI/tei:TEI",
+                                          namespaces=namespaces)
+    lessons_to_erase = {}
+    for index, lesson in enumerate(all_tei_lessons):
+        if len(lesson.xpath("tei:TEI", namespaces=namespaces)) == 1:
+            erase = True
+        else:
+            erase = False
+        lessons_to_erase[index] = erase
+    
+    # Let's erase the good lessons.
+    for index, TEI_lesson in enumerate(new_main_tree.xpath("/tei:TEI/tei:TEI", namespaces=namespaces)):
+        if lessons_to_erase[index] is True:
+            print("Erasing")
+            TEI_lesson.getparent().remove(TEI_lesson)
+        else:
+            pass
+        
+    with open("../../data/tei_sentences_tokenized/main.xml", "w") as output_TEI:
+        output_TEI.write(ET.tostring(new_main_tree, pretty_print=True, encoding='utf8').decode('utf8'))
+        
+    all_tei_nodes = main_tree.xpath("/tei:TEI/tei:TEI[count(descendant::tei:TEI) > 1]", namespaces=namespaces)
     for lesson in tqdm.tqdm(all_tei_nodes):
         all_versions = lesson.xpath("descendant::tei:TEI", namespaces=namespaces)
         for version in all_versions:
             version_id = version.xpath("@xml:id")[0]
-            word_tokenization(version)
-            tokenize_sentences(version_id)
+            word_tokenized = word_tokenization(version)
+            tokenize_sentences(version_id, word_tokenized)
+
+    
+    
 
 
 if __name__ == '__main__':
     namespaces = {"tei": "http://www.tei-c.org/ns/1.0"}
     retrieve_lessons("../../data/tei_with_numbered_divs/main.xml")
-    shutil.copy("../../data/tei_with_numbered_divs/main.xml", "../../data/tei_sentences_tokenized/main.xml")
