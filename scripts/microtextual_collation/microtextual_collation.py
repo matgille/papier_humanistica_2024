@@ -27,6 +27,10 @@ def run_align(src, tgt, align_layer, threshold):
                        tokenizer.prepare_for_model(list(itertools.chain(*wid_tgt)), return_tensors='pt',
                                                    truncation=True, model_max_length=tokenizer.model_max_length)[
                            'input_ids']
+
+    model.to("cuda:0")
+    ids_src.to("cuda:0")
+    ids_tgt.to("cuda:0")
     sub2word_map_src = []
     for i, word_list in enumerate(token_src):
         sub2word_map_src += [i for x in word_list]
