@@ -128,7 +128,7 @@ def main():
                  "@type='original'] "
     full_query = "descendant::tei:TEI/tei:TEI[@type='original']"
     for lesson in tqdm.tqdm(
-            as_tree.xpath(test_query, namespaces=namespaces)):
+            as_tree.xpath(full_query, namespaces=namespaces)):
         lesson_lang = lesson.xpath("descendant::tei:text/@xml:lang", namespaces=namespaces)[0]
         write_to_log(f"Lesson lang: {lesson_lang}")
         write_to_log(f"Corresponding concepts: {concepts[lesson_lang]}")
