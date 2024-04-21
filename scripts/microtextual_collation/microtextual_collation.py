@@ -36,10 +36,12 @@ def run_align(src, tgt, align_layer, threshold):
         sub2word_map_tgt += [i for x in word_list]
 
     # alignment
-    model.to("cuda:0")
+    device = "cpu"
+    model.to(device)
     model.eval()
-    ids_src = ids_src.cuda()
-    ids_tgt = ids_tgt.cuda()
+    if device != "cpu":
+        ids_src = ids_src.cuda()
+        ids_tgt = ids_tgt.cuda()
     with torch.no_grad():
         out_src = model(ids_src.unsqueeze(0), output_hidden_states=True)[2][align_layer][0, 1:-1]
         out_tgt = model(ids_tgt.unsqueeze(0), output_hidden_states=True)[2][align_layer][0, 1:-1]
@@ -52,7 +54,7 @@ def run_align(src, tgt, align_layer, threshold):
         softmax_inter = (softmax_srctgt > threshold) * (softmax_tgtsrc > threshold)
 
     align_subwords = torch.nonzero(softmax_inter, as_tuple=False)
-    align_subwords.to("cuda:0")
+    align_subwords.to(device)
     align_words = set()
     for i, j in align_subwords:
         align_words.add((sub2word_map_src[i], sub2word_map_tgt[j]))
@@ -78,16 +80,28 @@ def run_align(src, tgt, align_layer, threshold):
     return alignment_list
 
 
+
+def write_log_file(log_list):
+    if progressive_logging is True:
+        return
+    else:
+        with open(".logs/log.txt", "a") as log_file:
+            log_file.write("\n".join(log_list))
+
 def write_to_log(string):
-    with open(".logs/log.txt", "a") as log_file:
-        if type(string) != str:
-            if type(string) in [list, dict]:
-                json.dump(string, log_file)
+    global log_list
+    if progressive_logging is True:
+        with open(".logs/log.txt", "a") as log_file:
+            if type(string) != str:
+                if type(string) in [list, dict]:
+                    json.dump(string, log_file)
+                else:
+                    log_file.write(str(string))
             else:
-                log_file.write(str(string))
-        else:
-            log_file.write(string)
-        log_file.write("\n")
+                log_file.write(string)
+            log_file.write("\n")
+    else:
+        log_list.append(string)
 
 
 def main():
@@ -106,7 +120,7 @@ def main():
     concepts_dictionary = dict()
     # "descendant::tei:TEI[descendant::tei:TEI[@xml:id='preservar-datos-de-investigacion']]/tei:TEI[@type='original']
     for lesson in tqdm.tqdm(
-            as_tree.xpath("descendant::tei:TEI/tei:TEI[@type='original']", namespaces=namespaces)[20:25]):
+            as_tree.xpath("descendant::tei:TEI/tei:TEI[@type='original']", namespaces=namespaces)):
         lesson_lang = lesson.xpath("descendant::tei:text/@xml:lang", namespaces=namespaces)[0]
         write_to_log(f"Lesson lang: {lesson_lang}")
         write_to_log(f"Corresponding concepts: {concepts[lesson_lang]}")
@@ -172,11 +186,11 @@ def retrieve_translated_concepts(alignment_results, concepts, src_lang, tgt_lang
             continue
         elif concept_length == 1:
             if any([concept == word for word in original_sent.split(" ")]):
-                keywords_in_sentence.extend([concept for word in original_sent.split(" ") if concept == word])
+                keywords_in_sentence.extend([(concept, index) for index, word in enumerate(original_sent.split(" ")) if concept == word])
                 found = True
         else:
             if any([ngram == concept for ngram in n_grams]):
-                keywords_in_sentence.extend([ngram for ngram in n_grams if ngram == concept])
+                keywords_in_sentence.extend([(ngram, index) for index, ngram in enumerate(n_grams) if ngram == concept])
                 found = True
     keywords_in_sentence = list(set(keywords_in_sentence))
     if found:
@@ -187,23 +201,21 @@ def retrieve_translated_concepts(alignment_results, concepts, src_lang, tgt_lang
         write_to_log(translated_sent)
 
         # TODO: this is done without context if a keyword is repeated, there may be a problem.
-        for keyword in found_keywords:
-            write_to_log(f"New keyword: {keyword}")
+        for keyword, start_index in found_keywords:
+            write_to_log(f"\nNew keyword: {keyword}")
 
             # If the keyword is a composed word
             if " " in keyword:
                 write_to_log("Composed keyword")
                 
                 # Check with alignment table better, and index of matching element.
-                first_alignment_unit = [index for index, element in enumerate(original_sent.split()) if
-                                        keyword.split(" ")[0] == element][0]
-                last_alignment_unit = [index for index, element in enumerate(original_sent.split()) if
-                                       keyword.split(" ")[-1] == element][0]
+                first_alignment_unit = start_index
+                last_alignment_unit = start_index + len(keyword.split(" "))
                 write_to_log(first_alignment_unit)
                 write_to_log(last_alignment_unit)
                 corresponding_span_of_text = ""
                 all_targets = []
-                for unit in range(first_alignment_unit, last_alignment_unit + 1):
+                for unit in range(first_alignment_unit, last_alignment_unit):
                     target = [item for item in alignment_results if item[0] == unit]
                     write_to_log(f"Target: {target}")
                     # If the target is empty, the word is not identified by awesome-align OR 
@@ -226,8 +238,8 @@ def retrieve_translated_concepts(alignment_results, concepts, src_lang, tgt_lang
                     corresponding_span_of_text = " ".join(translated_sent.split(' ')[idx] for idx in
                                                           range(all_targets[0][0], all_targets[-1][0] + 1)).strip()
                 except IndexError:
-                    print("Something went wrong, please check line 223 and correct code. It has to do with multiple matching"
-                          "words in target sentence (protocol appears twice for instance.)")
+                    write_to_log("Something may have been wrong here, passing.")
+                    continue
                 write_to_log(f"Corresponding span for keyword '{keyword}': '{corresponding_span_of_text}'")
                 # We check if the identified target is not too different in length -- meaning a probable error
                 if len(corresponding_span_of_text.split(" ")) - len(keyword.split(" ")) > 4:
@@ -302,10 +314,15 @@ def clean_text_from_tokens(sentence):
     for element in sentence.xpath("descendant::node()[self::tei:w or self::tei:pc]", namespaces=namespaces):
         as_list.append(element.text.lower())
     cleaned = re.sub(multiple_spaces_pattern, " ", " ".join(as_list))
-    cleaned = cleaned.strip().replace('"', "").replace("'", "").replace("`", "")
+    cleaned = cleaned.strip().replace(' " ', "").replace(" ' ", "").replace("`", "")
+    cleaned = cleaned.replace(" - ", " ").replace(">", "").replace("<", "")
     return cleaned
 
 
 if __name__ == '__main__':
     namespaces = {"tei": "http://www.tei-c.org/ns/1.0"}
+    progressive_logging = True
+    global log_list
+    log_list = []
     main()
+    write_log_file(log_list)
