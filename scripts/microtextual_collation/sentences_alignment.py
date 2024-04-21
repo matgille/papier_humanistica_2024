@@ -1,4 +1,5 @@
 import copy
+import glob
 import json
 import os
 import re
@@ -100,16 +101,16 @@ def align_lessons(file, overwrite=False):
         all_translations_id = []
         all_translations = []
         all_langs = ['es', 'fr', 'pt']
-        
+
         # This list allows to adapt the translation table produced at the end of the script
         current_lesson_langs = ['en']
-        
+
         # We sort the results to get an alphabetical order by language, to be able to retrieve the correct
         # text when producing the translation table
         translations_as_xml_tree[:] = sorted(translations_as_xml_tree,
                                              key=lambda x: x.xpath("descendant::tei:text/@xml:lang",
                                                                    namespaces=namespaces))
-        
+
         # We create the objects that will be parsed to produce the alignment
         # (list of sentences as text, as ids, list of langs)
         for version_idx, version in enumerate(translations_as_xml_tree):
@@ -166,11 +167,11 @@ def align_lessons(file, overwrite=False):
 
             original_as_XML = original_file
             translation_as_xml = translations_as_xml_tree[translation_index]
-            
+
             # An xml base is being written, we'll remove it.
             pop_attribute(original_file, "self::node()", "xml:base")
             pop_attribute(translation_as_xml, "self::node()", "xml:base")
-            
+
             # Management of the tei:s nodes
             for original_sent_id, translated_sent_id in aligned_positions_and_ids:
                 # We start with the original file
@@ -306,6 +307,29 @@ def save_final_result(merged_alignments: list, text_dict, lesson_id, all_transla
         output_html.write(full_html_file)
 
 
+def create_index_of_lessons():
+    list_of_lessons = []
+    index = ""
+    for file in glob.glob("../../data/alignment_tables/html/*.html"):
+        filename = file.split("/")[-1]
+        list_of_lessons.append(file)
+        index += f"\n<li><a href ='{file.replace('../../', '')}' >{filename}</a></li>"
+    index_as_html = f"""<html>
+                          <head>
+                          <title>Alignement final</title>
+                            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+                            </head>
+                          <body>
+                          <ul>
+                          {index}
+                          </ul>
+                          </body>
+                    </html>"""
+
+    with open("../../index.html", "w") as output_file:
+        output_file.write(index_as_html)
+
+
 if __name__ == '__main__':
     namespaces = {"tei": "http://www.tei-c.org/ns/1.0"}
     if len(sys.argv) != 1:
@@ -313,3 +337,4 @@ if __name__ == '__main__':
     else:
         overwrite = False
     align_lessons("../../data/tei_sentences_tokenized/main.xml", overwrite)
+    create_index_of_lessons()
