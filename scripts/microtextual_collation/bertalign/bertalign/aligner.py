@@ -1,14 +1,13 @@
 import numpy as np
 
-from bertalign.Bertalign import model
-import bertalign.corelib as core
-import bertalign.utils as utils
+import bertalign.bertalign.corelib as core
 import torch.nn as nn
 import torch
 
 
 class Bertalign:
     def __init__(self,
+                 model,
                  src,
                  tgt,
                  max_align=3,
@@ -26,22 +25,19 @@ class Bertalign:
         self.skip = skip
         self.margin = margin
         self.len_penalty = len_penalty
-
+        self.model = model
         src_sents = src
         tgt_sents = tgt
-        # print(src_sents)
-        # print(tgt_sents)
-
         src_num = len(src_sents)
         tgt_num = len(tgt_sents)
         assert len(src_sents) != 0, "Problemo"
 
-        print("Embedding source and target text using {} ...".format(model.model_name))
-        src_vecs, src_lens = model.transform(src_sents, max_align - 1)
-        tgt_vecs, tgt_lens = model.transform(tgt_sents, max_align - 1)
+        print("Embedding source and target text using {} ...".format(self.model.model_name))
+        src_vecs, src_lens = self.model.transform(src_sents, max_align - 1)
+        tgt_vecs, tgt_lens = self.model.transform(tgt_sents, max_align - 1)
 
-        self.search_simple_vecs = model.simple_vectorization(src_sents)
-        self.tgt_simple_vecs = model.simple_vectorization(tgt_sents)
+        self.search_simple_vecs = self.model.simple_vectorization(src_sents)
+        self.tgt_simple_vecs = self.model.simple_vectorization(tgt_sents)
 
         char_ratio = np.sum(src_lens[0,]) / np.sum(tgt_lens[0,])
 
