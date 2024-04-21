@@ -321,7 +321,7 @@ def clean_text_from_tokens(sentence):
 
 if __name__ == '__main__':
     namespaces = {"tei": "http://www.tei-c.org/ns/1.0"}
-    progressive_logging = True
+    progressive_logging = False
     global log_list
     log_list = []
     main()
