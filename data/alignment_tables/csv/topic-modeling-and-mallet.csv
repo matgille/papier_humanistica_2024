@@ -1,0 +1,269 @@
+Editor 's NoteþNota del editor
+This lesson requires you to use the command line .þEn esta lección es necesario utilizar la línea de comandos .
+If you have no previous experience using the command line you may find it helpful to work through the Programming Historian Bash Command Line lesson .þSi no tienes experiencia previa utilizándola , consulta la lección Introducción a la línea de comandos en Bash de Programming Historian .
+Lesson GoalsþObjetivos de la lección
+In this lesson you will first learn what topic modeling is and why you might want to employ it in your research .þEn esta lección , primero aprenderás qué es topic modeling y por qué podrías querer utilizarlo en tus investigaciones .
+You will then learn how to install and work with the MALLET natural language processing toolkit to do so .þLuego aprenderás cómo instalar y trabajar con MALLET , una caja de herramientas para procesamiento de lenguajes naturales ( PLN ) que sirve para realizar este tipo de análisis .
+MALLET involves modifying an environment variable ( essentially , setting up a short-cut so that your computer always knows where to find the MALLET program ) and working with the command line ( ie , by typing in commands manually , rather than clicking on icons or menus ) .þMALLET requiere que se modifique una variable de entorno ( esto es , configurar un atajo para que la computadora sepa en todo momento dónde encontrar el programa MALLET ) y que se trabaje con la línea de comandos ( es decir , tecleando comandos manualmente en vez de hacer clic en íconos o menús ) .
+We will run the topic modeller on some example files , and look at the kinds of outputs that MALLET installed .þAplicaremos el modelador de tópicos a algunos archivos de ejemplo y veremos los tipos de output que genera MALLET .
+This will give us a good idea of how it can be used on a corpus of texts to identify topics found in the documents without reading them individually .þEsto nos dará una buena idea de cómo se puede aplicar topic modeling a un corpus de textos para identificar tópicos o temas que se encuentran en los documentos , sin tener que leerlos individualmente .
+Please see the MALLET users ' discussion list for the full range of things one can do with the software .þPor favor , remítete a la lista de discusión de los usuarios de MALLET para aprender más sobre todo lo que se pueda hacer con este programa .
+( We would like to thank Robert Nelson and Elijah Meeks for hints and tips in getting MALLET to run for us the first time , and for their examples of what can be done with this tool .þ( Queremos agradecer a Robert Nelson y Elijah Meeks por consejos y sugerencias sobre cómo empezar a utilizar MALLET por primera vez y por sus ejemplos de lo que se puede hacer con esta herramienta .
+)þ)
+What is Topic Modeling And For Whom is this Useful ?þ¿Qué es Topic Modeling y para quién es útil ?
+A topic modeling tool takes a single text ( or corpus ) and looks for patterns in the use of words ; it is an attempt to inject semantic meaning into vocabulary .þUna herramienta de topic modeling toma un texto individual ( o un corpus ) y busca patrones en el uso de las palabras ; es un intento de encontrar significado semántico en el vocabulario de ese texto ( o corpus ) .
+Before you begin with topic modeling , you should ask yourself whether or not it is likely to be useful for your project .þAntes de empezar con topic modeling deberías preguntarte si es o no útil para tu proyecto .
+Matthew Kirschenbaum 's Distant Reading ( a talk given at the 2009 National Science Foundation Symposium on the Next Generation of Data Mining and Cyber-Enabled Discovery for Innovation ) and Stephen Ramsay 's Reading Machines are good places for beginning to understand in which circumstances a technique such as this could be most effective .þPara empezar a entender en qué circunstancias una técnica como esta es la más efectiva , te recomendamos Distant Reading de Matthew Kirschenbaum ( una charla dada en el simposio de la Fundación Nacional de Ciencias de los Estados Unidos en 2009 , sobre la próxima generación de extracción de datos y descubrimiento cibernético para la inovación ) y Reading Machines de Stephen Ramsay .
+As with all tools , just because you can use it , doesn't necessarily mean that you should .þComo toda herramienta , el hecho de que se pueda utilizar no significa que deberías hacerlo .
+If you are working with a small number of documents ( or even a single document ) it may well be that simple frequency counts are sufficient , in which case something like Voyant Tools might be appropriate .þSi trabajas con pocos documentos ( o incluso con un solo documento ) puede ser que cálculos de frecuencia sean suficientes , en cuyo caso algo como las herramientas Voyant quizá serían convenientes .
+However , if you have hundreds of documents from an archive and you wish to understand something of what the archive contains without necessarily reading every document , then topic modeling might be a good approach .þSi , en cambio , tienes cientos de documentos procedentes de un archivo y quieres comprender qué contiene el archivo , pero sin necesariamente leer cada documento , entonces topic modeling podría ser una buena opción .
+Topic models represent a family of computer programs that extract topics from texts .þLos modelos de tópicos son una familia de programas informáticos que extraen tópicos de textos .
+A topic to the computer is a list of words that occur in statistically meaningful ways .þPara la computadora , un tópico es una lista de palabras que se presenta de manera que sea estadísticamente significativa .
+A text can be an email , a blog post , a book chapter , a journal article , a diary entry – that is , any kind of unstructured text .þUn texto puede ser un email , una entrada de blog , un capítulo de libro , un artículo periodístico , una entrada de diario – es decir , todo tipo de texto no estructurado .
+By unstructured we mean that there are no computer-readable annotations that tell the computer the semantic meaning of the words in the text .þNo estructurado quiere decir que no haya anotaciones legibles por la computadora que indiquen el significado semántico de las palabras del texto .
+Topic modeling programs do not know anything about the meaning of the words in a text .þLos programas de modelización de tópicos no saben nada sobre el significado de las palabras en un texto .
+Instead , they assume that any piece of text is composed ( by an author ) by selecting words from possible baskets of words where each basket corresponds to a topic .þEn vez de eso , asumen que cada fragmento de texto está compuesto ( por un autor ( a ) ) a través de la selección de palabras desde posibles canastas de palabras , donde cada canasta corresponde a un tópico .
+If that is true , then it becomes possible to mathematically decompose a text into the probable baskets from whence the words first came .þSi eso es cierto , entonces es posible descomponer matemáticamente un texto en las canastas desde las que con mayor probabilidad provienen las palabras que lo componen .
+The tool goes through this process over and over again until it settles on the most likely distribution of words into baskets , which we call topics .þLa herramienta repite el proceso una y otra vez hasta que se establezca la distribución más probable de las palabras dentro de las canastas , que es lo que llamamos tópicos ( o topics , en inglés ) .
+There are many different topic modeling programs available ; this tutorial uses one called MALLET .þHay muchos programas diferentes para topic modeling ; esta lección utiliza uno que se llama MALLET .
+If one used it on a series of political speeches for example , the program would return a list of topics and the keywords composing those topics .þSi este método se aplicara , por ejemplo , a un conjunto de discursos políticos , se obtendría una lista de tópicos y las palabras clave que los constituyen .
+Each of these lists is a topic according to the algorithm .þCada una de esas listas es un tópico de acuerdo con el algoritmo .
+Using the example of political speeches , the list might look like :þEn el caso del ejemplo de discursos políticos , la lista podría verse así :
+Job Jobs Loss Unemployment Growthþempleo empleos pérdida desempleo crecimiento
+Economy Sector Economics Stock Banksþeconomía sector bolsa bancos
+Afghanistan War Troops Middle-East Taliban TerrorþAfganistán guerra tropa Medio_Oriente taliban terror
+Election Opponent Upcoming Presidentþelección adversario futuro presidente
+By examining the keywords we can discern that the politician who gave the speeches was concerned with the economy , jobs , the Middle East , the upcoming election , and so on .þExaminando las palabras clave podemos ver que el político que dio los discursos se refirió a la economía , los empleos , el Medio Oriente , las próximas elecciones , etc .
+As Scott Weingart warns , there are many dangers that face those who use topic modeling without fully understanding it .þComo advierte Scott Weingart , quienes utilizan topic modeling sin entenderlo completamente enfrentan muchos peligros .
+For instance , we might be interested in word use as a proxy for placement along a political spectrum .þPor ejemplo , podría interesarnos el uso de las palabras como un indicador para la ubicación en un espectro político .
+Topic modeling could certainly help with that , but we have to remember that the proxy is not in itself the thing we seek to understand – as Andrew Gelman demonstrates in his mock study of zombies using Google Trends .þTopic modeling sin duda podría ayudar con eso , pero hay que recordar que el indicador no es en sí lo que queremos comprender - como lo muestra Andrew Gelman en su estudio de maqueta sobre zombis , utilizando Google Trends .
+Ted Underwood and Lisa Rhody ( see Further Reading ) argue that we as historians would be better to think of these categories as discourses ; however for our purposes here we will continue to use the word : topic .þTed Underwood y Lisa Rhody ( véase Lecturas adicionales ) sostienen que para nosotros como historiadores sería mejor considerar estas categorías como discursos ; sin embargo , para nuestros objetivos , continuaremos utilizando la palabra : tópico .
+Note : You will sometimes come across the term `` LDA `` when looking into the bibliography of topic modeling .þNota : En la bibliografía sobre topic modeling , a veces encontrarás el término `` LDA `` .
+LDA and Topic Model are often used synonymously , but the LDA technique is actually a special case of topic modeling created by David Blei and friends in 2002 .þMuchas veces , LDA y topic modeling se usan como sinónimos , pero la técnica LDA es , en realidad , un caso especial de topic modeling desarrollado por David Blei y amigos en 2002 .
+It was not the first technique now considered topic modeling , but it is by far the most popular .þNo fue la primera técnica considerada como topic modeling pero es la más popular .
+The myriad variations of topic modeling have resulted in an alphabet soup of techniques and programs to implement them that might be confusing or overwhelming to the uninitiated ; ignore them for now .þLas innumerables variaciones de topic modeling han resultado en una sopa de letras de técnicas y programas para implementarlas , lo cual puede ser desconcertante o agobiante para los no iniciados en la materia y por esto no nos detendremos en ellos por ahora .
+They all work in much the same way . MALLET uses LDA .þTodos los algoritmos trabajan casi del mismo modo y MALLET en particular utiliza LDA .
+Examples of topic models employed by historians :þEjemplos de modelos de tópicos usados por historiadores :
+Rob Nelson , Mining the DispatchþRob Nelson , Mining the Dispatch
+Cameron Blevins , `` Topic Modeling Martha Ballard 's Diary `` Historying , April 1 , 2010 .þCameron Blevins , `` Topic Modeling Martha Ballard 's Diary `` Historying , April 1 , 2010 .
+David J Newman and Sharon Block , `` Probabilistic topic decomposition of an eighteenth century American newspaper , '' Journal of the American Society for Information Science and Technology vol .þDavid J Newman y Sharon Block , `` Probabilistic topic decomposition of an eighteenth century American newspaper , '' Journal of the American Society for Information Science and Technology vol .
+57 , no .þ57 , no .
+6 ( April 1 , 2006 ) : 753-767 .þ6 ( April 1 , 2006 ) : 753-767 .
+Installing MALLETþInstalar MALLET
+There are many tools one could use to create topic models , but at the time of this writing ( summer 2017 ) the simplest tool to run your text through is called MALLET .þHay muchas herramientas que se podrían utilizar para crear modelos de tópicos , pero al momento de escribir estas líneas ( en el verano de 2007 ) la herramienta más sencilla es MALLET .
+MALLET uses an implementation of Gibbs sampling , a statistical technique meant to quickly construct a sample distribution , to create its topic models .þMALLET utiliza una implementación del Muestreo de Gibbs , una técnica estadística destinada a construir rápidamente una distribución de muestras , para luego crear los modelos de tópicos correspondientes .
+MALLET requires using the command line – we 'll talk about that more in a moment , although you typically use the same few commands over and over .þPara utilizar MALLET es necesario trabajar en la línea de comandos – hablaremos más de esto en un instante . Lo bueno es que normalmente los mismos comandos se usan repetidamente .
+The installation instructions are different for Windows and Mac .þLas instrucciones de instalación son diferentes para Windows y Mac .
+Follow the instructions appropriate for you below :þSigue las instrucciones apropiadadas para ti :
+Windows InstructionsþInstrucciones para Windows
+Go to the MALLET project page .þVe a la página del proyecto MALLET .
+You can download MALLET here .þPuedes descargar MALLET aquí .
+You will also need the Java developer 's kit – that is , not the regular Java that 's on every computer , but the one that lets you program things .þTambién necesitarás el Kit de desarrollo de Java ( JDK ) - esto es , no el Java normal que se encuentra en cada computadora sino el que permite programar cosas .
+Install this on your computer .þInstala este en tu computadora .
+Unzip MALLET into your C : directory .þDescomprime MALLET en tu directorio C : .
+This is important : it can not be anywhere else .þEsto es importante : no puede ser en ningún otro lugar .
+You will then have a directory called C : \mallet-2.0.8 or similar .þTendrás un directorio llamado C : \mallet-2.0.8 o parecido .
+For simplicity 's sake , rename this directory just mallet .þPara simplificar , cambia el nombre simplemente a mallet .
+MALLET uses an environment variable to tell the computer where to find all the various components of its processes when it is running .þMALLET utiliza una variable de entorno para indicar a la computadora donde encontrar todos los componentes necesarios para sus procesos en el momento de ejecutarse .
+It 's rather like a shortcut for the program .þEs como un atajo para el programa .
+A programmer can not know exactly where every user will install a program , so the programmer creates a variable in the code that will always stand in for that location .þUn ( a ) programador ( a ) no puede saber exactamente donde cada usuario instala un programa . Por eso , él o ella crea una variable en el código que representa el lugar de instalación en cada momento .
+We tell the computer , once , where that location is by setting the environment variable .þPor medio de la variable de entorno indicamos a la computadora donde se encuentra ese lugar .
+If you moved the program to a new location , you 'd have to change the variable .þSi mueves el programa a otro lugar tendrás que cambiar esa variable .
+To create an environment variable in Windows 10 , click Start ( Windows icon ) or press the Windows key on your keyboard then type 'Control Panel ' .þPara crear una variable de entorno en Windows 10 , ve a Este equipo . Este equipo se encuentra o como ícono en el escritorio o en el explorador de archivos que se puede abrir haciendo clic en el menú Inicio - > Explorador de archivos .
+Within Control Panel , select System and Security .þHaz clic derecho en Este equipo y selecciona Propiedades .
+In System and Security , type 'Advanced ' into the search field ( upper right ) and choose 'View advanced system settings ' from the results . In the pop-up dialogue box , click 'Environmental Variables ' .þSe abre una nueva ventana .
+Next , click 'New ' and type MALLET_HOME in the variable name box ( Figures 1,2,3 ) .þSelecciona la opción Configuración avanzada del sistema ( figuras 1 , 2 , 3 ) . Haz clic en Nueva ... y escribe MALLET_HOME en la casilla Nombre de la variable .
+It must be like this – all caps , with an underscore – since that is the shortcut that the programmer built into the program and all of its subroutines .þTiene que ser así – todo en mayúsculas y con un guión bajo – porque ese es el atajo que el o la programador ( a ) ha incluido en el programa y todos sus subprogramas .
+Then type the exact path ( location ) of where you unzipped MALLET in the variable value , e.g. , c : \mallet .þEntonces escribe la ruta exacta ( ubicación ) de donde descomprimiste MALLET en la casilla Valor de la variable , por ejemplo C : \mallet\ .
+To see if you have been successful , please read on to the next section .þPara ver si lo lograste , por favor continúa leyendo el próximo apartado .
+Figure 1 : Advanced System Settings on WindowsþFigura 1 : Configuración avanzada del sistema en Windows
+Figure 2 : Environment Variables LocationþFigura 2 : Lugar de las variables de entorno
+Figure 3 : Environment VariableþFigura 3 : Variable de entorno
+Running MALLET using the Command LineþEjecutar MALLET usando la línea de comandos
+MALLET is run from the command line , also known as Command Prompt ( Figure 4 ) .þMALLET se ejecuta desde la línea de comandos , conocida también como Símbolo del sistema ( figura 4 ) .
+If you remember MS-DOS , or have ever played with a Unix computer Terminal , this will be familiar .þSi recuerdas MS-DOS o alguna vez has experimentado con un terminal de computadora Unix , ya reconocerás esto .
+The command line is where you can type commands directly , rather than clicking on icons and menus .þEn la línea de comandos puedes teclear comandos directamente en vez de hacer clic en íconos o menús .
+Figure 4 : Command Prompt on WindowsþFigura 4 : Línea de comandos en Windows
+Click on your Start Menu - > All Programs - > Accessories - > Command Prompt .þHaz clic en tu menú Inicio - > Sistema de Windows - > Símbolo del sistema .
+You 'll get the command prompt window , which will have a cursor at c : \user\user > ( or similar ; see Figure 4 ) .þSe abre la ventana de la línea de comandos que tendrá el cursor en C : \Users\User > ( o parecido ; véase figura 4 ) .
+Type cd .. ( That is : cd-space-period-period ) to change directory .þTeclea cd .. ( Es decir : cd-espacio-punto-punto ) y presiona Entrar para cambiar directorio .
+Keep doing this until you 're at the C : \ . ( as in Figure 5 )þSigue haciendo esto hasta llegar a C : \ ( como en la figura 5 ) .
+Figure 5 : Navigating to the C : \ Directory in Command Promptþ
+Then type cd mallet and you are in the MALLET directory .þLuego escribe cd mallet y estarás en el directorio de MALLET .
+Anything you type in the command prompt window is a command .þTodo lo que escribas en la ventana de la línea de comandos es un comando .
+There are commands like cd ( change directory ) and dir ( list directory contents ) that the computer understands .þHay comandos como cd ( cambiar directorio ) o dir ( listar los contenidos del directorio ) que la computatora entiende .
+You have to tell the computer explicitly that 'this is a MALLET command ' when you want to use MALLET .þSi quieres utilizar MALLET tienes que decirle de manera explícita 'esto es un comando de MALLET ' .
+You do this by telling the computer to grab its instructions from the MALLET bin , a subfolder in MALLET that contains the core operating routines .þPara esto , se le especifica a la computadora que tiene que tomar sus instrucciones de la carpeta bin , un subdirectorio de MALLET que contiene las rutinas operacionales principales .
+Type bin\mallet as in Figure 6 .þTeclea bin\mallet como en la figura 6 .
+If all has gone well , you should be presented with a list of MALLET commands – congratulations !þSi todo ha ido bien deberías ver una lista de comandos de MALLET – ¡felicitaciones !
+If you get an error message , check your typing .þSi recibes un mensaje de error comprueba lo que has escrito .
+Did you use the wrong slash ?þ¿Utilizaste un tipo de barra equivocado ?
+Did you set up the environment variable correctly ?þ¿Configuraste la variable de entorno correctamente ?
+Is MALLET located at C : \mallet ?þ¿Se encuentra MALLET en C : \mallet ?
+þFigura 5 : Navegar al directorio C : \ en la línea de comandos
+Figure 6 : Command Prompt MALLET InstalledþFigura 6 : Línea de comandos : MALLET instalado
+You are now ready to skip ahead to the next section .þAhora estás preparado para avanzar a la próxima sección .
+Mac InstructionsþInstrucciones para Mac
+Many of the instructions for OS X installation are similar to Windows , with a few differences .þMuchas de las instrucciones para la instalación en OS X se parecen a las instrucciones para Windows , con pocas excepciones .
+In fact , it is a bit easier .þEn realidad , es un poco más fácil ejecutar comandos de MALLET en Mac .
+Download and install MALLET .þDescarga e instala MALLET .
+Download the Java Development Kit .þDescarga el Kit de desarrollo de Java ( JDK ) .
+Unzip MALLET into a directory on your system ( for ease of following along with this tutorial , your /user/ directory works but anywhere is okay ) .þDescomprime MALLET en un directorio en tu sistema ( para seguir esta lección con facilidad , escoge tu directorio /User/ , aunque otro lugar funcionará igualmente ) .
+Once it is unzipped , open up your Terminal window ( in the Applications directory in your Finder .þCuando esté descomprimido , abre tu ventana Terminal ( dentro del directorio Aplicaciones en tu Finder ) .
+Navigate to the directory where you unzipped MALLET using the Terminal ( it will be mallet-2.0.8 .þUsando la Terminal , navega al directorio donde descomprimiste MALLET ( será mallet-2.0.8 o mallet si cambiaste el nombre de la carpeta para simplificarlo .
+If you unzipped it into your /user/ directory as was suggested in this lesson , you can navigate to the correct directory by typing cd mallet-2.0.8 ) .þSi descomprimiste MALLET en tu directorio /User/ como se sugiere en esta lección , puedes navegar al directorio correcto tecleando cd mallet-2.0.8 o bien cd mallet ) .
+cd is short for `` change directory '' when working in the Terminal .þcd es la abreviatura para `` cambiar directorio '' cuando se trabaja en la Terminal .
+The same command will suffice to run commands from this directory , except you need to append ./ ( period-slash ) before each command .þ
+This needs to be done before all MALLET commands when working on a Mac . Going forward , the commands for MALLET on a Mac will be nearly identical to those on Windows , except for the direction of slashes ( there are a few other minor differences that will be noted when they arise ) .þEn adelante , los comandos de MALLET en Mac son casi idénticos a los de Windows , con excepción de la dirección de las barras ( hay algunas otras diferencias menores que se señalarán cuando resulte necesario ) .
+If on Windows a command would be \bin\mallet , on a Mac you would instead type :þSi el comando es \bin\mallet en Windows , en Mac sería :
+A list of commands should appear .þDebería aparecer una lista de comandos .
+If it does , congratulations – you've installed it correctly !þDe ser así , ¡felicitaciones – has instalado MALLET correctamente !
+Typing in MALLET CommandsþEjecutar comandos de MALLET
+Now that you have MALLET installed , it is time to learn what commands are available to use with the program .þAhora que has instalado MALLET , es hora de aprender qué comandos se pueden ejecutar con el programa .
+There are nine MALLET commands you can use ( see Figure 6 above ) .þHay nueve comandos diferentes ( véase figura 6 arriba ) .
+Sometimes you can combine multiple instructions .þA veces puedes combinar varias instrucciones .
+At the Command Prompt or Terminal ( depending on your operating system ) , try typing :þSegún tu sistema operativo , teclea en el Símbolo del sistema o la Terminal :
+You are presented with the error message that import-dir is not recognized as an internal or external command , operable program , or batch file .þSe te presentará un mensaje de error indicando que import-dir no se reconoce como orden o comando .
+This is because we forgot to tell the computer to look in the MALLET bin for it .þEso es así porque olvidamos decir a la computadora que buscara el comando dentro de MALLET bin .
+Try again , withþInténtalo otra vez con
+Remember , the direction of the slash matters ( See Figure 7 , which provides an entire transcript of what we have done so far in the tutorial ) .þRecuerda que la dirección de las barras es importante ( tal como se ve en la figura 7 que muestra una transcripción completa de lo que hemos hecho en la lección hasta ahora ) .
+We checked to see that we had installed MALLET by typing in bin\mallet .þAl teclear bin\mallet , comprobamos que MALLET está instalado .
+We then made the mistake with import-dir a few lines further down .þLuego generamos el error con import-dir algunas líneas más adelante .
+After that , we successfully called up the help file , which told us what import-dir does , and it listed all of the potential parameters you can set for this tool .þDespués de esto , conseguimos llamar al archivo de ayuda correctamente , el cual nos dijo lo que hace el comando import-dir y qué tipo de parámetros se pueden fijar para esta herramienta .
+Figure 7 : The Help Menu in MALLETþFigura 7 : El menú de ayuda en MALLET
+Note : there is a difference in MALLET commands between a single hyphen and a double hyphen .þNota : en los comandos de MALLET hay una diferencia entre un guión simple y un guión doble .
+A single hyphen is simply part of the name ; it replaces a space ( e.g. , import-dir rather than import dir ) , since spaces offset multiple commands or parameters .þEl guión simple es parte del nombre y sustituye un espacio ( por ejemplo , import-dir en vez de import dir ) , porque los espacios tienen la función de separar diferentes comandos o parámetros .
+These parameters let us tweak the file that is created when we import our texts into MALLET .þMediante estos parámetros podemos ajustar el archivo que se crea cuando importamos nuestros textos a MALLET .
+A double hyphen ( as with –-help above ) modifies , adds a sub-command , or specifies some sort of parameter to the command .þUn guión doble ( como por ejemplo -- help arriba ) modifica o añade un subcomando , o bien especifica algún tipo de parámetro para el comando .
+For Windows users , if you got the error 'exception in thread `` main '' java.lang.NoClassDefFoundError : ' it might be because you installed MALLET somewhere other than in the C : \ directory .þPara usuarios de Windows , si recibes el mensaje de error 'exception in thread `` main '' java.lang.NoClassDefFoundError : ' puede deberse a que instalaste MALLET en algún otro lugar que no sea el directorio C : \ .
+For instance , installing MALLET at C : \Program Files\mallet will produce this error message .þPor ejemplo , instalando MALLET en C : \Archivos de programa\mallet producirá este mensaje de error .
+The second thing to check is that your environment variable is set correctly .þLo segundo que se debe comprobar es si la variable de entorno está configurada correctamente .
+In either of these cases , check the Windows installation instructions and double check that you followed them properly .þEn cualquier caso , consulta las instrucciones de instalación en Windows y verifica que las seguiste correctamente .
+Working with dataþTrabajar con datos
+MALLET comes pre-packaged with sample .txt files with which you can practice .þMALLET exige datos en texto plano . Para ello , cada texto suele guardarse en un archivo .txt .
+Type dir at the C : \mallet > prompt , and you are given the listing of the MALLET directory contents .þEl conjunto de esos archivos conformará el corpus . Puedes descargar un corpus de muestra con textos en español aquí .
+One of those directories is called sample-data .þDescomprime el archivo ZIP en algún lugar de tu computadora y recuerda este lugar .
+You know it is a directory because it has the word < dir > beside it .þEn esta lección lo guardamos en el escritorio del usuario para poder encontrarlo fácilmente .
+Type cd sample-data .þPara navegar al directorio del corpus teclea cd C : \Users\User\Desktop\ensayos-de-jose-marti en la línea de comandos ( o similar dependiendo de dónde guardaste la carpeta descomprimida en tu computadora ) .
+Type dir again . Using what you know , navigate to first the web then the en directories .þEscribe dir ( ls para Mac ) para que se te muestre la lista de los contenidos del directorio ensayos-de-jose-marti ( véase figura 8 ) .
+You can look inside these .txt files by typing the full name of the file ( with extension ) .þPara abrir uno de los archivos de texto , escribe el nombre entero del archivo incluyendo la extensión al final . Figura 8 : Navegar al corpus de textos
+Note that you can not now run any MALLET commands from this directory .þTen en cuenta que ahora no puedes ejecutar ningún comando MALLET dentro de este directorio .
+Try it :þInténtalo :
+You get the error message . You will have to navigate back to the main MALLET folder to run the commands .þSi recibes un mensaje de error , tendrás que volver al directorio principal de MALLET para poder ejecutar los comandos ( por ejemplo con cd C : \mallet\ ) .
+This is because of the way MALLET and its components are structured .þEsto se debe a la manera como están estructurados MALLET y sus componentes .
+Importing dataþImportar datos
+In the sample data directory , there are a number of .txt files .þEn el directorio ensayos-de-jose-marti se encuentran varios archivos .txt .
+Each one of these files is a single document , the text of a number of different web pages .þCada uno de estos archivos es un documento individual , en este caso , el texto de un ensayo .
+The entire folder can be considered to be a corpus of data .þEl directorio entero se puede considerar un corpus de datos .
+To work with this corpus and find out what the topics are that compose these individual documents , we need to transform them from several individual text files into a single MALLET format file .þPara trabajar con este corpus y descubrir cuáles son los tópicos ( o temas ) que componen los documentos individuales , necesitamos transformarlos desde varios archivos de texto individuales a un único archivo en formato MALLET .
+MALLET can import more than one file at a time .þMALLET puede importar más de un archivo a la vez .
+We can import the entire directory of text files using the import command .þPodemos importar todo el directorio de archivos de texto mediante el comando import .
+The commands below import the directory , turn it into a MALLET file , keep the original texts in the order in which they were listed , and strip out the stop words ( words such as and , the , but , and if that occur in such frequencies that they obstruct analysis ) using the default English stop-words dictionary .þLos comandos de más abajo importan el directorio , lo convierten a un archivo MALLET , mantienen los archivos originales en el orden en que estaban listados y eliminan stop words ( esto es , palabras de función como y , el , la , pero , si , que ocurren en frecuencias tan altas que obstruyen el análisis ) . MALLET viene provisto de algunos diccionarios de palabras vacías , por ejemplo para inglés .
+Try the following , which will use sample data .þSi se quiere utilizar el diccionario predeterminado , el parámetro -- remove-stopwords es suficiente .
+If you type dir now ( or ls for Mac ) , you will find a file called tutorial.mallet .þComo no hay ningún diccionario predeterminado para español , es necesario incluirlo a través del parámetro -- stoplist-file . Para la mayoría de los idiomas es fácil encontrar listas de stop words en la red .
+( If you get an error message , you can hit the cursor up key on your keyboard to recall the last command you typed , and look carefully for typos ) .þPor ejemplo , puedes descargar una lista de palabras vacías en español en GitHub . Guárdala en tu computadora e indica la ruta a este fichero en el comando tal como está arriba : -- stoplist-file C : \Users\User\Desktop\stopwords-es.txt ( nombre del parámetro-espacio-ruta al fichero ) .
+This file now contains all of your data , in a format that MALLET can work with .þEl parámetro -- output junto con una ruta de fichero indica donde se guarda el corpus importado en formato MALLET , en este caso en el escritorio : C : \Users\User\Desktop\leccion.mallet .
+Try running it again now with different data . For example , let 's imagine we wanted to use the German sample data instead .þ( Si aparece un mensaje de error en el momento de ejecutar el comando , puedes usar la tecla de flecha arriba para recuperar el último comando que escribiste y checar si hay erratas ) .
+We would use :þAhora el fichero leccion.mallet contiene todos los datos en un formato que MALLET reconoce .
+And then finally , you could use your own data .þTambién podrías utilizar tus propios datos .
+Change sample-data\web\de to a directory that contains your own research files .þCambia C : \Users\User\Desktop\ensayos-jose-marti a un directorio que contenga tus propios archivos de investigación .
+Good luck !þ¡Buena suerte !
+If you are unsure how directories work , we suggest the Programming Historian lesson `` Introduction to the Bash Command Line '' .þSi no estás seguro de cómo funcionan los directorios , te recomendamos la lección Introducción a la línea de comandos en Bash de Programming Historian .
+For MacþPara Mac
+Mac instructions are similar to those above for Windows , but note some of the differences below :þLas instrucciones para Mac son parecidas a las de Windows , con algunas diferencias que puedes notar en el siguiente ejemplo :
+Issues with Big DataþProblemas con datos a gran escala
+If you 're working with large file collections – or indeed , very large files – you may run into issues with your heap space , your computer 's working memory .þSi trabajas con colecciones grandes de archivos – o también archivos muy grandes – puedes enfrentar problemas con tu heap space , la memoria de trabajo de tu computadora .
+This issue will initially arise during the import sequence , if it is relevant .þSi es relevante , este asunto suele surgir al principo , durante el proceso de importación .
+By default , MALLET allows for 1GB of memory to be used .þPor defecto , MALLET permite trabajar con una memoria de 1 GB .
+If you run into the following error message , you 've run into your limit :þSi recibes el siguiente mensaje de error , alcanzaste tu límite :
+If your system has more memory , you can try increasing the memory allocated to your Java virtual machine .þSi tu sistema tiene más memoria , puedes tratar de aumentar la memoria asignada a tu máquina virtual Java .
+To do so , you need to edit the code in the mallet file found in the bin subdirectory of your MALLET folder .þPara hacerlo , tienes que editar el código en el fichero mallet que se encuentra en el subdirectorio bin de tu carpeta MALLET .
+Using Komodo Edit , ( See Mac , Windows , Linux for installation instructions ) , open the Mallet.bat file ( C : \Mallet\bin\mallet.bat ) if you are using Windows , or the mallet file ( ~/Mallet/bin/mallet ) if you are using Linux or OS X .þAbre el archivo Mallet.bat ( C : \Mallet\bin\mallet.bat ) si trabajas en Windows o el archivo mallet ( ~/Mallet/bin/mallet ) si trabajas en Linux u OS X. Ábrelo con el programa Komodo Edit ( véase Mac , Windows , Linux para instrucciones de instalación ) .
+Find the following line :þEncuentra la línea siguiente :
+You can then change the 1g value upwards – to 2g , 4g , or even higher depending on your system 's RAM , which you can find out by looking up the machine 's system information .þPuedes aumentar el valor de 1g a 2g , 4g o aun más según la memoria de trabajo ( RAM ) que tenga tu sistema . Puedes encontrar esa información checando la información del sistema .
+Save your changes .þGuarda los cambios .
+You should now be able to avoid the error .þAhora no debería aparecer el error .
+If not , increase the value again .þSi no , aumenta el valor otra vez .
+Your first topic modelþTu primer modelo de tópicos
+At the command prompt in the MALLET directory , type :þEscribe en la línea de comandos en el directorio MALLET :
+This command opens your tutorial.mallet file , and runs the topic model routine on it using only the default settings .þEste comando abre tu archivo leccion.mallet y ejecuta la rutina de topic modeling , en este caso con la configuración predeterminada .
+As it iterates through the routine , trying to find the best division of words into topics , your command prompt window will fill with output from each run .þLa rutina se repite tratando de encontrar la mejor asignación de palabras a tópicos . Tu línea de comandos se llena con los resultados de cada iteración .
+When it is done , you can scroll up to see what it was outputting ( as in Figure 8 ) .þCuando concluya puedes desplazarte hacia arriba para ver lo que se imprimió ( como en la figura 9 ) .
+Figure 8 : Basic Topic Model OutputþFigura 9 : Resultados de un modelo de tópicos básico
+The computer is printing out the key words , the words that help define a statistically significant topic , per the routine .þLa computadora imprime las palabras clave , es decir , las palabras que ayudan a definir un tópico estadísticamente significativo , según la rutina .
+In Figure 8 , the first topic it prints out might look like this ( your key words might look a bit different ) :þEn la figura 9 , el primer tópico que se imprime podría verse así ( tus palabras clave podrían ser un poco diferentes ) :
+If you are a fan of cricket , you will recognize that all of these words could be used to describe a cricket match . What we are dealing with here is a topic related to Australian cricket .þReconocerás que muchas de las palabras se refieren a economía y política .
+If you go to C : \mallet\sample-data\web\en\hill.txt , you will see that this file is a brief biography of the noted Australian cricketer Clem Hill .þDe hecho , en el corpus hay un documento con el nombre el-congreso-de-Washington.txt que contiene un ensayo de José Martí sobre un congreso que se celebró en Washington en 1889 y que fue parte de la primera conferencia panamericana . Es de suponer que este y algunos otros documentos del corpus contribuyeron a la lista de palabras clave del primer tópico .
+The 0 and the 5 we will talk about later in the lesson .þMás adelante explicaremos qué significan los números 0 y 0,5 .
+Note that MALLET includes an element of randomness , so the keyword lists will look different every time the program is run , even if on the same set of data .þObserva que MALLET incluye elementos aleatorios , así que las listas de palabras clave serán diferentes cada vez que el programa se ejecute , incluso cuando se utilice el mismo conjunto de datos .
+Go back to the main MALLET directory , and type dir .þVuelve al escritorio y teclea dir .
+You will see that there is no output file .þVerás que no hay ningún output nuevo .
+While we successfully created a topic model , we did not save the output !þ¡Creamos un topic model con éxito pero no guardamos los resultados !
+At the command prompt , typeþVuelve al directorio de MALLET y escribe en la línea de comandos :
+Here , we have told MALLET to create a topic model ( train-topics ) and everything with a double hyphen afterwards sets different parametersþAquí , le decimos a MALLET que cree un modelo de tópicos ( train-topics ) . Todo lo que empieza con guión doble después del comando principal sirve para configurar parámetros :
+This commandþEste comando
+opens your tutorial.mallet fileþabre tu archivo leccion.mallet
+trains MALLET to find 20 topicsþprepara MALLET a encontrar 10 tópicos
+outputs every word in your corpus of materials and the topic it belongs to into a compressed file ( .gz ; see www.gzip.org on how to unzip this )þimprime cada palabra de tu corpus y el tópico al que pertenece en un archivo comprimido ( .gz ; véase gzip sobre cómo descomprimirlo )
+outputs a text document showing you what the top key words are for each topic ( tutorial_keys.txt )þproduce un documento de texto que muestra cuáles son las palabras clave principales para cada tópico ( leccion_topicos.txt )
+and outputs a text file indicating the breakdown , by percentage , of each topic within each original text file you imported ( tutorial_composition.txt ) .þy produce un archivo de texto que indica el porcentaje de cada tópico en cada documento de texto que importaste ( leccion_topicos_en_docs.txt ) .
+( To see the full range of possible parameters that you may wish to tweak , type bin\mallet train-topics –-help at the prompt .þ( Para ver todos los parámetros del comando train-topics que se pueden ajustar , teclea bin\mallet train-topics -- help en la línea de comandos .
+)þ)
+Type dir .þTeclea dir C : \Users\User\Desktop .
+Your outputted files will be at the bottom of the list of files and directories in C : \Mallet .þTus outputs aparecerán en la lista de archivos y directorios dentro del directorio del escritorio .
+Open tutorial_keys.txt in a word processor ( Figure 9 ) .þAbre leccion_topicos.txt en un procesador de texto ( figura 10 ) .
+You are presented with a series of paragraphs .þPuedes ver una serie de párrafos .
+The first paragraph is topic 0 ; the second paragraph is topic 1 ; the third paragraph is topic 2 ; etc. ( The output begins counting at 0 rather than 1 ; so if you ask it to determine 20 topics , your list will run from 0 to 19 ) .þEl primer párrafo corresponde al tópico 0 ; el segundo párrafo al tópico 1 ; el tercero al tópico 2 , etc. ( En el output , la cuenta comienza en 0 y no 1 ; así que con 10 tópicos , la lista va desde 0 a 9 ) .
+The second number in each paragraph is the Dirichlet parameter for the topic .þEl segundo número en cada párrafo es el parámetro Dirichlet para el tópico .
+This is related to an option which we did not run , and so its default value was used ( this is why every topic in this file has the number 2.5 ) .þEse parámetro está relacionado con una opción que no utilizamos , por lo que tiene el valor por defecto ( por eso cada tópico en este fichero lleva el número 0,5 ) .
+Figure 9 : Keywords Shown in a Word ProcessorþFigura 10 : Palabras clave en un procesador de texto
+If when you ran the topic model routine you had includedþSi al ejecutar la rutina de topic modeling hubieras incluido
+as belowþcomo abajo
+the output might look like this :þla salida podría haber sido :
+That is , the first number is the topic ( topic 0 ) , and the second number gives an indication of the weight of that topic .þEl primer número es el tópico ( topic 0 ) y el segundo número indica el peso de este tópico .
+In general , including -–optimize-interval leads to better topics .þGeneralmente , los tópicos resultan mejores si se incluye el parámetro -- optimize-interval .
+The composition of your documentsþLa composición de tus documentos
+What topics compose your documents ?þ¿Qué tópicos componen tus documentos ?
+The answer is in the tutorial_composition.txt file .þLa respuesta está en el archivo leccion_topicos_en_docs.txt .
+To stay organized , import the tutorial_composition.txt file into a spreadsheet ( Excel , Open Office , etc ) .þPara mantener todo organizado , importa el archivo leccion_topicos_en_docs.txt a una hoja de cálculo ( en Excel , Open Office , etc. ) .
+You will have a spreadsheet with a # doc , source , topic , proportion columns .þTendrás una tabla con las columnas número de documento , fuente , proporción del tópico .
+All subsequent columns run topic , proportion , topic , proportion , etc. , as in figure 10 .þTodas las columnas subsiguientes son proporciones de los tópicos , como en la figura 11 .
+Figure 10 : Topic CompositionþFigura 11 : Tópicos en documentos
+This can be a somewhat difficult file to read .þPuede resultar difícil leer estos datos .
+The topics begin in the third column , in this case Column C , and continue until the last topic in Column V. This is because we have trained 20 topics – if we trained 25 , for example , they would run until column AA .þLos tópicos comienzan en la tercera columna , en este caso en la columna C , y continúan hasta el último tópico en la columna L. Es así porque entrenamos 10 tópicos – si hubiéramos entrenado 20 , por ejemplo , llegarían hasta la columna V .
+From this , you can see that doc # 0 ( ie , the first document loaded into MALLET ) , elizabeth_needham.txt has topic 0 at a percentage of 0.43 % ( column C ) .þA partir de esto , se puede ver que en el documento número 0 ( es decir , el primer documento cargado en MALLET ) , a-aprender-en-las-haciendas.txt , el tópico 0 tiene un porcentaje de 0.33 % ( columna C ) .
+We can see that topic 17 is the principal topic , at 59.05 % , by locating the highest value .þSi buscamos el valor más alto en esta fila , podemos ver que el tópico 3 es el más importante en este documento , con un porcentaje de 69.24 % .
+Your own topics may be different given the nature of MALLET .þDada la naturaleza de MALLET , tus propios tópicos pueden tener valores diferentes .
+If you have a corpus of text files that are arranged in chronological order ( e.g. , 1.txt is earlier than 2.txt ) , then you can graph this output in your spreadsheet program , and begin to see changes over time , as Robert Nelson has done in Mining the Dispatch .þSi tienes un corpus de archivos de texto que están organizados en orden cronológico ( por ejemplo que 1.txt sea anterior a 2.txt ) , podrías generar un gráfico en tu programa de hoja de cálculo y empezar a ver cambios con el tiempo , tal como lo hizo Robert Nelson en Mining the Dispatch .
+How do you know the number of topics to search for ?þ¿Cómo puedes saber cuál es la cantidad adecuada de tópicos ?
+Is there a natural number of topics ?þ¿Hay una cantidad natural de tópicos ?
+What we have found is that one has to run the train-topics with varying numbers of topics to see how the composition file breaks down .þHemos descubierto que hay que ejecutar train-topics varias veces con distintas cantidades de tópicos para ver cómo la distribución de los tópicos en los documentos cambia .
+If we end up with the majority of our original texts all in a very limited number of topics , then we take that as a signal that we need to increase the number of topics ; the settings were too coarse .þSi encontramos que la mayoría de los textos están dominados por muy pocos tópicos , lo interpretamos como una señal de necesitar aumentar la cantidad de tópicos ; las preferencias fueron demasiado amplias .
+There are computational ways of searching for this , including using MALLETs hlda command , but for the reader of this tutorial , it is probably just quicker to cycle through a number of iterations ( but for more see Griffiths , T .þHay maneras de buscar la mejor configuración automáticamente , por ejemplo mediante el comando hlda de MALLET , pero para los lectores de esta lección probablemente es más rápido realizar algunas iteraciones ( para más información consulta Griffiths , T .
+L. , & Steyvers , M .þL. , & Steyvers , M .
+( 2004 ) .þ( 2004 ) .
+Finding scientific topics . Proceedings of the National Academy of Science , 101 , 5228-5235 ) .þFinding scientific topics . Proceedings of the National Academy of Science , 101 , 5228-5235 ) .
+Getting your own texts into MALLETþAnalizar tus propios textos con MALLET
+The sample data folder in MALLET is your guide to how you should arrange your texts .þLa carpeta sample data en el directorio de MALLET ( C : \mallet\sample-data ) te puede servir como guía para saber cómo organizar tus textos .
+You want to put everything you wish to topic model into a single folder within c : \mallet , ie c : \mallet\mydata .þPon todo lo que deseas en una sola carpeta , por ejemplo C : \mis-datos .
+Your texts should be in .txt format ( that is , you create them with Notepad , or in Word choose Save As - > MS Dos text ) .þTus archivos deben contener texto llano y estar en el formato .txt ( puedes crearlos en un procesador de textos como Notepad , Sublime Text o Atom , por ejemplo , y guardarlos como Texto ( * .txt ) o Texto sin formato ) .
+You have to make some decisions .þTienes que tomar algunas decisiones .
+Do you want to explore topics at a paragraph by paragraph level ?þ¿Quieres explorar los tópicos a nivel de párrafos ?
+Then each txt file should contain one paragraph .þEntonces cada archivo .txt debería contener solo un párrafo .
+Things like page numbers or other identifiers can be indicated in the name you give the file , e.g. , pg32_paragraph1.txt .þEn los nombres de los archivos puedes agregar información como el número de la página u otros identificadores , por ejemplo : pag32_parr1.txt .
+If you are working with a diary , each text file might be a single entry , e.g. , april_25_1887.txt .þSi trabajas con un diario , cada archivo de texto podría ser una entrada de diario , por ejemplo : abril_25_1887.txt .
+( Note that when naming folders or files , do not leave spaces in the name . Instead use underscores to represent spaces ) .þ( Nota que es importante no dejar espacios en los nombres de carpetas y archivos ) .
+If the texts that you are interested in are on the web , you might be able to automate this process .þSi los textos que te interesan están en la red , podrías automatizar este proceso .
+Further Reading about Topic ModelingþLecturas adicionales sobre Topic Modeling
+To see a fully worked out example of topic modeling with a body of materials culled from webpages , see Mining the Open Web with Looted Heritage Draft .þPara ver un ejemplo desarrollado de topic modeling basado en materiales obtenidos de páginas web , véase Mining the Open Web with Looted Heritage Draft .
+You can grab the data for yourself at Figshare.com , which includes a number of .txt files .þPuedes reutilizar los datos tomándolos de Figshare.com donde están incluidos algunos archivos .txt .
+Each individual .txt file is a single news report .þCada uno de los ficheros .txt contiene una noticia individual .
+For extensive background and bibliography on topic modeling you may wish to begin with Scott Weingart 's Guided Tour to Topic ModelingþPara amplia información adicional y una bibliografía sobre topic modeling podrías empezar con el Guided Tour to Topic Modeling de Scott Weingart .
+Ted Underwood 's ' Topic modeling made just simple enough ' is an important discussion on interpreting the meaning of topics .þUna discusión importante sobre la interpretación del significado de los tópicos es ' Topic modeling made just simple enough ' de Ted Underwood .
+Lisa Rhody 's post on interpreting topics is also illuminating. ' Some Assembly Required ' Lisa @ Work August 22 , 2012 .þEl artículo de blog ' Some Assembly Required ' Lisa @ Work 22 de agosto de 2012 escrito por Lisa Rhody también es muy revelador .
+Clay Templeton , ' Topic Modeling in the Humanities : An Overview | Maryland Institute for Technology in the Humanities ' , n.d .þClay Templeton , ' Topic Modeling in the Humanities : An Overview ' , Maryland Institute for Technology in the Humanities , n.d .
+David Blei , Andrew Ng , and Michael Jordan , ' Latent dirichlet allocation , ' The Journal of Machine Learning Research 3 ( 2003 ) .þDavid Blei , Andrew Ng , and Michael Jordan , ' Latent dirichlet allocation ' , The Journal of Machine Learning Research 3 ( 2003 ) .
+Finally , also consult David Mimno 's bibliography of topic modeling articles .þFinalmente , te recomendamos que consultes la bibliografía de artículos sobre topic modeling de David Mimno .
+They 're tagged by topic to make finding the right one for a particular application that much easier .þEstán clasificados por temas para facilitar encontrar el artículo más adecuado para una aplicación determinada .
+Also take a look at his recent article on Computational Historiography from ACM Transactions on Computational Logic which goes through a hundred years of Classics journals to learn something about the field .þTambién puedes echar un vistazo a su reciente artículo sobre Historiografía Computacional en la revista ACM Transactions on Computational Logic en el que analiza revistas científicas de los Clásicos a lo largo de cien años para aprender algo sobre este campo .
+While the article should be read as a good example of topic modeling , his 'Methods ' section is especially important , in that it discusses preparing text for this sort of analysis .þMientras el artículo debe leerse como un buen ejemplo de topic modeling , su sección sobre 'métodos ' es especialmente relevante porque incluye una discusión sobre cómo preparar los textos para un análisis de ese tipo . Notas de traducción
