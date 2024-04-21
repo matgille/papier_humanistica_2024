@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import sys
 
 import torch
 import tqdm
@@ -36,7 +37,6 @@ def run_align(src, tgt, align_layer, threshold):
         sub2word_map_tgt += [i for x in word_list]
 
     # alignment
-    device = "cpu"
     model.to(device)
     model.eval()
     if device != "cpu":
@@ -101,7 +101,13 @@ def write_to_log(string):
                 log_file.write(string)
             log_file.write("\n")
     else:
-        log_list.append(string)
+        if type(string) != str:
+            if type(string) in [list, dict]:
+                log_list.append((json.dumps(string)))
+            else:
+                log_list.append(str(string))
+        else:
+            log_list.append(string)
 
 
 def main():
@@ -118,9 +124,11 @@ def main():
     as_tree = ET.parse(main_file)
     as_tree.xinclude()
     concepts_dictionary = dict()
-    # "descendant::tei:TEI[descendant::tei:TEI[@xml:id='preservar-datos-de-investigacion']]/tei:TEI[@type='original']
+    test_query = "descendant::tei:TEI[descendant::tei:TEI[@xml:id='extrair-paginas-ilustradas-com-python']]/tei:TEI[" \
+                 "@type='original'] "
+    full_query = "descendant::tei:TEI/tei:TEI[@type='original']"
     for lesson in tqdm.tqdm(
-            as_tree.xpath("descendant::tei:TEI/tei:TEI[@type='original']", namespaces=namespaces)):
+            as_tree.xpath(test_query, namespaces=namespaces)):
         lesson_lang = lesson.xpath("descendant::tei:text/@xml:lang", namespaces=namespaces)[0]
         write_to_log(f"Lesson lang: {lesson_lang}")
         write_to_log(f"Corresponding concepts: {concepts[lesson_lang]}")
@@ -177,6 +185,7 @@ def main():
 
 def retrieve_translated_concepts(alignment_results, concepts, src_lang, tgt_lang, original_sent, translated_sent,
                                  concept_dict):
+    translated_sent = re.sub(r"\s+", " ", translated_sent)
     found = False
     keywords_in_sentence = []
     for concept in concepts[src_lang]:
@@ -324,5 +333,6 @@ if __name__ == '__main__':
     progressive_logging = False
     global log_list
     log_list = []
+    device = sys.argv[1]
     main()
     write_log_file(log_list)
