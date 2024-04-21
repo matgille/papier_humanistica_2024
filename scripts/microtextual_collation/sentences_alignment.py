@@ -3,14 +3,24 @@ import json
 import os
 import re
 import shutil
+import string
 import subprocess
-from bertalign.Bertalign import Bertalign
+
+from bertalign.bertalign.aligner import Bertalign
+from bertalign.bertalign.encoder import Encoder
+import bertalign.graph_merge as graph_merge
 import numpy as np
 import sys
 import lxml.etree as ET
+import pandas as pd
+
+models = {0: "distiluse-base-multilingual-cased-v2", 1: "LaBSE", 2: "Sonar"}
+model = Encoder(models[int(1)])
+model.load_model()
 
 
 # This scripts aims at aligning each lesson with its source (and between them?), sentence by sentence.
+
 
 def save_file(string, path):
     with open(path, "w") as output_file:
@@ -25,7 +35,12 @@ def pop_attribute(tree, xpath_expression, attribute_name):
         element.attrib.pop(attribute_name, None)
 
 
-def sentences_to_list(version):
+def sentences_to_list(version) -> tuple:
+    """
+    Takes XML tree, returns tokens nodes and index of sentences
+    :param version: 
+    :return: 
+    """
     list_of_sentences = []
     positions_and_ids = {}
     all_sents = version.xpath("descendant::tei:s", namespaces=namespaces)
@@ -63,10 +78,11 @@ def align_lessons(file, overwrite=False):
     print(file)
     main_tree = ET.parse(file)
     main_tree.xinclude()
-
-    all_tei_nodes = main_tree.xpath("/tei:TEI/tei:TEI[count(descendant::tei:TEI) > 1]", namespaces=namespaces)
+    working_xpath = "/tei:TEI/tei:TEI[count(descendant::tei:TEI) > 1]"
+    alt_xpath = "/tei:TEI/tei:TEI[descendant::tei:TEI[@xml:id='trabajar-con-paginas-web']]"
+    all_tei_nodes = main_tree.xpath(working_xpath, namespaces=namespaces)
     print(len(all_tei_nodes))
-    for lesson in all_tei_nodes:
+    for lesson in all_tei_nodes[12:]:
         print("New lesson")
         original_id = lesson.xpath("descendant::tei:TEI[@type='original']/@xml:id", namespaces=namespaces)[0]
         translations_id = lesson.xpath("descendant::tei:TEI[@type='translation']/@xml:id", namespaces=namespaces)
@@ -74,20 +90,40 @@ def align_lessons(file, overwrite=False):
         translations_as_xml_tree = lesson.xpath(
             "descendant::tei:TEI[@type='translation']",
             namespaces=namespaces)
+        original_lang = original_file.xpath("descendant::tei:text/@xml:lang", namespaces=namespaces)[0]
         if len(original_file) == 0 or len(translations_as_xml_tree) == 0:
             continue
+        corpus_as_dict = {}
         original_file_as_list, original_ids_as_dict = sentences_to_list(original_file)
+        corpus_as_dict[original_lang] = original_file_as_list
         print(f"Original file: {original_file}")
         all_translations_id = []
         all_translations = []
-        for version in translations_as_xml_tree:
+        all_langs = ['es', 'fr', 'pt']
+        
+        # This list allows to adapt the translation table produced at the end of the script
+        current_lesson_langs = ['en']
+        
+        # We sort the results to get an alphabetical order by language, to be able to retrieve the correct
+        # text when producing the translation table
+        translations_as_xml_tree[:] = sorted(translations_as_xml_tree,
+                                             key=lambda x: x.xpath("descendant::tei:text/@xml:lang",
+                                                                   namespaces=namespaces))
+        
+        # We create the objects that will be parsed to produce the alignment
+        # (list of sentences as text, as ids, list of langs)
+        for version_idx, version in enumerate(translations_as_xml_tree):
+            translation_lang = version.xpath("descendant::tei:text/@xml:lang", namespaces=namespaces)[0]
+            current_lesson_langs.append(translation_lang)
             all_translations.append(sentences_to_list(version)[0])
             all_translations_id.append(sentences_to_list(version)[1])
-
+            corpus_as_dict[translation_lang] = sentences_to_list(version)[0]
+        all_alignments = {}
         for translation_index, translation_as_list_of_sentences in enumerate(all_translations):
+            print(f"\n\nNew translation: {translations_id[translation_index]}\n---")
             current_translation_id = translations_id[translation_index]
-            print(current_translation_id)
-            
+            translation_lang = all_langs[translation_index]
+            print(translation_lang)
             # Test overwiting param, do nothing it file exists
             if overwrite:
                 pass
@@ -98,10 +134,11 @@ def align_lessons(file, overwrite=False):
                     continue
                 else:
                     pass
-            print(f"\n\nNew translation: {translations_id[translation_index]}\n---")
-            aligner = Bertalign(original_file_as_list, translation_as_list_of_sentences, max_align=3, win=5, skip=-.2)
+            aligner = Bertalign(model, original_file_as_list, translation_as_list_of_sentences, max_align=3, win=5,
+                                skip=-.2)
             aligner.align_sents()
             results = aligner.result
+            all_alignments[translation_index] = results
             save_file(json.dumps(results, cls=NpEncoder), f"/home/mgl/Documents/{current_translation_id}.json")
             with open(f"/home/mgl/Documents/{current_translation_id}.json", "r") as input_results:
                 results = json.load(input_results)
@@ -129,9 +166,12 @@ def align_lessons(file, overwrite=False):
 
             original_as_XML = original_file
             translation_as_xml = translations_as_xml_tree[translation_index]
-            # An xml base is being written before, we'll remove it.
+            
+            # An xml base is being written, we'll remove it.
             pop_attribute(original_file, "self::node()", "xml:base")
             pop_attribute(translation_as_xml, "self::node()", "xml:base")
+            
+            # Management of the tei:s nodes
             for original_sent_id, translated_sent_id in aligned_positions_and_ids:
                 # We start with the original file
                 try:
@@ -182,8 +222,6 @@ def align_lessons(file, overwrite=False):
                 id = sentence_without_corresp.xpath("@xml:id")[0]
                 corresponding_identifier = [orig for (orig, transl) in aligned_positions_and_ids
                                             if id in transl][0]
-                print(corresponding_identifier)
-                print(json.dumps({original_id: corresponding_identifier}))
                 sentence_without_corresp.set("corresp", json.dumps({original_id: corresponding_identifier}))
 
             os.makedirs(f"../../data/tei_sentences_aligned/{original_id}", exist_ok=True)
@@ -196,8 +234,76 @@ def align_lessons(file, overwrite=False):
                     as output_translation:
                 output_translation.write(
                     ET.tostring(translation_as_xml, pretty_print=True, encoding='utf8').decode('utf8'))
+        if all_alignments != {}:
+            list_of_merged_alignments = graph_merge.merge_alignment_table(all_alignments)
+            save_final_result(list_of_merged_alignments, corpus_as_dict, lesson_id=original_id,
+                              all_translation_langs=current_lesson_langs)
     shutil.copy("../../data/tei_sentences_tokenized/main.xml", "../../data/tei_sentences_aligned/main.xml")
     print("Done !")
+
+
+def save_final_result(merged_alignments: list, text_dict, lesson_id, all_translation_langs):
+    """
+    Saves result to csv file
+    """
+    try:
+        os.mkdir("../../data/alignment_tables")
+    except FileExistsError:
+        pass
+    try:
+        os.mkdir("../../data/alignment_tables/html")
+    except FileExistsError:
+        pass
+    try:
+        os.mkdir("../../data/alignment_tables/csv")
+    except FileExistsError:
+        pass
+
+    # We adapt the translation table to the number of translations
+    translation_table = {letter: lang for letter, lang in
+                         zip(string.ascii_lowercase[:len(all_translation_langs)], all_translation_langs)}
+
+    # Weird delimiter to avoid confusion
+    delimiter = "þ"
+    with open(f"../../data/alignment_tables/csv/{lesson_id}.csv", "w") as output_text:
+        print("Creating table")
+        print(len(merged_alignments))
+        print(merged_alignments)
+        for alignment_unit in merged_alignments:
+            print(f"\nNew alignment unit: {alignment_unit}")
+            for index, witness in enumerate(merged_alignments[0]):
+                print(f"New wit: {witness}")
+                try:
+                    merged_sents = " ".join(text_dict[translation_table[witness]][int(value)] for value in
+                                            alignment_unit[witness])
+                    output_text.write(merged_sents)
+                    print(f" Merged sentence: {merged_sents}")
+                    print(f"Lang: {translation_table[witness]}")
+                except KeyError:
+                    output_text.write("Key error")
+                    print("Key error")
+                except IndexError:
+                    print("Index error")
+                    output_text.write("Index error")
+                if index + 1 != len(merged_alignments[0]):
+                    output_text.write(delimiter)
+            output_text.write("\n")
+
+    # Convert the DataFrame to an HTML table
+    df = pd.read_csv(f"../../data/alignment_tables/csv/{lesson_id}.csv", names=None, delimiter=delimiter,
+                     engine='python')
+    html_table = df.to_html()
+    full_html_file = f"""<html>
+                      <head>
+                      <title>Alignement final</title>
+                        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+                        </head>
+                      <body>
+                      {html_table}
+                      </body>
+                </html>"""
+    with open(f"../../data/alignment_tables/html/{lesson_id}.html", "w") as output_html:
+        output_html.write(full_html_file)
 
 
 if __name__ == '__main__':
