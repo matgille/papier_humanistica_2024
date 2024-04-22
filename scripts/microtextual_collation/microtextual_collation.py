@@ -2,7 +2,7 @@ import json
 import os
 import re
 import sys
-
+import pandas as pd
 import torch
 import tqdm
 import transformers
@@ -329,7 +329,7 @@ def clean_text_from_tokens(sentence):
     return cleaned
 
 
-def create_concept_table(aligned_concepts: str):
+def create_concept_tables(aligned_concepts: str):
     with open(aligned_concepts, "r") as input_json:
         aligned_concepts_as_dict = json.load(input_json)
     langs = ['en', 'es', 'pt', 'fr']
@@ -360,7 +360,24 @@ def create_concept_table(aligned_concepts: str):
                     aligned_table.write("ø")
                 if index != (len(langs) - 1):
                     aligned_table.write(",")
+
             aligned_table.write("\n")
+            
+    df = pd.read_csv(f"../../data/aligned_concepts_table.csv", names=None, delimiter=',',
+                     engine='python')
+    html_table = df.to_html()
+    full_html_file = f"""<html>
+                          <head>
+                          <title>Alignement final</title>
+                            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+                            </head>
+                          <body>
+                          {html_table}
+                          </body>
+                    </html>"""
+
+    with open("../../data/aligned_concepts_table.html", "w") as aligned_table_html:
+        aligned_table_html.write(full_html_file)
 
 
 if __name__ == '__main__':
@@ -371,4 +388,4 @@ if __name__ == '__main__':
     device = sys.argv[1]
     align()
     write_log_file(log_list)
-    create_concept_table("../../data/aligned_concepts.json")
+    create_concept_tables("../../data/aligned_concepts.json")
