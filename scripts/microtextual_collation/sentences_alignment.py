@@ -80,10 +80,10 @@ def align_lessons(file, overwrite=False):
     main_tree = ET.parse(file)
     main_tree.xinclude()
     working_xpath = "/tei:TEI/tei:TEI[count(descendant::tei:TEI) > 1]"
-    alt_xpath = "/tei:TEI/tei:TEI[descendant::tei:TEI[@xml:id='trabajar-con-paginas-web']]"
-    all_tei_nodes = main_tree.xpath(working_xpath, namespaces=namespaces)
+    alt_xpath = "/tei:TEI/tei:TEI[descendant::tei:TEI[@xml:id='working-with-web-pages']]"
+    all_tei_nodes = main_tree.xpath(alt_xpath, namespaces=namespaces)
     print(len(all_tei_nodes))
-    for lesson in all_tei_nodes[12:]:
+    for lesson in all_tei_nodes:
         print("New lesson")
         original_id = lesson.xpath("descendant::tei:TEI[@type='original']/@xml:id", namespaces=namespaces)[0]
         translations_id = lesson.xpath("descendant::tei:TEI[@type='translation']/@xml:id", namespaces=namespaces)
@@ -328,6 +328,7 @@ def create_index_of_lessons():
 
     with open("../../index.html", "w") as output_file:
         output_file.write(index_as_html)
+        
 
 
 if __name__ == '__main__':
