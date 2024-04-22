@@ -80,13 +80,13 @@ def run_align(src, tgt, align_layer, threshold):
     return alignment_list
 
 
-
 def write_log_file(log_list):
     if progressive_logging is True:
         return
     else:
         with open(".logs/log.txt", "a") as log_file:
             log_file.write("\n".join(log_list))
+
 
 def write_to_log(string):
     global log_list
@@ -124,7 +124,7 @@ def main():
     as_tree = ET.parse(main_file)
     as_tree.xinclude()
     concepts_dictionary = dict()
-    test_query = "descendant::tei:TEI[descendant::tei:TEI[@xml:id='extrair-paginas-ilustradas-com-python']]/tei:TEI[" \
+    test_query = "descendant::tei:TEI[descendant::tei:TEI[@xml:id='working-with-web-pages']]/tei:TEI[" \
                  "@type='original'] "
     full_query = "descendant::tei:TEI/tei:TEI[@type='original']"
     for lesson in tqdm.tqdm(
@@ -195,7 +195,8 @@ def retrieve_translated_concepts(alignment_results, concepts, src_lang, tgt_lang
             continue
         elif concept_length == 1:
             if any([concept == word for word in original_sent.split(" ")]):
-                keywords_in_sentence.extend([(concept, index) for index, word in enumerate(original_sent.split(" ")) if concept == word])
+                keywords_in_sentence.extend(
+                    [(concept, index) for index, word in enumerate(original_sent.split(" ")) if concept == word])
                 found = True
         else:
             if any([ngram == concept for ngram in n_grams]):
@@ -216,7 +217,7 @@ def retrieve_translated_concepts(alignment_results, concepts, src_lang, tgt_lang
             # If the keyword is a composed word
             if " " in keyword:
                 write_to_log("Composed keyword")
-                
+
                 # Check with alignment table better, and index of matching element.
                 first_alignment_unit = start_index
                 last_alignment_unit = start_index + len(keyword.split(" "))
@@ -328,6 +329,40 @@ def clean_text_from_tokens(sentence):
     return cleaned
 
 
+def create_concept_table(aligned_concepts: str):
+    with open(aligned_concepts, "r") as input_json:
+        aligned_concepts_as_dict = json.load(input_json)
+    langs = ['en', 'es', 'pt', 'fr']
+    output_list = []
+    for concept, values in aligned_concepts_as_dict.items():
+        alignment_unit = {'en': [concept]}
+        for lang in langs:
+            for translation_lang, translation in values:
+                if lang == translation_lang:
+                    try:
+                        alignment_unit[translation_lang].append(translation)
+                    except AttributeError:
+                        alignment_unit[translation_lang] = [translation]
+                    except KeyError:
+                        alignment_unit[translation_lang] = [translation]
+                    alignment_unit[translation_lang] = sorted(alignment_unit[translation_lang])
+        output_list.append(alignment_unit)
+    output_list.sort(key=(lambda x: x['en']))
+    print(output_list)
+
+    with open("../../data/aligned_concepts_table.csv", "w") as aligned_table:
+        aligned_table.write(",".join(langs) + "\n")
+        for unit in output_list:
+            for index, lang in enumerate(langs):
+                try:
+                    aligned_table.write(" | ".join(unit[lang]).replace(",", ";"))
+                except KeyError:
+                    aligned_table.write("ø")
+                if index != (len(langs) - 1):
+                    aligned_table.write(",")
+            aligned_table.write("\n")
+
+
 if __name__ == '__main__':
     namespaces = {"tei": "http://www.tei-c.org/ns/1.0"}
     progressive_logging = False
@@ -336,3 +371,4 @@ if __name__ == '__main__':
     device = sys.argv[1]
     main()
     write_log_file(log_list)
+    create_concept_table("../../data/aligned_concepts.json")
