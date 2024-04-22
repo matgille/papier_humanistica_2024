@@ -34,7 +34,7 @@ def extract_terms():
             lang = lesson.xpath("descendant::tei:text/@xml:lang", namespaces=ns_decl)[0]
             all_words = text_from_tokens(paragraph)
             try:
-                identified_ents = model.predict_entities(all_words, labels['en'], threshold=0.3)
+                identified_ents = model.predict_entities(all_words, labels['en'], threshold=0.25)
             except  IndexError:
                 continue
             for entity in identified_ents:
