@@ -27,7 +27,7 @@ def extract_terms():
     all_entities = {}
     main_file = ET.parse("../../data/tei_sentences_tokenized/main.xml")
     main_file.xinclude()
-    for lesson in tqdm.tqdm(main_file.xpath("/tei:TEI/tei:TEI/tei:TEI", namespaces=ns_decl)):
+    for lesson in tqdm.tqdm(main_file.xpath("/tei:TEI/tei:TEI[descendant::tei:TEI[@xml:id='working-with-web-pages']]/tei:TEI", namespaces=ns_decl)):
         for paragraph in lesson.xpath("descendant::node()[self::tei:code or self::tei:item or self::tei:p or "
                                       "self::tei:head or self::tei:desc "
                                       " or self::tei:figDesc or self::tei:abstract]", namespaces=ns_decl):
