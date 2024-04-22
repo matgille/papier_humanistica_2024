@@ -301,6 +301,10 @@ def save_final_result(merged_alignments: list, text_dict, lesson_id, all_transla
                         </head>
                       <body>
                       {html_table}
+                      <ul>
+<li><a href="data/aligned_concepts_table.html">Table d'alignement des concepts</a></li>
+<li><a href="data/wikipedia_alignment_use_case.html">Exemple d'alignement avec Wikipédia (une leçon)</a></li>
+</ul>
                       </body>
                 </html>"""
     with open(f"../../data/alignment_tables/html/{lesson_id}.html", "w") as output_html:
