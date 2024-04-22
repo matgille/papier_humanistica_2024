@@ -110,7 +110,7 @@ def write_to_log(string):
             log_list.append(string)
 
 
-def main():
+def align():
     try:
         os.mkdir(".logs/")
     except FileExistsError:
@@ -164,7 +164,7 @@ def main():
                 write_to_log("\n\n")
                 write_to_log(f"Source text: '{source}'")
                 write_to_log(f"Target text: '{target}'")
-                align_layer = 6
+                align_layer = 8
                 threshold = .000001
                 alignment_results = run_align(source, target, align_layer, threshold)
                 write_to_log(alignment_results)
@@ -369,6 +369,6 @@ if __name__ == '__main__':
     global log_list
     log_list = []
     device = sys.argv[1]
-    main()
+    align()
     write_log_file(log_list)
     create_concept_table("../../data/aligned_concepts.json")
