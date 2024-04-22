@@ -18,7 +18,7 @@ def text_from_tokens(sentence):
 
 
 def extract_terms():
-    labels = {"en": ["methodological term", "technical term", "computer", "programming", "code", "informatics"], 
+    labels = {"en": ["technical term", "programming", "code", "informatics"], 
               "es": ["término metodológico","terminología técnica", "computadora", "ordenador", "código", "programación", "informática"],
               "fr": ["terme méthodologique","terme technique", "ordinateur", "programmation", "code", "informatique"],
               "pt": ["termo metodológico","termo técnico", "computador", "código", "programação", "informática"]}
