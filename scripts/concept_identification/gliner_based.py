@@ -5,7 +5,7 @@ from gliner import GLiNER
 import sys
 import lxml.etree as ET
 
-model = GLiNER.from_pretrained("urchade/gliner_multi-v2.1")
+model = GLiNER.from_pretrained("urchade/gliner_large-v2.1")
 
 ns_decl = {"tei": "http://www.tei-c.org/ns/1.0"}
 
