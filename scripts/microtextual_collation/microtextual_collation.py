@@ -165,7 +165,7 @@ def align():
                 write_to_log(f"Source text: '{source}'")
                 write_to_log(f"Target text: '{target}'")
                 align_layer = 8
-                threshold = .000001
+                threshold = .001
                 alignment_results = run_align(source, target, align_layer, threshold)
                 write_to_log(alignment_results)
                 concepts_dictionary = merge_dicts(concepts_dictionary,
