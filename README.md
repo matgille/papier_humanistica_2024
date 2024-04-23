@@ -5,7 +5,7 @@ Auteur·ices: Matthias Gille Levenson, Célian Ringwald, Marie Flesch, Jennifer 
 
 Article présenté à la conférence Humanistica 2024, le 3 mai 2024. 
 
-Les résultats de l'alignement sont disponible (sans garantie sur le futur) à l'adresse suivante: 
+Une visualisation HTML des résultats de l'alignement est disponible (sans garantie sur le futur) à l'adresse suivante: 
 
 https://matgille.github.io/papier_humanistica_2024/
 
