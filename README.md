@@ -11,3 +11,15 @@ https://matgille.github.io/papier_humanistica_2024/
 
 
  
+![Pipeline](https://github.com/matgille/papier_humanistica_2024/blob/main/HumanisticaPipeline.png)
+--- 
+If you use the code or cite our work, please reference this one as follows ) :
+```
+@inproceedings{levenson2024connecter,
+  title={Connecter les chapitres linguistiques de Programming Historian?},
+  author={Levenson, Matthias Gille and Ringwald, Celian and Flesch, Marie and Isasi, Jennifer and Papastamkou, Sofia and Quiroga, Riva and Valentine, David},
+  booktitle={Humanistica 2024},
+  year={2024}
+}
+
+```
